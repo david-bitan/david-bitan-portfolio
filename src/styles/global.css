@@ -60,18 +60,21 @@ body {
   display: flex;
   width: max-content;
   animation: marquee 28s linear infinite;
+  will-change: transform;
 }
 
 .marquee-mask:hover .marquee-track {
   animation-play-state: paused;
 }
 
+/* Track is 3 identical copies back to back; translating exactly one third
+   lines the second copy up with the first, so the loop point is invisible. */
 @keyframes marquee {
   from {
     transform: translateX(0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translateX(-33.3333%);
   }
 }
 

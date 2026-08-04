@@ -9,7 +9,10 @@ const employers = [
 	'Arc Interactive',
 	'Mench',
 ];
-const track = [...employers, ...employers];
+// Tripled (not doubled) so the strip never runs out of content mid-loop on
+// wide screens — two copies can be narrower than the viewport, leaving a
+// visible gap right before the seamless wrap.
+const track = [...employers, ...employers, ...employers];
 ---
 
 <section class="overflow-hidden py-14" data-reveal>

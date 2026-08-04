@@ -8,7 +8,7 @@ const city = 'Ashkelon, Israel';
 	<h2 class="text-4xl font-extrabold tracking-tight sm:text-6xl">Let's build something.</h2>
 
 	<div class="mt-10 flex flex-wrap items-center justify-center gap-3">
-		<a href={`mailto:${email}`} class="text-xl font-semibold hover:text-accent transition-colors sm:text-2xl">
+		<a href={`mailto:${email}`} class="text-xl font-semibold text-accent hover:underline sm:text-2xl">
 			{email}
 		</a>
 		<button
@@ -27,7 +27,7 @@ const city = 'Ashkelon, Israel';
 	</div>
 
 	<div class="mt-6 flex flex-col items-center gap-1 text-muted">
-		<a href={`tel:${phone.replace(/\D/g, '')}`} class="hover:text-ink transition-colors">{phone}</a>
+		<a href={`tel:${phone.replace(/\D/g, '')}`} class="text-accent hover:underline">{phone}</a>
 		<p>{city}</p>
 	</div>
 </section>

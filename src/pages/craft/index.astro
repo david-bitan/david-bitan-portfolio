@@ -3,10 +3,9 @@ import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import ContactCTA from '../../components/ContactCTA.astro';
 import { craftItems } from '../../data/craftItems';
-import { cld } from '../../lib/cloudinary';
+import { cld, SQUARE } from '../../lib/cloudinary';
 
 const categories = ['All', ...Array.from(new Set(craftItems.map((c) => c.category)))];
-const SQUARE = 'c_fill,ar_1:1,g_auto,q_auto,f_auto,w_600';
 ---
 
 <Layout title="Craft — David Bitan">
