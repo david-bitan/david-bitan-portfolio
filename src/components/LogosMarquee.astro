@@ -1,0 +1,28 @@
+---
+const employers = [
+	'Publicis Group',
+	'Ryze Beyond',
+	'Smart.bid',
+	'Wochat',
+	'Gamingtech',
+	'Tradologic',
+	'Arc Interactive',
+	'Mench',
+];
+const track = [...employers, ...employers];
+---
+
+<section class="overflow-hidden py-14" data-reveal>
+	<p class="mb-8 text-center text-xs font-semibold uppercase tracking-widest text-muted">
+		20 years across these companies
+	</p>
+	<div class="marquee-mask">
+		<div class="marquee-track">
+			{
+				track.map((name) => (
+					<span class="shrink-0 px-8 text-xl font-bold text-black/25 whitespace-nowrap">{name}</span>
+				))
+			}
+		</div>
+	</div>
+</section>

@@ -1,0 +1,37 @@
+---
+const skills = [
+	'User Research & Usability Testing',
+	'A/B Testing, Personas, Journey Mapping',
+	'Design systems (variants, auto layout, nested components)',
+	'WCAG accessibility',
+	'AI-augmented workflow (Claude, ChatGPT, Midjourney, Figma AI)',
+	'HTML5 / CSS3 (Flexbox & Grid)',
+	'3D & motion (Cinema 4D, After Effects, SVGator)',
+];
+---
+
+<section id="about" class="mx-auto max-w-6xl px-6 py-20 sm:py-28" data-reveal>
+	<div class="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
+		<p class="text-2xl font-medium leading-relaxed tracking-tight sm:text-3xl">
+			20 years designing products across fintech, gaming, and AI-first startups. Scaled Ryze
+			Beyond design from 32 to 110 employees, consolidated a 3-designer team into a single senior
+			role through AI-augmented workflows.
+		</p>
+
+		<div>
+			<ul class="flex flex-col gap-4">
+				{
+					skills.map((skill) => (
+						<li class="flex items-start gap-3 text-muted">
+							<span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+							<span>{skill}</span>
+						</li>
+					))
+				}
+			</ul>
+			<a href="/about" class="mt-6 inline-block text-sm font-semibold hover:text-accent transition-colors">
+				More about me →
+			</a>
+		</div>
+	</div>
+</section>

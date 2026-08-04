@@ -1,0 +1,54 @@
+---
+const email = 'advance26@gmail.com';
+const phone = '054-9-248-520';
+const city = 'Ashkelon, Israel';
+---
+
+<section id="contact" class="mx-auto max-w-6xl px-6 py-24 text-center sm:py-32" data-reveal>
+	<h2 class="text-4xl font-extrabold tracking-tight sm:text-6xl">Let's build something.</h2>
+
+	<div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+		<a href={`mailto:${email}`} class="text-xl font-semibold hover:text-accent transition-colors sm:text-2xl">
+			{email}
+		</a>
+		<button
+			id="copy-email"
+			type="button"
+			data-email={email}
+			aria-label="Copy email address"
+			class="flex items-center gap-2 rounded-pill border border-ink/15 px-4 py-2 text-sm font-medium hover:border-ink/40 transition-colors"
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<rect x="9" y="9" width="13" height="13" rx="2"></rect>
+				<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+			</svg>
+			<span id="copy-email-label">Copy email</span>
+		</button>
+	</div>
+
+	<div class="mt-6 flex flex-col items-center gap-1 text-muted">
+		<a href={`tel:${phone.replace(/\D/g, '')}`} class="hover:text-ink transition-colors">{phone}</a>
+		<p>{city}</p>
+	</div>
+</section>
+
+<script>
+	const button = document.getElementById('copy-email');
+	const label = document.getElementById('copy-email-label');
+
+	button?.addEventListener('click', async () => {
+		const email = button.getAttribute('data-email') ?? '';
+		try {
+			await navigator.clipboard.writeText(email);
+			if (label) {
+				const original = label.textContent;
+				label.textContent = 'Copied!';
+				setTimeout(() => {
+					label.textContent = original;
+				}, 2000);
+			}
+		} catch {
+			// clipboard API unavailable — user can still select the email link above
+		}
+	});
+</script>

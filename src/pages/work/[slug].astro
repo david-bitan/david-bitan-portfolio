@@ -1,0 +1,62 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import ContactCTA from '../../components/ContactCTA.astro';
+import { allProjects } from '../../data/allProjects';
+import { cld, LANDSCAPE } from '../../lib/cloudinary';
+
+export function getStaticPaths() {
+	return allProjects.map((project) => ({
+		params: { slug: project.slug },
+		props: { project },
+	}));
+}
+
+const { project } = Astro.props;
+---
+
+<Layout title={`${project.title} — David Bitan`}>
+	<Nav />
+
+	<article class="mx-auto max-w-6xl px-6 pt-16 pb-20 sm:pt-20" data-reveal>
+		<a href="/work" class="text-sm font-semibold text-muted hover:text-ink transition-colors">← All work</a>
+
+		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">{project.category}</p>
+		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">{project.title}</h1>
+		<p class="mt-4 max-w-2xl text-lg text-muted">{project.shortDesc}</p>
+
+		<div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
+			<span><span class="font-semibold text-ink">Client</span> · {project.client}</span>
+			<span><span class="font-semibold text-ink">Year</span> · {project.year}</span>
+		</div>
+
+		<div class="mt-6 flex flex-wrap gap-2">
+			{
+				project.tags.map((tag) => (
+					<span class="rounded-pill bg-card px-3 py-1 text-xs font-medium text-muted">{tag}</span>
+				))
+			}
+		</div>
+
+		<p class="mt-10 max-w-3xl whitespace-pre-line leading-relaxed text-ink">{project.fullDesc}</p>
+	</article>
+
+	<section class="mx-auto max-w-6xl px-6 pb-24" data-reveal>
+		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+			{
+				project.gallery.map((url) => (
+					<div class="overflow-hidden rounded-md bg-card">
+						<img
+							src={cld(url, LANDSCAPE)}
+							alt={project.title}
+							loading="lazy"
+							class="h-full w-full object-cover"
+						/>
+					</div>
+				))
+			}
+		</div>
+	</section>
+
+	<ContactCTA />
+</Layout>
