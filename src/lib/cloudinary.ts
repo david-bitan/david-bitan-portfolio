@@ -33,11 +33,13 @@ export const FIT_TALL = 'c_limit,h_800,q_auto:best,f_auto';
 // squishing tall images into a tiny letterbox.
 export const FULL = 'c_limit,w_2400,q_auto:best,f_auto';
 
-// Lightbox main image, TALL (mobile screenshots up to 16000px high). Bumped
-// from h_800 to h_2400 for the same retina reason. c_limit keeps the "never
-// upscale past source" contract — Cloudinary just serves the source when it
-// is smaller than the cap.
-export const FULL_TALL = 'c_limit,h_2400,q_auto:best,f_auto';
+// Lightbox main image, TALL (mobile screenshots up to 16000px high).
+// Was `c_limit,h_2400`, but that capped HEIGHT — a 375x16000 source came out
+// 56x2400px (a squished sliver). Switched to `c_scale,w_1200` which caps
+// WIDTH (upscales narrow mobile sources to a legible ~1200px wide) and lets
+// HEIGHT grow proportionally — the lightbox scrolls the tall image vertically
+// like a real phone screen.
+export const FULL_TALL = 'c_scale,w_1200,q_auto:best,f_auto';
 
 // Build a srcset spanning 1200 → 3200 CSS px, so the browser picks the
 // right density for the current viewport / DPR instead of the biggest one
