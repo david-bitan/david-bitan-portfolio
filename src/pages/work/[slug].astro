@@ -4,7 +4,7 @@ import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import Lightbox from '../../components/Lightbox.astro';
 import { allProjects } from '../../data/allProjects';
-import { cld, LANDSCAPE, FIT_TALL, isMobileShot } from '../../lib/cloudinary';
+import { cld, LANDSCAPE } from '../../lib/cloudinary';
 
 export function getStaticPaths() {
 	return allProjects.map((project) => ({
@@ -45,37 +45,24 @@ const { project } = Astro.props;
 	<section class="mx-auto max-w-[1200px] px-6 pb-24" data-reveal>
 		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 			{
-				project.gallery.map((url, i) =>
-					isMobileShot(url) ? (
-						// Tall phone screenshots: fit whole shot, never crop or upscale it
-						// into a landscape frame — that's what pixelates them.
-						<button
-							type="button"
-							data-lightbox-trigger={i}
-							class="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md bg-card p-3"
-						>
-							<img
-								src={cld(url, FIT_TALL)}
-								alt={project.title}
-								loading="lazy"
-								class="h-full w-auto max-w-full object-contain"
-							/>
-						</button>
-					) : (
-						<button
-							type="button"
-							data-lightbox-trigger={i}
-							class="aspect-[4/3] overflow-hidden rounded-md bg-card"
-						>
-							<img
-								src={cld(url, LANDSCAPE)}
-								alt={project.title}
-								loading="lazy"
-								class="h-full w-full object-cover object-top"
-							/>
-						</button>
-					)
-				)
+				project.gallery.map((url, i) => (
+					// Uniform 4/3 crop for every thumbnail — desktop AND mobile.
+					// LANDSCAPE preset uses c_fill,ar_4:3,g_north so tall mobile shots
+					// show their TOP (status bar + first UI screen) instead of the
+					// old "thin sliver on whitespace" look from object-contain.
+					<button
+						type="button"
+						data-lightbox-trigger={i}
+						class="aspect-[4/3] overflow-hidden rounded-md bg-card"
+					>
+						<img
+							src={cld(url, LANDSCAPE)}
+							alt={project.title}
+							loading="lazy"
+							class="h-full w-full object-cover object-top"
+						/>
+					</button>
+				))
 			}
 		</div>
 	</section>
