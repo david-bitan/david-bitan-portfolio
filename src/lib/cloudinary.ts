@@ -25,3 +25,8 @@ export const SQUARE = 'c_fill,ar_1:1,g_north,q_auto:best,f_auto,w_800';
 // (fl_no_upscale would express the same intent on top of c_fit, but this
 // Cloudinary account rejects it with a 400, so c_limit is used instead.)
 export const FIT_TALL = 'c_limit,h_800,q_auto:best,f_auto';
+
+// Lightbox main image: never crop, never upscale, whatever the source shape.
+// c_limit fits within the box (wide box for landscape shots, effectively a
+// height cap for narrow tall ones) — one transform works for both.
+export const FULL = 'c_limit,w_1600,h_1600,q_auto:best,f_auto';

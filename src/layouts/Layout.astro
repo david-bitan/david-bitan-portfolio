@@ -23,6 +23,18 @@ const { title = 'David Bitan — Senior Product Designer' } = Astro.props;
 			rel="stylesheet"
 		/>
 		<title>{title}</title>
+		<script is:inline>
+			// Runs before body paint to avoid a light→dark flash. Light is the
+			// default — only a saved "dark" preference switches it, never OS
+			// detection.
+			try {
+				if (localStorage.getItem('theme') === 'dark') {
+					document.documentElement.setAttribute('data-theme', 'dark');
+				}
+			} catch {
+				// localStorage unavailable (private mode, etc.) — default to light
+			}
+		</script>
 	</head>
 	<body>
 		<slot />

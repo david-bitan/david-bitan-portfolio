@@ -17,7 +17,7 @@ const heights = ['sm:h-[480px]', 'sm:h-[400px]'];
 	<div class="flex flex-col gap-8">
 		<a
 			href={`/work/${hero.slug}`}
-			class="group flex flex-col overflow-hidden rounded-md border border-transparent bg-card transition-all hover:-translate-y-1 hover:border-accent sm:h-[420px] sm:flex-row"
+			class="group flex flex-col overflow-hidden rounded-md bg-card sm:h-[420px] sm:flex-row"
 		>
 			<div class="h-64 overflow-hidden sm:h-full sm:w-3/5">
 				<img
@@ -47,7 +47,7 @@ const heights = ['sm:h-[480px]', 'sm:h-[400px]'];
 				rest.map((project, i) => (
 					<a
 						href={`/work/${project.slug}`}
-						class={`group flex h-[400px] flex-col overflow-hidden rounded-md border border-transparent bg-card transition-all hover:-translate-y-1 hover:border-accent ${heights[i]}`}
+						class={`group flex h-[400px] flex-col overflow-hidden rounded-md bg-card ${heights[i]}`}
 					>
 						<div class="flex-1 overflow-hidden">
 							<img

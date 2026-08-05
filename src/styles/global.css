@@ -21,6 +21,17 @@
   --color-footer-muted: #8a8680;
 }
 
+/* Dark mode: same warm-charcoal family as the footer, not navy/cold gray.
+   Accent orange is deliberately not overridden — it stays #F25C24 in both
+   modes. Toggled via [data-theme] on <html>, set by the script in
+   Layout.astro (localStorage-persisted, light by default — no OS detection). */
+:root[data-theme='dark'] {
+  --color-bg: #262624;
+  --color-ink: #f5f4f0;
+  --color-muted: #9c9a95;
+  --color-card: #30302e;
+}
+
 html {
   /* Prevents the off-canvas mobile nav (translate-x-full) from creating
      document-level horizontal scroll below the lg breakpoint. */
@@ -31,6 +42,16 @@ body {
   background-color: var(--color-bg);
   color: var(--color-ink);
   font-family: var(--font-sans);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+* {
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Scroll reveal: toggled by IntersectionObserver in Layout.astro */
