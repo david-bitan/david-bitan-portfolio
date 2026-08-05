@@ -15,9 +15,14 @@ export function isMobileShot(url: string): boolean {
 // land anywhere.
 // "Large" cards (Selected Work grid, Work grid, case-study gallery) get enough
 // width to stay sharp at 2x pixel density; "small" thumbnails (Craft grid) get less.
-export const PORTRAIT = 'c_fill,ar_3:4,g_north,q_auto:best,f_auto,w_1200';
-export const LANDSCAPE = 'c_fill,ar_4:3,g_north,q_auto:best,f_auto,w_1200';
-export const SQUARE = 'c_fill,ar_1:1,g_north,q_auto:best,f_auto,w_800';
+// Quality policy: David's Cloudinary uploads are already WebP q=90. Passing
+// them through Cloudinary's default `q_auto:best` (~85) re-compresses them,
+// noticeably softening UI screenshots (menus, text, thin lines). We force
+// `q_100` so Cloudinary re-encodes at the maximum quality — bigger files,
+// but the visual fidelity matches what David sees in Figma.
+export const PORTRAIT = 'c_fill,ar_3:4,g_north,q_100,f_auto,w_1200';
+export const LANDSCAPE = 'c_fill,ar_4:3,g_north,q_100,f_auto,w_1200';
+export const SQUARE = 'c_fill,ar_1:1,g_north,q_100,f_auto,w_800';
 
 // For mobile screenshots INSIDE the project-page grid thumbnail (aspect 4/3
 // frame, ~280px CSS wide at 4-col): h_800 is enough. c_limit only ever
@@ -25,13 +30,13 @@ export const SQUARE = 'c_fill,ar_1:1,g_north,q_auto:best,f_auto,w_800';
 // stay sharp inside the small frame.
 // (fl_no_upscale would express the same intent on top of c_fit, but this
 // Cloudinary account rejects it with a 400, so c_limit is used instead.)
-export const FIT_TALL = 'c_limit,h_800,q_auto:best,f_auto';
+export const FIT_TALL = 'c_limit,h_800,q_100,f_auto';
 
 // Lightbox main image, LANDSCAPE. Bumped from w_1600 to w_2400 because the
 // old cap made a 1200px-CSS-wide lightbox look upscaled and blurry on any
 // retina / 2K / 4K display. The h_1600 cap was also removed — it was
 // squishing tall images into a tiny letterbox.
-export const FULL = 'c_limit,w_2400,q_auto:best,f_auto';
+export const FULL = 'c_limit,w_2400,q_100,f_auto';
 
 // Lightbox main image, TALL (mobile screenshots up to 16000px high).
 // Was `c_limit,h_2400`, but that capped HEIGHT — a 375x16000 source came out
@@ -39,20 +44,25 @@ export const FULL = 'c_limit,w_2400,q_auto:best,f_auto';
 // WIDTH (upscales narrow mobile sources to a legible ~1200px wide) and lets
 // HEIGHT grow proportionally — the lightbox scrolls the tall image vertically
 // like a real phone screen.
-export const FULL_TALL = 'c_scale,w_1200,q_auto:best,f_auto';
+// c_limit (never upscale) instead of c_scale — David's rule: no upscale ever.
+// A tall mobile source narrower than 1200px is served at its true native
+// width; the browser handles fit-to-viewport in the (now unused) lightbox.
+export const FULL_TALL = 'c_limit,w_1200,q_100,f_auto';
 
 // Mobile screenshot preset for the project-page grid. Rendered at 375px CSS
-// (the true native width of the source designs). The 2x variant covers
-// retina; the 3x variant covers high-DPR laptops (MacBook Pro, Pixel, etc.).
-// c_scale upscales past the source when needed — we accept Cloudinary's
-// bicubic interpolation over the browser's blockier stretch, and the design
-// remains legible because a 375-wide phone UI has generous type sizes to
-// begin with.
-export const MOBILE = 'c_scale,w_750,q_auto:best,f_auto';
+// (the true native width of the source designs). c_limit (never upscale) is
+// non-negotiable per David — we accept that on retina the browser stretches
+// the 375 source to 750 device pixels rather than serving an interpolated
+// 750-wide file, because interpolated upscales look worse than a straight
+// browser stretch on UI mockups (soft type, halos on borders).
+export const MOBILE = 'c_limit,w_800,q_100,f_auto';
 
+// srcset only proposes widths ≤ source width — nothing that would trigger
+// Cloudinary upscaling. The browser picks between 375 (fits any DPR≥1
+// viewport) and 800 (best it can do with the native source).
 export function mobileSrcset(url: string): string {
-	return [375, 750, 1125]
-		.map((w) => `${cld(url, `c_scale,w_${w},q_auto:best,f_auto`)} ${w}w`)
+	return [375, 800]
+		.map((w) => `${cld(url, `c_limit,w_${w},q_100,f_auto`)} ${w}w`)
 		.join(', ');
 }
 
@@ -62,6 +72,6 @@ export function mobileSrcset(url: string): string {
 // width so a single high-res version is simpler.
 export function landscapeSrcset(url: string): string {
 	return [1200, 1800, 2400, 3200]
-		.map((w) => `${cld(url, `c_limit,w_${w},q_auto:best,f_auto`)} ${w}w`)
+		.map((w) => `${cld(url, `c_limit,w_${w},q_100,f_auto`)} ${w}w`)
 		.join(', ');
 }

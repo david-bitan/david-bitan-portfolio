@@ -7,10 +7,10 @@ interface Props {
 
 const { zones } = Astro.props;
 
-// Build the filter pill row dynamically from the zones actually present on
-// this page. Sonary Dashboard (4 zones) → All · Desktop · Mobile · Light · Dark.
-// A 2-zone project → All · Desktop · Mobile. A 1-zone Gallery-only project →
-// no filters rendered at all.
+// Two independent filter groups — a Device choice AND a Theme choice can be
+// combined (e.g. Desktop + Dark → shows only the "Desktop · Dark" zone).
+// Sonary Dashboard shows both groups. A 2-zone project without theme split
+// shows only the Device group. A Gallery-only project shows nothing.
 const labels = zones.map((z) => z.label);
 const hasDesktop = labels.some((l) => /desktop/i.test(l));
 const hasMobile = labels.some((l) => /mobile/i.test(l));
@@ -18,14 +18,22 @@ const hasLight = labels.some((l) => /light/i.test(l));
 const hasDark = labels.some((l) => /dark/i.test(l));
 
 type Filter = { key: string; label: string };
-const filters: Filter[] = [{ key: 'all', label: 'All' }];
-if (hasDesktop) filters.push({ key: 'desktop', label: 'Desktop' });
-if (hasMobile) filters.push({ key: 'mobile', label: 'Mobile' });
-if (hasLight) filters.push({ key: 'light', label: 'Light' });
-if (hasDark) filters.push({ key: 'dark', label: 'Dark' });
 
-// A single "All" pill isn't a filter — skip the bar entirely.
-const showBar = filters.length > 1;
+const deviceOptions: Filter[] = [];
+if (hasDesktop || hasMobile) {
+	deviceOptions.push({ key: 'all', label: 'All' });
+	if (hasDesktop) deviceOptions.push({ key: 'desktop', label: 'Desktop' });
+	if (hasMobile) deviceOptions.push({ key: 'mobile', label: 'Mobile' });
+}
+
+const themeOptions: Filter[] = [];
+if (hasLight || hasDark) {
+	themeOptions.push({ key: 'all', label: 'All' });
+	if (hasLight) themeOptions.push({ key: 'light', label: 'Light' });
+	if (hasDark) themeOptions.push({ key: 'dark', label: 'Dark' });
+}
+
+const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 ---
 
 {
@@ -34,42 +42,84 @@ const showBar = filters.length > 1;
 			id="zone-filters-bar"
 			class="sticky top-[68px] z-30 w-full border-y border-ink/10 bg-bg/95 backdrop-blur"
 		>
-			<div class="mx-auto flex max-w-[1200px] flex-wrap gap-2 px-6 py-3">
-				{filters.map((f, i) => (
-					<button
-						type="button"
-						data-zone-filter={f.key}
-						data-active={i === 0 ? 'true' : 'false'}
-						class="zone-filter-btn rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
-					>
-						{f.label}
-					</button>
-				))}
+			<div class="mx-auto flex max-w-[1200px] flex-col gap-3 px-6 py-3 sm:flex-row sm:items-center sm:gap-8">
+				{deviceOptions.length > 1 && (
+					<div class="flex flex-wrap items-center gap-2">
+						<span class="text-[11px] font-semibold uppercase tracking-widest text-muted">Device</span>
+						{deviceOptions.map((f, i) => (
+							<button
+								type="button"
+								data-filter-group="device"
+								data-filter-key={f.key}
+								data-active={i === 0 ? 'true' : 'false'}
+								class="zone-filter-btn rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
+							>
+								{f.label}
+							</button>
+						))}
+					</div>
+				)}
+
+				{themeOptions.length > 1 && (
+					<div class="flex flex-wrap items-center gap-2">
+						<span class="text-[11px] font-semibold uppercase tracking-widest text-muted">Theme</span>
+						{themeOptions.map((f, i) => (
+							<button
+								type="button"
+								data-filter-group="theme"
+								data-filter-key={f.key}
+								data-active={i === 0 ? 'true' : 'false'}
+								class="zone-filter-btn rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
+							>
+								{f.label}
+							</button>
+						))}
+					</div>
+				)}
 			</div>
 		</div>
 	)
 }
 
 <script>
-	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('.zone-filter-btn'));
-	// Sections opt into filtering by carrying data-zone-label={{ zone.label }}.
-	// The pill's data-zone-filter key is matched case-insensitively against
-	// the label — "desktop" matches "Desktop · Dark", "dark" matches both
-	// Desktop · Dark and Mobile · Dark, etc.
-	const sections = Array.from(document.querySelectorAll<HTMLElement>('section[data-zone-label]'));
+	const deviceBtns = Array.from(
+		document.querySelectorAll<HTMLButtonElement>('[data-filter-group="device"]'),
+	);
+	const themeBtns = Array.from(
+		document.querySelectorAll<HTMLButtonElement>('[data-filter-group="theme"]'),
+	);
+	const sections = Array.from(
+		document.querySelectorAll<HTMLElement>('section[data-zone-label]'),
+	);
 
-	function applyFilter(key: string) {
-		buttons.forEach((b) => {
-			b.dataset.active = b.dataset.zoneFilter === key ? 'true' : 'false';
+	let selectedDevice = 'all';
+	let selectedTheme = 'all';
+
+	function apply() {
+		deviceBtns.forEach((b) => {
+			b.dataset.active = b.dataset.filterKey === selectedDevice ? 'true' : 'false';
+		});
+		themeBtns.forEach((b) => {
+			b.dataset.active = b.dataset.filterKey === selectedTheme ? 'true' : 'false';
 		});
 		sections.forEach((sec) => {
 			const label = (sec.dataset.zoneLabel || '').toLowerCase();
-			const show = key === 'all' || label.includes(key);
-			sec.classList.toggle('hidden', !show);
+			const matchDevice = selectedDevice === 'all' || label.includes(selectedDevice);
+			const matchTheme = selectedTheme === 'all' || label.includes(selectedTheme);
+			sec.classList.toggle('hidden', !(matchDevice && matchTheme));
 		});
 	}
 
-	buttons.forEach((btn) =>
-		btn.addEventListener('click', () => applyFilter(btn.dataset.zoneFilter || 'all')),
+	deviceBtns.forEach((b) =>
+		b.addEventListener('click', () => {
+			selectedDevice = b.dataset.filterKey || 'all';
+			apply();
+		}),
+	);
+	themeBtns.forEach((b) =>
+		b.addEventListener('click', () => {
+			selectedTheme = b.dataset.filterKey || 'all';
+			apply();
+		}),
 	);
 </script>

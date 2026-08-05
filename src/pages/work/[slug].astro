@@ -72,18 +72,14 @@ const zones = groupImagesByZone(project.gallery);
 					zone.isMobile ? (
 						// Mobile shots at their true native width (375px CSS). A 2-col
 						// grid on ≥sm gives each phone shot a generous card around it
-						// (bg-card + p-8). srcset x1/x2/x3 covers retina without any
-						// bogus CSS downscale — the image renders pixel-accurate to
-						// the original design. Click opens the full-quality image in
-						// a new tab (browser's own zoom is better than any custom lightbox).
+						// (bg-card + p-8). Images are NOT clickable — David's rule:
+						// clicking opened a new tab with the source URL, but on mobile
+						// designs the browser upscaled the 375px source to fill the
+						// window, which looked awful and also broke the "stay on site"
+						// UX. In-page is the final render.
 						<div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
 							{zone.images.map(({ url }) => (
-								<a
-									href={cld(url, MOBILE)}
-									target="_blank"
-									rel="noopener"
-									class="group flex items-start justify-center overflow-hidden rounded-lg bg-card p-6 transition-transform hover:scale-[1.005] sm:p-8"
-								>
+								<div class="flex items-start justify-center overflow-hidden rounded-lg bg-card p-6 sm:p-8">
 									<img
 										src={cld(url, MOBILE)}
 										srcset={mobileSrcset(url)}
@@ -93,30 +89,30 @@ const zones = groupImagesByZone(project.gallery);
 										width="375"
 										class="mx-auto h-auto w-[375px] max-w-full"
 									/>
-								</a>
+								</div>
 							))}
 						</div>
 					) : (
 						// Desktop shots: stacked full-width, one per row. srcset covers
-						// 2K/4K/retina without upscaling a 1200px asset. Click opens
-						// full-quality in a new tab.
+						// 2K/4K/retina without upscaling a 1200px asset.
+						// NO rounded corners and NO bg on the wrapper — corners would
+						// clip whatever pixels are at the mockup's actual edges and
+						// leak the site background through (dark strip in dark mode).
+						// Straight edges let each mockup's own native shape (rounded
+						// or not) show through unmodified. Not clickable (same reason
+						// as mobile — no source-upscale in a new tab).
 						<div class="mt-12 space-y-10">
 							{zone.images.map(({ url }) => (
-								<a
-									href={cld(url, FULL)}
-									target="_blank"
-									rel="noopener"
-									class="block w-full overflow-hidden rounded-lg bg-card"
-								>
+								<div class="w-full">
 									<img
 										src={cld(url, FULL)}
 										srcset={landscapeSrcset(url)}
 										sizes="(min-width: 1280px) 1200px, 100vw"
 										alt={project.title}
 										loading="lazy"
-										class="h-auto w-full"
+										class="block h-auto w-full"
 									/>
-								</a>
+								</div>
 							))}
 						</div>
 					)

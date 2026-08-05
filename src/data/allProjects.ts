@@ -24,7 +24,10 @@ export const allProjects: FullProject[] = [
 		category: 'SaaS',
 		shortDesc: `SaaS de gestion des abonnements logiciels, avec design system complet dark/light et flows AI.`,
 		fullDesc: `PLACEHOLDER : Case study complet Sonary Dashboard. Contexte : Ryze Beyond a lancé Sonary pour aider les équipes à tracker et optimiser leurs abonnements SaaS (comme Hubspot, Adobe, Zoom, GitHub). Rôle : Product designer solo, de la recherche utilisateur au shipping. Livrables : design system complet (dark + light mode), 6 features majeures (Software Stack, Calculators, User Settings, Login, Dashboard, AI Chat Bot), architecture responsive full-width Desktop 1920 + Laptop 1280 + Tablet 992 + Mobile 375, gestion des états (empty, loading, filters, multi-select, modals), 96+ frames livrées. Impact : produit clé dans la line Ryze Beyond, contribue au revenue growth.`,
-		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342017/portfolio/sonary-dashboard/01---software-stack-page/desktop/dark-mode/dashboard---grid-with-all-columns-1.webp',
+		// Homepage thumb switched to the real Dashboard screen (the 4 gradient
+		// stat cards + donut + spend timeline) — more recognizable than the
+		// software-stack table for a first impression.
+		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342119/portfolio/sonary-dashboard/07---dashboard/desktop/dark-mode/dashboard.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785342017/portfolio/sonary-dashboard/01---software-stack-page/desktop/dark-mode/dashboard---grid-with-all-columns-1.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342019/portfolio/sonary-dashboard/01---software-stack-page/desktop/dark-mode/dashboard---grid-with-all-columns.webp',
