@@ -4,6 +4,18 @@ const links = [
 	{ href: '/about', label: 'About' },
 	{ href: '/contact', label: 'Contact' },
 ];
+
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+
+// Projects points to the home page's Work section — active on "/" but stays
+// clickable so its anchor-scroll keeps working.
+// About and Contact are actual pages — active AND disabled when we're on them.
+function activeState(href: string) {
+	if (href === '/#work') return pathname === '/' ? 'active' : null;
+	if (href === '/about') return pathname === '/about' ? 'active-locked' : null;
+	if (href === '/contact') return pathname === '/contact' ? 'active-locked' : null;
+	return null;
+}
 ---
 
 <header class="sticky top-0 z-50 border-b border-ink/5 bg-bg/80 backdrop-blur">
@@ -12,11 +24,23 @@ const links = [
 
 		<div class="hidden items-center gap-8 lg:flex">
 			{
-				links.map((link) => (
-					<a href={link.href} class="text-sm font-medium text-muted hover:text-ink transition-colors">
-						{link.label}
-					</a>
-				))
+				links.map((link) => {
+					const state = activeState(link.href);
+					const isLocked = state === 'active-locked';
+					const isActive = state !== null;
+					const cls = isActive
+						? 'nav-link nav-link-active text-sm font-semibold text-accent'
+						: 'nav-link text-sm font-medium text-muted hover:text-ink transition-colors';
+					return isLocked ? (
+						<span aria-current="page" class={cls}>
+							{link.label}
+						</span>
+					) : (
+						<a href={link.href} aria-current={isActive ? 'page' : undefined} class={cls}>
+							{link.label}
+						</a>
+					);
+				})
 			}
 		</div>
 
@@ -62,13 +86,47 @@ const links = [
 		</svg>
 	</button>
 	{
-		links.map((link) => (
-			<a href={link.href} class="mobile-nav-link text-3xl font-semibold">
-				{link.label}
-			</a>
-		))
+		links.map((link) => {
+			const state = activeState(link.href);
+			const isLocked = state === 'active-locked';
+			const isActive = state !== null;
+			const cls = isActive
+				? 'mobile-nav-link nav-link-active text-3xl font-semibold text-accent'
+				: 'mobile-nav-link text-3xl font-semibold';
+			return isLocked ? (
+				<span aria-current="page" class={cls}>
+					{link.label}
+				</span>
+			) : (
+				<a href={link.href} aria-current={isActive ? 'page' : undefined} class={cls}>
+					{link.label}
+				</a>
+			);
+		})
 	}
 </div>
+
+<style>
+	/* Active nav item: orange text (applied inline) + underline bar sized to
+	   the word only. Locked variant disables interaction on the current page. */
+	.nav-link-active {
+		position: relative;
+	}
+	.nav-link-active::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: -6px;
+		height: 2px;
+		background: var(--color-accent);
+		border-radius: 1px;
+	}
+	span.nav-link-active {
+		cursor: default;
+		pointer-events: none;
+	}
+</style>
 
 <script>
 	const toggle = document.getElementById('nav-toggle');
