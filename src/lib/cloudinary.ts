@@ -41,13 +41,20 @@ export const FULL = 'c_limit,w_2400,q_auto:best,f_auto';
 // like a real phone screen.
 export const FULL_TALL = 'c_scale,w_1200,q_auto:best,f_auto';
 
-// Native-size preset: never upscale past the source. Used for mobile thumbs
-// in the project-page grid where we render the phone shot at ~280–320px CSS
-// wide — a source of 375px is already enough, and c_scale up to 1200 would
-// waste bandwidth and (worse) look soft when the browser downscales an
-// interpolated image. `c_limit` guarantees the source is served as-is if it
-// fits under the cap.
-export const NATIVE = 'c_limit,w_800,q_auto:best,f_auto';
+// Mobile screenshot preset for the project-page grid. Rendered at 375px CSS
+// (the true native width of the source designs). The 2x variant covers
+// retina; the 3x variant covers high-DPR laptops (MacBook Pro, Pixel, etc.).
+// c_scale upscales past the source when needed — we accept Cloudinary's
+// bicubic interpolation over the browser's blockier stretch, and the design
+// remains legible because a 375-wide phone UI has generous type sizes to
+// begin with.
+export const MOBILE = 'c_scale,w_750,q_auto:best,f_auto';
+
+export function mobileSrcset(url: string): string {
+	return [375, 750, 1125]
+		.map((w) => `${cld(url, `c_scale,w_${w},q_auto:best,f_auto`)} ${w}w`)
+		.join(', ');
+}
 
 // Build a srcset spanning 1200 → 3200 CSS px, so the browser picks the
 // right density for the current viewport / DPR instead of the biggest one
