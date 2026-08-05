@@ -19,14 +19,32 @@ export const PORTRAIT = 'c_fill,ar_3:4,g_north,q_auto:best,f_auto,w_1200';
 export const LANDSCAPE = 'c_fill,ar_4:3,g_north,q_auto:best,f_auto,w_1200';
 export const SQUARE = 'c_fill,ar_1:1,g_north,q_auto:best,f_auto,w_800';
 
-// For mobile screenshots: fit the whole shot (no crop, no forced aspect
-// ratio), capped by height. c_limit only ever downscales — never crops,
-// never upscales past the source — which is what keeps these from pixelating.
+// For mobile screenshots INSIDE the project-page grid thumbnail (aspect 4/3
+// frame, ~280px CSS wide at 4-col): h_800 is enough. c_limit only ever
+// downscales — never crops, never upscales past the source — so tall shots
+// stay sharp inside the small frame.
 // (fl_no_upscale would express the same intent on top of c_fit, but this
 // Cloudinary account rejects it with a 400, so c_limit is used instead.)
 export const FIT_TALL = 'c_limit,h_800,q_auto:best,f_auto';
 
-// Lightbox main image: never crop, never upscale, whatever the source shape.
-// c_limit fits within the box (wide box for landscape shots, effectively a
-// height cap for narrow tall ones) — one transform works for both.
-export const FULL = 'c_limit,w_1600,h_1600,q_auto:best,f_auto';
+// Lightbox main image, LANDSCAPE. Bumped from w_1600 to w_2400 because the
+// old cap made a 1200px-CSS-wide lightbox look upscaled and blurry on any
+// retina / 2K / 4K display. The h_1600 cap was also removed — it was
+// squishing tall images into a tiny letterbox.
+export const FULL = 'c_limit,w_2400,q_auto:best,f_auto';
+
+// Lightbox main image, TALL (mobile screenshots up to 16000px high). Bumped
+// from h_800 to h_2400 for the same retina reason. c_limit keeps the "never
+// upscale past source" contract — Cloudinary just serves the source when it
+// is smaller than the cap.
+export const FULL_TALL = 'c_limit,h_2400,q_auto:best,f_auto';
+
+// Build a srcset spanning 1200 → 3200 CSS px, so the browser picks the
+// right density for the current viewport / DPR instead of the biggest one
+// every time. Landscape only — tall mobile screenshots have a fixed narrow
+// width so a single high-res version is simpler.
+export function landscapeSrcset(url: string): string {
+	return [1200, 1800, 2400, 3200]
+		.map((w) => `${cld(url, `c_limit,w_${w},q_auto:best,f_auto`)} ${w}w`)
+		.join(', ');
+}

@@ -1,5 +1,5 @@
 ---
-import { cld, FULL, SQUARE, isMobileShot } from '../lib/cloudinary';
+import { cld, FULL, FULL_TALL, SQUARE, isMobileShot, landscapeSrcset } from '../lib/cloudinary';
 
 interface Props {
 	images: string[];
@@ -72,7 +72,11 @@ const { images, title } = Astro.props;
 
 <script
 	define:vars={{
-		items: images.map((url) => ({ full: cld(url, FULL), tall: isMobileShot(url) })),
+		items: images.map((url) => ({
+			full: cld(url, isMobileShot(url) ? FULL_TALL : FULL),
+			srcset: isMobileShot(url) ? null : landscapeSrcset(url),
+			tall: isMobileShot(url),
+		})),
 		title,
 	}}
 >
@@ -93,6 +97,14 @@ const { images, title } = Astro.props;
 
 		const img = document.createElement('img');
 		img.src = item.full;
+		if (item.srcset) {
+			img.srcset = item.srcset;
+			// Lightbox stage caps at ~1200px CSS wide on desktop (max-w-[1200px]
+			// centered inside the padded stage). The browser picks a source from
+			// srcset based on this hint * DPR — 2K@1x picks 1200w, 4K/retina
+			// picks 2400w or 3200w, and a 1080p phone picks a smaller one.
+			img.sizes = '(min-width: 1280px) 1200px, 100vw';
+		}
 		img.alt = title;
 
 		if (item.tall) {
