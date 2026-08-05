@@ -31,6 +31,10 @@ const { title = 'David Bitan — Senior Product Designer' } = Astro.props;
 
 <script>
 	const targets = document.querySelectorAll('[data-reveal]');
+	// threshold: 0 + a bottom rootMargin (not a % threshold) so this triggers
+	// consistently regardless of section height — a percentage threshold like
+	// 0.15 can never be satisfied by a section taller than ~6x the viewport
+	// (e.g. a 96-image case-study gallery), leaving it permanently invisible.
 	const observer = new IntersectionObserver(
 		(entries) => {
 			for (const entry of entries) {
@@ -40,7 +44,7 @@ const { title = 'David Bitan — Senior Product Designer' } = Astro.props;
 				}
 			}
 		},
-		{ threshold: 0.15 }
+		{ threshold: 0, rootMargin: '0px 0px -10% 0px' }
 	);
 	targets.forEach((target) => observer.observe(target));
 </script>

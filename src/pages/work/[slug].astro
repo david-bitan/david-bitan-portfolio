@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import ContactCTA from '../../components/ContactCTA.astro';
 import { allProjects } from '../../data/allProjects';
-import { cld, LANDSCAPE } from '../../lib/cloudinary';
+import { cld, LANDSCAPE, FIT_TALL, isMobileShot } from '../../lib/cloudinary';
 
 export function getStaticPaths() {
 	return allProjects.map((project) => ({
@@ -44,16 +44,29 @@ const { project } = Astro.props;
 	<section class="mx-auto max-w-6xl px-6 pb-24" data-reveal>
 		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
 			{
-				project.gallery.map((url) => (
-					<div class="overflow-hidden rounded-md bg-card">
-						<img
-							src={cld(url, LANDSCAPE)}
-							alt={project.title}
-							loading="lazy"
-							class="h-full w-full object-cover"
-						/>
-					</div>
-				))
+				project.gallery.map((url) =>
+					isMobileShot(url) ? (
+						// Tall phone screenshots: fit whole shot, never crop or upscale it
+						// into a landscape frame — that's what pixelates them.
+						<div class="flex items-center justify-center overflow-hidden rounded-md bg-card p-4">
+							<img
+								src={cld(url, FIT_TALL)}
+								alt={project.title}
+								loading="lazy"
+								class="max-h-[640px] w-auto max-w-full object-contain"
+							/>
+						</div>
+					) : (
+						<div class="aspect-[4/3] overflow-hidden rounded-md bg-card">
+							<img
+								src={cld(url, LANDSCAPE)}
+								alt={project.title}
+								loading="lazy"
+								class="h-full w-full object-cover object-top"
+							/>
+						</div>
+					)
+				)
 			}
 		</div>
 	</section>
