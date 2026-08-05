@@ -50,9 +50,7 @@ const zones = groupImagesByZone(project.gallery);
 		<p class="mt-10 max-w-3xl whitespace-pre-line leading-relaxed text-ink">{project.fullDesc}</p>
 	</article>
 
-	<div class="mx-auto max-w-[1200px] px-6">
-		<ZoneFilters zones={zones} />
-	</div>
+	<ZoneFilters zones={zones} />
 
 	{
 		zones.map((zone) => (
