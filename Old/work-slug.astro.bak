@@ -43,7 +43,7 @@ const { project } = Astro.props;
 	</article>
 
 	<section class="mx-auto max-w-[1200px] px-6 pb-24" data-reveal>
-		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
 			{
 				project.gallery.map((url, i) =>
 					isMobileShot(url) ? (
@@ -52,13 +52,13 @@ const { project } = Astro.props;
 						<button
 							type="button"
 							data-lightbox-trigger={i}
-							class="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md bg-card p-3"
+							class="flex items-center justify-center overflow-hidden rounded-md bg-card p-4"
 						>
 							<img
 								src={cld(url, FIT_TALL)}
 								alt={project.title}
 								loading="lazy"
-								class="h-full w-auto max-w-full object-contain"
+								class="max-h-[640px] w-auto max-w-full object-contain"
 							/>
 						</button>
 					) : (
