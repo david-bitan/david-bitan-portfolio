@@ -1,6 +1,11 @@
 ---
 import { featuredProjects } from '../data/projects';
-import ProjectCard from './ProjectCard.astro';
+import { cld, LANDSCAPE, PORTRAIT } from '../lib/cloudinary';
+
+const [hero, ...rest] = featuredProjects;
+// Slight height variety per card — a lightweight nod to a Pinterest-style
+// bento — but every card still gets a hard cap so the row never runs away.
+const heights = ['sm:h-[480px]', 'sm:h-[400px]'];
 ---
 
 <section id="work" class="mx-auto max-w-6xl px-6 py-20 sm:py-28" data-reveal>
@@ -9,7 +14,58 @@ import ProjectCard from './ProjectCard.astro';
 		<a href="/work" class="text-sm font-semibold text-accent hover:underline">View all →</a>
 	</div>
 
-	<div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-		{featuredProjects.map((project) => <ProjectCard project={project} />)}
+	<div class="flex flex-col gap-8">
+		<a
+			href={`/work/${hero.slug}`}
+			class="group flex flex-col overflow-hidden rounded-md border border-transparent bg-card transition-all hover:-translate-y-1 hover:border-accent sm:h-[420px] sm:flex-row"
+		>
+			<div class="h-64 overflow-hidden sm:h-full sm:w-3/5">
+				<img
+					src={cld(hero.thumbnail, LANDSCAPE)}
+					alt={hero.title}
+					loading="lazy"
+					class="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+				/>
+			</div>
+			<div class="flex flex-1 flex-col justify-center gap-3 p-8 sm:p-10">
+				<span class="text-xs font-semibold uppercase tracking-widest text-muted">{hero.category}</span>
+				<h3 class="text-2xl font-bold tracking-tight sm:text-3xl">{hero.title}</h3>
+				<p class="text-sm text-muted">{hero.client} · {hero.year}</p>
+				<p class="text-muted">{hero.shortDesc}</p>
+				<div class="mt-2 flex flex-wrap gap-2">
+					{
+						hero.tags.slice(0, 3).map((tag) => (
+							<span class="rounded-pill bg-bg px-3 py-1 text-xs font-medium text-muted">{tag}</span>
+						))
+					}
+				</div>
+			</div>
+		</a>
+
+		<div class="grid grid-cols-1 gap-8 sm:grid-cols-2">
+			{
+				rest.map((project, i) => (
+					<a
+						href={`/work/${project.slug}`}
+						class={`group flex h-[400px] flex-col overflow-hidden rounded-md border border-transparent bg-card transition-all hover:-translate-y-1 hover:border-accent ${heights[i]}`}
+					>
+						<div class="flex-1 overflow-hidden">
+							<img
+								src={cld(project.thumbnail, PORTRAIT)}
+								alt={project.title}
+								loading="lazy"
+								class="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+							/>
+						</div>
+						<div class="shrink-0 p-5">
+							<p class="font-semibold">{project.title}</p>
+							<p class="mt-1 text-sm text-muted">
+								{project.client} · {project.year}
+							</p>
+						</div>
+					</a>
+				))
+			}
+		</div>
 	</div>
 </section>

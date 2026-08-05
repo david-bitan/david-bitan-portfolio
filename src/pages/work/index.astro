@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import ContactCTA from '../../components/ContactCTA.astro';
+import Footer from '../../components/Footer.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import { allProjects } from '../../data/allProjects';
 
@@ -40,6 +41,7 @@ const categories = ['All', ...Array.from(new Set(allProjects.map((p) => p.catego
 	</section>
 
 	<ContactCTA />
+	<Footer />
 </Layout>
 
 <style>

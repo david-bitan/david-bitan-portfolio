@@ -14,6 +14,11 @@
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-pill: 999px;
+
+  /* Footer: warm dark charcoal (Claude-interface style), not navy/pure black */
+  --color-footer-bg: #1c1b1a;
+  --color-footer-ink: #f2f1ef;
+  --color-footer-muted: #8a8680;
 }
 
 html {

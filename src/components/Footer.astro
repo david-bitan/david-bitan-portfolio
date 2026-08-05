@@ -1,0 +1,16 @@
+---
+const email = 'advance26@gmail.com';
+const phone = '054-9-248-520';
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-footer-bg px-6 py-20 text-center">
+	<p class="text-sm font-medium text-footer-muted">
+		<a href={`mailto:${email}`} class="text-accent hover:underline">{email}</a>
+		<span class="mx-3">·</span>
+		<a href={`tel:${phone.replace(/\D/g, '')}`} class="text-accent hover:underline">{phone}</a>
+		<span class="mx-3">·</span>
+		<span class="text-footer-ink">Israel</span>
+	</p>
+	<p class="mt-6 text-xs text-footer-muted">© {year} David Bitan. All rights reserved.</p>
+</footer>
