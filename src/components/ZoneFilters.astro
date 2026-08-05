@@ -1,0 +1,75 @@
+---
+import type { Zone } from '../lib/zones';
+
+interface Props {
+	zones: Zone[];
+}
+
+const { zones } = Astro.props;
+
+// Build the filter pill row dynamically from the zones actually present on
+// this page. Sonary Dashboard (4 zones) → All · Desktop · Mobile · Light · Dark.
+// A 2-zone project → All · Desktop · Mobile. A 1-zone Gallery-only project →
+// no filters rendered at all.
+const labels = zones.map((z) => z.label);
+const hasDesktop = labels.some((l) => /desktop/i.test(l));
+const hasMobile = labels.some((l) => /mobile/i.test(l));
+const hasLight = labels.some((l) => /light/i.test(l));
+const hasDark = labels.some((l) => /dark/i.test(l));
+
+type Filter = { key: string; label: string };
+const filters: Filter[] = [{ key: 'all', label: 'All' }];
+if (hasDesktop) filters.push({ key: 'desktop', label: 'Desktop' });
+if (hasMobile) filters.push({ key: 'mobile', label: 'Mobile' });
+if (hasLight) filters.push({ key: 'light', label: 'Light' });
+if (hasDark) filters.push({ key: 'dark', label: 'Dark' });
+
+// A single "All" pill isn't a filter — skip the bar entirely.
+const showBar = filters.length > 1;
+---
+
+{
+	showBar && (
+		<div
+			id="zone-filters-bar"
+			class="sticky top-[68px] z-30 -mx-6 border-y border-ink/10 bg-bg/95 px-6 py-3 backdrop-blur"
+		>
+			<div class="mx-auto flex max-w-[1200px] flex-wrap gap-2">
+				{filters.map((f, i) => (
+					<button
+						type="button"
+						data-zone-filter={f.key}
+						data-active={i === 0 ? 'true' : 'false'}
+						class="zone-filter-btn rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
+					>
+						{f.label}
+					</button>
+				))}
+			</div>
+		</div>
+	)
+}
+
+<script>
+	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('.zone-filter-btn'));
+	// Sections opt into filtering by carrying data-zone-label={{ zone.label }}.
+	// The pill's data-zone-filter key is matched case-insensitively against
+	// the label — "desktop" matches "Desktop · Dark", "dark" matches both
+	// Desktop · Dark and Mobile · Dark, etc.
+	const sections = Array.from(document.querySelectorAll<HTMLElement>('section[data-zone-label]'));
+
+	function applyFilter(key: string) {
+		buttons.forEach((b) => {
+			b.dataset.active = b.dataset.zoneFilter === key ? 'true' : 'false';
+		});
+		sections.forEach((sec) => {
+			const label = (sec.dataset.zoneLabel || '').toLowerCase();
+			const show = key === 'all' || label.includes(key);
+			sec.classList.toggle('hidden', !show);
+		});
+	}
+
+	buttons.forEach((btn) =>
+		btn.addEventListener('click', () => applyFilter(btn.dataset.zoneFilter || 'all')),
+	);
+</script>

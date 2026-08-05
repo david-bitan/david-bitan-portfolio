@@ -41,6 +41,14 @@ export const FULL = 'c_limit,w_2400,q_auto:best,f_auto';
 // like a real phone screen.
 export const FULL_TALL = 'c_scale,w_1200,q_auto:best,f_auto';
 
+// Native-size preset: never upscale past the source. Used for mobile thumbs
+// in the project-page grid where we render the phone shot at ~280–320px CSS
+// wide — a source of 375px is already enough, and c_scale up to 1200 would
+// waste bandwidth and (worse) look soft when the browser downscales an
+// interpolated image. `c_limit` guarantees the source is served as-is if it
+// fits under the cap.
+export const NATIVE = 'c_limit,w_800,q_auto:best,f_auto';
+
 // Build a srcset spanning 1200 → 3200 CSS px, so the browser picks the
 // right density for the current viewport / DPR instead of the biggest one
 // every time. Landscape only — tall mobile screenshots have a fixed narrow

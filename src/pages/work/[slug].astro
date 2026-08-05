@@ -3,8 +3,9 @@ import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import Lightbox from '../../components/Lightbox.astro';
+import ZoneFilters from '../../components/ZoneFilters.astro';
 import { allProjects } from '../../data/allProjects';
-import { cld, FULL, FULL_TALL, landscapeSrcset } from '../../lib/cloudinary';
+import { cld, FULL, NATIVE, landscapeSrcset } from '../../lib/cloudinary';
 import { groupImagesByZone, zoneDescription } from '../../lib/zones';
 
 export function getStaticPaths() {
@@ -16,7 +17,7 @@ export function getStaticPaths() {
 
 const { project } = Astro.props;
 // Phase D — Behance-style layout: each project page is split into responsive
-// "zones" (Desktop·Dark / Desktop·Light / Mobile·Dark / Mobile·Light for
+// "zones" (Desktop·Light / Desktop·Dark / Mobile·Light / Mobile·Dark for
 // Sonary Dashboard; Desktop / Mobile for simpler projects; a single Gallery
 // for legacy Wix imports). See src/lib/zones.ts for the classifier.
 const zones = groupImagesByZone(project.gallery);
@@ -48,10 +49,15 @@ const zones = groupImagesByZone(project.gallery);
 		<p class="mt-10 max-w-3xl whitespace-pre-line leading-relaxed text-ink">{project.fullDesc}</p>
 	</article>
 
+	<div class="mx-auto max-w-[1200px] px-6">
+		<ZoneFilters zones={zones} />
+	</div>
+
 	{
 		zones.map((zone) => (
 			<section
-				class="mx-auto mt-24 max-w-[1200px] border-t border-ink/10 px-6 pt-24"
+				data-zone-label={zone.label}
+				class="mx-auto mt-24 max-w-[1200px] scroll-mt-32 border-t border-ink/10 px-6 pt-24"
 				data-reveal
 			>
 				<header class="grid grid-cols-12 gap-8">
@@ -65,22 +71,25 @@ const zones = groupImagesByZone(project.gallery);
 
 				{
 					zone.isMobile ? (
-						// Mobile shots: 3-col grid (portrait sources ~375×800, laid out
-						// side-by-side so a phone screen doesn't take the full page width).
-						// FULL_TALL = c_scale,w_1200 upscales the narrow source enough to
-						// stay sharp on retina inside a ~380px CSS tile.
+						// Mobile shots at their native size. Each tile is a padded card
+						// (bg-card) with the phone screenshot centered at max-w-[280px].
+						// NATIVE preset uses c_limit,w_800 so Cloudinary never upscales
+						// past the source (typically 375px wide) — zero interpolation,
+						// crisp on every DPR. The tile gets breathing room instead of
+						// being stretched full-width, which is what caused the previous
+						// "pixellated / soft" look.
 						<div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
 							{zone.images.map(({ url, globalIndex }) => (
 								<button
 									type="button"
 									data-lightbox-trigger={globalIndex}
-									class="block overflow-hidden rounded-lg bg-card"
+									class="group flex items-start justify-center overflow-hidden rounded-lg bg-card p-6 transition-transform hover:scale-[1.01] sm:p-8"
 								>
 									<img
-										src={cld(url, FULL_TALL)}
+										src={cld(url, NATIVE)}
 										alt={project.title}
 										loading="lazy"
-										class="h-auto w-full"
+										class="h-auto w-full max-w-[280px]"
 									/>
 								</button>
 							))}

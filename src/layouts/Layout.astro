@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import BackToTop from '../components/BackToTop.astro';
 
 interface Props {
 	title?: string;
@@ -38,6 +39,7 @@ const { title = 'David Bitan — Senior Product Designer' } = Astro.props;
 	</head>
 	<body>
 		<slot />
+		<BackToTop />
 	</body>
 </html>
 

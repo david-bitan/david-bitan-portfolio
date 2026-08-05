@@ -1,0 +1,32 @@
+---
+// Floating "scroll to top" button. Hidden until the user has scrolled past
+// ~400px, then fades in bottom-right. One instance per page — placed in the
+// Layout so every route gets it for free.
+---
+
+<button
+	id="back-to-top"
+	type="button"
+	aria-label="Back to top"
+	class="pointer-events-none fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-ink opacity-0 shadow-lg transition-opacity duration-200 hover:opacity-90"
+>
+	<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+		<path d="M12 19V5M5 12l7-7 7 7"></path>
+	</svg>
+</button>
+
+<script>
+	const btn = document.getElementById('back-to-top');
+	if (btn) {
+		const onScroll = () => {
+			const show = window.scrollY > 400;
+			btn.classList.toggle('opacity-0', !show);
+			btn.classList.toggle('pointer-events-none', !show);
+			btn.classList.toggle('opacity-100', show);
+			btn.classList.toggle('pointer-events-auto', show);
+		};
+		window.addEventListener('scroll', onScroll, { passive: true });
+		onScroll();
+		btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+	}
+</script>
