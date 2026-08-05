@@ -4,7 +4,8 @@ import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import Lightbox from '../../components/Lightbox.astro';
 import { allProjects } from '../../data/allProjects';
-import { cld, LANDSCAPE } from '../../lib/cloudinary';
+import { cld, FULL, FULL_TALL, landscapeSrcset } from '../../lib/cloudinary';
+import { groupImagesByZone, zoneDescription } from '../../lib/zones';
 
 export function getStaticPaths() {
 	return allProjects.map((project) => ({
@@ -14,12 +15,17 @@ export function getStaticPaths() {
 }
 
 const { project } = Astro.props;
+// Phase D — Behance-style layout: each project page is split into responsive
+// "zones" (Desktop·Dark / Desktop·Light / Mobile·Dark / Mobile·Light for
+// Sonary Dashboard; Desktop / Mobile for simpler projects; a single Gallery
+// for legacy Wix imports). See src/lib/zones.ts for the classifier.
+const zones = groupImagesByZone(project.gallery);
 ---
 
 <Layout title={`${project.title} — David Bitan`}>
 	<Nav />
 
-	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-20 sm:pt-20" data-reveal>
+	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20" data-reveal>
 		<a href="/#work" class="text-sm font-semibold text-accent hover:underline">← Back to work</a>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">{project.category}</p>
@@ -42,30 +48,72 @@ const { project } = Astro.props;
 		<p class="mt-10 max-w-3xl whitespace-pre-line leading-relaxed text-ink">{project.fullDesc}</p>
 	</article>
 
-	<section class="mx-auto max-w-[1200px] px-6 pb-24" data-reveal>
-		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-			{
-				project.gallery.map((url, i) => (
-					// Uniform 4/3 crop for every thumbnail — desktop AND mobile.
-					// LANDSCAPE preset uses c_fill,ar_4:3,g_north so tall mobile shots
-					// show their TOP (status bar + first UI screen) instead of the
-					// old "thin sliver on whitespace" look from object-contain.
-					<button
-						type="button"
-						data-lightbox-trigger={i}
-						class="aspect-[4/3] overflow-hidden rounded-md bg-card"
-					>
-						<img
-							src={cld(url, LANDSCAPE)}
-							alt={project.title}
-							loading="lazy"
-							class="h-full w-full object-cover object-top"
-						/>
-					</button>
-				))
-			}
-		</div>
-	</section>
+	{
+		zones.map((zone) => (
+			<section
+				class="mx-auto mt-24 max-w-[1200px] border-t border-ink/10 px-6 pt-24"
+				data-reveal
+			>
+				<header class="grid grid-cols-12 gap-8">
+					<h2 class="col-span-12 text-3xl font-extrabold tracking-tight text-ink sm:col-span-4 sm:text-4xl">
+						{zone.label}
+					</h2>
+					<p class="col-span-12 text-lg leading-relaxed text-muted sm:col-span-6 sm:col-start-7">
+						{zoneDescription(zone.label, zone.images.length)}
+					</p>
+				</header>
+
+				{
+					zone.isMobile ? (
+						// Mobile shots: 3-col grid (portrait sources ~375×800, laid out
+						// side-by-side so a phone screen doesn't take the full page width).
+						// FULL_TALL = c_scale,w_1200 upscales the narrow source enough to
+						// stay sharp on retina inside a ~380px CSS tile.
+						<div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+							{zone.images.map(({ url, globalIndex }) => (
+								<button
+									type="button"
+									data-lightbox-trigger={globalIndex}
+									class="block overflow-hidden rounded-lg bg-card"
+								>
+									<img
+										src={cld(url, FULL_TALL)}
+										alt={project.title}
+										loading="lazy"
+										class="h-auto w-full"
+									/>
+								</button>
+							))}
+						</div>
+					) : (
+						// Desktop shots: stacked full-width, one per row. Uses the same
+						// srcset the lightbox uses so 2K/4K/retina all get a matching
+						// resolution instead of upscaling a 1200px asset.
+						<div class="mt-12 space-y-10">
+							{zone.images.map(({ url, globalIndex }) => (
+								<button
+									type="button"
+									data-lightbox-trigger={globalIndex}
+									class="block w-full overflow-hidden rounded-lg bg-card"
+								>
+									<img
+										src={cld(url, FULL)}
+										srcset={landscapeSrcset(url)}
+										sizes="(min-width: 1280px) 1200px, 100vw"
+										alt={project.title}
+										loading="lazy"
+										class="h-auto w-full"
+									/>
+								</button>
+							))}
+						</div>
+					)
+				}
+			</section>
+		))
+	}
+
+	<div class="pb-24"></div>
 
 	<Lightbox images={project.gallery} title={project.title} />
 	<Footer />
