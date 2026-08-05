@@ -7,14 +7,13 @@ const links = [
 
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
 
-// Projects points to the home page's Work section — active on "/" but stays
-// clickable so its anchor-scroll keeps working.
-// About and Contact are actual pages — active AND disabled when we're on them.
-function activeState(href: string) {
-	if (href === '/#work') return pathname === '/' ? 'active' : null;
-	if (href === '/about') return pathname === '/about' ? 'active-locked' : null;
-	if (href === '/contact') return pathname === '/contact' ? 'active-locked' : null;
-	return null;
+// The link matching the current page is active AND non-clickable —
+// applies uniformly to Projects (home), About, and Contact.
+function isActive(href: string) {
+	if (href === '/#work') return pathname === '/';
+	if (href === '/about') return pathname === '/about';
+	if (href === '/contact') return pathname === '/contact';
+	return false;
 }
 ---
 
@@ -25,18 +24,16 @@ function activeState(href: string) {
 		<div class="hidden items-center gap-8 lg:flex">
 			{
 				links.map((link) => {
-					const state = activeState(link.href);
-					const isLocked = state === 'active-locked';
-					const isActive = state !== null;
-					const cls = isActive
+					const active = isActive(link.href);
+					const cls = active
 						? 'nav-link nav-link-active text-sm font-semibold text-accent'
 						: 'nav-link text-sm font-medium text-muted hover:text-ink transition-colors';
-					return isLocked ? (
+					return active ? (
 						<span aria-current="page" class={cls}>
 							{link.label}
 						</span>
 					) : (
-						<a href={link.href} aria-current={isActive ? 'page' : undefined} class={cls}>
+						<a href={link.href} class={cls}>
 							{link.label}
 						</a>
 					);
@@ -87,18 +84,16 @@ function activeState(href: string) {
 	</button>
 	{
 		links.map((link) => {
-			const state = activeState(link.href);
-			const isLocked = state === 'active-locked';
-			const isActive = state !== null;
-			const cls = isActive
+			const active = isActive(link.href);
+			const cls = active
 				? 'mobile-nav-link nav-link-active text-3xl font-semibold text-accent'
 				: 'mobile-nav-link text-3xl font-semibold';
-			return isLocked ? (
+			return active ? (
 				<span aria-current="page" class={cls}>
 					{link.label}
 				</span>
 			) : (
-				<a href={link.href} aria-current={isActive ? 'page' : undefined} class={cls}>
+				<a href={link.href} class={cls}>
 					{link.label}
 				</a>
 			);
