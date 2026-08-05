@@ -36,6 +36,13 @@ html {
   /* Prevents the off-canvas mobile nav (translate-x-full) from creating
      document-level horizontal scroll below the lg breakpoint. */
   overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {

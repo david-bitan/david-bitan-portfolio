@@ -19,7 +19,7 @@ const { project } = Astro.props;
 <Layout title={`${project.title} — David Bitan`}>
 	<Nav />
 
-	<article class="mx-auto max-w-6xl px-6 pt-16 pb-20 sm:pt-20" data-reveal>
+	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-20 sm:pt-20" data-reveal>
 		<a href="/#work" class="text-sm font-semibold text-accent hover:underline">← Back to work</a>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">{project.category}</p>
@@ -42,7 +42,7 @@ const { project } = Astro.props;
 		<p class="mt-10 max-w-3xl whitespace-pre-line leading-relaxed text-ink">{project.fullDesc}</p>
 	</article>
 
-	<section class="mx-auto max-w-6xl px-6 pb-24" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 pb-24" data-reveal>
 		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
 			{
 				project.gallery.map((url, i) =>

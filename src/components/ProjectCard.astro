@@ -1,5 +1,5 @@
 ---
-import { cld, PORTRAIT, LANDSCAPE } from '../lib/cloudinary';
+import { cld, LANDSCAPE } from '../lib/cloudinary';
 import type { FullProject } from '../data/allProjects';
 
 interface Props {
@@ -14,18 +14,16 @@ const { project } = Astro.props;
 	data-category={project.category}
 	class="group block overflow-hidden rounded-md bg-card"
 >
-	<div class={project.orientation === 'portrait' ? 'aspect-[3/4]' : 'aspect-[4/3]'}>
+	<div class="aspect-[4/3] overflow-hidden">
 		<img
-			src={cld(project.thumbnail, project.orientation === 'portrait' ? PORTRAIT : LANDSCAPE)}
+			src={cld(project.thumbnail, LANDSCAPE)}
 			alt={project.title}
 			loading="lazy"
 			class="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
 		/>
 	</div>
-	<div class="p-5">
-		<p class="font-semibold">{project.title}</p>
-		<p class="mt-1 text-sm text-muted">
-			{project.client} · {project.year}
-		</p>
+	<div class="p-4">
+		<h3 class="text-base font-bold tracking-tight">{project.title}</h3>
+		<p class="mt-1.5 line-clamp-2 text-sm text-muted">{project.shortDesc}</p>
 	</div>
 </a>
