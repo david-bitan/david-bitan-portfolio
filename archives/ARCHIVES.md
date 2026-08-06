@@ -108,3 +108,28 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - `Remove-Item src\components\PhoneMockup.astro`
   - `Remove-Item src\lib\projectColors.ts`
 - **v005 abandonnée** (fixes qui n'ont jamais été commités)
+
+---
+
+## v007 — 2026-08-06 — état AVANT Craft random + Load More
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/components/CraftSection.astro` (état actuel — grid 4-col, tous items visibles d'un coup)
+- **Rollback** : `cp archives/v007_.../src__components__CraftSection.astro src/components/CraftSection.astro`
+
+---
+
+## v008 — 2026-08-06 — Craft random 12 + Load More button
+
+- **Commit git associé** : à remplir après push
+- **Type** : point de repère stable
+- **Fichiers modifiés** :
+  - `src/components/CraftSection.astro` — SSR rend TOUS les items (SEO-friendly). Client-side script shuffle Fisher-Yates via CSS `order`, cache tous les items au-delà du 12ème. Bouton "Load more" centré avec flèche ↓ (SVG inline, animate-y-0.5 au hover) qui reveal tout au clic.
+- **Comportement** :
+  - Page load : 30 items rendus, 12 visibles dans un ordre random (mix 3D + Digital Painting)
+  - Click "Load more" : révèle les 18 restants, cache le bouton
+  - Refresh : nouveau shuffle random
+  - No-JS fallback : tous les items visibles (dégradation gracieuse)
+- **Note tech** : `<script is:inline>` pour éviter le bundling Astro. Utilise CSS `order` plutôt que DOM reorder pour garder l'ordre source stable (accessibilité)
+- **Rollback vers v007** : voir v007 ci-dessus
