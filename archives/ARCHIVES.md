@@ -157,3 +157,28 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - `src/components/CraftSection.astro` (home) — retire `target="_blank"` + `rel`, change href de `item.image` vers `/craft#${item.slug}`. Click thumbnail = navigation interne + scroll auto sur l'image cliquée
 - **Extensibilité** : ajouter une nouvelle catégorie dans `craftItems.ts` (Drawings, Icons, etc.) crée automatiquement un nouveau pill filtre
 - **Rollback vers v009** : voir v009 ci-dessus
+
+---
+
+## v011 — 2026-08-06 — état AVANT restyle Load More (orange + arrow externe animée)
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/components/CraftSection.astro` (état v010 — bouton pill outlined, flèche interne petite)
+- **Rollback** : `cp archives/v011_.../src__components__CraftSection.astro src/components/CraftSection.astro`
+
+---
+
+## v012 — 2026-08-06 — Load More restyle : bouton orange + flèche externe bounce
+
+- **Commit git associé** : à remplir après push
+- **Type** : polish visuel Load More
+- **Fichier modifié** :
+  - `src/components/CraftSection.astro`
+- **Design** :
+  - Bouton pill `bg-accent` (orange) `text-white`, `px-8 py-3`, ombre légère, hover `bg-accent/90`
+  - Flèche externe SVG chevron ↓ `h-7 w-7 text-accent` (orange), sous le pill (gap-4), pas dans le fond du pill
+  - Animation `craft-arrow-bounce` : `translateY 0 → 8px → 0` en 1.6s `ease-in-out` infinite, opacity 0.85 → 1 pour effet doux
+  - Toute la zone `<button>` reste clickable (pill + flèche déclenchent tous deux le reveal)
+  - `@media prefers-reduced-motion` désactive l'animation (accessibilité)
+- **Rollback vers v011** : voir v011 ci-dessus
