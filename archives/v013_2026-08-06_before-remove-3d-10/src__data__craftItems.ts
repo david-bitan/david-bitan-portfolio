@@ -93,6 +93,15 @@ export const craftItems: CraftItem[] = [
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
+		slug: '3d-10',
+		title: `3D artwork #10`,
+		year: '2014',
+		category: '3D',
+		description: `PLACEHOLDER : rendu 3D personnel (ZBrush + Cinema 4D).`,
+		image: 'https://res.cloudinary.com/akael/image/upload/v1785345921/portfolio/old-wix/3d/3d-10.webp',
+		tags: ['3D', 'ZBrush', 'Cinema 4D'],
+	},
+	{
 		slug: '3d-11',
 		title: `3D artwork #11`,
 		year: '2014',

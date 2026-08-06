@@ -97,28 +97,8 @@ const INITIAL_COUNT = 12;
 		animation: craft-arrow-bounce 1.6s ease-in-out infinite;
 		will-change: transform, opacity;
 	}
-
-	/* Newly-revealed thumbnails after Load More: fade + slide up, staggered
-	   via inline animation-delay set by the script. `both` keeps the item at
-	   the final frame after the animation ends. */
-	@keyframes craft-reveal {
-		from {
-			opacity: 0;
-			transform: translateY(16px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-	.craft-revealing {
-		animation: craft-reveal 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) both;
-		will-change: transform, opacity;
-	}
-
 	@media (prefers-reduced-motion: reduce) {
-		.craft-arrow-bounce,
-		.craft-revealing {
+		.craft-arrow-bounce {
 			animation: none;
 		}
 	}
@@ -163,17 +143,10 @@ const INITIAL_COUNT = 12;
 		}
 
 		btn.addEventListener('click', () => {
-			// Reveal newly-shown items with a staggered fade-up so the batch
-			// doesn't pop in abruptly. Delay is capped so long lists don't
-			// linger too long before the last item shows.
-			let revealIdx = 0;
 			items.forEach((el) => {
 				if (el.dataset.craftHidden === 'true') {
 					el.classList.remove('hidden');
 					delete el.dataset.craftHidden;
-					el.style.animationDelay = Math.min(revealIdx * 60, 800) + 'ms';
-					el.classList.add('craft-revealing');
-					revealIdx++;
 				}
 			});
 			wrap.classList.add('hidden');

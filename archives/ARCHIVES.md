@@ -182,3 +182,45 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - Toute la zone `<button>` reste clickable (pill + flèche déclenchent tous deux le reveal)
   - `@media prefers-reduced-motion` désactive l'animation (accessibilité)
 - **Rollback vers v011** : voir v011 ci-dessus
+
+---
+
+## v013 — 2026-08-06 — état AVANT retrait 3d-10 (thumbnail buggée)
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/data/craftItems.ts` (contient encore l'entrée `3d-10`)
+- **Rollback** : `cp archives/v013_.../src__data__craftItems.ts src/data/craftItems.ts`
+
+---
+
+## v014 — 2026-08-06 — Retrait item Craft 3d-10 (buggé)
+
+- **Commit git associé** : à remplir après push
+- **Type** : nettoyage data
+- **Fichier modifié** : `src/data/craftItems.ts` — entrée `3d-10` supprimée (image buggée signalée par David)
+- **Impact** : liste Craft passe de 30 à 29 items. Aucun autre code à modifier (mapping dynamique).
+- **Rollback vers v013** : voir v013 ci-dessus
+
+---
+
+## v015 — 2026-08-06 — état AVANT animation reveal thumbnails Load More
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/components/CraftSection.astro` (état pushé, sans animation reveal)
+- **Rollback** : `cp archives/v015_.../src__components__CraftSection.astro src/components/CraftSection.astro`
+
+---
+
+## v016 — 2026-08-06 — Animation reveal staggered fade-up thumbnails Load More
+
+- **Commit git associé** : à remplir après push
+- **Type** : polish visuel Load More
+- **Fichier modifié** : `src/components/CraftSection.astro`
+- **Changement** :
+  - Nouvelle keyframe CSS `craft-reveal` : `opacity 0→1 + translateY 16px→0`, `0.55s cubic-bezier(0.22, 0.61, 0.36, 1) both` (courbe out-quart, sensation fluide et douce)
+  - Nouvelle classe `.craft-revealing` appliquée aux items révélés au click Load More
+  - Script Load More : itère les items cachés, remove `hidden`, applique `animation-delay: min(index * 60ms, 800ms)` en inline style + add `craft-revealing` → effet cascade staggered
+  - `@media prefers-reduced-motion` désactive aussi la reveal animation (accessibilité)
+- **Rollback vers v015** : voir v015 ci-dessus
