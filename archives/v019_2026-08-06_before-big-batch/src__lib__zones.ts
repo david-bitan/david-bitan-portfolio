@@ -66,14 +66,14 @@ export function groupImagesByZone(gallery: string[]): Zone[] {
 	}
 
 	if (anyTheme && anyDevice) {
-		// 4-zone mode. Display order (David preference, 2026-08-06): Dark first.
+		// 4-zone mode. Fixed display order (per contexte-portfolio.md, Phase D):
 		// Desktop·Light → Desktop·Dark → Mobile·Light → Mobile·Dark.
 		// "Big picture" first (desktop before mobile), light before dark.
 		const buckets: Record<string, Zone> = {
-			'Desktop · Dark': { label: 'Desktop · Dark', isMobile: false, images: [] },
 			'Desktop · Light': { label: 'Desktop · Light', isMobile: false, images: [] },
-			'Mobile · Dark': { label: 'Mobile · Dark', isMobile: true, images: [] },
+			'Desktop · Dark': { label: 'Desktop · Dark', isMobile: false, images: [] },
 			'Mobile · Light': { label: 'Mobile · Light', isMobile: true, images: [] },
+			'Mobile · Dark': { label: 'Mobile · Dark', isMobile: true, images: [] },
 		};
 		const other: Zone = { label: 'Other', isMobile: false, images: [] };
 		for (const c of classified) {

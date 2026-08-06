@@ -244,3 +244,54 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Fichier modifié** : `src/pages/work/[slug].astro`
 - **Changement** : sur le wrapper `<div class="w-full">` de chaque image desktop, ajout de `border border-ink/10 shadow-sm`. Sans rounded (respecte le commentaire précédent : rounded clip les coins natifs des mockups). Border droit + shadow léger = image détachée du fond, visible même quand son contenu interne est presque blanc
 - **Rollback vers v017** : voir v017 ci-dessus
+
+---
+
+## v019 — 2026-08-06 — état AVANT batch polish (rounded/grid/order/back-to-top/Other)
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro`
+  - `src/lib/zones.ts`
+  - `src/components/ZoneFilters.astro`
+  - `src/components/ProjectCard.astro`
+  - `src/components/CraftSection.astro`
+  - `src/pages/craft.astro`
+- **Rollback** : `cp archives/v019_.../* ` vers chaque path correspondant
+
+---
+
+## v020 — 2026-08-06 — Batch polish (feedback David)
+
+- **Commit git associé** : à remplir après push
+- **Type** : polish visuel batch
+- **5 changements** :
+  1. **Border radius plus prononcé** — `rounded-md` / `rounded-lg` → `rounded-2xl` (16px) sur : ProjectCard home, CraftSection thumbnails home, craft.astro figures, mobile cards `[slug].astro`, Other cards `[slug].astro`. Images desktop wrapper restent plates (border+shadow sans radius, préserve les coins natifs des mockups).
+  2. **Ordre zones Sonary Dashboard** (`src/lib/zones.ts`) — 4-zone mode passe de Desktop·Light→Desktop·Dark→Mobile·Light→Mobile·Dark à **Desktop·Dark → Desktop·Light → Mobile·Dark → Mobile·Light**. Dark first dans chaque paire.
+  3. **Grid mobile 3 cols** (`[slug].astro` branche mobile) — passe `sm:grid-cols-2` à `sm:grid-cols-2 lg:grid-cols-3`. Padding cards réduit `p-6 → p-5` pour compenser la place plus serrée.
+  4. **Back-to-top dans sticky ZoneFilters** — nouveau `<button data-back-to-top>` icône chevron ↑ à gauche des filter groups, `rounded-full h-8 w-8` outline hover accent. Handler JS `window.scrollTo({top:0, behavior:'smooth'})`. En plus du BackToTop bottom-right existant.
+  5. **Fallback "Other" safe** (`[slug].astro`) — nouvelle branche `zone.label === 'Other'` : grid 2 cols, images `object-contain max-h-[720px]` dans card `bg-card rounded-2xl border shadow-sm`. Résout le problème signalé David : image mobile classifée "Other" étirée en full-width desktop.
+- **Rollback vers v019** : voir v019 ci-dessus
+
+---
+
+## v021 — 2026-08-06 — état AVANT fix gap Other + réordonner Sonary Dashboard
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro`
+  - `src/data/allProjects.ts`
+- **Rollback** : `cp archives/v021_.../* ` vers chaque path
+
+---
+
+## v022 — 2026-08-06 — Fix gap Other cards + reorder Sonary Dashboard gallery
+
+- **Commit git associé** : à remplir après push
+- **Type** : fixes visuels + polish contenu
+- **2 changements** :
+  1. **Gap image/bordure Other cards** — signalé David : sur `[slug].astro` branche `zone.label === 'Other'`, le wrapper `bg-card border shadow` créait un gap blanc autour des images `object-contain` plus petites que la card. Nouveau rendu : image seule, `rounded-2xl ring-1 ring-ink/10 shadow-sm` directement sur `<img>`, plus de wrapper visuel. Pas de gap, la border épouse l'image.
+  2. **Ordre gallery Sonary Dashboard** — 2 URLs déplacées en tête de gallery pour être les premières dans leurs zones :
+     - `07---dashboard/desktop/dark-mode/dashboard.webp` → premier dans Desktop·Dark (le hero avec 4 stat cards colorées)
+     - `05---user-setting/desktop/light-mode/team-member-board.webp` → premier dans Desktop·Light (vue Team Members reconnaissable)
+- **Rollback vers v021** : voir v021 ci-dessus

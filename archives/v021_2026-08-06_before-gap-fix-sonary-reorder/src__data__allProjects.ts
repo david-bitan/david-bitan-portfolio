@@ -29,11 +29,6 @@ export const allProjects: FullProject[] = [
 		// software-stack table for a first impression.
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342119/portfolio/sonary-dashboard/07---dashboard/desktop/dark-mode/dashboard.webp',
 		gallery: [
-			// Featured first (David preference 2026-08-06): the 4-stat-cards
-			// dashboard opens Desktop·Dark, the team-member-board opens
-			// Desktop·Light — most recognizable frames for the case study.
-			'https://res.cloudinary.com/akael/image/upload/v1785342119/portfolio/sonary-dashboard/07---dashboard/desktop/dark-mode/dashboard.webp',
-			'https://res.cloudinary.com/akael/image/upload/v1785342098/portfolio/sonary-dashboard/05---user-setting/desktop/light-mode/team-member-board.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342017/portfolio/sonary-dashboard/01---software-stack-page/desktop/dark-mode/dashboard---grid-with-all-columns-1.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342019/portfolio/sonary-dashboard/01---software-stack-page/desktop/dark-mode/dashboard---grid-with-all-columns.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342020/portfolio/sonary-dashboard/01---software-stack-page/desktop/dark-mode/dashboard---list---bulk-selection-button-delete.webp',
@@ -90,6 +85,7 @@ export const allProjects: FullProject[] = [
 			'https://res.cloudinary.com/akael/image/upload/v1785342094/portfolio/sonary-dashboard/05---user-setting/desktop/light-mode/reset-password.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342096/portfolio/sonary-dashboard/05---user-setting/desktop/light-mode/team-member-dropdown-menu---edit---resend---remove.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342097/portfolio/sonary-dashboard/05---user-setting/desktop/light-mode/team-member-board-1.webp',
+			'https://res.cloudinary.com/akael/image/upload/v1785342098/portfolio/sonary-dashboard/05---user-setting/desktop/light-mode/team-member-board.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342099/portfolio/sonary-dashboard/05---user-setting/mobile/dark-mode/dashboard---list---mobile-1.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342101/portfolio/sonary-dashboard/05---user-setting/mobile/dark-mode/dashboard---list---mobile-2.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342102/portfolio/sonary-dashboard/05---user-setting/mobile/dark-mode/dashboard---list---mobile-3.webp',
@@ -105,6 +101,7 @@ export const allProjects: FullProject[] = [
 			'https://res.cloudinary.com/akael/image/upload/v1785342114/portfolio/sonary-dashboard/05---user-setting/mobile/light-mode/dashboard---list---mobile.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342116/portfolio/sonary-dashboard/05---user-setting/mobile/light-mode/reset-password.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342117/portfolio/sonary-dashboard/07---dashboard/desktop/dark-mode/dashboard-1.webp',
+			'https://res.cloudinary.com/akael/image/upload/v1785342119/portfolio/sonary-dashboard/07---dashboard/desktop/dark-mode/dashboard.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342121/portfolio/sonary-dashboard/07---dashboard/mobile/dark-mode/dashboard.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342123/portfolio/sonary-dashboard/16---chat-bot/desktop/dark-mode/01.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342124/portfolio/sonary-dashboard/16---chat-bot/desktop/dark-mode/02.webp',

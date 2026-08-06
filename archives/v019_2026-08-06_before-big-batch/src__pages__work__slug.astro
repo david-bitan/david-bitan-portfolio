@@ -70,22 +70,24 @@ const zones = groupImagesByZone(project.gallery);
 
 				{
 					zone.isMobile ? (
-						// Mobile shots at their true native width (375px CSS). A 3-col
-						// grid on ≥lg lets more phone tiles fit in the 1200px canvas —
-						// tighter Behance-style layout. 2-col on tablet, 1-col mobile.
-						// Cards use `rounded-2xl` (softer than the previous rounded-lg
-						// — David preference for more generous corners).
-						// Images are NOT clickable — David's rule: clicking opened a
-						// new tab with the source URL, but on mobile designs the
-						// browser upscaled the 375px source, which looked awful and
-						// broke the "stay on site" UX. In-page is the final render.
-						<div class="mt-12 grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
+						// Mobile shots at their true native width (375px CSS). A 2-col
+						// grid on ≥sm gives each phone shot a generous card around it
+						// (bg-card + p-8). Images are NOT clickable — David's rule:
+						// clicking opened a new tab with the source URL, but on mobile
+						// designs the browser upscaled the 375px source to fill the
+						// window, which looked awful and also broke the "stay on site"
+						// UX. In-page is the final render.
+						<div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
 							{zone.images.map(({ url }) => (
-								// bg-card + border + shadow lift the card off the body,
-								// and the `ring` on the image draws a hairline outline
-								// around the mockup so its edges stay legible even when
-								// its inner content is white (Sonary Website light).
-								<div class="flex items-start justify-center overflow-hidden rounded-2xl border border-ink/10 bg-card p-5 shadow-md sm:p-6">
+								// bg-card (#fff in light) sits on top of a gray-100 body,
+								// which is a barely-there contrast; and mockups with
+								// white-page designs (Sonary Website light-mode reviews,
+								// article pages, etc.) melt into the card. `shadow-md +
+								// border-ink/10` lifts the card off the page, and the
+								// `ring-1 ring-ink/10` on the image itself draws a
+								// hairline outline around the mockup so its own edges are
+								// legible regardless of its inner colors.
+								<div class="flex items-start justify-center overflow-hidden rounded-lg border border-ink/10 bg-card p-6 shadow-md sm:p-8">
 									<img
 										src={cld(url, MOBILE)}
 										srcset={mobileSrcset(url)}
@@ -93,31 +95,9 @@ const zones = groupImagesByZone(project.gallery);
 										alt={project.title}
 										loading="lazy"
 										width="375"
-										class="mx-auto h-auto w-[375px] max-w-full rounded-xl ring-1 ring-ink/10"
+										class="mx-auto h-auto w-[375px] max-w-full rounded-md ring-1 ring-ink/10"
 									/>
 								</div>
-							))}
-						</div>
-					) : zone.label === 'Other' ? (
-						// Fallback for images that couldn't be classified by
-						// zones.ts (no `desktop` / `mobile` / theme token in the URL,
-						// e.g. Sonary Website article-hub captures, mobile long-scroll
-						// shots without a `mobile` filename token).
-						// NO bg-card wrapper — that created a visible white/dark
-						// gap around portrait/mobile shots that don't fill the card
-						// height. Instead: image alone, ring outline sized to the
-						// actual image, mx-auto to center. Contained max-h keeps
-						// portrait mobiles readable AND landscape desktops intact.
-						<div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
-							{zone.images.map(({ url }) => (
-								<img
-									src={cld(url, FULL)}
-									srcset={landscapeSrcset(url)}
-									sizes="(min-width: 1024px) 560px, 100vw"
-									alt={project.title}
-									loading="lazy"
-									class="mx-auto block h-auto max-h-[720px] w-auto max-w-full rounded-2xl object-contain shadow-sm ring-1 ring-ink/10"
-								/>
 							))}
 						</div>
 					) : (
