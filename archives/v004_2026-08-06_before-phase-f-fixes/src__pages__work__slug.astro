@@ -79,10 +79,7 @@ const zones = groupImagesByZone(project.gallery);
 						// (white-page mockups no longer melt into a white card) and
 						// gives mobile zones a distinct visual identity per project.
 						// Not clickable (David's rule — no source-upscale in new tab).
-						// `items-start` on the grid: prevents a short phone from being
-						// vertically centered when its neighbour is a tall long-scroll
-						// capture (row auto-stretched to the tallest child).
-						<div class="mt-12 grid grid-cols-1 items-start gap-6 sm:grid-cols-2">
+						<div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
 							{zone.images.map(({ url }) => (
 								<PhoneMockup
 									src={cld(url, MOBILE)}
@@ -91,28 +88,6 @@ const zones = groupImagesByZone(project.gallery);
 									alt={project.title}
 									bgColor={projectColor(project.slug)}
 								/>
-							))}
-						</div>
-					) : zone.label === 'Other' ? (
-						// Fallback for images that couldn't be classified by
-						// zones.ts (no `desktop` / `mobile` / theme token in the URL,
-						// e.g. Sonary Website article-hub captures). We can't know
-						// their real aspect ratio at build time, so we render them
-						// contained in a bounded grid — never stretched to 1200px
-						// full-width. `object-contain max-h-[720px]` keeps portrait
-						// mobiles readable AND landscape desktops intact.
-						<div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
-							{zone.images.map(({ url }) => (
-								<div class="flex items-start justify-center rounded-lg border border-ink/10 bg-card p-6 shadow-sm">
-									<img
-										src={cld(url, FULL)}
-										srcset={landscapeSrcset(url)}
-										sizes="(min-width: 1024px) 560px, 100vw"
-										alt={project.title}
-										loading="lazy"
-										class="block h-auto max-h-[720px] w-auto max-w-full object-contain"
-									/>
-								</div>
 							))}
 						</div>
 					) : (

@@ -35,11 +35,11 @@ const {
 ---
 
 <div
-	class="flex items-start justify-center rounded-2xl px-6 py-14 sm:px-10 sm:py-20"
+	class="flex items-center justify-center rounded-2xl px-6 py-14 sm:px-10 sm:py-20"
 	style={`background-color: ${bgColor}`}
 >
 	<div class="relative rounded-[2.5rem] bg-black p-[10px] shadow-2xl ring-1 ring-white/10">
-		<div class="relative max-h-[820px] overflow-hidden rounded-[2rem]">
+		<div class="overflow-hidden rounded-[2rem]">
 			<img
 				src={src}
 				srcset={srcset}
@@ -49,11 +49,6 @@ const {
 				width="375"
 				class="block h-auto w-[375px] max-w-full"
 			/>
-			{/* Bottom fade — hints that the screenshot continues beyond the
-				visible bezel area when the source is a long-scroll mobile
-				capture (e.g. Sonary Website review page 375x16000). Positioned
-				inside the clipped wrapper so the fade sits above the image. */}
-			<div class="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent"></div>
 		</div>
 	</div>
 </div>

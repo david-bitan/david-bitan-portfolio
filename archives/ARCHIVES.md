@@ -48,7 +48,7 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ## v003 — 2026-08-06 — Phase F PhoneMockup intégré
 
-- **Commit git associé** : à remplir après push
+- **Commit git associé** : `1771238`
 - **Type** : point de repère stable (état APRÈS intégration Phase F)
 - **Fichiers créés** :
   - `src/components/PhoneMockup.astro` — composant bezel iPhone-like (frame CSS, pas de SVG détaillé)
@@ -66,3 +66,31 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - Bezel noir `p-[10px] rounded-[2.5rem]` + `shadow-2xl` + `ring-1 ring-white/10`
   - Image screenshot 375px native, `rounded-[2rem]` clipped via wrapper `overflow-hidden`
 - **Rollback vers v002** : voir instructions v002 ci-dessus
+
+---
+
+## v004 — 2026-08-06 — état AVANT fixes Phase F (long clips, align, Other)
+
+- **Commit git associé** : `1771238` (post Phase F initial)
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro` (état v003)
+  - `src/components/PhoneMockup.astro` (état v003)
+- **Rollback** :
+  - `cp archives/v004_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+  - `cp archives/v004_.../src__components__PhoneMockup.astro src/components/PhoneMockup.astro`
+
+---
+
+## v005 — 2026-08-06 — fixes Phase F (clip long shots + align top + Other safe)
+
+- **Commit git associé** : à remplir après push
+- **Type** : point de repère stable
+- **Problèmes visuels remontés par David sur Cloudflare preview** :
+  - Screenshots mobiles longs (Sonary Website review 375x16000) étirés sur toute la hauteur dans le bezel → phones absurdement grands
+  - Grid `sm:grid-cols-2` : phone court centré verticalement dans un row auto-stretched par un phone long voisin → grand vide au-dessus
+  - Zone "Other" (images sans device dans l'URL, ex: sonary-website article-hub) rendues en full-width desktop 1200px → screenshots mobiles gigantesques
+- **Fichiers modifiés** :
+  - `src/components/PhoneMockup.astro` — `max-h-[820px] overflow-hidden` sur le wrapper image + fade bottom `bg-gradient-to-t from-black/60` pour indiquer scroll continue. Wrapper flex passe de `items-center` à `items-start`.
+  - `src/pages/work/[slug].astro` — grid mobile passe `items-start` + nouvelle branche dédiée `zone.label === 'Other'` : grille 2 cols, images `object-contain max-h-[720px]` dans card `bg-card`, plus jamais full-width stretch.
+- **Rollback vers v004** : voir v004 ci-dessus
