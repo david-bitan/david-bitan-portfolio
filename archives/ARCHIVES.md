@@ -520,3 +520,30 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Fichier modifié** : `src/pages/contact.astro` — `const city = 'Ashkelon, Israel'` → `const city = 'Israel · Remote or Tel Aviv area'`
 - **Note** : Footer déjà OK (juste "Israel" sans ville, par décision antérieure)
 - **Rollback vers v041** : voir v041 ci-dessus
+
+---
+
+## v043 — 2026-08-06 — état AVANT 4 fixes (hover, radius revert, scroll anchor, retrait Remote/Tel Aviv)
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/styles/global.css`
+  - `src/components/ProjectCard.astro`
+  - `src/components/CraftSection.astro`
+  - `src/pages/craft.astro`
+  - `src/pages/contact.astro`
+  - `src/pages/work/[slug].astro`
+- **Rollback** : `cp archives/v043_.../* ` vers chaque path
+
+---
+
+## v044 — 2026-08-06 — 4 fixes feedback David
+
+- **Commit git associé** : à remplir après push
+- **Type** : batch fixes visuels + revert
+- **4 changements** :
+  1. **Hover thumbnails ne fonctionnait pas** — l'arbitrary Tailwind value `ease-[cubic-bezier(0.22,0.61,0.36,1)]` avec virgules + espaces ne se compilait pas correctement, killait la transition. Nouveau : classe CSS custom `.thumb-hover-zoom` dans `global.css` avec transition 900ms cubic-bezier + `.group:hover .thumb-hover-zoom { transform: scale(1.06) }`. Appliqué sur ProjectCard + CraftSection img.
+  2. **Radius revert** — David voulait squircle (forme) mais PAS augmenter la taille du radius. Revert : ProjectCard `rounded-2xl` → `rounded-md`, CraftSection thumb `rounded-2xl` → `rounded-md`, /craft figure img `rounded-2xl` → `rounded-md`, mobile card wrappers + Other card `rounded-2xl` → `rounded-lg` dans `[slug].astro`. Le squircle CSS reste actif (superellipse s'applique à toutes les rounded-* de md à 3xl).
+  3. **Scroll anchor /craft coupé** — click thumbnail home arrivait au milieu de l'image (masquée par nav 68px + filter bar ~60px). `scroll-mt-32` (128px) insuffisant. Bumper à `scroll-mt-48` (192px) sur `.craft-figure`.
+  4. **Retrait "Remote or Tel Aviv area"** — David change d'avis. `contact.astro` : `Israel · Remote or Tel Aviv area` → `Israel` tout court.
+- **Rollback vers v043** : voir v043 ci-dessus

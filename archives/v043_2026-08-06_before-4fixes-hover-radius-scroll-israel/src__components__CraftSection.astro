@@ -30,14 +30,14 @@ const INITIAL_COUNT = 12;
 				<a
 					href={`/craft#${item.slug}`}
 					data-category={item.category}
-					class="craft-item group block overflow-hidden rounded-md bg-card"
+					class="craft-item group block overflow-hidden rounded-2xl bg-card"
 				>
 					<div class="aspect-[4/3] overflow-hidden">
 						<img
 							src={cld(item.image, LANDSCAPE)}
 							alt={item.title}
 							loading="lazy"
-							class="thumb-hover-zoom h-full w-full object-cover object-top"
+							class="h-full w-full object-cover object-top transition-transform duration-[900ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:scale-[1.06]"
 						/>
 					</div>
 					<div class="p-4">

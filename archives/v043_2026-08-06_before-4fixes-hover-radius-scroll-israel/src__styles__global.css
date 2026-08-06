@@ -106,28 +106,6 @@ body {
   }
 }
 
-/* Thumbnail hover zoom — used on Selected Work + Craft home cards.
-   Explicit CSS class instead of Tailwind arbitrary values
-   (`ease-[cubic-bezier(...)]`) because those didn't always compile cleanly
-   with the extra whitespace / comma parsing, killing the transition and
-   giving the "immediate zoom" bug David saw. Uses the parent .group:hover
-   pattern (parent <a class="group"> triggers the child img scale). */
-.thumb-hover-zoom {
-  transition: transform 900ms cubic-bezier(0.22, 0.61, 0.36, 1);
-  will-change: transform;
-}
-.group:hover .thumb-hover-zoom {
-  transform: scale(1.06);
-}
-@media (prefers-reduced-motion: reduce) {
-  .thumb-hover-zoom {
-    transition: none;
-  }
-  .group:hover .thumb-hover-zoom {
-    transform: none;
-  }
-}
-
 /* Logos marquee */
 .marquee-mask {
   mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
