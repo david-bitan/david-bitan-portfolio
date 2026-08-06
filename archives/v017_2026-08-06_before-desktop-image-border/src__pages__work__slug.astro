@@ -103,15 +103,15 @@ const zones = groupImagesByZone(project.gallery);
 					) : (
 						// Desktop shots: stacked full-width, one per row. srcset covers
 						// 2K/4K/retina without upscaling a 1200px asset.
-						// NO rounded corners (would clip the mockup's actual edges).
-						// Straight-edge border + soft shadow lifts light-mode mockups
-						// (Sonary Website reviews, Booster light dashboards, etc.)
-						// off the near-white body background — otherwise the mockup
-						// bleeds into the page and its own outline disappears.
-						// Not clickable (same reason as mobile — no source-upscale).
+						// NO rounded corners and NO bg on the wrapper — corners would
+						// clip whatever pixels are at the mockup's actual edges and
+						// leak the site background through (dark strip in dark mode).
+						// Straight edges let each mockup's own native shape (rounded
+						// or not) show through unmodified. Not clickable (same reason
+						// as mobile — no source-upscale in a new tab).
 						<div class="mt-12 space-y-10">
 							{zone.images.map(({ url }) => (
-								<div class="w-full border border-ink/10 shadow-sm">
+								<div class="w-full">
 									<img
 										src={cld(url, FULL)}
 										srcset={landscapeSrcset(url)}

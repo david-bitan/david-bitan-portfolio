@@ -224,3 +224,23 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - Script Load More : itère les items cachés, remove `hidden`, applique `animation-delay: min(index * 60ms, 800ms)` en inline style + add `craft-revealing` → effet cascade staggered
   - `@media prefers-reduced-motion` désactive aussi la reveal animation (accessibilité)
 - **Rollback vers v015** : voir v015 ci-dessus
+
+---
+
+## v017 — 2026-08-06 — état AVANT border images desktop light mode
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro` (branche desktop sans border/shadow)
+- **Rollback** : `cp archives/v017_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v018 — 2026-08-06 — Border + shadow sur images desktop (fix fusion light mode)
+
+- **Commit git associé** : à remplir après push
+- **Type** : fix visuel (feedback David)
+- **Problème** : sur pages Work (`/work/[slug]`), certains mockups desktop light mode utilisent des gris très clairs (Sonary Website Review hub, Booster light dashboards) qui se fondent dans le body `bg = #F3F4F6` → contours invisibles, image collée au fond
+- **Fichier modifié** : `src/pages/work/[slug].astro`
+- **Changement** : sur le wrapper `<div class="w-full">` de chaque image desktop, ajout de `border border-ink/10 shadow-sm`. Sans rounded (respecte le commentaire précédent : rounded clip les coins natifs des mockups). Border droit + shadow léger = image détachée du fond, visible même quand son contenu interne est presque blanc
+- **Rollback vers v017** : voir v017 ci-dessus
