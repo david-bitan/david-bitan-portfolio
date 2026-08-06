@@ -3,11 +3,9 @@ import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import ZoneFilters from '../../components/ZoneFilters.astro';
-import PhoneMockup from '../../components/PhoneMockup.astro';
 import { allProjects } from '../../data/allProjects';
 import { cld, FULL, MOBILE, landscapeSrcset, mobileSrcset } from '../../lib/cloudinary';
 import { groupImagesByZone, zoneDescription } from '../../lib/zones';
-import { projectColor } from '../../lib/projectColors';
 
 export function getStaticPaths() {
 	return allProjects.map((project) => ({
@@ -72,22 +70,34 @@ const zones = groupImagesByZone(project.gallery);
 
 				{
 					zone.isMobile ? (
-						// Phase F : mobile shots framed by <PhoneMockup>. Each tile is
-						// a colored block (project-specific bg from projectColors.ts)
-						// with a black iPhone-style bezel around the 375px native
-						// screenshot. Solves the light-mode contrast issue for good
-						// (white-page mockups no longer melt into a white card) and
-						// gives mobile zones a distinct visual identity per project.
-						// Not clickable (David's rule — no source-upscale in new tab).
+						// Mobile shots at their true native width (375px CSS). A 2-col
+						// grid on ≥sm gives each phone shot a generous card around it
+						// (bg-card + p-8). Images are NOT clickable — David's rule:
+						// clicking opened a new tab with the source URL, but on mobile
+						// designs the browser upscaled the 375px source to fill the
+						// window, which looked awful and also broke the "stay on site"
+						// UX. In-page is the final render.
 						<div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
 							{zone.images.map(({ url }) => (
-								<PhoneMockup
-									src={cld(url, MOBILE)}
-									srcset={mobileSrcset(url)}
-									sizes="375px"
-									alt={project.title}
-									bgColor={projectColor(project.slug)}
-								/>
+								// bg-card (#fff in light) sits on top of a gray-100 body,
+								// which is a barely-there contrast; and mockups with
+								// white-page designs (Sonary Website light-mode reviews,
+								// article pages, etc.) melt into the card. `shadow-md +
+								// border-ink/10` lifts the card off the page, and the
+								// `ring-1 ring-ink/10` on the image itself draws a
+								// hairline outline around the mockup so its own edges are
+								// legible regardless of its inner colors.
+								<div class="flex items-start justify-center overflow-hidden rounded-lg border border-ink/10 bg-card p-6 shadow-md sm:p-8">
+									<img
+										src={cld(url, MOBILE)}
+										srcset={mobileSrcset(url)}
+										sizes="375px"
+										alt={project.title}
+										loading="lazy"
+										width="375"
+										class="mx-auto h-auto w-[375px] max-w-full rounded-md ring-1 ring-ink/10"
+									/>
+								</div>
 							))}
 						</div>
 					) : (
