@@ -94,3 +94,17 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - `src/components/PhoneMockup.astro` — `max-h-[820px] overflow-hidden` sur le wrapper image + fade bottom `bg-gradient-to-t from-black/60` pour indiquer scroll continue. Wrapper flex passe de `items-center` à `items-start`.
   - `src/pages/work/[slug].astro` — grid mobile passe `items-start` + nouvelle branche dédiée `zone.label === 'Other'` : grille 2 cols, images `object-contain max-h-[720px]` dans card `bg-card`, plus jamais full-width stretch.
 - **Rollback vers v004** : voir v004 ci-dessus
+
+---
+
+## v006 — 2026-08-06 — ROLLBACK Phase F (David n'aime pas le design bleu + bezel)
+
+- **Commit git associé** : à remplir après push
+- **Type** : rollback — retour à l'état v002 (avant Phase F)
+- **Raison** : après review Cloudflare, David n'aime pas le design PhoneMockup (bloc de couleur + bezel noir). Préfère l'ancien rendu (cards blanches avec border/shadow/ring du fix contraste v001).
+- **Actions faites côté Cowork** :
+  - `src/pages/work/[slug].astro` restauré depuis `archives/v002_.../` (identique à v001)
+- **Actions à faire côté David (sandbox ne peut pas rm sur mount Windows)** :
+  - `Remove-Item src\components\PhoneMockup.astro`
+  - `Remove-Item src\lib\projectColors.ts`
+- **v005 abandonnée** (fixes qui n'ont jamais été commités)
