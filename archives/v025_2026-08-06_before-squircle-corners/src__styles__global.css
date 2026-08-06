@@ -83,26 +83,6 @@ body {
   }
 }
 
-/* Squircle corners (iOS-style superellipse) applied via the CSS
-   `corner-shape` property (CSS Borders 4 spec, Chrome 139+ / Safari 26+).
-   Hijacks the Tailwind rounded utilities so every rounded card/element in
-   the site gets the softer superellipse curve instead of the default
-   quarter-circle radius. Browsers without support fall back to normal
-   border-radius (round corners) — no visible break. `superellipse(3)` gives
-   the classic Apple-icon look; higher values push the corner closer to the
-   square, lower values (down to 1) approach an ellipse. */
-@supports (corner-shape: superellipse(3)) {
-  .rounded-md,
-  .rounded-lg,
-  .rounded-xl,
-  .rounded-2xl,
-  .rounded-3xl,
-  .rounded-full,
-  .rounded-pill {
-    corner-shape: superellipse(3);
-  }
-}
-
 /* Logos marquee */
 .marquee-mask {
   mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);

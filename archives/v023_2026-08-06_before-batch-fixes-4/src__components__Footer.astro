@@ -7,14 +7,11 @@ const year = new Date().getFullYear();
 <footer class="bg-footer-bg px-6 py-24 text-center sm:py-32">
 	<h2 class="text-4xl font-extrabold tracking-tight text-footer-ink sm:text-6xl">Let's build something.</h2>
 
-	{/* Mobile: stacks vertically (email / phone / location on their own
-		lines) so the phone number doesn't clip off-screen on 375px width.
-		sm+ : single-line inline with `·` separators (previous behaviour). */}
-	<p class="mt-10 flex flex-col items-center gap-y-2 text-sm font-medium text-footer-muted sm:block">
+	<p class="mt-10 text-sm font-medium text-footer-muted">
 		<a href={`mailto:${email}`} class="text-accent hover:underline">{email}</a>
-		<span class="mx-3 hidden sm:inline">·</span>
+		<span class="mx-3">·</span>
 		<a href={`tel:${phone.replace(/\D/g, '')}`} class="text-accent hover:underline">{phone}</a>
-		<span class="mx-3 hidden sm:inline">·</span>
+		<span class="mx-3">·</span>
 		<span class="text-footer-ink">Israel</span>
 	</p>
 

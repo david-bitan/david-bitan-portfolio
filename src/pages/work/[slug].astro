@@ -53,100 +53,105 @@ const zones = groupImagesByZone(project.gallery);
 	<ZoneFilters zones={zones} />
 
 	{
-		zones.map((zone) => (
-			<section
-				data-zone-label={zone.label}
-				class="mx-auto mt-24 max-w-[1200px] scroll-mt-32 border-t border-ink/10 px-6 pt-24"
-				data-reveal
-			>
-				<header class="grid grid-cols-12 gap-8">
-					<h2 class="col-span-12 text-3xl font-extrabold tracking-tight text-ink sm:col-span-4 sm:text-4xl">
-						{zone.label}
-					</h2>
-					<p class="col-span-12 text-lg leading-relaxed text-muted sm:col-span-6 sm:col-start-7">
-						{zoneDescription(zone.label, zone.images.length)}
-					</p>
-				</header>
+		zones.map((zone) => {
+			// Dark mockups already have a distinct dark background of their
+			// own, so they don't need the wrapper border/shadow/bg treatment
+			// that light mockups need to stand out from the near-white body.
+			// Zones without a theme token (just "Desktop" / "Mobile" /
+			// "Other") default to the "needs border" behaviour (safer for
+			// unclassified content).
+			const isDarkZone = /dark/i.test(zone.label);
+			return (
+				<section
+					data-zone-label={zone.label}
+					class="mx-auto mt-24 max-w-[1200px] scroll-mt-32 border-t border-ink/10 px-6 pt-24"
+					data-reveal
+				>
+					<header class="grid grid-cols-12 gap-8">
+						<h2 class="col-span-12 text-3xl font-extrabold tracking-tight text-ink sm:col-span-4 sm:text-4xl">
+							{zone.label}
+						</h2>
+						<p class="col-span-12 text-lg leading-relaxed text-muted sm:col-span-6 sm:col-start-7">
+							{zoneDescription(zone.label, zone.images.length)}
+						</p>
+					</header>
 
-				{
-					zone.isMobile ? (
-						// Mobile shots at their true native width (375px CSS). A 3-col
-						// grid on ≥lg lets more phone tiles fit in the 1200px canvas —
-						// tighter Behance-style layout. 2-col on tablet, 1-col mobile.
-						// Cards use `rounded-2xl` (softer than the previous rounded-lg
-						// — David preference for more generous corners).
-						// Images are NOT clickable — David's rule: clicking opened a
-						// new tab with the source URL, but on mobile designs the
-						// browser upscaled the 375px source, which looked awful and
-						// broke the "stay on site" UX. In-page is the final render.
-						<div class="mt-12 grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
-							{zone.images.map(({ url }) => (
-								// bg-card + border + shadow lift the card off the body,
-								// and the `ring` on the image draws a hairline outline
-								// around the mockup so its edges stay legible even when
-								// its inner content is white (Sonary Website light).
-								<div class="flex items-start justify-center overflow-hidden rounded-2xl border border-ink/10 bg-card p-5 shadow-md sm:p-6">
-									<img
-										src={cld(url, MOBILE)}
-										srcset={mobileSrcset(url)}
-										sizes="375px"
-										alt={project.title}
-										loading="lazy"
-										width="375"
-										class="mx-auto h-auto w-[375px] max-w-full rounded-xl ring-1 ring-ink/10"
-									/>
-								</div>
-							))}
-						</div>
-					) : zone.label === 'Other' ? (
-						// Fallback for images that couldn't be classified by
-						// zones.ts (no `desktop` / `mobile` / theme token in the URL,
-						// e.g. Sonary Website article-hub captures, mobile long-scroll
-						// shots without a `mobile` filename token).
-						// NO bg-card wrapper — that created a visible white/dark
-						// gap around portrait/mobile shots that don't fill the card
-						// height. Instead: image alone, ring outline sized to the
-						// actual image, mx-auto to center. Contained max-h keeps
-						// portrait mobiles readable AND landscape desktops intact.
-						<div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
-							{zone.images.map(({ url }) => (
-								<img
-									src={cld(url, FULL)}
-									srcset={landscapeSrcset(url)}
-									sizes="(min-width: 1024px) 560px, 100vw"
-									alt={project.title}
-									loading="lazy"
-									class="mx-auto block h-auto max-h-[720px] w-auto max-w-full rounded-2xl object-contain shadow-sm ring-1 ring-ink/10"
-								/>
-							))}
-						</div>
-					) : (
-						// Desktop shots: stacked full-width, one per row. srcset covers
-						// 2K/4K/retina without upscaling a 1200px asset.
-						// NO rounded corners (would clip the mockup's actual edges).
-						// Straight-edge border + soft shadow lifts light-mode mockups
-						// (Sonary Website reviews, Booster light dashboards, etc.)
-						// off the near-white body background — otherwise the mockup
-						// bleeds into the page and its own outline disappears.
-						// Not clickable (same reason as mobile — no source-upscale).
-						<div class="mt-12 space-y-10">
-							{zone.images.map(({ url }) => (
-								<div class="w-full border border-ink/10 shadow-sm">
+					{
+						zone.isMobile ? (
+							// Mobile shots at native 375px. 3-col grid on ≥lg,
+							// 2-col tablet, 1-col mobile. Dark mockups render on
+							// a naked slot (their own dark bg is enough); light
+							// mockups get the card treatment so their white edges
+							// stay visible against the near-white body.
+							<div class="mt-12 grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
+								{zone.images.map(({ url }) =>
+									isDarkZone ? (
+										<img
+											src={cld(url, MOBILE)}
+											srcset={mobileSrcset(url)}
+											sizes="375px"
+											alt={project.title}
+											loading="lazy"
+											width="375"
+											class="mx-auto block h-auto w-[375px] max-w-full rounded-xl"
+										/>
+									) : (
+										<div class="flex items-start justify-center overflow-hidden rounded-2xl border border-ink/10 bg-card p-5 shadow-md sm:p-6">
+											<img
+												src={cld(url, MOBILE)}
+												srcset={mobileSrcset(url)}
+												sizes="375px"
+												alt={project.title}
+												loading="lazy"
+												width="375"
+												class="mx-auto h-auto w-[375px] max-w-full rounded-xl ring-1 ring-ink/10"
+											/>
+										</div>
+									),
+								)}
+							</div>
+						) : zone.label === 'Other' ? (
+							// Fallback for unclassified images. No bg wrapper
+							// (avoids the gap issue when object-contain shows
+							// a smaller image than the card). Ring + shadow
+							// live on the <img> itself.
+							<div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
+								{zone.images.map(({ url }) => (
 									<img
 										src={cld(url, FULL)}
 										srcset={landscapeSrcset(url)}
-										sizes="(min-width: 1280px) 1200px, 100vw"
+										sizes="(min-width: 1024px) 560px, 100vw"
 										alt={project.title}
 										loading="lazy"
-										class="block h-auto w-full"
+										class="mx-auto block h-auto max-h-[720px] w-auto max-w-full rounded-2xl object-contain shadow-sm ring-1 ring-ink/10"
 									/>
-								</div>
-							))}
-						</div>
-					)
-				}
-			</section>
-		))
+								))}
+							</div>
+						) : (
+							// Desktop shots: stacked full-width. srcset covers 2K/4K.
+							// NO rounded (would clip mockup edges). Border+shadow
+							// only for LIGHT (or theme-less) zones so light mockups
+							// don't bleed into the near-white body. Dark mockups
+							// render border-less — they already stand out.
+							<div class="mt-12 space-y-10">
+								{zone.images.map(({ url }) => (
+									<div class={isDarkZone ? 'w-full' : 'w-full border border-ink/10 shadow-sm'}>
+										<img
+											src={cld(url, FULL)}
+											srcset={landscapeSrcset(url)}
+											sizes="(min-width: 1280px) 1200px, 100vw"
+											alt={project.title}
+											loading="lazy"
+											class="block h-auto w-full"
+										/>
+									</div>
+								))}
+							</div>
+						)
+					}
+				</section>
+			);
+		})
 	}
 
 	<div class="pb-24"></div>

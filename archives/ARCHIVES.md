@@ -295,3 +295,55 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
      - `07---dashboard/desktop/dark-mode/dashboard.webp` → premier dans Desktop·Dark (le hero avec 4 stat cards colorées)
      - `05---user-setting/desktop/light-mode/team-member-board.webp` → premier dans Desktop·Light (vue Team Members reconnaissable)
 - **Rollback vers v021** : voir v021 ci-dessus
+
+---
+
+## v023 — 2026-08-06 — état AVANT batch fixes 4
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro`
+  - `src/components/ZoneFilters.astro`
+  - `src/components/Footer.astro`
+- **Rollback** : `cp archives/v023_.../* ` vers chaque path
+
+---
+
+## v024 — 2026-08-06 — 4 fixes feedback David
+
+- **Commit git associé** : à remplir après push
+- **Type** : batch fixes visuels
+- **4 changements** :
+  1. **Back-to-projects** — le bouton sticky bar (icône chevron) devient un `<a href="/#work">` avec icône chevron LEFT ←. Retour à la homepage section Projects, plus scroll top de la page projet. Handler JS `scrollTo` retiré.
+  2. **Séparateur Device/Theme** — ajout `<div class="hidden h-6 w-px bg-ink/15 sm:block">` entre les 2 groupes, uniquement quand les 2 sont présents et sur ≥sm. Gap serré `sm:gap-6` (vs 8 avant).
+  3. **Border light-only** — nouveau `isDarkZone = /dark/i.test(zone.label)` calculé par zone. Appliqué :
+     - Desktop Dark : wrapper `w-full` nu, plus de border+shadow
+     - Desktop Light/other : wrapper `w-full border border-ink/10 shadow-sm` (comme avant)
+     - Mobile Dark : image directe rendue sans card (`<img>` seule avec `rounded-xl`)
+     - Mobile Light/other : card complète (bg-card + border + shadow + image ring, comme avant)
+     - Loop refactor : `zones.map((zone) => (...))` → `zones.map((zone) => { const isDark = ...; return (...); })`
+  4. **Footer mobile 2 lignes** — email / phone / location empilés verticalement sur mobile (`flex flex-col gap-y-2`), séparateurs `·` masqués. Sur ≥sm : layout inline single-line comme avant.
+- **Rollback vers v023** : voir v023 ci-dessus
+
+---
+
+## v025 — 2026-08-06 — état AVANT squircle corners
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/styles/global.css`
+- **Rollback** : `cp archives/v025_.../src__styles__global.css src/styles/global.css`
+
+---
+
+## v026 — 2026-08-06 — Squircle corners (iOS-style) via corner-shape
+
+- **Commit git associé** : à remplir après push
+- **Type** : polish visuel — coins arrondis en superellipse
+- **Fichier modifié** : `src/styles/global.css`
+- **Changement** :
+  - Ajout d'un bloc `@supports (corner-shape: superellipse(3))` qui hijack toutes les utility Tailwind rounded (md, lg, xl, 2xl, 3xl, full, pill) et leur applique `corner-shape: superellipse(3)`
+  - Résultat : coins style icônes iOS (courbe plus lisse, tangente continue) au lieu du quart de cercle classique
+  - Browsers sans support : fallback naturel vers border-radius quart de cercle. Pas de break.
+  - Support : Chrome 139+, Safari 26+
+- **Rollback vers v025** : voir v025 ci-dessus

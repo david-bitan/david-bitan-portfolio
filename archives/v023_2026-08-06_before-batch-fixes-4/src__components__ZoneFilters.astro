@@ -42,15 +42,15 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 			id="zone-filters-bar"
 			class="sticky top-[68px] z-30 w-full border-y border-ink/10 bg-bg/95 backdrop-blur"
 		>
-			<div class="mx-auto flex max-w-[1200px] flex-col gap-3 px-6 py-3 sm:flex-row sm:items-center sm:gap-6">
-				{/* Back-to-projects link — sends the user to the homepage
-					Selected Work section, so they can pick another project
-					without scrolling all the way up + clicking Projects in the
-					nav. Uses a native <a> so it plays nicely with browser
-					history (back button returns to current project scroll pos). */}
-				<a
-					href="/#work"
-					aria-label="Back to projects"
+			<div class="mx-auto flex max-w-[1200px] flex-col gap-3 px-6 py-3 sm:flex-row sm:items-center sm:gap-8">
+				{/* Back-to-top button — sits before the filter groups so the user
+					doesn't have to scroll all the way up to jump to the top of
+					the project page. Keeps the fixed bottom-right BackToTop as
+					well; this one is contextual to the sticky filter bar. */}
+				<button
+					type="button"
+					data-back-to-top
+					aria-label="Back to top"
 					class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ink/15 text-muted transition-colors hover:border-accent hover:text-accent"
 				>
 					<svg
@@ -64,9 +64,9 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 						stroke-linejoin="round"
 						class="h-4 w-4"
 					>
-						<path d="M15 18l-6-6 6-6" />
+						<path d="M18 15l-6-6-6 6" />
 					</svg>
-				</a>
+				</button>
 				{deviceOptions.length > 1 && (
 					<div class="flex flex-wrap items-center gap-2">
 						<span class="text-[11px] font-semibold uppercase tracking-widest text-muted">Device</span>
@@ -84,12 +84,6 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 					</div>
 				)}
 
-				{/* Vertical separator between Device and Theme groups —
-					only rendered when both groups are present. Hidden on
-					mobile where the layout stacks vertically. */}
-				{deviceOptions.length > 1 && themeOptions.length > 1 && (
-					<div class="hidden h-6 w-px shrink-0 bg-ink/15 sm:block" aria-hidden="true"></div>
-				)}
 				{themeOptions.length > 1 && (
 					<div class="flex flex-wrap items-center gap-2">
 						<span class="text-[11px] font-semibold uppercase tracking-widest text-muted">Theme</span>
@@ -153,4 +147,12 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 		}),
 	);
 
+	// Back-to-top button inside the sticky filter bar. Scrolls to page top
+	// smoothly (also respects the `html { scroll-behavior: smooth }` in
+	// global.css). Independent from the fixed bottom-right BackToTop.
+	document.querySelectorAll<HTMLButtonElement>('[data-back-to-top]').forEach((b) =>
+		b.addEventListener('click', () => {
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		}),
+	);
 </script>
