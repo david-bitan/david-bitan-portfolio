@@ -347,3 +347,108 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - Browsers sans support : fallback naturel vers border-radius quart de cercle. Pas de break.
   - Support : Chrome 139+, Safari 26+
 - **Rollback vers v025** : voir v025 ci-dessus
+
+---
+
+## v027 — 2026-08-06 — état AVANT scope-fix squircle (exclure pills/full)
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** : `src/styles/global.css`
+- **Rollback** : `cp archives/v027_.../src__styles__global.css src/styles/global.css`
+
+---
+
+## v028 — 2026-08-06 — Squircle : exclure rounded-full / rounded-pill
+
+- **Commit git associé** : à remplir après push
+- **Type** : fix scope squircle
+- **Raison** : sur les pills (`rounded-pill`) et boutons ronds (`rounded-full`), le `corner-shape: superellipse(3)` aplatit bizarrement les côtés parce que la hauteur est très faible → look moche. Les pills doivent rester parfaitement ronds.
+- **Fichier modifié** : `src/styles/global.css` — retiré `.rounded-full` et `.rounded-pill` du bloc `@supports (corner-shape: ...)`. Ne restent hijackées que : `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-3xl` (containers avec radius significatif).
+- **Rollback vers v027** : voir v027 ci-dessus
+
+---
+
+## v029 — 2026-08-06 — état AVANT thumbnail hover zoom fluide
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/components/ProjectCard.astro`
+  - `src/components/CraftSection.astro`
+- **Rollback** : `cp archives/v029_.../* ` vers chaque path
+
+---
+
+## v030 — 2026-08-06 — Thumbnail hover zoom fluide
+
+- **Commit git associé** : à remplir après push
+- **Type** : polish visuel — animation hover thumbnails
+- **Raison** : le hover-scale sur les thumbnails Work/Craft home était trop rapide (500ms) et le scale trop discret (1.03), donnait un effet "immédiat"
+- **Fichiers modifiés** :
+  - `src/components/ProjectCard.astro`
+  - `src/components/CraftSection.astro`
+- **Changement** : sur les `<img>` thumbnails, remplace `transition-transform duration-500 group-hover:scale-[1.03]` par `transition-transform duration-[900ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:scale-[1.06]`. Courbe out-quart, 900ms, scale 6% (au lieu de 3%). Sensation fluide, filmée.
+- **Rollback vers v029** : voir v029 ci-dessus
+
+---
+
+## v031 — 2026-08-06 — état AVANT reformulation Cactus awards
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/components/Metrics.astro`
+  - `src/components/Hero.astro`
+  - `src/pages/about.astro`
+- **Rollback** : `cp archives/v031_.../* ` vers chaque path
+
+---
+
+## v032 — 2026-08-06 — Reformulation Cactus awards (honesty pass, team-explicit)
+
+- **Commit git associé** : à remplir après push
+- **Type** : correction contenu — accuracy + honnêteté
+- **Raison** : David signale que "3× Cactus" est doublement faux — nombre inexact (12+ en réalité sur 5 ans) et attribution personnelle abusive (un Cactus se gagne en équipe, pas en solo)
+- **Fichiers modifiés** :
+  - `src/components/Metrics.astro` — stat passe de `3× Cactus awards` à `12+ · Cactus awards in 5 years` + sous-ligne `Publicis Group · team contributor`. Support ajouté pour un champ optionnel `sub` sur les Metric items.
+  - `src/components/Hero.astro` — bandeau trophée : `Awarded 3× Cactus at Publicis Group` → `12+ Cactus awards in 5 years · Publicis Group team contributor`
+  - `src/pages/about.astro` — Timeline highlight passé de `Cactus d'Or/Argent/Bronze awards won yearly` à `Team contributor on 12+ Cactus-awarded campaigns (Or, Argent, Bronze)`. Awards section : ajout "Team contributor on 12+ Cactus wins over 5 years".
+- **Rollback vers v031** : voir v031 ci-dessus
+
+---
+
+## v033 — 2026-08-06 — état AVANT reformulation AI-native
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/components/Hero.astro`
+  - `src/pages/about.astro`
+- **Rollback** : `cp archives/v033_.../* ` vers chaque path
+
+---
+
+## v034 — 2026-08-06 — Reformulation H1 : AI-native (accuracy + positionnement 2026)
+
+- **Commit git associé** : à remplir après push
+- **Type** : correction contenu — accuracy + positionnement
+- **Raison** : la phrase "20 years of craft, augmented by AI" suggérait faussement une continuité 20 ans + AI (alors que David utilise l'IA depuis ~2023 avec ChatGPT/Midjourney). En 2026, "AI-augmented since 2023" est aussi devenu banal. Terme "AI-native" = vocabulaire 2026 signalant intégration profonde, sans excuse temporelle.
+- **Fichiers modifiés** :
+  - `src/components/Hero.astro` — H1 : `Designing products with 20 years of craft, augmented by AI.` → `20 years of product design craft, now AI-native.` (AI-native en accent orange)
+  - `src/pages/about.astro` — H1 : `20 years of craft, now AI-augmented.` → `20 years of product design craft, now AI-native.` (cohérent avec Hero)
+- **Rollback vers v033** : voir v033 ci-dessus
+
+---
+
+## v035 — 2026-08-06 — état AVANT swap "100+ Shipped features" → "3 → 1 Designers"
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** : `src/components/Metrics.astro`
+- **Rollback** : `cp archives/v035_.../src__components__Metrics.astro src/components/Metrics.astro`
+
+---
+
+## v036 — 2026-08-06 — Metrics: swap placeholder "100+" par "3 → 1 Designers"
+
+- **Commit git associé** : à remplir après push
+- **Type** : correction contenu — accuracy + positionnement 2026
+- **Raison** : "100+ Shipped features" était un placeholder sans source vérifiable. Remplacé par "3 → 1 Designers consolidated (AI-augmented workflow)" — matérialise concrètement le positionnement AI-native, prouve le H1 au lieu de juste l'affirmer
+- **Fichier modifié** : `src/components/Metrics.astro` — 4ème stat passe de `{ value: '100+', label: 'Shipped features' }` à `{ value: '3 → 1', label: 'Designers consolidated', sub: 'AI-augmented workflow' }`
+- **Rollback vers v035** : voir v035 ci-dessus

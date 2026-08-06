@@ -92,16 +92,13 @@ body {
    the classic Apple-icon look; higher values push the corner closer to the
    square, lower values (down to 1) approach an ellipse. */
 @supports (corner-shape: superellipse(3)) {
-  /* Squircle only for card-like elements (rectangular containers with a
-     meaningful border-radius). Pills / round buttons stay perfectly round
-     — superellipse on a low-height element (like a pill button) flattens
-     the sides in an ugly way. `rounded-full` and `rounded-pill` are
-     intentionally excluded. */
   .rounded-md,
   .rounded-lg,
   .rounded-xl,
   .rounded-2xl,
-  .rounded-3xl {
+  .rounded-3xl,
+  .rounded-full,
+  .rounded-pill {
     corner-shape: superellipse(3);
   }
 }
