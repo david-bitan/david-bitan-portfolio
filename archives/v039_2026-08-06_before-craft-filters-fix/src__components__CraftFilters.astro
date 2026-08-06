@@ -1,0 +1,81 @@
+---
+// Sticky pill filter bar for the /craft page.
+// - `All` is always present and active by default.
+// - Categories are passed in from the caller (built from craftItems), so
+//   adding a new category to the data source (Digital Painting, 3D, Drawing,
+//   Icons, ...) automatically adds a new pill here — no code change needed.
+// - Filtering is client-side: toggles `.hidden` on `<figure data-category="...">`.
+
+interface Props {
+	categories: string[];
+}
+const { categories } = Astro.props;
+---
+
+<div
+	id="craft-filters"
+	class="sticky top-[68px] z-30 border-y border-ink/10 bg-bg/95 backdrop-blur"
+>
+	<div class="mx-auto max-w-[1200px] px-6 py-4">
+		<div class="flex flex-wrap items-center gap-2">
+			<button
+				type="button"
+				data-craft-filter="__all__"
+				class="craft-filter-btn rounded-pill border border-ink/10 bg-accent px-4 py-2 text-sm font-semibold text-accent-ink transition"
+				aria-pressed="true"
+			>
+				All
+			</button>
+			{
+				categories.map((cat) => (
+					<button
+						type="button"
+						data-craft-filter={cat}
+						class="craft-filter-btn rounded-pill border border-ink/10 bg-transparent px-4 py-2 text-sm font-semibold text-ink transition hover:border-ink/30"
+						aria-pressed="false"
+					>
+						{cat}
+					</button>
+				))
+			}
+		</div>
+	</div>
+</div>
+
+<script is:inline>
+	(() => {
+		const buttons = document.querySelectorAll('.craft-filter-btn');
+		const figures = document.querySelectorAll('.craft-figure');
+		if (!buttons.length || !figures.length) return;
+
+		const ACTIVE = ['bg-accent', 'text-accent-ink'];
+		const INACTIVE_BG = 'bg-transparent';
+		const INACTIVE_TEXT = 'text-ink';
+
+		function apply(filter) {
+			figures.forEach((f) => {
+				const cat = f.dataset.category;
+				const show = filter === '__all__' || cat === filter;
+				f.classList.toggle('hidden', !show);
+			});
+			buttons.forEach((b) => {
+				const active = b.dataset.craftFilter === filter;
+				b.setAttribute('aria-pressed', String(active));
+				if (active) {
+					b.classList.add(...ACTIVE);
+					b.classList.remove(INACTIVE_BG, INACTIVE_TEXT);
+				} else {
+					b.classList.remove(...ACTIVE);
+					b.classList.add(INACTIVE_BG, INACTIVE_TEXT);
+				}
+			});
+		}
+
+		buttons.forEach((b) => {
+			b.addEventListener('click', () => apply(b.dataset.craftFilter));
+		});
+
+		// If the URL has a hash (e.g. /craft#3d-07), the browser auto-scrolls
+		// to that item. Keep "All" active so the target isn't hidden.
+	})();
+</script>

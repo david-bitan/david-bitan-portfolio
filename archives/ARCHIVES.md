@@ -452,3 +452,71 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Raison** : "100+ Shipped features" était un placeholder sans source vérifiable. Remplacé par "3 → 1 Designers consolidated (AI-augmented workflow)" — matérialise concrètement le positionnement AI-native, prouve le H1 au lieu de juste l'affirmer
 - **Fichier modifié** : `src/components/Metrics.astro` — 4ème stat passe de `{ value: '100+', label: 'Shipped features' }` à `{ value: '3 → 1', label: 'Designers consolidated', sub: 'AI-augmented workflow' }`
 - **Rollback vers v035** : voir v035 ci-dessus
+
+---
+
+## v037 — 2026-08-06 — état AVANT renforcement border/shadow light
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** : `src/pages/work/[slug].astro`
+- **Rollback** : `cp archives/v037_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v038 — 2026-08-06 — Border/shadow renforcés sur zones Light (mockups blancs)
+
+- **Commit git associé** : à remplir après push
+- **Type** : fix visuel — renforcement contraste bordure
+- **Raison** : David signale qu'après le batch précédent, le pb persiste sur mockups light (Sonary Software Stack, etc.). Cause : `border-ink/10 shadow-sm` était trop pâle pour se distinguer sur bg gris clair face à du contenu image majoritairement blanc.
+- **Fichier modifié** : `src/pages/work/[slug].astro`
+- **Changement** :
+  - Wrappers desktop light : `border-ink/10 shadow-sm` → `border-ink/15 shadow-md`
+  - Cards mobile light : `border-ink/10` → `border-ink/15` (shadow-md déjà là)
+  - Mobile image ring : `ring-ink/10` → `ring-ink/15`
+  - Other card image : `ring-ink/10 shadow-sm` → `ring-ink/15 shadow-md`
+- **Rollback vers v037** : voir v037 ci-dessus
+
+---
+
+## v039 — 2026-08-06 — état AVANT fix CraftFilters (broken script + no hover)
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** : `src/components/CraftFilters.astro`
+- **Rollback** : `cp archives/v039_.../src__components__CraftFilters.astro src/components/CraftFilters.astro`
+
+---
+
+## v040 — 2026-08-06 — Fix CraftFilters : click handler + hover visible
+
+- **Commit git associé** : à remplir après push
+- **Type** : bug fix
+- **Bug 1 signalé** : cliquer sur un pill filter (`3D`, `Digital Painting`) ne faisait rien
+- **Cause racine** : `<script is:inline>` était placé DANS CraftFilters.astro qui se rend en tête du HTML, AVANT les `<figure class="craft-figure">` de craft.astro qui viennent plus bas. Au moment de l'exécution du script inline, `document.querySelectorAll('.craft-figure')` renvoyait 0 → early return → click handlers jamais wire.
+- **Bug 2 signalé** : pas de hover effect visible sur les pills
+- **Cause racine** : `hover:border-ink/30` sur `border-ink/10` = différentiel trop subtil, presque invisible
+- **Fix** : `src/components/CraftFilters.astro`
+  - Retire `is:inline` du script → Astro le compile en module ES6 automatiquement deferred → exécute après DOM prêt
+  - Ajoute types TS (`HTMLButtonElement`, `HTMLElement`) pour cohérence
+  - `cursor-pointer` explicite sur les boutons
+  - Hover renforcé : `hover:border-accent hover:text-accent` (au lieu de `hover:border-ink/30`) → hover clair et visible
+  - Border par défaut passe `border-ink/10` → `border-ink/15` pour meilleure visibilité
+- **Rollback vers v039** : voir v039 ci-dessus
+
+---
+
+## v041 — 2026-08-06 — état AVANT retrait Ashkelon
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** : `src/pages/contact.astro`
+- **Rollback** : `cp archives/v041_.../src__pages__contact.astro src/pages/contact.astro`
+
+---
+
+## v042 — 2026-08-06 — Retrait Ashkelon + signal remote/Tel Aviv
+
+- **Commit git associé** : à remplir après push
+- **Type** : correction contenu — strategic positioning
+- **Raison** : David signale que "Ashkelon" (sud d'Israël, loin de Tel Aviv) peut freiner des recruteurs qui cherchent des candidats disponibles sur Tel Aviv. Il a une proposition de télétravail — préciser l'ouverture au remote / Tel Aviv area résout le pb.
+- **Fichier modifié** : `src/pages/contact.astro` — `const city = 'Ashkelon, Israel'` → `const city = 'Israel · Remote or Tel Aviv area'`
+- **Note** : Footer déjà OK (juste "Israel" sans ville, par décision antérieure)
+- **Rollback vers v041** : voir v041 ci-dessus

@@ -21,7 +21,7 @@ const { categories } = Astro.props;
 			<button
 				type="button"
 				data-craft-filter="__all__"
-				class="craft-filter-btn rounded-pill border border-ink/10 bg-accent px-4 py-2 text-sm font-semibold text-accent-ink transition"
+				class="craft-filter-btn cursor-pointer rounded-pill border border-ink/15 bg-accent px-4 py-2 text-sm font-semibold text-accent-ink transition-colors"
 				aria-pressed="true"
 			>
 				All
@@ -31,7 +31,7 @@ const { categories } = Astro.props;
 					<button
 						type="button"
 						data-craft-filter={cat}
-						class="craft-filter-btn rounded-pill border border-ink/10 bg-transparent px-4 py-2 text-sm font-semibold text-ink transition hover:border-ink/30"
+						class="craft-filter-btn cursor-pointer rounded-pill border border-ink/15 bg-transparent px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent"
 						aria-pressed="false"
 					>
 						{cat}
@@ -42,17 +42,24 @@ const { categories } = Astro.props;
 	</div>
 </div>
 
-<script is:inline>
-	(() => {
-		const buttons = document.querySelectorAll('.craft-filter-btn');
-		const figures = document.querySelectorAll('.craft-figure');
-		if (!buttons.length || !figures.length) return;
+<script>
+	// Craft filters: wire up click handlers once the DOM is ready. Uses
+	// `type="module"` (Astro default when no `is:inline`) which is
+	// automatically deferred — runs after the whole HTML is parsed, so
+	// `.craft-figure` selectors below the filter bar are already in the DOM.
+	//
+	// Previous bug: `<script is:inline>` in this component ran in-place,
+	// BEFORE the figures rendered further down in craft.astro. `figures`
+	// was empty and the early return killed all click handlers, giving
+	// the impression the filter did nothing.
+	const buttons = document.querySelectorAll<HTMLButtonElement>('.craft-filter-btn');
+	const figures = document.querySelectorAll<HTMLElement>('.craft-figure');
 
-		const ACTIVE = ['bg-accent', 'text-accent-ink'];
-		const INACTIVE_BG = 'bg-transparent';
-		const INACTIVE_TEXT = 'text-ink';
+	if (buttons.length && figures.length) {
+		const ACTIVE_ADD = ['bg-accent', 'text-accent-ink'];
+		const ACTIVE_REMOVE = ['bg-transparent', 'text-ink', 'hover:border-accent', 'hover:text-accent'];
 
-		function apply(filter) {
+		function apply(filter: string) {
 			figures.forEach((f) => {
 				const cat = f.dataset.category;
 				const show = filter === '__all__' || cat === filter;
@@ -62,20 +69,20 @@ const { categories } = Astro.props;
 				const active = b.dataset.craftFilter === filter;
 				b.setAttribute('aria-pressed', String(active));
 				if (active) {
-					b.classList.add(...ACTIVE);
-					b.classList.remove(INACTIVE_BG, INACTIVE_TEXT);
+					b.classList.add(...ACTIVE_ADD);
+					b.classList.remove(...ACTIVE_REMOVE);
 				} else {
-					b.classList.remove(...ACTIVE);
-					b.classList.add(INACTIVE_BG, INACTIVE_TEXT);
+					b.classList.remove(...ACTIVE_ADD);
+					b.classList.add(...ACTIVE_REMOVE);
 				}
 			});
 		}
 
 		buttons.forEach((b) => {
-			b.addEventListener('click', () => apply(b.dataset.craftFilter));
+			b.addEventListener('click', () => {
+				const key = b.dataset.craftFilter;
+				if (key) apply(key);
+			});
 		});
-
-		// If the URL has a hash (e.g. /craft#3d-07), the browser auto-scrolls
-		// to that item. Keep "All" active so the target isn't hidden.
-	})();
+	}
 </script>
