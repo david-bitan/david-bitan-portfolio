@@ -133,3 +133,27 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - No-JS fallback : tous les items visibles (dégradation gracieuse)
 - **Note tech** : `<script is:inline>` pour éviter le bundling Astro. Utilise CSS `order` plutôt que DOM reorder pour garder l'ordre source stable (accessibilité)
 - **Rollback vers v007** : voir v007 ci-dessus
+
+---
+
+## v009 — 2026-08-06 — état AVANT création page /craft
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/components/CraftSection.astro` (état v008 — random+load more, hrefs vers image directe target=_blank)
+- **Rollback** : `cp archives/v009_.../src__components__CraftSection.astro src/components/CraftSection.astro` + `rm src/pages/craft.astro src/components/CraftFilters.astro`
+
+---
+
+## v010 — 2026-08-06 — Page /craft interne + filtres pill sticky
+
+- **Commit git associé** : à remplir après push
+- **Type** : point de repère stable
+- **Problème résolu** : clic sur thumbnail Craft home ouvrait l'image full en nouvel onglet → user forcé de fermer le tab manuellement, mauvaise UX
+- **Fichiers créés** :
+  - `src/pages/craft.astro` — page interne dédiée : hero "Personal work" + `<CraftFilters>` sticky + stack full-width toutes les images (chaque `<figure>` a `id={slug}` pour anchor scroll + `data-category` pour filtre)
+  - `src/components/CraftFilters.astro` — barre pill sticky `top-[68px]` avec bouton "All" + un pill par catégorie distincte (extraite dynamiquement depuis `craftItems`). Actif = `bg-accent text-accent-ink`. Filtrage client-side toggle `.hidden` sur les figures
+- **Fichiers modifiés** :
+  - `src/components/CraftSection.astro` (home) — retire `target="_blank"` + `rel`, change href de `item.image` vers `/craft#${item.slug}`. Click thumbnail = navigation interne + scroll auto sur l'image cliquée
+- **Extensibilité** : ajouter une nouvelle catégorie dans `craftItems.ts` (Drawings, Icons, etc.) crée automatiquement un nouveau pill filtre
+- **Rollback vers v009** : voir v009 ci-dessus

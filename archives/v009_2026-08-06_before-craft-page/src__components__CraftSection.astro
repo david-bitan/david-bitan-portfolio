@@ -28,7 +28,9 @@ const INITIAL_COUNT = 12;
 		{
 			craftItems.map((item) => (
 				<a
-					href={`/craft#${item.slug}`}
+					href={item.image}
+					target="_blank"
+					rel="noopener noreferrer"
 					data-category={item.category}
 					class="craft-item group block overflow-hidden rounded-md bg-card"
 				>
