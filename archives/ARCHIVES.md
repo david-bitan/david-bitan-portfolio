@@ -584,3 +584,40 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Vérif build sandbox** : impossible (native binding rolldown installé Windows-side, sandbox Linux). Astro syntax + logique JS relues manuellement. David lance `npm run build` en local avant push.
 - **Rollback vers v045** : voir v045 ci-dessus
 
+
+---
+
+## v047 — 2026-08-07 — état AVANT multi-tags + fix Load More
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/data/allProjects.ts`
+  - `src/components/ProjectCard.astro`
+  - `src/components/HomeFilters.astro`
+  - `src/components/CraftSection.astro`
+- **Rollback** : `cp archives/v047_.../* ` vers chaque path
+
+---
+
+## v048 — 2026-08-07 — Multi-tags par projet + fix Load More All
+
+- **Commit git associé** : à remplir après push
+- **Type** : fix bugs feedback David sur v046
+- **Bug 1** : cliquer pill "UI/UX" ne montrait que `ui-ux-vintage` alors que David voulait aussi voir les SaaS (SaaS = UI/UX au sens large).
+- **Bug 2** : cliquer "All" sur Craft ne réaffichait pas le bouton Load More après un filtre catégorie.
+- **Fix Bug 1 — Multi-tags par projet** :
+  - `FullProject` : ajout champ optionnel `categories?: string[]` (multi-tag pour filtrage). Le champ `category` (single) reste pour affichage page projet.
+  - Les 5 SaaS projects (sonary-dashboard/website/mailer, playright, top5) ont `categories: ['SaaS', 'UI/UX']`.
+  - `ProjectCard` : émet `data-categories={(categories ?? [category]).join(' ')}`.
+  - `SelectedWork` : extraction pills via `flatMap(p => p.categories ?? [p.category])` + Set. Ordre first-occurrence : SaaS · UI/UX · Branding · Gaming.
+  - `HomeFilters` script : lit `data-categories`, split whitespace, `includes(filter)`.
+  - `CraftSection` : renommé `data-category` → `data-categories` par cohérence (une seule cat par craft item pour l'instant, mais API uniforme).
+  - Selector target dans les 2 sections passe de `[data-category]` → `[data-categories]`.
+- **Fix Bug 2 — Load More Craft** :
+  - Retrait de `allRevealed` (sticky). Nouveau : `expanded` state boolean qui se reset à false quand user revient à "All".
+  - Nouvelle logique : **All = toujours reset** (re-cache past-cap items + réaffiche Load More), même si user avait cliqué Load More auparavant. Prévisible.
+  - Helper `pastCapItems()` + `setExpanded(val)` + `updateLoadMoreVisibility()` séparent responsabilités.
+  - `currentFilter` state variable pour ne pas ré-passer le filter en param à chaque check.
+- **Note trade-off** : perte du comportement "sticky Load More" (si user cliquait Load More puis filtrait puis All, tout restait visible). Nouveau comportement : All = retour aux 12 shuffled + bouton. Plus intuitif ("All" = état initial).
+- **Rollback vers v047** : voir v047 ci-dessus
+

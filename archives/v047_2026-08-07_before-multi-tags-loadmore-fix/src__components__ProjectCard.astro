@@ -7,15 +7,11 @@ interface Props {
 }
 
 const { project } = Astro.props;
-// Space-separated list of pill categories this card belongs to. HomeFilters
-// splits on whitespace and checks membership. Falls back to the single
-// primary category when no explicit `categories` field is present.
-const cardCategories = (project.categories ?? [project.category]).join(' ');
 ---
 
 <a
 	href={`/work/${project.slug}`}
-	data-categories={cardCategories}
+	data-category={project.category}
 	class="group block overflow-hidden rounded-md bg-card"
 >
 	<div class="aspect-[4/3] overflow-hidden">

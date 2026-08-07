@@ -6,7 +6,10 @@ import { allProjects } from '../data/allProjects';
 // Categories built dynamically from data — adding a new project category
 // (or renaming one) in allProjects.ts automatically updates the pill row.
 // Order preserved by first-occurrence to keep it stable across builds.
-const workCategories = Array.from(new Set(allProjects.map((p) => p.category)));
+// Uses `categories` (multi-tag) when present, else falls back to `category`.
+const workCategories = Array.from(
+	new Set(allProjects.flatMap((p) => p.categories ?? [p.category])),
+);
 ---
 
 <section id="work" class="mx-auto max-w-[1200px] scroll-mt-24 px-6 py-20 sm:py-28" data-reveal>
@@ -18,7 +21,7 @@ const workCategories = Array.from(new Set(allProjects.map((p) => p.category)));
 	<HomeFilters
 		id="work-filters"
 		categories={workCategories}
-		target="#work-grid > [data-category]"
+		target="#work-grid > [data-categories]"
 	/>
 
 	<div id="work-grid" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">

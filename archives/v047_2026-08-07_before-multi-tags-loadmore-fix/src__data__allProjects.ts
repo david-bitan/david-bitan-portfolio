@@ -3,14 +3,7 @@ export interface FullProject {
 	title: string;
 	client: string;
 	year: string;
-	/** Primary category — used for the tag shown on the project page header. */
 	category: string;
-	/**
-	 * Filter categories — used by the home pill filter (SelectedWork).
-	 * A project can belong to multiple pills (e.g. a SaaS project also
-	 * counts as UI/UX). If omitted, falls back to `[category]`.
-	 */
-	categories?: string[];
 	shortDesc: string;
 	fullDesc: string;
 	thumbnail: string;
@@ -29,7 +22,6 @@ export const allProjects: FullProject[] = [
 		client: `Ryze Beyond`,
 		year: '2025',
 		category: 'SaaS',
-		categories: ['SaaS', 'UI/UX'],
 		shortDesc: `SaaS de gestion des abonnements logiciels, avec design system complet dark/light et flows AI.`,
 		fullDesc: `PLACEHOLDER : Case study complet Sonary Dashboard. Contexte : Ryze Beyond a lancé Sonary pour aider les équipes à tracker et optimiser leurs abonnements SaaS (comme Hubspot, Adobe, Zoom, GitHub). Rôle : Product designer solo, de la recherche utilisateur au shipping. Livrables : design system complet (dark + light mode), 6 features majeures (Software Stack, Calculators, User Settings, Login, Dashboard, AI Chat Bot), architecture responsive full-width Desktop 1920 + Laptop 1280 + Tablet 992 + Mobile 375, gestion des états (empty, loading, filters, multi-select, modals), 96+ frames livrées. Impact : produit clé dans la line Ryze Beyond, contribue au revenue growth.`,
 		// Homepage thumb switched to the real Dashboard screen (the 4 gradient
@@ -147,7 +139,6 @@ export const allProjects: FullProject[] = [
 		client: `Ryze Beyond`,
 		year: '2025',
 		category: 'SaaS',
-		categories: ['SaaS', 'UI/UX'],
 		shortDesc: `Site marketing Sonary avec review hub, article hub, comparatifs et pages produits.`,
 		fullDesc: `PLACEHOLDER : Design du site marketing Sonary. Sections : Homepage, Review Hub, Review Page, Article Hub, Articles, Lineup, Alternative Prod Info, Write a Review, Legal. Approche : storytelling produit + SEO-optimized, structure content-heavy scalable.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342169/portfolio/sonary-website/alternative-prod-info/alternative---desktop.webp',
@@ -182,7 +173,6 @@ export const allProjects: FullProject[] = [
 		client: `Ryze Beyond`,
 		year: '2025',
 		category: 'SaaS',
-		categories: ['SaaS', 'UI/UX'],
 		shortDesc: `Templates emails Sonary (Desktop + Mobile) : notifications, digests, onboarding.`,
 		fullDesc: `PLACEHOLDER : Design de la suite email Sonary. 4 mailers Desktop + 4 Mobile. Focus : cohérence design system, lisibilité, dark mode support, CTAs clairs.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342153/portfolio/sonary-mailer/desktop/mailer-1-desktop.webp',
@@ -206,7 +196,6 @@ export const allProjects: FullProject[] = [
 		client: `Ryze Beyond`,
 		year: '2024',
 		category: 'SaaS',
-		categories: ['SaaS', 'UI/UX'],
 		shortDesc: `Homepage + product list pour Playright, module Ryze Beyond.`,
 		fullDesc: `PLACEHOLDER : Design de Playright. Focus sur la conversion et la présentation produit.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785341989/portfolio/playright/home-page/desktop---1200px---container-1140px.webp',
@@ -229,7 +218,6 @@ export const allProjects: FullProject[] = [
 		client: `Ryze Beyond`,
 		year: '2024',
 		category: 'SaaS',
-		categories: ['SaaS', 'UI/UX'],
 		shortDesc: `Système d'articles comparatifs et lineup pour la plateforme Top5.`,
 		fullDesc: `PLACEHOLDER : Design Top5 : Article, Comparison, Lineup pages. Approche éditoriale premium pour aider les users à comparer produits/services.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342213/portfolio/top5/article/article-side-bar-1920.webp',

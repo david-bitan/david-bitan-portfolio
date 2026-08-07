@@ -74,12 +74,8 @@ const { id, categories, target } = Astro.props;
 
 		function apply(filter: string) {
 			items.forEach((el) => {
-				// Multi-tag support: `data-categories="SaaS UI/UX"` — split on
-				// whitespace and check membership. A project can belong to
-				// several pill filters (e.g. SaaS projects are also UI/UX).
-				const raw = el.dataset.categories || '';
-				const cats = raw.split(/\s+/).filter(Boolean);
-				const show = filter === '__all__' || cats.includes(filter);
+				const cat = el.dataset.category;
+				const show = filter === '__all__' || cat === filter;
 				el.classList.toggle('home-filter-hidden', !show);
 			});
 			buttons.forEach((b) => {

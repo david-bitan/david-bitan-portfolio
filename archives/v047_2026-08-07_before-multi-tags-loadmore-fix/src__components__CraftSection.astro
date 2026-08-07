@@ -27,7 +27,7 @@ const craftCategories = Array.from(new Set(craftItems.map((c) => c.category)));
 	<HomeFilters
 		id="craft-home-filters"
 		categories={craftCategories}
-		target="#craft-grid > [data-categories]"
+		target="#craft-grid > [data-category]"
 	/>
 
 	<div
@@ -39,7 +39,7 @@ const craftCategories = Array.from(new Set(craftItems.map((c) => c.category)));
 			craftItems.map((item) => (
 				<a
 					href={`/craft#${item.slug}`}
-					data-categories={item.category}
+					data-category={item.category}
 					class="craft-item group block overflow-hidden rounded-md bg-card"
 				>
 					<div class="aspect-[4/3] overflow-hidden">
@@ -173,67 +173,73 @@ const craftCategories = Array.from(new Set(craftItems.map((c) => c.category)));
 		});
 
 		const overCap = items.length > initial;
-		let expanded = false; // true = past-cap items visible (Load More clicked)
-		let currentFilter = '__all__';
+		let allRevealed = false; // set true once user clicks Load More
 
-		function pastCapItems() {
-			return items.filter((el) => el.dataset.craftHidden === 'true');
+		function updateLoadMoreVisibility(activeFilter) {
+			// Load More is only relevant when viewing All AND we still have
+			// hidden items to show. Any category filter reveals every item
+			// of that category and makes Load More meaningless.
+			const showBtn = overCap && !allRevealed && activeFilter === '__all__';
+			wrap.classList.toggle('hidden', !showBtn);
 		}
 
-		function setExpanded(val) {
-			expanded = val;
-			pastCapItems().forEach((el) => {
-				el.classList.toggle('hidden', !val);
-				if (!val) el.classList.remove('craft-revealing');
-			});
+		// Initial state.
+		if (!overCap) {
+			wrap.classList.add('hidden');
 		}
-
-		function updateLoadMoreVisibility() {
-			// Show button ONLY when: viewing All AND still have past-cap
-			// items to reveal (i.e. not expanded). Any active category
-			// filter makes it meaningless (all items of that cat are shown
-			// regardless of cap).
-			const show = overCap && !expanded && currentFilter === '__all__';
-			wrap.classList.toggle('hidden', !show);
-		}
-
-		// Initial state: if we don't have more than the cap, no Load More.
-		if (!overCap) wrap.classList.add('hidden');
 
 		btn.addEventListener('click', () => {
-			// Reveal all past-cap items with staggered fade-up.
+			// Reveal newly-shown items with a staggered fade-up so the batch
+			// doesn't pop in abruptly. Delay is capped so long lists don't
+			// linger too long before the last item shows.
 			let revealIdx = 0;
-			pastCapItems().forEach((el) => {
-				if (el.classList.contains('hidden')) {
+			items.forEach((el) => {
+				if (el.dataset.craftHidden === 'true') {
 					el.classList.remove('hidden');
+					delete el.dataset.craftHidden;
 					el.style.animationDelay = Math.min(revealIdx * 60, 800) + 'ms';
 					el.classList.add('craft-revealing');
 					revealIdx++;
 				}
 			});
-			expanded = true;
-			updateLoadMoreVisibility();
+			allRevealed = true;
+			wrap.classList.add('hidden');
 		});
 
-		// Coordinate with HomeFilters: category filters reveal every matching
-		// item (even past-cap ones); "All" always resets to the initial 12
-		// shuffled + Load More visible — even if user previously clicked
-		// Load More. Predictable: All = reset.
+		// Coordinate with HomeFilters: when a category filter is active,
+		// temporarily un-hide the Load-More-hidden items so ALL matching
+		// items in that category show. When user returns to "All", restore
+		// the initial shuffled 12 + Load More button (unless already fully
+		// revealed by an earlier click).
 		if (filterBar) {
 			filterBar.addEventListener('home-filter:change', (ev) => {
 				const filter = ev.detail && ev.detail.filter;
 				if (!filter) return;
-				currentFilter = filter;
 
 				if (filter === '__all__') {
-					setExpanded(false); // re-hide past-cap items
+					// Re-apply hidden state on flagged items (only if user
+					// never clicked Load More — allRevealed keeps the choice
+					// sticky, otherwise going back to All would re-hide items
+					// the user has already asked to see).
+					if (!allRevealed) {
+						items.forEach((el) => {
+							if (el.dataset.craftHidden === 'true') {
+								el.classList.add('hidden');
+							}
+						});
+					}
 				} else {
-					// Temporarily un-hide past-cap items so the entire
-					// category is visible. `expanded` state stays false so
-					// returning to All restores the cap.
-					pastCapItems().forEach((el) => el.classList.remove('hidden'));
+					// Show every item in the filtered category, even ones
+					// past the Load More cap. Keep the memory flag so we can
+					// restore on return to All.
+					items.forEach((el) => {
+						if (el.dataset.craftHidden === 'true') {
+							el.classList.remove('hidden');
+						}
+					});
 				}
-				updateLoadMoreVisibility();
+
+				updateLoadMoreVisibility(filter);
 			});
 		}
 	})();
