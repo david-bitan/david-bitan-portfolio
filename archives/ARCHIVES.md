@@ -734,3 +734,47 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **À faire ensuite (validé David)** : image dans /colophon entre "Who did what" et "Build stats" (option B). David doit fournir un screenshot d'une conversation Cowork ou VS Code montrant le workflow. Je l'intègre au batch suivant.
 - **Rollback vers v053** : voir v053 ci-dessus
 
+
+---
+
+## v055 — 2026-08-07 — état AVANT update skills (about + AboutPreview)
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** : `src/pages/about.astro`, `src/components/AboutPreview.astro`
+- **Rollback** : `cp archives/v055_.../* ` vers chaque path
+
+---
+
+## v056 — 2026-08-07 — Update skills (Adobe AI, Cowork, Animate, JS/Python learning)
+
+- **Commit git associé** : à remplir après push
+- **Type** : update contenu skills
+- **/about Skills** :
+  - **AI tools** : ajout `Claude (Code, Artifacts, Skills, Cowork)` (Cowork nouveau), `Claude ↔ VS Code integration` (nouveau), `Adobe AI (Illustrator, Photoshop, After Effects)` (nouveau). Réordonné pour cohérence.
+  - **Visual & motion** : ajout `Adobe Animate (formerly Flash)`
+  - **Code** : retrait `Swift (learning)`, ajout `JavaScript (learning)` + `Python (learning)`
+- **AboutPreview** (home) : ajout `Adobe AI` dans la ligne AI workflow
+- **Rollback vers v055** : voir v055 ci-dessus
+
+
+---
+
+## v057 — 2026-08-07 — état AVANT skills v2 (Cursor learning, CapCut, Firefly, video AI)
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** : `src/pages/about.astro`, `src/components/AboutPreview.astro`
+- **Note** : AboutPreview reconstruit manuellement pour refléter état v056 (avec Adobe AI, sans Firefly)
+- **Rollback** : `cp archives/v057_.../* ` vers chaque path
+
+---
+
+## v058 — 2026-08-07 — Skills v2 : Cursor learning, CapCut, Firefly, Runway/Sora/Kling
+
+- **Commit git associé** : à remplir après push
+- **Type** : update skills follow-up feedback David
+- **/about Skills** :
+  - **AI tools** : ajout `Cursor (learning)`, `Adobe Firefly`, `Runway · Sora · Kling (video gen)` (David a mentionné les avoir déjà utilisés, puis switché sur Midjourney + Firefly)
+  - **Visual & motion** : ajout `CapCut`
+- **AboutPreview** : ajout `Firefly` dans la ligne AI workflow
+- **Rollback vers v057** : voir v057 ci-dessus
+
