@@ -832,3 +832,25 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Reste 10 case studies à écrire** : sonary-website, sonary-mailer, playright, top5, ryze-hub, ryze-brand, casino-work, sport-betting, branding-old, ui-ux-vintage. Chacun validé par David avant push.
 - **Rollback vers v061** : voir v061 ci-dessus
 
+
+---
+
+## v063 — 2026-08-07 — état AVANT accordéon case study
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** : `src/pages/work/[slug].astro`
+- **Rollback** : `cp archives/v063_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v064 — 2026-08-07 — Case study en accordéon (Read more/less)
+
+- **Commit git associé** : à remplir après push
+- **Type** : UX improvement — feedback David sur pilote Sonary Dashboard
+- **Problème** : le case study Sonary Dashboard v062 poussait les mockups images très bas dans la page. Recruteur ne voyait pas les designs above the fold.
+- **Solution** : case study détaillé (sections + liveUrl) rendu dans un `<div id="case-study-body" class="hidden">` par défaut. Bouton toggle "Read the full case study" juste après le shortDesc. Click → expand + label devient "Show less" + chevron rotate 180°. Script inline auto-scope IIFE, écoute click, toggle `.hidden` + `aria-expanded` + `aria-hidden` + label + rotation chevron.
+- **A11y** : `aria-controls`, `aria-expanded`, `aria-hidden` correctement wire.
+- **Fallback** : projets sans `sections` gardent le rendu legacy `<p whitespace-pre-line>{fullDesc}</p>` (pas d'accordéon). Le fallback sera actif pour les 10 projets pas encore réécrits jusqu'à ce qu'ils passent en `sections`.
+- **Impact visuel** : title + tags + shortDesc + bouton Read more, puis ZoneFilters + galleries — images maintenant above the fold sur desktop 1080p.
+- **Rollback vers v063** : voir v063 ci-dessus
+

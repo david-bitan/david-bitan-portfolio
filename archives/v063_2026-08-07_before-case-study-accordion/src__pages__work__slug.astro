@@ -48,112 +48,53 @@ const zones = groupImagesByZone(project.gallery);
 		</div>
 
 		{
-			/* Rich case study: kept collapsed by default so mockup images can
-			   sit above the fold. A "Read the full case study" toggle expands
-			   the sections and switches to "Show less". Falls back to the
-			   legacy fullDesc paragraph when sections are absent. */
+			/* Rich case study: render structured sections (h2 + paragraphs).
+			   Each section body is split on blank lines into paragraphs so
+			   longer bodies read naturally without needing a markdown parser. */
 			project.sections ? (
-				<div class="mt-8 max-w-3xl">
-					<div
-						id="case-study-body"
-						class="hidden"
-						aria-hidden="true"
-					>
-						{project.sections.map((section) => (
-							<section class="mt-10 first:mt-0">
-								<h2 class="text-xl font-extrabold tracking-tight sm:text-2xl">{section.heading}</h2>
-								<div class="mt-4 space-y-4 leading-relaxed text-ink">
-									{section.body
-										.split(/\n\s*\n/)
-										.map((para) => (
-											<p>{para.trim()}</p>
-										))}
-								</div>
-							</section>
-						))}
-						{project.liveUrl && (
-							<a
-								href={project.liveUrl}
-								target="_blank"
-								rel="noopener"
-								class="mt-10 inline-flex items-center gap-2 rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-colors hover:bg-ink"
-							>
-								Visit live site
-								<svg
-									aria-hidden="true"
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2.4"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="h-4 w-4"
-								>
-									<path d="M5 12h14" />
-									<path d="M13 5l7 7-7 7" />
-								</svg>
-							</a>
-						)}
-					</div>
-
-					<button
-						type="button"
-						id="case-study-toggle"
-						aria-controls="case-study-body"
-						aria-expanded="false"
-						class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
-					>
-						<span data-toggle-label>Read the full case study</span>
-						<svg
-							aria-hidden="true"
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2.4"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="h-4 w-4 transition-transform"
-							data-toggle-chevron
+				<div class="mt-12 max-w-3xl">
+					{project.sections.map((section) => (
+						<section class="mt-10 first:mt-0">
+							<h2 class="text-xl font-extrabold tracking-tight sm:text-2xl">{section.heading}</h2>
+							<div class="mt-4 space-y-4 leading-relaxed text-ink">
+								{section.body
+									.split(/\n\s*\n/)
+									.map((para) => (
+										<p>{para.trim()}</p>
+									))}
+							</div>
+						</section>
+					))}
+					{project.liveUrl && (
+						<a
+							href={project.liveUrl}
+							target="_blank"
+							rel="noopener"
+							class="mt-10 inline-flex items-center gap-2 rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-colors hover:bg-ink"
 						>
-							<path d="M6 9l6 6 6-6" />
-						</svg>
-					</button>
+							Visit live site
+							<svg
+								aria-hidden="true"
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2.4"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="h-4 w-4"
+							>
+								<path d="M5 12h14" />
+								<path d="M13 5l7 7-7 7" />
+							</svg>
+						</a>
+					)}
 				</div>
 			) : (
 				<p class="mt-10 max-w-3xl whitespace-pre-line leading-relaxed text-ink">{project.fullDesc}</p>
 			)
 		}
 	</article>
-
-	<script is:inline>
-		// Case-study accordion: keep the detailed sections collapsed by default
-		// so the mockups (ZoneFilters + galleries below) sit above the fold.
-		// Toggle expands the body and swaps the button label + chevron.
-		(() => {
-			const btn = document.getElementById('case-study-toggle');
-			const body = document.getElementById('case-study-body');
-			if (!btn || !body) return;
-
-			const labelEl = btn.querySelector('[data-toggle-label]');
-			const chevron = btn.querySelector('[data-toggle-chevron]');
-
-			btn.addEventListener('click', () => {
-				const expanded = btn.getAttribute('aria-expanded') === 'true';
-				const next = !expanded;
-				btn.setAttribute('aria-expanded', String(next));
-				body.classList.toggle('hidden', !next);
-				body.setAttribute('aria-hidden', String(!next));
-				if (labelEl) {
-					labelEl.textContent = next ? 'Show less' : 'Read the full case study';
-				}
-				if (chevron) {
-					chevron.style.transform = next ? 'rotate(180deg)' : '';
-				}
-			});
-		})();
-	</script>
 
 	<ZoneFilters zones={zones} />
 
