@@ -53,10 +53,10 @@ const zones = groupImagesByZone(project.gallery);
 			   the sections and switches to "Show less". Falls back to the
 			   legacy fullDesc paragraph when sections are absent. */
 			project.sections ? (
-				<div class="mt-8 max-w-3xl pb-4">
+				<div class="mt-8 max-w-3xl">
 					<div
 						id="case-study-body"
-						class="case-study-body"
+						class="hidden"
 						aria-hidden="true"
 					>
 						{project.sections.map((section) => (
@@ -102,7 +102,7 @@ const zones = groupImagesByZone(project.gallery);
 						id="case-study-toggle"
 						aria-controls="case-study-body"
 						aria-expanded="false"
-						class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
+						class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
 					>
 						<span data-toggle-label>Read the full case study</span>
 						<svg
@@ -127,33 +127,10 @@ const zones = groupImagesByZone(project.gallery);
 		}
 	</article>
 
-	<style>
-		/* Accordion body: animate expand/collapse using measured scrollHeight
-		   set inline by the toggle script. Fallback to auto so the layout
-		   still works without JS. */
-		.case-study-body {
-			overflow: hidden;
-			max-height: 0;
-			opacity: 0;
-			transition:
-				max-height 500ms cubic-bezier(0.22, 0.61, 0.36, 1),
-				opacity 350ms ease-out;
-		}
-		.case-study-body[aria-hidden='false'] {
-			opacity: 1;
-		}
-		@media (prefers-reduced-motion: reduce) {
-			.case-study-body {
-				transition: none;
-			}
-		}
-	</style>
-
 	<script is:inline>
 		// Case-study accordion: keep the detailed sections collapsed by default
 		// so the mockups (ZoneFilters + galleries below) sit above the fold.
-		// Uses measured scrollHeight (in px) rather than a magic max-height
-		// value so any content length animates smoothly.
+		// Toggle expands the body and swaps the button label + chevron.
 		(() => {
 			const btn = document.getElementById('case-study-toggle');
 			const body = document.getElementById('case-study-body');
@@ -162,44 +139,23 @@ const zones = groupImagesByZone(project.gallery);
 			const labelEl = btn.querySelector('[data-toggle-label]');
 			const chevron = btn.querySelector('[data-toggle-chevron]');
 
-			function setExpanded(next) {
+			btn.addEventListener('click', () => {
+				const expanded = btn.getAttribute('aria-expanded') === 'true';
+				const next = !expanded;
 				btn.setAttribute('aria-expanded', String(next));
+				body.classList.toggle('hidden', !next);
 				body.setAttribute('aria-hidden', String(!next));
-
-				if (next) {
-					// Open: measured height, then release to `none` after
-					// the transition so late-loaded images can't get clipped.
-					body.style.maxHeight = body.scrollHeight + 'px';
-					const clear = () => {
-						body.style.maxHeight = 'none';
-						body.removeEventListener('transitionend', clear);
-					};
-					body.addEventListener('transitionend', clear);
-				} else {
-					// Close: pin the current height, force reflow, drop to 0.
-					body.style.maxHeight = body.scrollHeight + 'px';
-					void body.offsetHeight;
-					body.style.maxHeight = '0px';
-				}
-
 				if (labelEl) {
 					labelEl.textContent = next ? 'Show less' : 'Read the full case study';
 				}
 				if (chevron) {
 					chevron.style.transform = next ? 'rotate(180deg)' : '';
 				}
-			}
-
-			btn.addEventListener('click', () => {
-				const expanded = btn.getAttribute('aria-expanded') === 'true';
-				setExpanded(!expanded);
 			});
 		})();
 	</script>
 
-	<div class="mt-8">
-		<ZoneFilters zones={zones} />
-	</div>
+	<ZoneFilters zones={zones} />
 
 	{
 		zones.map((zone) => {

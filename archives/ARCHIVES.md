@@ -875,3 +875,27 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - Réduit `mt-24 pt-24` → `mt-12` (192px → 48px total). Espacement cohérent pills↔titre partout.
 - **Rollback vers v065** : voir v065 ci-dessus
 
+
+---
+
+## v067 — 2026-08-07 — état AVANT anim smooth + spacing accordéon
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** : `src/pages/work/[slug].astro`
+- **Rollback** : `cp archives/v067_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v068 — 2026-08-07 — Accordéon case study : animation smooth + spacing cohérent
+
+- **Commit git associé** : à remplir après push
+- **Type** : polish UX case study Sonary Dashboard
+- **3 fixes** :
+  1. **Animation** : remplacé `.hidden` (display:none, instant) par une classe `.case-study-body` avec transition `max-height 500ms cubic-bezier(0.22,0.61,0.36,1)` + `opacity 350ms`. Script inline mesure `scrollHeight` du body, l'applique en px pour l'open, release à `none` après transitionend (évite clip si images tardives). Close : pin scrollHeight, force reflow, drop à 0px pour animation.
+  2. **`prefers-reduced-motion`** : transition désactivée automatiquement.
+  3. **Spacing** :
+     - `mt-8` sur le bouton toggle → 32px entre body (CTA "Visit live site" en bas) et bouton "Show less"
+     - `pb-4` sur le wrapper article max-w-3xl → petit padding bas de la section case study
+     - Wrapper `<div class="mt-8">` autour de `<ZoneFilters>` → 32px entre bouton "Show less" et les pill filters
+- **Rollback vers v067** : voir v067 ci-dessus
+
