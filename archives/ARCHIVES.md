@@ -649,3 +649,32 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - Conséquence : pill "Branding" ne matche plus que `branding-old`. Le pill reste utile (13 mockups Publicis awarded).
 - **Rollback vers v049** : voir v049 ci-dessus
 
+
+---
+
+## v051 — 2026-08-07 — état AVANT Phase 5 (AI Collaboration Showcase)
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/pages/about.astro`
+  - `src/components/Footer.astro`
+- **Rollback** : `cp archives/v051_.../* ` vers chaque path
+
+---
+
+## v052 — 2026-08-07 — Phase 5 AI Collaboration Showcase
+
+- **Commit git associé** : à remplir après push
+- **Type** : nouvelle fonctionnalité — page + section + footer mention
+- **3 changements coordonnés** :
+  1. **`/about` section AI** : nouveau bloc `bg-card` entre le hero et Experience. Ligne "How this site was built" en small caps orange + paragraphe 3 phrases grand public + lien "Read the full colophon →" vers `/colophon`.
+  2. **Footer micro-mention** : nouvelle ligne discrète sous le copyright — "Designed and built with Astro, Tailwind CSS, and Claude · Colophon" (Colophon = lien).
+  3. **Nouvelle page `/colophon`** (moyenne, 4 sections + hero + closing) :
+     - Hero : "How this site was built." + intro 2 phrases
+     - Section "The stack" : grid 2-col de 6 cards (Framework, Styling, Images, Hosting, Source, Editor) avec label + valeur + pourquoi
+     - Section "Who did what" : 2 colonnes côte à côte (Claude did / I did), 5 items chacun. Ligne éditoriale : division of labor, pas magie.
+     - Section "Build stats" : 4 chiffres (2 semaines, 46+ archives, 7 sessions Claude, 0→1 designer & dev)
+     - Section "A note on honesty" : disclaimer — les projets sont conçus main en Figma sur 20 ans, ce qui change en 2025-2026 c'est *comment* je ship la surface autour (portfolio, filters, case studies), pas le design lui-même
+- **Ton** : hybride validé par David. About = grand public court, Colophon = moyen technique-friendly mais accessible.
+- **Rollback vers v051** : voir v051 ci-dessus
+
