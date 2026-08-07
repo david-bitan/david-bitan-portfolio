@@ -621,3 +621,31 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Note trade-off** : perte du comportement "sticky Load More" (si user cliquait Load More puis filtrait puis All, tout restait visible). Nouveau comportement : All = retour aux 12 shuffled + bouton. Plus intuitif ("All" = état initial).
 - **Rollback vers v047** : voir v047 ci-dessus
 
+
+---
+
+## v049 — 2026-08-07 — état AVANT fix separator + recat Ryze
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** : `src/data/allProjects.ts`, `src/components/ProjectCard.astro`, `src/components/HomeFilters.astro`, `src/components/CraftSection.astro`
+- **Rollback** : `cp archives/v049_.../* ` vers chaque path
+
+---
+
+## v050 — 2026-08-07 — Fix separator pipe + recat Ryze Hub/Brand en UI/UX
+
+- **Commit git associé** : à remplir après push
+- **Type** : bug fix + recat contenu
+- **Bug** : clic pill "Digital Painting" sur Craft home ne montrait rien.
+- **Cause racine** : `HomeFilters` script splittait `data-categories` sur `\s+` (whitespace), donc "Digital Painting" devenait `["Digital", "Painting"]`. `cats.includes("Digital Painting")` → false. Même problème latent pour "UI/UX" (pas d'espace mais confirme choix séparateur unique).
+- **Fix separator** :
+  - `ProjectCard.astro` : `join(' ')` → `join('|')` pour émettre `data-categories="SaaS|UI/UX"`.
+  - `HomeFilters.astro` script : `raw.split(/\s+/)` → `raw.split('|').map(s => s.trim())`. Le trim() gère les espaces autour du pipe si un jour ajouté.
+  - `CraftSection` inchangé pour l'émission (un seul cat par item, pipe absent = split retourne `["Digital Painting"]`, includes match).
+- **Recat Ryze** :
+  - `ryze-hub` : category `'Branding'` → `'UI/UX'`
+  - `ryze-brand` : category `'Branding'` → `'UI/UX'`
+  - David signale que ces 2 projets ne sont pas du branding pur, plus proche d'UI/UX (hub company + brand elements = surface produit).
+  - Conséquence : pill "Branding" ne matche plus que `branding-old`. Le pill reste utile (13 mockups Publicis awarded).
+- **Rollback vers v049** : voir v049 ci-dessus
+

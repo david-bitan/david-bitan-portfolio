@@ -7,12 +7,10 @@ interface Props {
 }
 
 const { project } = Astro.props;
-// Pipe-separated list of pill categories this card belongs to. HomeFilters
-// splits on `|` and checks membership. Pipe (not space) avoids breaking on
-// multi-word category names like "Digital Painting" or "UI/UX".
-// Falls back to the single primary category when no explicit `categories`
-// field is present.
-const cardCategories = (project.categories ?? [project.category]).join('|');
+// Space-separated list of pill categories this card belongs to. HomeFilters
+// splits on whitespace and checks membership. Falls back to the single
+// primary category when no explicit `categories` field is present.
+const cardCategories = (project.categories ?? [project.category]).join(' ');
 ---
 
 <a
