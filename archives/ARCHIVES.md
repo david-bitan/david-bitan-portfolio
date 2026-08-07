@@ -854,3 +854,24 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Impact visuel** : title + tags + shortDesc + bouton Read more, puis ZoneFilters + galleries — images maintenant above the fold sur desktop 1080p.
 - **Rollback vers v063** : voir v063 ci-dessus
 
+
+---
+
+## v065 — 2026-08-07 — état AVANT retrait séparateur zones + reduce spacing
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** : `src/pages/work/[slug].astro`
+- **Rollback** : `cp archives/v065_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v066 — 2026-08-07 — Retrait border-t entre zones + spacing cohérent pills→title
+
+- **Commit git associé** : à remplir après push
+- **Type** : polish visuel — feedback David sur page projet Sonary
+- **Problème** : entre ZoneFilters (sticky pill bar) et le titre de zone (ex "Desktop · Dark"), il y avait une ligne de séparation `border-t border-ink/10` + un énorme espace (`mt-24 pt-24` = 96px + 96px = 192px total). Trop d'air, ligne visuelle superflue.
+- **Fix** : dans `[slug].astro` sur chaque `<section data-zone-label>` :
+  - Retrait `border-t border-ink/10` (plus de ligne)
+  - Réduit `mt-24 pt-24` → `mt-12` (192px → 48px total). Espacement cohérent pills↔titre partout.
+- **Rollback vers v065** : voir v065 ci-dessus
+
