@@ -778,3 +778,24 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **AboutPreview** : ajout `Firefly` dans la ligne AI workflow
 - **Rollback vers v057** : voir v057 ci-dessus
 
+
+---
+
+## v059 — 2026-08-07 — état AVANT swap Cursor → v0.dev + Framer AI
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** : `src/pages/about.astro`
+- **Rollback** : `cp archives/v059_.../* ` vers chaque path
+
+---
+
+## v060 — 2026-08-07 — Swap Cursor → v0.dev + Framer AI (better fit for designer profile)
+
+- **Commit git associé** : à remplir après push
+- **Type** : correction skills après discussion CV
+- **Contexte** : ma reco initiale "Cursor (learning)" était biaisée profil dev. Pour un profil designer AI-native, v0.dev (text-to-UI React components) et Framer AI (site gen visuel) sont plus pertinents. Cursor = paradigme "designer qui code chaque diff", moins aligné avec le workflow délégation Cowork de David.
+- **/about Skills AI tools** :
+  - Retrait : `Cursor (learning)`
+  - Ajout : `v0.dev by Vercel (learning)`, `Framer AI (explored)` (David avait commencé Framer au tout début du projet, abandonné pour Astro + Cowork)
+- **Rollback vers v059** : voir v059 ci-dessus
+
