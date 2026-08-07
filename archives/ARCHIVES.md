@@ -799,3 +799,36 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - Ajout : `v0.dev by Vercel (learning)`, `Framer AI (explored)` (David avait commencé Framer au tout début du projet, abandonné pour Astro + Cowork)
 - **Rollback vers v059** : voir v059 ci-dessus
 
+
+---
+
+## v061 — 2026-08-07 — état AVANT réécriture fullDesc Sonary Dashboard (pilote case studies)
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** : `src/data/allProjects.ts`, `src/pages/work/[slug].astro`
+- **Rollback** : `cp archives/v061_.../* ` vers chaque path
+
+---
+
+## v062 — 2026-08-07 — Sonary Dashboard fullDesc (pilote) + template sections + liveUrl
+
+- **Commit git associé** : à remplir après push
+- **Type** : nouvelle fonctionnalité + contenu case study #1/11
+- **Contexte** : premier case study réécrit sur les 11 projets. Sonary Dashboard sert de pilote pour valider le format avec David.
+- **Type FullProject** :
+  - Ajout interface `Section { heading, body }`
+  - Ajout champ optionnel `sections?: Section[]` (préféré à `fullDesc` quand présent)
+  - Ajout champ optionnel `liveUrl?: string` (CTA "Visit live site" après le corps du case study)
+  - `fullDesc` gardé comme fallback pour les 10 projets pas encore réécrits
+- **Sonary Dashboard** :
+  - `fullDesc` : court résumé fallback (utilisé pour SEO/meta)
+  - `sections` : 6 sections structurées (Context, Role, Approach, Key challenge, Deliverables, What I took from it) — approx 400-450 mots au total
+  - `liveUrl` : `https://sonary.com`
+- **Template `/work/[slug].astro`** :
+  - Si `sections` présent : render chaque section en `<h2>` + paragraphes (split sur blank lines)
+  - Si `liveUrl` présent : CTA pill orange "Visit live site →" après les sections
+  - Sinon fallback comportement legacy `<p whitespace-pre-line>{fullDesc}</p>`
+- **Ton du case study** : factuel, orienté résultat, sans blâmer stakeholders sur le "key challenge" (David a insisté). Focus ownership + livraison.
+- **Reste 10 case studies à écrire** : sonary-website, sonary-mailer, playright, top5, ryze-hub, ryze-brand, casino-work, sport-betting, branding-old, ui-ux-vintage. Chacun validé par David avant push.
+- **Rollback vers v061** : voir v061 ci-dessus
+

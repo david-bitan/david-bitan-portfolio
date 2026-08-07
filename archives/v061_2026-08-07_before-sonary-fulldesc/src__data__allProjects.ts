@@ -1,10 +1,3 @@
-/** One section of a rich case study — heading + free-form body (paragraphs
- * separated by blank lines). Rendered by the /work/[slug] template. */
-export interface Section {
-	heading: string;
-	body: string;
-}
-
 export interface FullProject {
 	slug: string;
 	title: string;
@@ -19,15 +12,7 @@ export interface FullProject {
 	 */
 	categories?: string[];
 	shortDesc: string;
-	/** Legacy plain-text case study. Used as a fallback when `sections` is
-	 * absent. New/rewritten projects use `sections` instead for structured
-	 * rendering (h2 + paragraphs). */
 	fullDesc: string;
-	/** Structured case study — preferred over `fullDesc` when present. */
-	sections?: Section[];
-	/** Optional CTA to the live product. Rendered as a button after the
-	 * case study body. */
-	liveUrl?: string;
 	thumbnail: string;
 	gallery: string[];
 	tags: string[];
@@ -46,46 +31,7 @@ export const allProjects: FullProject[] = [
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
 		shortDesc: `Sole-designed a SaaS to track software subscriptions — full dark/light design system, 96+ shipped frames, AI-powered flows.`,
-		fullDesc: `Sole-designed a SaaS to track software subscriptions — full dark/light design system, 2,000+ frames, AI chat bot for natural-language queries. See structured case study below.`,
-		liveUrl: 'https://sonary.com',
-		sections: [
-			{
-				heading: 'Context',
-				body: `Software subscriptions are messy — teams sign up for SaaS across departments, individual receipts sit in different inboxes, and nobody has a clean picture of what's actually being spent, used, or duplicated.
-
-Sonary was Ryze Beyond's answer: a single dashboard that gives users a full view of their subscription stack (spend per month, potential savings, unused tools) while surfacing personalized alternatives — recommendations funded through Sonary's affiliate model, which keeps the product free for end users.`,
-			},
-			{
-				heading: 'Role',
-				body: `Sole designer on the product, within a cross-functional team of product managers, content managers and engineers. From research to shipped design system, and through design QA post-implementation.`,
-			},
-			{
-				heading: 'Approach',
-				body: `Two months of concentrated work (~4.5 days per week).
-
-Research phase: user interviews, competitive benchmarking, curated inspiration from Dribbble, Pinterest and comparable market products, then accelerated exploration with AI tools (Midjourney, Firefly, Figma AI) to rapidly generate visual directions before narrowing down.
-
-Then: information architecture, wireframes, high-fidelity design, iteration on stakeholder feedback, developer hand-off, and design QA after implementation to verify conformance screen by screen.
-
-Design system built from scratch — full dark and light modes, responsive across 5 breakpoints (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375), all component states (empty, loading, filter, multi-select, modals) documented. Separate motion design system documented in Figma for developers, complemented by SVGator animations delivered when needed. An AI chat bot was designed as a dedicated flow so users could query their stack in natural language.`,
-			},
-			{
-				heading: 'Key challenge',
-				body: `An initial visual direction, defined collectively upfront, didn't pass top-level review — deemed too close to what competitors were shipping.
-
-I then brought forward the alternative I had been proposing from the start; once validated, it required a full re-design in two weeks (9 working days at 4.5 days/week): new palette, new iconography, addition of a dark mode (only one mode existed at first), applied across a project of 2,000+ frames. Delivered on time.`,
-			},
-			{
-				heading: 'Deliverables',
-				body: `6 core surfaces (Software Stack, Calculators, User Settings, Login, Dashboard, AI Chat Bot). Design system with variants, auto-layout, nested and interactive components. The full project runs over 2,000 frames — the screens shown here are a representative sample.`,
-			},
-			{
-				heading: 'What I took from it',
-				body: `Consolidating both sides of the value equation into one product — help users spend less, help the business recommend more — is a UX balancing act that only works in a team.
-
-The design system also paid off later: several downstream Ryze Beyond products (Sonary Website, Playright, Top5) reused parts of it as they came online.`,
-			},
-		],
+		fullDesc: `PLACEHOLDER : Case study complet Sonary Dashboard. Contexte : Ryze Beyond a lancé Sonary pour aider les équipes à tracker et optimiser leurs abonnements SaaS (comme Hubspot, Adobe, Zoom, GitHub). Rôle : Product designer solo, de la recherche utilisateur au shipping. Livrables : design system complet (dark + light mode), 6 features majeures (Software Stack, Calculators, User Settings, Login, Dashboard, AI Chat Bot), architecture responsive full-width Desktop 1920 + Laptop 1280 + Tablet 992 + Mobile 375, gestion des états (empty, loading, filters, multi-select, modals), 96+ frames livrées. Impact : produit clé dans la line Ryze Beyond, contribue au revenue growth.`,
 		// Homepage thumb switched to the real Dashboard screen (the 4 gradient
 		// stat cards + donut + spend timeline) — more recognizable than the
 		// software-stack table for a first impression.

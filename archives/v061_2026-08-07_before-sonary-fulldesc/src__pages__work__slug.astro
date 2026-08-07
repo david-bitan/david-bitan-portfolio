@@ -47,53 +47,7 @@ const zones = groupImagesByZone(project.gallery);
 			}
 		</div>
 
-		{
-			/* Rich case study: render structured sections (h2 + paragraphs).
-			   Each section body is split on blank lines into paragraphs so
-			   longer bodies read naturally without needing a markdown parser. */
-			project.sections ? (
-				<div class="mt-12 max-w-3xl">
-					{project.sections.map((section) => (
-						<section class="mt-10 first:mt-0">
-							<h2 class="text-xl font-extrabold tracking-tight sm:text-2xl">{section.heading}</h2>
-							<div class="mt-4 space-y-4 leading-relaxed text-ink">
-								{section.body
-									.split(/\n\s*\n/)
-									.map((para) => (
-										<p>{para.trim()}</p>
-									))}
-							</div>
-						</section>
-					))}
-					{project.liveUrl && (
-						<a
-							href={project.liveUrl}
-							target="_blank"
-							rel="noopener"
-							class="mt-10 inline-flex items-center gap-2 rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-colors hover:bg-ink"
-						>
-							Visit live site
-							<svg
-								aria-hidden="true"
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2.4"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="h-4 w-4"
-							>
-								<path d="M5 12h14" />
-								<path d="M13 5l7 7-7 7" />
-							</svg>
-						</a>
-					)}
-				</div>
-			) : (
-				<p class="mt-10 max-w-3xl whitespace-pre-line leading-relaxed text-ink">{project.fullDesc}</p>
-			)
-		}
+		<p class="mt-10 max-w-3xl whitespace-pre-line leading-relaxed text-ink">{project.fullDesc}</p>
 	</article>
 
 	<ZoneFilters zones={zones} />
