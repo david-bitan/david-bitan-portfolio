@@ -30,7 +30,7 @@ export const allProjects: FullProject[] = [
 		year: '2025',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Sole-designed a SaaS to track software subscriptions — full dark/light design system, 96+ shipped frames, AI-powered flows.`,
+		shortDesc: `SaaS de gestion des abonnements logiciels, avec design system complet dark/light et flows AI.`,
 		fullDesc: `PLACEHOLDER : Case study complet Sonary Dashboard. Contexte : Ryze Beyond a lancé Sonary pour aider les équipes à tracker et optimiser leurs abonnements SaaS (comme Hubspot, Adobe, Zoom, GitHub). Rôle : Product designer solo, de la recherche utilisateur au shipping. Livrables : design system complet (dark + light mode), 6 features majeures (Software Stack, Calculators, User Settings, Login, Dashboard, AI Chat Bot), architecture responsive full-width Desktop 1920 + Laptop 1280 + Tablet 992 + Mobile 375, gestion des états (empty, loading, filters, multi-select, modals), 96+ frames livrées. Impact : produit clé dans la line Ryze Beyond, contribue au revenue growth.`,
 		// Homepage thumb switched to the real Dashboard screen (the 4 gradient
 		// stat cards + donut + spend timeline) — more recognizable than the
@@ -148,7 +148,7 @@ export const allProjects: FullProject[] = [
 		year: '2025',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Marketing site with review hub, comparison pages and content architecture — designed for SEO scale from day one.`,
+		shortDesc: `Site marketing Sonary avec review hub, article hub, comparatifs et pages produits.`,
 		fullDesc: `PLACEHOLDER : Design du site marketing Sonary. Sections : Homepage, Review Hub, Review Page, Article Hub, Articles, Lineup, Alternative Prod Info, Write a Review, Legal. Approche : storytelling produit + SEO-optimized, structure content-heavy scalable.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342169/portfolio/sonary-website/alternative-prod-info/alternative---desktop.webp',
 		gallery: [
@@ -183,7 +183,7 @@ export const allProjects: FullProject[] = [
 		year: '2025',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Full email system — 4 mailer templates × responsive, dark-mode aware, on-brand across the funnel.`,
+		shortDesc: `Templates emails Sonary (Desktop + Mobile) : notifications, digests, onboarding.`,
 		fullDesc: `PLACEHOLDER : Design de la suite email Sonary. 4 mailers Desktop + 4 Mobile. Focus : cohérence design system, lisibilité, dark mode support, CTAs clairs.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342153/portfolio/sonary-mailer/desktop/mailer-1-desktop.webp',
 		gallery: [
@@ -207,7 +207,7 @@ export const allProjects: FullProject[] = [
 		year: '2024',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Homepage and product list for Playright — focused on conversion and product clarity.`,
+		shortDesc: `Homepage + product list pour Playright, module Ryze Beyond.`,
 		fullDesc: `PLACEHOLDER : Design de Playright. Focus sur la conversion et la présentation produit.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785341989/portfolio/playright/home-page/desktop---1200px---container-1140px.webp',
 		gallery: [
@@ -230,7 +230,7 @@ export const allProjects: FullProject[] = [
 		year: '2024',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Editorial comparison system — article, comparison and lineup pages built for premium content at scale.`,
+		shortDesc: `Système d'articles comparatifs et lineup pour la plateforme Top5.`,
 		fullDesc: `PLACEHOLDER : Design Top5 : Article, Comparison, Lineup pages. Approche éditoriale premium pour aider les users à comparer produits/services.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342213/portfolio/top5/article/article-side-bar-1920.webp',
 		gallery: [
@@ -251,7 +251,7 @@ export const allProjects: FullProject[] = [
 		client: `Ryze Beyond`,
 		year: '2024',
 		category: 'UI/UX',
-		shortDesc: `Company hub and portfolio landing — a single surface tying Ryze Beyond's product line together.`,
+		shortDesc: `Company hub / homepage flow Ryze Beyond.`,
 		fullDesc: `PLACEHOLDER : Design du hub Ryze Beyond, présentation portfolio produits + landing pages Desktop et Mobile.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342009/portfolio/ryze-hub/desktop/company-hub---home-page---step-01.webp',
 		gallery: [
@@ -271,7 +271,7 @@ export const allProjects: FullProject[] = [
 		client: `Ryze Beyond`,
 		year: '2024',
 		category: 'UI/UX',
-		shortDesc: `Visual identity system for Ryze Beyond — logo, palette, motion and web-facing brand elements.`,
+		shortDesc: `Identité et éléments visuels Ryze Beyond.`,
 		fullDesc: `PLACEHOLDER : Éléments d'identité de marque pour Ryze Beyond.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342005/portfolio/ryze/ryze-website---homepage---example-of-lines-per-section.webp',
 		gallery: [
@@ -288,7 +288,7 @@ export const allProjects: FullProject[] = [
 		client: `Gamingtech / Tradologic`,
 		year: '2016',
 		category: 'Gaming',
-		shortDesc: `20+ casino UI screens (2011–2017) — game lobbies, bonus systems, deposit funnels, mobile-first.`,
+		shortDesc: `20+ écrans casino online (2011-2017) : lobbies, jeux, promotions, mobile.`,
 		fullDesc: `PLACEHOLDER : Design de plateformes casino online sur plusieurs années (Gamingtech 2015-2017 pour 10Bet, Real Deal Bet, Bet Rally + Tradologic 2011-2013). Livrables : lobbies de jeux, systèmes de bonus, tunnels de dépôt, interfaces mobile/desktop, animations HTML5/CSS3.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785345974/portfolio/old-wix/casino/casino-01.webp',
 		gallery: [
@@ -339,7 +339,7 @@ export const allProjects: FullProject[] = [
 		client: `Gamingtech`,
 		year: '2016',
 		category: 'Gaming',
-		shortDesc: `Live sport-betting interfaces for 10Bet and Real Deal Bet — real-time odds tables, HTML5 animations.`,
+		shortDesc: `Interfaces sport betting (10Bet, Real Deal Bet).`,
 		fullDesc: `PLACEHOLDER : Design de plateformes sport betting online chez Gamingtech (2015-2017). Livrables : interfaces de paris live, calendriers interactifs, tableaux de cotes, animations HTML5.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785346043/portfolio/old-wix/sport-betting/sport-betting-01.webp',
 		gallery: [
@@ -369,7 +369,7 @@ export const allProjects: FullProject[] = [
 		client: `Arc Interactive / Publicis`,
 		year: '2010',
 		category: 'Branding',
-		shortDesc: `13 brand identities from the Arc Interactive / Publicis years (2006–2011) — same period as the Cactus wins.`,
+		shortDesc: `13 identités de marque et éléments visuels (période Arc Interactive Publicis).`,
 		fullDesc: `PLACEHOLDER : Sélection de travaux branding réalisés chez Arc Interactive (Publicis Group), 2006-2011, période récompensée par Cactus d'Or/Argent/Bronze. Logos, palettes, guidelines, campaigns.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785345947/portfolio/old-wix/branding/branding-01.webp',
 		gallery: [
@@ -397,7 +397,7 @@ export const allProjects: FullProject[] = [
 		client: `Multiple clients`,
 		year: '2015',
 		category: 'UI/UX',
-		shortDesc: `20 selected UI/UX screens from earlier years — fintech, mobile apps, dashboards (Smart.bid, Wochat and others).`,
+		shortDesc: `20 écrans UI/UX vintage : fintech, mobile apps, dashboards.`,
 		fullDesc: `PLACEHOLDER : Sélection de projets UI/UX antérieurs à Ryze Beyond. Fintech (Smart.bid/LoanMax 2018-2019), Wochat mobile app 2017-2018, autres missions.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785346069/portfolio/old-wix/ui-ux/ui-ux-01.webp',
 		gallery: [

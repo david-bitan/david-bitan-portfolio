@@ -678,3 +678,59 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Ton** : hybride validé par David. About = grand public court, Colophon = moyen technique-friendly mais accessible.
 - **Rollback vers v051** : voir v051 ci-dessus
 
+
+---
+
+## v053 — 2026-08-07 — état AVANT passe audit textes
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/data/allProjects.ts`
+  - `src/components/Hero.astro`
+  - `src/components/Metrics.astro`
+  - `src/components/AboutPreview.astro`
+  - `src/pages/about.astro`
+  - `src/pages/colophon.astro`
+- **Rollback** : `cp archives/v053_.../* ` vers chaque path
+
+---
+
+## v054 — 2026-08-07 — Passe audit textes complète (EN + honnêteté + impact recruteur)
+
+- **Commit git associé** : à remplir après push
+- **Type** : polish éditorial batch — traductions + reformulations + corrections factuelles
+- **Contexte** : David demande une passe complète où recruteur qui lit dit "wow, c'est le mec qu'il me faut", sans exagérer ni mentir.
+- **11 shortDesc traduits FR → EN + orientés bénéfice** (allProjects.ts) :
+  - sonary-dashboard : "Sole-designed a SaaS to track software subscriptions — full dark/light design system, 96+ shipped frames, AI-powered flows."
+  - sonary-website : "Marketing site with review hub, comparison pages and content architecture — designed for SEO scale from day one."
+  - sonary-mailer : "Full email system — 4 mailer templates × responsive, dark-mode aware, on-brand across the funnel."
+  - playright : "Homepage and product list for Playright — focused on conversion and product clarity."
+  - top5 : "Editorial comparison system — article, comparison and lineup pages built for premium content at scale."
+  - ryze-hub : "Company hub and portfolio landing — a single surface tying Ryze Beyond's product line together."
+  - ryze-brand : "Visual identity system for Ryze Beyond — logo, palette, motion and web-facing brand elements."
+  - casino-work : "20+ casino UI screens (2011–2017) — game lobbies, bonus systems, deposit funnels, mobile-first."
+  - sport-betting : "Live sport-betting interfaces for 10Bet and Real Deal Bet — real-time odds tables, HTML5 animations."
+  - branding-old : "13 brand identities from the Arc Interactive / Publicis years (2006–2011) — same period as the Cactus wins."
+  - ui-ux-vintage : "20 selected UI/UX screens from earlier years — fintech, mobile apps, dashboards (Smart.bid, Wochat and others)."
+- **Hero** : subline `UI/UX · AI-UX · Web · Mobile · Graphic · 3D` (liste sèche) → `Product interfaces across web, mobile and 3D — designed with an AI-native workflow.`
+- **Metrics** :
+  - `20+ Years experience` → `20+ Years designing products`
+  - `6 Industries` (sec) → `6 Industries shipped in` + sub `SaaS · gaming · fintech · ads · mobile · 3D`
+  - `3 → 1 Designers consolidated · AI-augmented workflow` → `3 → 1 Team consolidated · Sole designer through multi-year stretches` (matches new "2 stretches" narrative)
+- **AboutPreview** : ambigu "Scaled Ryze Beyond design from 32 to 110 employees" → "Sole designer at Ryze Beyond through two multi-year stretches while the company grew from 32 to 110 people — held together by an AI-augmented workflow." (reflète le vécu exact : David seul designer 2× pendant 2 ans, entre-temps équipe de 2-3 embauchée puis dispersée)
+- **/about page** :
+  - Intro : "Currently pioneering AI-augmented..." (marketing) → "Sole designer at Ryze Beyond through two multi-year stretches — the AI-augmented workflow lets a single senior handle what used to take a full team."
+  - Section AI : "in a few evenings" (minimise + imprécis) → "in about two weeks of evening sessions" (factuel + montre vitesse)
+- **/colophon Build stats** :
+  - `~2 weeks / From empty repo to live site` : ajout sub `Real elapsed time — capped by daily Claude session + token limits`
+  - `46+ / Local archive snapshots for rollback` → `46+ / Iteration checkpoints tracked locally` (formulation positive)
+  - `7 / Working sessions with Claude` (ambigu) → `17 / Pages designed + coded` (scope tangible)
+  - `0 → 1 / Designer & developer` (cryptique) → `Solo / Designer + AI-assisted dev` (validé David)
+  - Support `sub?: string` ajouté au type BuildStat
+- **/colophon Honesty note** (correction factuelle importante) :
+  - Ancienne version prétendait "designed by hand in Figma over the past 20 years" — **faux** (Figma sorti 2016).
+  - Nouvelle version : "Figma today, Adobe XD before that, Photoshop and Illustrator in the earlier years — plus Cinema 4D, ZBrush, After Effects and Spline for motion and 3D."
+  - Deuxième paragraphe séparé pour meilleure lecture.
+- **À faire ensuite (validé David)** : image dans /colophon entre "Who did what" et "Build stats" (option B). David doit fournir un screenshot d'une conversation Cowork ou VS Code montrant le workflow. Je l'intègre au batch suivant.
+- **Rollback vers v053** : voir v053 ci-dessus
+

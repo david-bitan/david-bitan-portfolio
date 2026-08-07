@@ -32,15 +32,11 @@ const davidDid = [
 	'Ran every git push from PowerShell (Cowork sandbox blocks HTTPS to GitHub).',
 ];
 
-// `sub` shown below the label for context. Kept optional so short stats
-// stay clean.
-type BuildStat = { n: string; label: string; sub?: string };
-
-const buildStats: BuildStat[] = [
-	{ n: '~2 weeks', label: 'From empty repo to live site', sub: 'Real elapsed time — capped by daily Claude session + token limits' },
-	{ n: '46+', label: 'Iteration checkpoints tracked locally' },
-	{ n: '17', label: 'Pages designed + coded' },
-	{ n: 'Solo', label: 'Designer + AI-assisted dev' },
+const buildStats = [
+	{ n: '~2 weeks', label: 'From empty repo to live site' },
+	{ n: '46+', label: 'Local archive snapshots for rollback' },
+	{ n: '7', label: 'Working sessions with Claude' },
+	{ n: '0 → 1', label: 'Designer & developer' },
 ];
 ---
 
@@ -114,13 +110,12 @@ const buildStats: BuildStat[] = [
 
 	<section class="mx-auto max-w-[1200px] px-6 py-16" data-reveal>
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Build stats</h2>
-		<div class="mt-10 grid grid-cols-2 gap-8 sm:grid-cols-4">
+		<div class="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-4">
 			{
 				buildStats.map((s) => (
 					<div>
 						<p class="text-3xl font-extrabold tracking-tight sm:text-4xl">{s.n}</p>
 						<p class="mt-2 text-sm text-muted">{s.label}</p>
-						{s.sub && <p class="mt-1 text-xs text-muted/80">{s.sub}</p>}
 					</div>
 				))
 			}
@@ -131,18 +126,14 @@ const buildStats: BuildStat[] = [
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">A note on honesty</h2>
 		<div class="mt-6 max-w-2xl space-y-4 text-lg text-muted">
 			<p>
-				Every project shown here was designed by hand — Figma today, Adobe XD before that,
-				Photoshop and Illustrator in the earlier years — plus Cinema 4D, ZBrush,
-				After Effects and Spline for motion and 3D.
+				Every project shown here was designed by hand in Figma over the past 20 years.
+				What changed in 2025-2026 is <em>how</em> I ship the surface around them — this
+				portfolio, its filters, its case-study pages — not the design work itself.
 			</p>
 			<p>
-				What changed in 2025-2026 is <em>how</em> I ship the surface around the work —
-				this portfolio, its filters, its case-study pages — not the design craft itself.
-			</p>
-			<p>
-				If you want to see the same workflow applied to your product, that's exactly what
-				the <a href="/#work" class="text-accent hover:underline">Selected work</a> section
-				is about.
+				If you want to see the same workflow applied to your product, that's exactly
+				what the <a href="/#work" class="text-accent hover:underline">Selected work</a>
+				section is about.
 			</p>
 		</div>
 	</section>
