@@ -1,16 +1,12 @@
 ---
 import { craftItems } from '../data/craftItems';
 import { cld, LANDSCAPE } from '../lib/cloudinary';
-import HomeFilters from './HomeFilters.astro';
 
 // Number of thumbnails shown by default. The full list is always rendered to
 // the HTML (SEO-friendly, and gracefully degrades if JS is disabled — the
 // visitor just sees all items). Client-side script shuffles the order and
 // hides everything past this cap until the user clicks "Load more".
 const INITIAL_COUNT = 12;
-
-// Pills built from data — order = first-occurrence in craftItems.
-const craftCategories = Array.from(new Set(craftItems.map((c) => c.category)));
 ---
 
 <div class="mx-auto max-w-[1200px] px-6">
@@ -23,12 +19,6 @@ const craftCategories = Array.from(new Set(craftItems.map((c) => c.category)));
 		<h2 class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Personal work</h2>
 		<p class="mt-4 max-w-2xl text-muted">3D renders and digital painting — outside the product work.</p>
 	</div>
-
-	<HomeFilters
-		id="craft-home-filters"
-		categories={craftCategories}
-		target="#craft-grid > [data-category]"
-	/>
 
 	<div
 		id="craft-grid"
@@ -135,8 +125,7 @@ const craftCategories = Array.from(new Set(craftItems.map((c) => c.category)));
 </style>
 
 <script is:inline>
-	// Craft grid enhancement: shuffle client-side + reveal-on-click + coordinate
-	// with the pill filter bar (HomeFilters emits `home-filter:change`).
+	// Craft grid enhancement: shuffle client-side + reveal-on-click.
 	// SSR renders ALL items so the page is complete without JS (SEO + no-JS
 	// fallback). This script randomizes visual order via CSS `order` and
 	// hides everything past `INITIAL_COUNT`. Refreshing the page reshuffles.
@@ -144,7 +133,6 @@ const craftCategories = Array.from(new Set(craftItems.map((c) => c.category)));
 		const grid = document.getElementById('craft-grid');
 		const wrap = document.getElementById('craft-load-more-wrapper');
 		const btn = document.getElementById('craft-load-more');
-		const filterBar = document.getElementById('craft-home-filters');
 		if (!grid || !wrap || !btn) return;
 
 		const items = Array.from(grid.querySelectorAll('.craft-item'));
@@ -160,9 +148,6 @@ const craftCategories = Array.from(new Set(craftItems.map((c) => c.category)));
 		// Assign CSS `order` so the grid renders in the shuffled sequence,
 		// then hide anything past the initial cap. Using CSS order (rather
 		// than reordering the DOM) keeps the source order stable for AT/SEO.
-		// `data-craft-hidden` is a MEMORY flag — items keep it even when
-		// temporarily un-hidden by a category filter, so we can restore
-		// the Load-More state when the user goes back to "All".
 		order.forEach((originalIdx, position) => {
 			const el = items[originalIdx];
 			el.style.order = String(position);
@@ -172,20 +157,9 @@ const craftCategories = Array.from(new Set(craftItems.map((c) => c.category)));
 			}
 		});
 
-		const overCap = items.length > initial;
-		let allRevealed = false; // set true once user clicks Load More
-
-		function updateLoadMoreVisibility(activeFilter) {
-			// Load More is only relevant when viewing All AND we still have
-			// hidden items to show. Any category filter reveals every item
-			// of that category and makes Load More meaningless.
-			const showBtn = overCap && !allRevealed && activeFilter === '__all__';
-			wrap.classList.toggle('hidden', !showBtn);
-		}
-
-		// Initial state.
-		if (!overCap) {
+		if (items.length <= initial) {
 			wrap.classList.add('hidden');
+			return;
 		}
 
 		btn.addEventListener('click', () => {
@@ -202,45 +176,7 @@ const craftCategories = Array.from(new Set(craftItems.map((c) => c.category)));
 					revealIdx++;
 				}
 			});
-			allRevealed = true;
 			wrap.classList.add('hidden');
 		});
-
-		// Coordinate with HomeFilters: when a category filter is active,
-		// temporarily un-hide the Load-More-hidden items so ALL matching
-		// items in that category show. When user returns to "All", restore
-		// the initial shuffled 12 + Load More button (unless already fully
-		// revealed by an earlier click).
-		if (filterBar) {
-			filterBar.addEventListener('home-filter:change', (ev) => {
-				const filter = ev.detail && ev.detail.filter;
-				if (!filter) return;
-
-				if (filter === '__all__') {
-					// Re-apply hidden state on flagged items (only if user
-					// never clicked Load More — allRevealed keeps the choice
-					// sticky, otherwise going back to All would re-hide items
-					// the user has already asked to see).
-					if (!allRevealed) {
-						items.forEach((el) => {
-							if (el.dataset.craftHidden === 'true') {
-								el.classList.add('hidden');
-							}
-						});
-					}
-				} else {
-					// Show every item in the filtered category, even ones
-					// past the Load More cap. Keep the memory flag so we can
-					// restore on return to All.
-					items.forEach((el) => {
-						if (el.dataset.craftHidden === 'true') {
-							el.classList.remove('hidden');
-						}
-					});
-				}
-
-				updateLoadMoreVisibility(filter);
-			});
-		}
 	})();
 </script>

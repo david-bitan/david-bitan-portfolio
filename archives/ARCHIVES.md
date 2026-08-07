@@ -547,3 +547,40 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   3. **Scroll anchor /craft coupé** — click thumbnail home arrivait au milieu de l'image (masquée par nav 68px + filter bar ~60px). `scroll-mt-32` (128px) insuffisant. Bumper à `scroll-mt-48` (192px) sur `.craft-figure`.
   4. **Retrait "Remote or Tel Aviv area"** — David change d'avis. `contact.astro` : `Israel · Remote or Tel Aviv area` → `Israel` tout court.
 - **Rollback vers v043** : voir v043 ci-dessus
+
+---
+
+## v045 — 2026-08-07 — état AVANT filtres pill home (Selected Work + Craft)
+
+- **Type** : snapshot pré-modif
+- **Fichiers snapshotés** :
+  - `src/components/SelectedWork.astro`
+  - `src/components/CraftSection.astro`
+- **Rollback** : `cp archives/v045_.../src__components__SelectedWork.astro src/components/SelectedWork.astro` (idem CraftSection)
+
+---
+
+## v046 — 2026-08-07 — Filtres pill home Selected Work + Craft
+
+- **Commit git associé** : à remplir après push
+- **Type** : nouvelle fonctionnalité — filtres client-side
+- **Contexte** : dernière phase visuelle de la refonte avant Phase 5 (AI showcase). Même pattern que `CraftFilters.astro` de la page `/craft`, mais rendu **inline** dans les sections home (pas sticky) + coordination fine avec Load More sur Craft home.
+- **Nouveau composant** : `src/components/HomeFilters.astro`
+  - Props : `id`, `categories: string[]`, `target: string` (CSS selector des items à filtrer, doivent avoir `[data-category]`)
+  - Rendu : pill row `All` + un pill par catégorie. Actif = `bg-accent text-accent-ink`. Hover : `border-accent text-accent` (aligné CraftFilters v040+).
+  - Script module (auto-deferred) : wire tous les `.home-filters` du DOM, toggle classe `.home-filter-hidden` sur les items non-matchants. Dispatch `CustomEvent('home-filter:change', { detail: { filter } })` sur son container à chaque changement.
+  - Classe hide séparée (`.home-filter-hidden`, `!important`, `display: none`) — pas la Tailwind `.hidden`, pour éviter les collisions avec le Load More de Craft qui utilise déjà `.hidden`.
+- **SelectedWork.astro** : ajout `<HomeFilters id="work-filters" categories={workCategories} target="#work-grid > [data-category]" />` sous le titre. Wrap le grid dans `id="work-grid"`. Catégories dérivées dynamiquement de `allProjects` (Set → Array, ordre = première occurrence).
+- **CraftSection.astro** :
+  - Ajout `<HomeFilters id="craft-home-filters" categories={craftCategories} target="#craft-grid > [data-category]" />` sous le paragraphe.
+  - Script inline étendu : écoute `home-filter:change` sur le filter bar.
+    - Filter ≠ `__all__` : retire `.hidden` de tous les items ayant flag `data-craft-hidden` (les items past-Load-More cap deviennent visibles) → toute la catégorie s'affiche. Cache le bouton Load More.
+    - Filter = `__all__` : re-applique `.hidden` sur les items flag (retour aux 12 shuffled) SAUF si user a déjà cliqué Load More (`allRevealed` sticky). Réaffiche Load More si `overCap && !allRevealed`.
+- **Interaction validée mentalement** :
+  - Init : 12 shuffled + 17 hidden + Load More visible
+  - Click "3D" : 24 items 3D visibles (dont ceux hidden par cap), 5 Digital Painting cachés, Load More caché
+  - Click "All" (sans Load More cliqué) : retour 12 shuffled + Load More visible
+  - Click Load More avant filtre : tout visible, `allRevealed=true` → filtres n'affectent plus Load More visibility
+- **Vérif build sandbox** : impossible (native binding rolldown installé Windows-side, sandbox Linux). Astro syntax + logique JS relues manuellement. David lance `npm run build` en local avant push.
+- **Rollback vers v045** : voir v045 ci-dessus
+

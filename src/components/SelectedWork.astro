@@ -1,6 +1,12 @@
 ---
 import ProjectCard from './ProjectCard.astro';
+import HomeFilters from './HomeFilters.astro';
 import { allProjects } from '../data/allProjects';
+
+// Categories built dynamically from data — adding a new project category
+// (or renaming one) in allProjects.ts automatically updates the pill row.
+// Order preserved by first-occurrence to keep it stable across builds.
+const workCategories = Array.from(new Set(allProjects.map((p) => p.category)));
 ---
 
 <section id="work" class="mx-auto max-w-[1200px] scroll-mt-24 px-6 py-20 sm:py-28" data-reveal>
@@ -9,7 +15,13 @@ import { allProjects } from '../data/allProjects';
 		<h2 class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Selected work</h2>
 	</div>
 
-	<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+	<HomeFilters
+		id="work-filters"
+		categories={workCategories}
+		target="#work-grid > [data-category]"
+	/>
+
+	<div id="work-grid" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 		{allProjects.map((project) => <ProjectCard project={project} />)}
 	</div>
 </section>
