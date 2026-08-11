@@ -899,3 +899,19 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
      - Wrapper `<div class="mt-8">` autour de `<ZoneFilters>` → 32px entre bouton "Show less" et les pill filters
 - **Rollback vers v067** : voir v067 ci-dessus
 
+
+## v069 — 2026-08-11 — before sticky back-arrow reveal on filter bars
+
+- **Commit git associé** : (à créer après)
+- **Type** : snapshot AVANT modif
+- **Fichiers snapshotés** :
+  - `src/components/ZoneFilters.astro`
+  - `src/components/CraftFilters.astro`
+  - `src/components/HomeFilters.astro` (unchanged pour l'instant — pas sticky)
+- **Changement à venir** :
+  - ZoneFilters : back-arrow existant `<a href="/#work">` déplacé en `position: absolute`, hidden par défaut (opacity 0 + translateX -6px + pointer-events none). Fade-in + slide-in via classe `.is-stuck` toggled par IntersectionObserver quand la bar pin au top-[68px]. Contenu principal shift à droite via `padding-left: 48px` sur la même transition (400ms cubic-bezier(0.22,0.61,0.36,1)).
+  - CraftFilters : ajout du même pattern back-arrow (nouveau `<a href="/#craft">`) + IntersectionObserver + CSS reveal.
+  - HomeFilters : pas modifié. Rendu inline (pas sticky) → pas de moment "devient sticky" à détecter. À revoir si on veut le rendre sticky aussi.
+- **Rollback** :
+  1. `cp archives/v069_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
+  2. `cp archives/v069_.../src__components__CraftFilters.astro src/components/CraftFilters.astro`

@@ -16,31 +16,8 @@ const { categories } = Astro.props;
 	id="craft-filters"
 	class="sticky top-[68px] z-30 border-y border-ink/10 bg-bg/95 backdrop-blur"
 >
-	<div class="relative mx-auto max-w-[1200px] px-6 py-4">
-		{/* Back-to-home link — appears only when the bar becomes sticky
-			(user scrolled past its natural position). Slides in from the
-			left with a fade, and pushes the pill row to the right via
-			padding-left transition. */}
-		<a
-			href="/#craft"
-			aria-label="Back to home"
-			class="craft-filters-back absolute left-6 top-1/2 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ink/15 text-muted transition-all duration-[400ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] hover:border-accent hover:text-accent"
-		>
-			<svg
-				aria-hidden="true"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2.2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="h-4 w-4"
-			>
-				<path d="M15 18l-6-6 6-6" />
-			</svg>
-		</a>
-		<div class="craft-filters-content flex flex-wrap items-center gap-2 transition-[padding] duration-[400ms] ease-[cubic-bezier(0.22,0.61,0.36,1)]">
+	<div class="mx-auto max-w-[1200px] px-6 py-4">
+		<div class="flex flex-wrap items-center gap-2">
 			<button
 				type="button"
 				data-craft-filter="__all__"
@@ -108,40 +85,4 @@ const { categories } = Astro.props;
 			});
 		});
 	}
-
-	// Sticky detection — same pattern as ZoneFilters. Toggle .is-stuck
-	// on the bar when it pins under the nav. The back arrow + content
-	// padding animate off that class (see <style is:global> below).
-	const bar = document.getElementById('craft-filters');
-	if (bar && 'IntersectionObserver' in window) {
-		const io = new IntersectionObserver(
-			([entry]) => {
-				bar.classList.toggle('is-stuck', entry.intersectionRatio < 1);
-			},
-			{ rootMargin: '-69px 0px 0px 0px', threshold: [1] },
-		);
-		io.observe(bar);
-	}
 </script>
-
-<style is:global>
-	.craft-filters-back {
-		opacity: 0;
-		transform: translateY(-50%) translateX(-6px);
-		pointer-events: none;
-	}
-	#craft-filters.is-stuck .craft-filters-back {
-		opacity: 1;
-		transform: translateY(-50%) translateX(0);
-		pointer-events: auto;
-	}
-	#craft-filters.is-stuck .craft-filters-content {
-		padding-left: 48px;
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.craft-filters-back,
-		.craft-filters-content {
-			transition: none !important;
-		}
-	}
-</style>

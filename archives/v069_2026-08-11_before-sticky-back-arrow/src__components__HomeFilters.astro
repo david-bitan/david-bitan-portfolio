@@ -1,0 +1,122 @@
+---
+// Inline pill filter bar for home sections (Selected Work, Craft).
+// Same visual language as CraftFilters.astro (sticky /craft page), but
+// rendered INLINE inside the section — not sticky.
+//
+// Params:
+//  - id: unique DOM id (also used as script scope)
+//  - categories: pills to render, in order (built by caller from data source)
+//  - target: CSS selector of items to filter. Items must have [data-category].
+//
+// Emits a CustomEvent 'home-filter:change' on the container with
+// detail `{ filter }` so callers (CraftSection) can react — used to
+// coordinate with Load More visibility.
+
+interface Props {
+	id: string;
+	categories: string[];
+	target: string;
+}
+const { id, categories, target } = Astro.props;
+---
+
+<div
+	id={id}
+	class="home-filters mb-8"
+	data-target={target}
+>
+	<div class="flex flex-wrap items-center gap-2">
+		<button
+			type="button"
+			data-home-filter="__all__"
+			class="home-filter-btn cursor-pointer rounded-pill border border-ink/15 bg-accent px-4 py-2 text-sm font-semibold text-accent-ink transition-colors"
+			aria-pressed="true"
+		>
+			All
+		</button>
+		{
+			categories.map((cat) => (
+				<button
+					type="button"
+					data-home-filter={cat}
+					class="home-filter-btn cursor-pointer rounded-pill border border-ink/15 bg-transparent px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent"
+					aria-pressed="false"
+				>
+					{cat}
+				</button>
+			))
+		}
+	</div>
+</div>
+
+<script>
+	// Wire ALL .home-filters bars found on the page. Each bar owns its own
+	// button set + a `data-target` selector pointing at the items to filter.
+	// Script is a module (auto-deferred) — runs after full DOM parse, so
+	// items further down in the source are already reachable.
+	const bars = document.querySelectorAll<HTMLElement>('.home-filters');
+
+	const ACTIVE_ADD = ['bg-accent', 'text-accent-ink'];
+	const ACTIVE_REMOVE = [
+		'bg-transparent',
+		'text-ink',
+		'hover:border-accent',
+		'hover:text-accent',
+	];
+
+	bars.forEach((bar) => {
+		const selector = bar.dataset.target;
+		if (!selector) return;
+
+		const buttons = bar.querySelectorAll<HTMLButtonElement>('.home-filter-btn');
+		const items = document.querySelectorAll<HTMLElement>(selector);
+		if (!buttons.length || !items.length) return;
+
+		function apply(filter: string) {
+			items.forEach((el) => {
+				// Multi-tag support: `data-categories="SaaS|UI/UX"` — split on
+				// pipe (chosen over whitespace to survive multi-word category
+				// names like "Digital Painting"). A project can belong to
+				// several pill filters (e.g. SaaS projects are also UI/UX).
+				const raw = el.dataset.categories || '';
+				const cats = raw.split('|').map((s) => s.trim()).filter(Boolean);
+				const show = filter === '__all__' || cats.includes(filter);
+				el.classList.toggle('home-filter-hidden', !show);
+			});
+			buttons.forEach((b) => {
+				const active = b.dataset.homeFilter === filter;
+				b.setAttribute('aria-pressed', String(active));
+				if (active) {
+					b.classList.add(...ACTIVE_ADD);
+					b.classList.remove(...ACTIVE_REMOVE);
+				} else {
+					b.classList.remove(...ACTIVE_ADD);
+					b.classList.add(...ACTIVE_REMOVE);
+				}
+			});
+			// Notify listeners (e.g. CraftSection Load More logic).
+			bar.dispatchEvent(
+				new CustomEvent('home-filter:change', {
+					detail: { filter },
+					bubbles: true,
+				}),
+			);
+		}
+
+		buttons.forEach((b) => {
+			b.addEventListener('click', () => {
+				const key = b.dataset.homeFilter;
+				if (key) apply(key);
+			});
+		});
+	});
+</script>
+
+<style is:global>
+	/* Own hide class (not Tailwind `.hidden`) so that filter state doesn't
+	   collide with Craft Load More logic — CraftSection uses `.hidden` for
+	   its "past initial cap" items, and both systems need to coexist. */
+	.home-filter-hidden {
+		display: none !important;
+	}
+</style>
