@@ -915,3 +915,15 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   1. `cp archives/v069_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
   2. `cp archives/v069_.../src__components__CraftFilters.astro src/components/CraftFilters.astro`
+
+## v070 — 2026-08-11 — before Sonary Website homepage-first reorder
+
+- **Commit git associé** : (à créer après)
+- **Type** : snapshot AVANT modif
+- **Fichiers snapshotés** :
+  - `src/data/allProjects.ts`
+- **Changement** :
+  - Sonary Website : `home-page-desktop.webp` promu **thumbnail** (à la place de `alternative---desktop.webp`) → aussi image affichée sur home ProjectCard.
+  - Gallery réordonnée : `home-page-desktop.webp` + `home-page-mobile.webp` déplacées en 1ère et 2ème position. Le reste (alternative → articles → legal → lineup → review → write) suit dans l'ordre existant.
+- **Rollback** :
+  - `cp archives/v070_.../src__data__allProjects.ts src/data/allProjects.ts`
