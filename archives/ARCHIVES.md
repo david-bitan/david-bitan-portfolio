@@ -1009,3 +1009,18 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rationale** : v074 caps chaque image à sa taille native. Sur /craft en stack, ça donne un effet visuel où les grandes images s'imposent et les petites paraissent perdues. Ordre par taille décroissante = perception "large → small" naturelle après les voitures.
 - **Rollback** :
   - `cp archives/v075_.../src__data__craftItems.ts src/data/craftItems.ts`
+
+## v076 — 2026-08-11 — Colophon : ajout Design system + Method sections
+
+- **Commit git associé** : (à créer après)
+- **Type** : contenu
+- **Fichiers snapshotés** :
+  - `src/pages/colophon.astro`
+- **Changement** :
+  - 2 nouvelles sections insérées entre "The stack" et "Who did what" :
+    1. **Design system** — Palette (5 couleurs avec swatches carrés, name, hex code, role) sur grid 5-col responsive + sub-section "Type, shape, mode" (4 cards : Typeface Manrope, Radius 8/12/pill, Corners squircle superellipse, Dark mode warm charcoal).
+    2. **Method** — 6 cards grid 2-col : Pair with Claude via Cowork, Versioned local archives before every edit (75+ checkpoints), Session memory file (contexte-portfolio.md), Content in Google Sheets, Behance-informed layout own tokens, Ship in phases + review live.
+  - Bump du build stat "46+" → "75+" iteration checkpoints (à jour avec v075).
+- **Style** : cohérent avec les cards existantes (rounded-lg border-ink/10 bg-card, uppercase label muted, bold value). Palette swatches en div coloré avec ring-1 ink/10 pour définir le contour même sur bg white.
+- **Rollback** :
+  - `cp archives/v076_.../src__pages__colophon.astro src/pages/colophon.astro`

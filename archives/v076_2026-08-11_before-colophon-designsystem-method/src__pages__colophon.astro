@@ -38,53 +38,9 @@ type BuildStat = { n: string; label: string; sub?: string };
 
 const buildStats: BuildStat[] = [
 	{ n: '~2 weeks', label: 'From empty repo to live site', sub: 'Real elapsed time — capped by daily Claude session + token limits' },
-	{ n: '75+', label: 'Iteration checkpoints tracked locally' },
+	{ n: '46+', label: 'Iteration checkpoints tracked locally' },
 	{ n: '17', label: 'Pages designed + coded' },
 	{ n: 'Solo', label: 'Designer + AI-assisted dev' },
-];
-
-// Design tokens actually shipped — kept in sync with src/styles/global.css.
-// Split into two blocks so the layout reads as "colors first, then shape".
-const palette = [
-	{ swatch: '#F3F4F6', name: 'Background', role: 'Near-white canvas — launchnow.design-inspired, easy on the eyes' },
-	{ swatch: '#0A0A0A', name: 'Ink', role: 'Body copy + headlines, high contrast on the light bg' },
-	{ swatch: '#4B5563', name: 'Muted', role: 'Secondary text, metadata, captions' },
-	{ swatch: '#F25C24', name: 'Accent', role: 'CTAs, links, active states — preserved in both light + dark' },
-	{ swatch: '#1C1B1A', name: 'Footer / Dark bg', role: 'Warm charcoal (Claude-interface family), not navy or pure black' },
-];
-
-const shape = [
-	{ label: 'Typeface', value: 'Manrope 400 / 500 / 700 / 800', why: 'Geometric sans with tight tracking on headlines — modern without being sterile.' },
-	{ label: 'Radius', value: '8px · 12px · pill', why: 'Buttons 8, cards 12, CTAs full-round. Kept small tokens; no random values.' },
-	{ label: 'Corners', value: 'Squircle (superellipse 3)', why: 'iOS-style corner-shape on rounded cards where supported — quiet upgrade, falls back to normal radius elsewhere.' },
-	{ label: 'Dark mode', value: 'Warm charcoal, orange kept', why: 'Same family as the footer — never navy. Accent orange is identical in both modes, so the brand reads the same.' },
-];
-
-const method = [
-	{
-		title: 'Pair with Claude via Cowork',
-		body: 'Claude has direct file + shell access to the repo. I keep the taste line and review every change in-browser; Claude writes the code, debugs, and proposes UX improvements.',
-	},
-	{
-		title: 'Versioned local archives before every edit',
-		body: 'Each substantive change gets a numbered snapshot in `/archives/vNNN_.../` with a README and the exact rollback command. 75+ checkpoints so far — one-click revert whenever an experiment does not land.',
-	},
-	{
-		title: 'Session memory file',
-		body: 'A `contexte-portfolio.md` living outside the repo carries decisions, patterns, and next steps across chat sessions. Every new session starts by re-reading it; no restart cost.',
-	},
-	{
-		title: 'Content in Google Sheets, code in Astro',
-		body: 'Projects, craft items, timeline and metadata live in a five-tab spreadsheet, parsed by a TypeScript layer at build time. Edit the sheet, rebuild, ship — no CMS to host.',
-	},
-	{
-		title: 'Behance-informed layout, own tokens',
-		body: 'Grid + case-study format inspired by Behance; visual tokens come from launchnow.design as a starting point, then narrowed down to what this site actually needs.',
-	},
-	{
-		title: 'Ship in phases, review live',
-		body: 'Work sequenced as focused phases (nav → layout → interactions → SEO/backend). Each phase is built, pushed, reviewed on the live URL, then the next phase starts.',
-	},
 ];
 ---
 
@@ -112,62 +68,6 @@ const method = [
 						<p class="text-xs font-semibold uppercase tracking-widest text-muted">{s.label}</p>
 						<p class="mt-2 text-lg font-bold">{s.value}</p>
 						<p class="mt-2 text-sm text-muted">{s.why}</p>
-					</div>
-				))
-			}
-		</div>
-	</section>
-
-	<section class="mx-auto max-w-[1200px] px-6 py-16" data-reveal>
-		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Design system</h2>
-		<p class="mt-4 max-w-2xl text-muted">
-			A small, opinionated set of tokens shared across every page — the same values
-			live in <code class="rounded bg-ink/5 px-1.5 py-0.5 text-sm">global.css</code>.
-		</p>
-
-		<h3 class="mt-10 text-sm font-semibold uppercase tracking-widest text-muted">Palette</h3>
-		<div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-			{
-				palette.map((c) => (
-					<div class="rounded-lg border border-ink/10 bg-card p-4">
-						<div
-							class="h-16 w-full rounded-md ring-1 ring-ink/10"
-							style={`background-color: ${c.swatch};`}
-							aria-hidden="true"
-						/>
-						<p class="mt-3 text-sm font-bold">{c.name}</p>
-						<p class="mt-1 font-mono text-xs uppercase text-muted">{c.swatch}</p>
-						<p class="mt-2 text-xs text-muted/90">{c.role}</p>
-					</div>
-				))
-			}
-		</div>
-
-		<h3 class="mt-12 text-sm font-semibold uppercase tracking-widest text-muted">Type, shape, mode</h3>
-		<div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-			{
-				shape.map((s) => (
-					<div class="rounded-lg border border-ink/10 bg-card p-6">
-						<p class="text-xs font-semibold uppercase tracking-widest text-muted">{s.label}</p>
-						<p class="mt-2 text-lg font-bold">{s.value}</p>
-						<p class="mt-2 text-sm text-muted">{s.why}</p>
-					</div>
-				))
-			}
-		</div>
-	</section>
-
-	<section class="mx-auto max-w-[1200px] px-6 py-16" data-reveal>
-		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Method</h2>
-		<p class="mt-4 max-w-2xl text-muted">
-			How the work actually got done — the process behind the pixels.
-		</p>
-		<div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
-			{
-				method.map((m) => (
-					<div class="rounded-lg border border-ink/10 bg-card p-6">
-						<p class="text-base font-bold text-ink">{m.title}</p>
-						<p class="mt-2 text-sm leading-relaxed text-muted">{m.body}</p>
 					</div>
 				))
 			}
