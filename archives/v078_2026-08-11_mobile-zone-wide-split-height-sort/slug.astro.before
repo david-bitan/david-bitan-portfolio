@@ -236,18 +236,20 @@ const zones = groupImagesByZone(project.gallery);
 							// a naked slot (their own dark bg is enough); light
 							// mockups get the card treatment so their white edges
 							// stay visible against the near-white body.
-							// Client script (see bottom of file) reads each image's
-							// naturalWidth/naturalHeight after load:
-							//   - Wide (W/H > 1) = multi-screen composition/planche →
-							//     moved to the full-width stack below the grid,
-							//     src/srcset swapped to landscape presets for sharpness.
-							//   - Portrait = real mobile capture → sorted by height DESC
-							//     (via CSS order = -height) so similar heights sit
-							//     side-by-side and the grid packs cleanly.
-							<div class="mt-12" data-mobile-zone>
-								<div class="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-3" data-mobile-grid>
-									{zone.images.map(({ url }) =>
-										isDarkZone ? (
+							<div class="mt-12 grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
+								{zone.images.map(({ url }) =>
+									isDarkZone ? (
+										<img
+											src={cld(url, MOBILE)}
+											srcset={mobileSrcset(url)}
+											sizes="375px"
+											alt={project.title}
+											loading="lazy"
+											width="375"
+											class="mx-auto block h-auto w-[375px] max-w-full rounded-xl"
+										/>
+									) : (
+										<div class="flex items-start justify-center overflow-hidden rounded-lg border border-ink/15 bg-card p-5 shadow-md sm:p-6">
 											<img
 												src={cld(url, MOBILE)}
 												srcset={mobileSrcset(url)}
@@ -255,33 +257,11 @@ const zones = groupImagesByZone(project.gallery);
 												alt={project.title}
 												loading="lazy"
 												width="375"
-												class="mx-auto block h-auto w-[375px] max-w-full rounded-xl"
-												data-mobile-item
-												data-full-src={cld(url, FULL)}
-												data-full-srcset={landscapeSrcset(url)}
-												data-is-dark="1"
+												class="mx-auto h-auto w-[375px] max-w-full rounded-xl ring-1 ring-ink/15"
 											/>
-										) : (
-											<div
-												class="flex items-start justify-center overflow-hidden rounded-lg border border-ink/15 bg-card p-5 shadow-md sm:p-6"
-												data-mobile-item
-											>
-												<img
-													src={cld(url, MOBILE)}
-													srcset={mobileSrcset(url)}
-													sizes="375px"
-													alt={project.title}
-													loading="lazy"
-													width="375"
-													class="mx-auto h-auto w-[375px] max-w-full rounded-xl ring-1 ring-ink/15"
-													data-full-src={cld(url, FULL)}
-													data-full-srcset={landscapeSrcset(url)}
-												/>
-											</div>
-										),
-									)}
-								</div>
-								<div class="mt-10 space-y-10" data-mobile-wide-stack></div>
+										</div>
+									),
+								)}
 							</div>
 						) : zone.label === 'Other' ? (
 							// Fallback for unclassified images. No bg wrapper
@@ -329,91 +309,6 @@ const zones = groupImagesByZone(project.gallery);
 	</div>
 
 	<div class="pb-24"></div>
-
-	<style is:global>
-		/* Wide (multi-screen composition) items moved out of the mobile grid
-		   into the full-width stack. Override the 375px cap + card padding so
-		   the composition fills the 1200px column and is legible. */
-		[data-mobile-wide-stack] > [data-mobile-item] {
-			display: block;
-			padding: 0;
-			border: 0;
-			background: transparent;
-			box-shadow: none;
-			border-radius: 0;
-			overflow: visible;
-		}
-		[data-mobile-wide-stack] > [data-mobile-item] > img,
-		[data-mobile-wide-stack] > img[data-mobile-item] {
-			width: 100% !important;
-			max-width: 100% !important;
-			height: auto;
-			margin: 0;
-			border-radius: 0;
-		}
-	</style>
-
-	<script is:inline>
-		// Mobile zone layout: detect wide compositions vs portrait captures.
-		// Runs per-zone (Sonary Dashboard has 4 zones, others 1-2).
-		//   - Aspect ratio > 1 → composition/planche → moved to wide stack,
-		//     src/srcset swapped to the FULL/landscape presets so the browser
-		//     refetches a sharp version for the 1200px slot.
-		//   - Portrait → CSS `order = -Math.round(naturalHeight)` so tallest
-		//     items sort first and similar heights end up adjacent.
-		// Waits per-image via load event (or resolves immediately if already
-		// decoded from cache).
-		(() => {
-			const zones = document.querySelectorAll('[data-mobile-zone]');
-			if (!zones.length) return;
-
-			zones.forEach((zone) => {
-				const grid = zone.querySelector('[data-mobile-grid]');
-				const wideStack = zone.querySelector('[data-mobile-wide-stack]');
-				if (!grid || !wideStack) return;
-
-				const items = Array.from(grid.querySelectorAll('[data-mobile-item]'));
-
-				items.forEach((item) => {
-					const img = item.tagName === 'IMG' ? item : item.querySelector('img');
-					if (!img) return;
-
-					const handle = () => {
-						const w = img.naturalWidth;
-						const h = img.naturalHeight;
-						if (!w || !h) return;
-
-						const ratio = w / h;
-
-						if (ratio > 1) {
-							// Wide composition: swap to landscape srcset for sharpness,
-							// move item to wide stack.
-							const fullSrc = img.dataset.fullSrc;
-							const fullSrcset = img.dataset.fullSrcset;
-							if (fullSrc) img.src = fullSrc;
-							if (fullSrcset) {
-								img.srcset = fullSrcset;
-								img.sizes = '(min-width: 1280px) 1200px, 100vw';
-							}
-							img.removeAttribute('width');
-							wideStack.appendChild(item);
-						} else {
-							// Portrait: sort by height DESC via CSS order.
-							// Negative value → CSS treats as smaller → renders first.
-							item.style.order = String(-Math.round(h));
-						}
-					};
-
-					if (img.complete && img.naturalWidth) {
-						handle();
-					} else {
-						img.addEventListener('load', handle, { once: true });
-						img.addEventListener('error', () => {}, { once: true });
-					}
-				});
-			});
-		})();
-	</script>
 
 	<Footer />
 </Layout>
