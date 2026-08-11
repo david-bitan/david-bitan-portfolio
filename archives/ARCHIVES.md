@@ -979,3 +979,20 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - `cp archives/v073_.../src__styles__global.css src/styles/global.css`
   - `cp archives/v073_.../src__data__craftItems.ts src/data/craftItems.ts`
+
+## v074 — 2026-08-11 — fix /craft image upscale (naturalWidth cap)
+
+- **Commit git associé** : (à créer après)
+- **Type** : bug fix qualité visuelle
+- **Fichiers snapshotés** :
+  - `src/pages/craft.astro`
+- **Root cause** :
+  - Les sources 3D old-Wix vont de ~600px à ~1400px de large. La page /craft affiche chaque figure en `w-full` dans un container `max-w-[1200px]`. Sur écran ≥1280px, le browser étire les images de 600-1000px à 1200px → CSS upscale = flou/pixelisation visible (spécialement les créatures sculpts 3d-06/07/11/22).
+  - Preset Cloudinary `c_limit` empêchait déjà l'upscale côté serveur (source width max) mais pas côté CSS.
+- **Fix** :
+  - Ajout classe `.craft-img` + `mx-auto` sur chaque `<img>`.
+  - Script au bas de la page : détecte `naturalWidth` de chaque image (après `load`) et applique `img.style.maxWidth = naturalWidth + 'px'`. Résultat : displayed max = actual pixels max → jamais d'upscale. Les petites images (622px, 735px...) restent centrées à leur taille native, les grandes prennent la largeur du container.
+  - Fonctionne pour toutes les catégories (3D + Digital Painting + futures). Aucune data-driven config à maintenir.
+- **Trade-off retina** : sur DPR=2, images natif < 1200px restent "1x" (Cloudinary c_limit ne peut pas servir plus que source). Le flou léger retina persiste sur les vraiment petites images, mais l'upscale grossier est éliminé. Amélioration nette du rendu.
+- **Rollback** :
+  - `cp archives/v074_.../src__pages__craft.astro src/pages/craft.astro`
