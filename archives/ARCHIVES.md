@@ -996,3 +996,16 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Trade-off retina** : sur DPR=2, images natif < 1200px restent "1x" (Cloudinary c_limit ne peut pas servir plus que source). Le flou léger retina persiste sur les vraiment petites images, mais l'upscale grossier est éliminé. Amélioration nette du rendu.
 - **Rollback** :
   - `cp archives/v074_.../src__pages__craft.astro src/pages/craft.astro`
+
+## v075 — 2026-08-11 — 3D reorder : cars first, rest by pixel size desc
+
+- **Commit git associé** : (à créer après)
+- **Type** : reorder curatoriel
+- **Fichiers snapshotés** :
+  - `src/data/craftItems.ts` (état v073 juste avant reorder par taille)
+- **Nouvel ordre 3D** :
+  1. Voitures (ordre fixe, curated) : 3d-03 (rouge) → 3d-09/18/20 (batmobiles noires) → 3d-05/13 (RC buggies)
+  2. Reste (véhicules + créatures/sculpts mélangés) trié par aire pixel (w×h) décroissante : 3d-04 (2560×1600) → 3d-15 → 3d-16 → 3d-24 (2000×1337) → 3d-02 → 3d-21 (1536×900) → 3d-19 (1421×879) → 3d-23 (1280×720) → 3d-25 → 3d-06 (1163×775) → 3d-08 → 3d-11 → 3d-12 → 3d-22 → 3d-07 → 3d-17 → 3d-01 → 3d-14 (800×450, plus petites)
+- **Rationale** : v074 caps chaque image à sa taille native. Sur /craft en stack, ça donne un effet visuel où les grandes images s'imposent et les petites paraissent perdues. Ordre par taille décroissante = perception "large → small" naturelle après les voitures.
+- **Rollback** :
+  - `cp archives/v075_.../src__data__craftItems.ts src/data/craftItems.ts`
