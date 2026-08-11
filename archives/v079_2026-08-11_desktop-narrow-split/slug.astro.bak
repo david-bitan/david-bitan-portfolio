@@ -306,35 +306,19 @@ const zones = groupImagesByZone(project.gallery);
 							// only for LIGHT (or theme-less) zones so light mockups
 							// don't bleed into the near-white body. Dark mockups
 							// render border-less — they already stand out.
-							// Client script (see bottom of file) reads each image's
-							// naturalWidth after load:
-							//   - Narrow (natW < 900) = email template / narrow
-							//     screenshot → moved to a 2-col grid below the stack,
-							//     capped to natural width so it never upscales.
-							//   - Wide (natW ≥ 900) = normal desktop mockup → stays
-							//     full-width in the stack.
-							<div class="mt-12" data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
-								<div class="space-y-10" data-desktop-stack>
-									{zone.images.map(({ url }) => (
-										<div
-											class={isDarkZone ? 'w-full' : 'w-full border border-ink/15 shadow-md'}
-											data-desktop-item
-										>
-											<img
-												src={cld(url, FULL)}
-												srcset={landscapeSrcset(url)}
-												sizes="(min-width: 1280px) 1200px, 100vw"
-												alt={project.title}
-												loading="lazy"
-												class="block h-auto w-full"
-											/>
-										</div>
-									))}
-								</div>
-								<div
-									class="mt-10 grid grid-cols-1 items-start justify-items-center gap-8 sm:grid-cols-2"
-									data-desktop-narrow-grid
-								></div>
+							<div class="mt-12 space-y-10">
+								{zone.images.map(({ url }) => (
+									<div class={isDarkZone ? 'w-full' : 'w-full border border-ink/15 shadow-md'}>
+										<img
+											src={cld(url, FULL)}
+											srcset={landscapeSrcset(url)}
+											sizes="(min-width: 1280px) 1200px, 100vw"
+											alt={project.title}
+											loading="lazy"
+											class="block h-auto w-full"
+										/>
+									</div>
+								))}
 							</div>
 						)
 					}
@@ -366,20 +350,6 @@ const zones = groupImagesByZone(project.gallery);
 			height: auto;
 			margin: 0;
 			border-radius: 0;
-		}
-
-		/* Narrow desktop items (e.g. email templates 400px wide) moved out
-		   of the full-width stack into a 2-col grid, capped at their natural
-		   width so the browser never upscales. Wrapper drops the full-width
-		   stretch but keeps its border + shadow (light) or naked (dark). */
-		[data-desktop-narrow-grid] > [data-desktop-item] {
-			width: auto;
-			max-width: 100%;
-		}
-		[data-desktop-narrow-grid] > [data-desktop-item] > img {
-			width: auto;
-			max-width: 100%;
-			height: auto;
 		}
 	</style>
 
@@ -431,54 +401,6 @@ const zones = groupImagesByZone(project.gallery);
 							// Portrait: sort by height DESC via CSS order.
 							// Negative value → CSS treats as smaller → renders first.
 							item.style.order = String(-Math.round(h));
-						}
-					};
-
-					if (img.complete && img.naturalWidth) {
-						handle();
-					} else {
-						img.addEventListener('load', handle, { once: true });
-						img.addEventListener('error', () => {}, { once: true });
-					}
-				});
-			});
-		})();
-	</script>
-
-	<script is:inline>
-		// Desktop zone: split narrow images (e.g. Sonary Email Templates, 400px
-		// wide) out of the full-width stack into a 2-col grid. Cap each moved
-		// item's inline max-width to its own naturalWidth so the browser never
-		// upscales the source. Wide images (≥900px source) stay in the stack.
-		// Runs per desktop zone (one per project side, or 2 for Sonary Dashboard
-		// theme-split etc.).
-		(() => {
-			const NARROW_THRESHOLD = 900;
-			const zones = document.querySelectorAll('[data-desktop-zone]');
-			if (!zones.length) return;
-
-			zones.forEach((zone) => {
-				const stack = zone.querySelector('[data-desktop-stack]');
-				const narrowGrid = zone.querySelector('[data-desktop-narrow-grid]');
-				if (!stack || !narrowGrid) return;
-
-				const items = Array.from(stack.querySelectorAll('[data-desktop-item]'));
-
-				items.forEach((item) => {
-					const img = item.querySelector('img');
-					if (!img) return;
-
-					const handle = () => {
-						const w = img.naturalWidth;
-						if (!w) return;
-
-						if (w < NARROW_THRESHOLD) {
-							// Cap the item to the source's natural width so the
-							// browser never has to interpolate beyond available
-							// pixels. Landscape at 400px, portrait at 400px — both
-							// stay crisp at their exact source size.
-							item.style.maxWidth = w + 'px';
-							narrowGrid.appendChild(item);
 						}
 					};
 

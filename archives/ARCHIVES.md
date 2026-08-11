@@ -1055,3 +1055,38 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Groupage Dark/Light** : déjà géré par les 4 zones splittées de Sonary Dashboard (Desktop·Dark / Desktop·Light / Mobile·Dark / Mobile·Light) via `groupImagesByZone`. Rien à ajouter côté layout.
 - **Rollback** :
   - `cp archives/v078_.../slug.astro.before src/pages/work/[slug].astro`
+
+## v079 — 2026-08-11 — Work page : desktop zone split narrow images to 2-col grid
+
+- **Commit git associé** : (à créer après)
+- **Type** : layout / fix pixellisation
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro` → `slug.astro.bak`
+- **Changement** :
+  - Desktop zone : détection client-side du `naturalWidth` de chaque image au load.
+    - Narrow (natW < 900px) = template email / screenshot étroit → move hors du stack full-width vers un grid 2-col en dessous. Cap `max-width: naturalWidth px` sur le wrapper → image jamais upscalée.
+    - Wide (natW ≥ 900px) = mockup desktop normal → reste dans le stack full-width comme avant.
+  - Wrapper `<div data-desktop-zone>` englobe stack + narrow-grid. `<style is:global>` override le `w-full` du wrapper pour les items déplacés.
+- **Rationale** : Sonary Email Templates a des sources 400×N (format email portrait standard). Zone URL-classée "Desktop" → rendu full-width 1151px CSS × DPR 1.5 = upscale ×4.32 = pixellisé sévère. User feedback direct : « je préfère que l'image soit légèrement plus petite mais qu'elle soit visible comme il faut ». Cap à naturalWidth = image crisp à sa taille native, 2-col pour équilibrer la page.
+- **Portée** : générique, tous projets — tout image desktop sous 900px source va bénéficier du cap.
+- **Rollback** :
+  - `cp archives/v079_.../slug.astro.bak src/pages/work/[slug].astro`
+
+## v080 — 2026-08-11 — About Experience : full detail sur tous postes
+
+- **Commit git associé** : (à créer après)
+- **Type** : contenu / rewrite
+- **Fichiers snapshotés** :
+  - `src/pages/about.astro` → `about.astro.bak`
+- **Changement** :
+  - Smart.bid : 2 → 5 bullets (match CV v3 verbatim)
+  - Wochat : 2 → 5 bullets (match CV v3 verbatim)
+  - Gamingtech : 2 → 4 bullets (match CV v3 verbatim)
+  - Mench — Qdigital : 1 → 3 bullets + noms de brands (Bank Discount, Coca-Cola, Laline)
+  - IGMD Affeurope — Tradologic : 1 → 3 bullets (white-label casino + binary options, trading widgets, HUDs, marketing Flash/HTML5)
+  - Arc Interactive (Publicis Group) : 2 → 4 bullets + noms de brands (Bank Leumi, Afeka, UMI Motors — Cadillac, Chevrolet) + collaboration cross-discipline agency
+  - Gestimo : 1 → 2 bullets (contexte real-estate Israeli firm, management de l'équipe)
+  - Ryze Beyond : intact (déjà étoffé en v077)
+- **Rationale** : session 10 v077 avait sur-condensé les postes anciens (choix « CV recruteur scan »). User feedback session 11 : site portfolio a plus d'espace qu'un CV, l'écart entre Ryze (8 bullets) et les 7 autres postes (1-2 bullets) était visuellement déséquilibré. Full-detail pour montrer les 20 ans réels, brands fournies par David en direct pour rendre les postes agency crédibles.
+- **Rollback** :
+  - `cp archives/v080_.../about.astro.bak src/pages/about.astro`

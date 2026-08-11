@@ -25,11 +25,8 @@ const timeline = [
 		role: 'Senior UI/UX Designer',
 		company: 'Smart.bid (LoanMax Team)',
 		highlights: [
-			'Led UI/UX for the LoanMax brand and its sub-brands across all platforms',
-			'Rebranded the website, mobile web, and payment application end-to-end',
-			'Built a financial portal from scratch — wireframes, UX flows, UI design, and hand-off specs',
-			'Produced design materials for landing pages, blogs, marketing sites, and social',
-			'Created high-impact visual design assets and reusable design solutions across the team',
+			'Led UI/UX for LoanMax and its sub-brands across all platforms',
+			'Rebranded website, mobile web, and payment application; built a financial portal from scratch (wireframes, UX, UI)',
 		],
 	},
 	{
@@ -37,11 +34,8 @@ const timeline = [
 		role: 'UI/UX Designer',
 		company: 'Wochat',
 		highlights: [
-			'Instant-translation messaging app — owned all design aspects (sketches, user flows, wireframes, specs) for the mobile app',
-			'Researched new features and ideas; owned Wochat brand identity from scratch',
-			'Specified and designed both mobile and desktop sites; built page templates in HTML5 / CSS3',
-			'Designed landing pages, marketing banners, and micro-animations',
-			'Wrote video scenarios and handled the post-production compositing',
+			'Instant-translation messaging app — sketches, flows, wireframes, specs; owned the brand',
+			'Mobile and desktop sites built in HTML5 / CSS3; landing pages, banners, animations, and video scenarios',
 		],
 	},
 	{
@@ -49,51 +43,36 @@ const timeline = [
 		role: 'UI/UX Designer',
 		company: 'Gamingtech',
 		highlights: [
-			'Sports betting and casino gaming products — sketches, wireframes, and full UI design for mobile and web',
-			'Owned branding, specification, and design for the 10Bet, Real Deal Bet, and Bet Rally brands',
-			'Designed responsive landing pages, product surfaces, and applications',
-			'Produced marketing banners and interactive calendars, including animated interactive banners built in HTML5 / CSS3',
+			'Branding, spec, and design for 10Bet, Real Deal Bet, Bet Rally — mobile and web',
+			'Landing pages, applications, interactive calendars, and animated HTML5 / CSS3 banners',
 		],
 	},
 	{
 		range: '2013 — 2015',
 		role: 'Interactive Art Designer',
 		company: 'Mench — Qdigital',
-		highlights: [
-			'Digital advertising agency — designed campaigns and interactive experiences for major Israeli brands including Bank Discount, Coca-Cola, and Laline',
-			'Rich media banners, campaign microsites, and landing pages across Flash and HTML5 / CSS3',
-			'Owned art direction on multi-client briefs, from concept through delivery',
-		],
+		highlights: ['Digital campaigns and interactive experiences'],
 	},
 	{
 		range: '2011 — 2013',
 		role: 'Interactive Art Designer',
 		company: 'IGMD Affeurope — Tradologic',
-		highlights: [
-			'White-label platform provider for online casino and binary options operators — designed operator-facing interfaces and player-facing UI',
-			'Trading widgets, casino lobbies, gaming HUDs, and promotional landing pages',
-			'Delivered animated marketing assets in Flash / HTML5 for multi-market rollouts',
-		],
+		highlights: ['Casino gaming and binary options interfaces'],
 	},
 	{
 		range: '2006 — 2011',
 		role: 'Interactive Art Designer',
 		company: 'Arc Interactive (Publicis Group)',
 		highlights: [
-			'Digital advertising agency inside Publicis Group — designed campaigns for major brands including Bank Leumi, Afeka College of Engineering, and UMI Motors (Cadillac, Chevrolet)',
-			'Interactive rich media, campaign microsites, and animated banner ecosystems in Flash and HTML5',
-			'Contributed to team-designed campaigns awarded 12+ Cactus prizes (Or, Argent, Bronze) — Israel\'s top advertising awards — every year from 2006 to 2011',
-			'Cross-discipline collaboration with creative directors, copywriters, developers, and account teams inside a full-service agency',
+			'Digital advertising campaigns for French market brands',
+			'Team contributor on 12+ Cactus awards over 5 years (Or, Argent, Bronze)',
 		],
 	},
 	{
 		range: '2003 — 2005',
 		role: 'Department Manager & Print Designer',
 		company: 'Gestimo',
-		highlights: [
-			'First professional role — managed the in-house print and digital design department at an Israeli real-estate advertising firm',
-			'Directed print collateral (brochures, catalogs, ads) and early web campaigns; oversaw output quality across a small design team',
-		],
+		highlights: ['Print and digital advertising'],
 	},
 ];
 
