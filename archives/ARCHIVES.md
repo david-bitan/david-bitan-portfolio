@@ -1124,6 +1124,28 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - `cp archives/v082_.../allProjects.ts src/data/allProjects.ts`
   - `cp archives/v082_.../slug.astro src/pages/work/[slug].astro`
 
+## v083 — 2026-08-11 — Selected Work : reorder des 11 projets (curated David)
+
+- **Commit git associé** : (à créer après)
+- **Type** : curation / data reorder
+- **Fichiers snapshotés** :
+  - `src/data/allProjects.ts` → `allProjects.ts.bak`
+- **Changement** — nouvel ordre validé par David sur screenshot annoté :
+  1. sonary-dashboard
+  2. sonary-website
+  3. top5
+  4. ryze-brand
+  5. ryze-hub
+  6. sonary-mailer
+  7. playright
+  8. ui-ux-vintage
+  9. branding-old
+  10. casino-work
+  11. sport-betting
+- **Rationale** : ordre curated pour montrer d'abord les 2 gros projets Sonary récents (case study #1 en prod), puis Top5 (SaaS SEO), puis les 2 Ryze (brand + hub) qui donnent le contexte du groupe, puis les autres Sonary, puis les projets legacy triés visuellement (vintage UI/UX 2011-18 → branding 2006-15 → casino 2011-17 → sport betting). Le sport-betting en dernier = moins portfolio-forward que les screens SaaS récents.
+- **Rollback** :
+  - `cp archives/v083_.../allProjects.ts.bak src/data/allProjects.ts`
+
 - **Rationale** : corrections directes suite feedback David session 11. La phrase « two junior designers » était inexacte et se lisait comme de la vantardise ; la nouvelle formulation dit la même chose mais en montrant le partage de savoir plutôt que la hiérarchie. Video/3D/animation/logos/loaders manquaient — c'est une grosse part du craft real de David sur Ryze. L'autodidacte 20 ans + siteduzero/OpenClassrooms montre la trajectoire d'apprentissage continue, différenciant.
 - **Rollback** :
   - `cp archives/v081_.../about.astro.bak src/pages/about.astro`
