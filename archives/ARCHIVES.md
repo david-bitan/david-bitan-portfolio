@@ -962,3 +962,20 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - `cp archives/v072_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
   - `cp archives/v072_.../src__components__CraftFilters.astro src/components/CraftFilters.astro`
+
+## v073 — 2026-08-11 — cursor pointer global + 3D craft reorder (car-first)
+
+- **Commit git associé** : (à créer après)
+- **Type** : polish (UX affordance + curation ordre)
+- **Fichiers snapshotés** :
+  - `src/styles/global.css`
+  - `src/data/craftItems.ts`
+- **Changements** :
+  - **Cursor pointer global** : Tailwind Preflight reset `<button> { cursor: default }`. Ajout d'une règle globale dans `global.css` : `button:not(:disabled), [role='button']:not([aria-disabled='true']), summary, label[for], input[type='submit|reset|button|checkbox|radio']:not(:disabled), select:not(:disabled) { cursor: pointer; }`. Un seul endroit, couvre tous les composants (nav toggle, filter pills, accordion toggle, load more, BackToTop, X + arrows de la Lightbox, etc.).
+  - **Réordonnancement 3D** dans `craftItems.ts` : voiture rouge en 1er (3d-03), puis 3 voitures noires Batmobile-style (3d-09, 3d-18, 3d-20), puis 2 RC buggies noirs (3d-05, 3d-13), puis 7 autres véhicules (podracers/hovercraft/missiles : 3d-01, 3d-14, 3d-17, 3d-21, 3d-24, 3d-23, 3d-25), puis 11 autres modèles (créatures/sculpts/épée/yeux : 3d-02, 3d-04, 3d-06, 3d-07, 3d-08, 3d-11, 3d-12, 3d-15, 3d-16, 3d-19, 3d-22). Digital Painting inchangé (paint-01→paint-05). Réordonnancement via script Python (regex parse-then-rebuild) plutôt qu'edit texte massif pour éviter les typos.
+- **Impact** :
+  - `/craft` filtrée "3D" : voiture rouge affichée en 1er.
+  - Home CraftSection : ordre source utilisé pour SSR mais shuffle Fisher-Yates côté client au load (session 6) — l'ordre source ne détermine pas ce qui est visible dans les 12 premiers items home.
+- **Rollback** :
+  - `cp archives/v073_.../src__styles__global.css src/styles/global.css`
+  - `cp archives/v073_.../src__data__craftItems.ts src/data/craftItems.ts`
