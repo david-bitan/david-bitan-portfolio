@@ -1024,3 +1024,34 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Style** : cohérent avec les cards existantes (rounded-lg border-ink/10 bg-card, uppercase label muted, bold value). Palette swatches en div coloré avec ring-1 ink/10 pour définir le contour même sur bg white.
 - **Rollback** :
   - `cp archives/v076_.../src__pages__colophon.astro src/pages/colophon.astro`
+
+## v077 — 2026-08-11 — About Experience : rewrite timeline from CV v3
+
+- **Commit git associé** : (à créer après)
+- **Type** : contenu
+- **Fichiers snapshotés** :
+  - `src/pages/about.astro` → `about.astro.before`
+- **Changement** :
+  - Timeline `Experience` réécrite depuis `CV_David_Bitan_2026_v3.docx`. Ryze Beyond enrichi : ajout architecture composants Figma (variants/auto-layout/nested/interactive), méthodes research (user research, usability testing, A/B, personas, journey mapping), mentoring des 2 juniors, Sonary Software Stack Manager avec sub-features (dashboards, AI recommendation flows, chatbot UX), pratique quotidienne AI (Claude, ChatGPT, Midjourney, Leonardo, Figma AI). Reformulation team consolidation en voix passive/neutre (« team of 3 was consolidated to 1 as the company shifted to an AI-augmented workflow » vs « I consolidated a team »).
+  - Reorder highlights Ryze : scale metric d'abord → Sonary produit ensuite → sole designer/consolidation → mentoring → craft (Figma, systems, research) → AI.
+  - Smart.bid, Wochat, Gamingtech : 2 bullets chacun avec noms de marques réels (LoanMax + sub-brands, 10Bet/Real Deal Bet/Bet Rally) et scope du CV.
+  - Postes anciens (Arc Interactive/Publicis, Tradologic, Mench, Gestimo) : 1-2 bullets max, credit Cactus factuel.
+- **Rationale** : about.astro actuel = maigre vs CV v3 riche. Recruteur senior scanne les 3 premiers bullets par job — impact chiffré et produit doivent être en tête.
+- **Rollback** :
+  - `cp archives/v077_.../about.astro.before src/pages/about.astro`
+
+## v078 — 2026-08-11 — Work page : mobile zone split wide/portrait + sort by height
+
+- **Commit git associé** : (à créer après)
+- **Type** : layout / UX
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro` → `slug.astro.before`
+- **Changement** :
+  - Mobile zone : détection client-side du ratio W/H de chaque image via `naturalWidth`/`naturalHeight` au load.
+    - Wide (ratio > 1) = compositions multi-screens (planches) → move hors de la grid 3-col vers un stack full-width sous la grille. Swap src + srcset vers presets FULL + landscapeSrcset (pré-calculés au SSR, stockés en data-attributes) → browser refetch une version crisp adaptée au slot 1200px.
+    - Portrait = vraies captures mobiles → tri par hauteur DESC via CSS `order = -Math.round(naturalHeight)` → tallest en haut, hauteurs proches côte-à-côte, grid packé proprement.
+  - Wrapper `<div data-mobile-zone>` englobe grid + wide-stack. `<style is:global>` override le cap 375px + kill card padding pour les items promus.
+- **Rationale** : sur Sonary Dashboard, les compositions Figma (Import x3 vues, Add New Software 6 étapes, planches à 6 screens) étaient rendues comme des mobiles normaux dans la grid 3-col → écrasées à ~380px, illisibles. En même temps la grid avait des trous verticaux à cause des hauteurs disparates.
+- **Groupage Dark/Light** : déjà géré par les 4 zones splittées de Sonary Dashboard (Desktop·Dark / Desktop·Light / Mobile·Dark / Mobile·Light) via `groupImagesByZone`. Rien à ajouter côté layout.
+- **Rollback** :
+  - `cp archives/v078_.../slug.astro.before src/pages/work/[slug].astro`
