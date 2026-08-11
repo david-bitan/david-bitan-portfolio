@@ -12,12 +12,11 @@ const timeline = [
 		highlights: [
 			'Scaled design as the company grew 32 → 110 employees',
 			'Shipped Sonary Software Stack Manager — dashboards, AI recommendation flows, chatbot UX',
-			'Sole designer through two multi-year stretches; the team of 3 was consolidated to 1 as the company shifted to an AI-augmented workflow',
-			'During the team-of-3 period, worked with two talented designers, sharing knowledge across the team in both directions. I tended to handle the more complex system specs given my years in the craft',
+			'Sole designer through two multi-year stretches; team of 3 designers was consolidated to 1 as the company shifted to an AI-augmented workflow',
+			'Trained and mentored the two junior designers during the team-of-3 period',
 			'Architected reusable Figma component systems — variants, auto-layout, nested and interactive components',
 			'Multiple design systems and icon sets across several product verticals, accessibility-conscious',
 			'User research, usability testing, A/B testing, personas, journey mapping — grounded decisions in real behavior',
-			'Motion and visual craft — SVG micro-interactions and loaders, UI animation, brand logos and marks, 3D concept explorations, and short-form video creation for product and marketing',
 			'AI in daily practice: Claude and ChatGPT for concepting and iteration, Midjourney / Leonardo / Figma AI for visual assets',
 		],
 	},
@@ -38,7 +37,7 @@ const timeline = [
 		role: 'UI/UX Designer',
 		company: 'Wochat',
 		highlights: [
-			'Live voice, text, and video translation messaging app — owned all design aspects (sketches, user flows, wireframes, specs) for the mobile app',
+			'Instant-translation messaging app — owned all design aspects (sketches, user flows, wireframes, specs) for the mobile app',
 			'Researched new features and ideas; owned Wochat brand identity from scratch',
 			'Specified and designed both mobile and desktop sites; built page templates in HTML5 / CSS3',
 			'Designed landing pages, marketing banners, and micro-animations',
@@ -296,15 +295,6 @@ const languages = [
 					<div>
 						<p class="font-semibold">UI/UX Design Certification</p>
 						<p class="mt-1 text-muted">Tal Florentin (Israel)</p>
-					</div>
-					<div>
-						<p class="font-semibold">Self-taught, continuously — 20+ years</p>
-						<p class="mt-1 text-muted">
-							Hundreds of design courses over two decades: Udemy, YouTube, and community platforms
-							(Le Site du Zéro → OpenClassrooms). I've always been driven to learn — new tools,
-							new techniques, new craft — to stay current with the best tech and software in the
-							design field.
-						</p>
 					</div>
 				</div>
 			</div>

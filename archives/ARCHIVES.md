@@ -1090,3 +1090,18 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rationale** : session 10 v077 avait sur-condensé les postes anciens (choix « CV recruteur scan »). User feedback session 11 : site portfolio a plus d'espace qu'un CV, l'écart entre Ryze (8 bullets) et les 7 autres postes (1-2 bullets) était visuellement déséquilibré. Full-detail pour montrer les 20 ans réels, brands fournies par David en direct pour rendre les postes agency crédibles.
 - **Rollback** :
   - `cp archives/v080_.../about.astro.bak src/pages/about.astro`
+
+## v081 — 2026-08-11 — About : corrections Ryze mentoring + Wochat precision + Ryze craft + self-taught education
+
+- **Commit git associé** : (à créer après)
+- **Type** : contenu / corrections
+- **Fichiers snapshotés** :
+  - `src/pages/about.astro` → `about.astro.bak`
+- **Changement** :
+  - **Ryze team-of-3** : correction factuelle — pas « two junior designers », pas non plus labelisés par level (David préfère ne pas les catégoriser junior/mid, les 2 étaient bons). Reformulé neutre + humble : « worked with two talented designers, sharing knowledge across the team in both directions. I tended to handle the more complex system specs given my years in the craft ». Reconnaît leur talent, situe l'écart uniquement sur l'expérience accumulée.
+  - **Wochat** : « Instant-translation messaging app » → « Live voice, text, and video translation messaging app ». Plus précis sur le scope réel du produit.
+  - **Ryze motion/craft bullet ajouté** : « Motion and visual craft — SVG micro-interactions and loaders, UI animation, brand logos and marks, 3D concept explorations, and short-form video creation for product and marketing ». David demandait video creation + 3D concept + animation + interaction + logos + loaders — tout regroupé en un bullet dense.
+  - **Education** : ajout d'un bloc « Self-taught, continuously — 20+ years ». Hundreds of courses over 2 decades (Udemy, YouTube, Le Site du Zéro → OpenClassrooms). Positionne l'autodidacte + veille tech continue.
+- **Rationale** : corrections directes suite feedback David session 11. La phrase « two junior designers » était inexacte et se lisait comme de la vantardise ; la nouvelle formulation dit la même chose mais en montrant le partage de savoir plutôt que la hiérarchie. Video/3D/animation/logos/loaders manquaient — c'est une grosse part du craft real de David sur Ryze. L'autodidacte 20 ans + siteduzero/OpenClassrooms montre la trajectoire d'apprentissage continue, différenciant.
+- **Rollback** :
+  - `cp archives/v081_.../about.astro.bak src/pages/about.astro`
