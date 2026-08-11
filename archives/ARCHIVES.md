@@ -927,3 +927,19 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - Gallery réordonnée : `home-page-desktop.webp` + `home-page-mobile.webp` déplacées en 1ère et 2ème position. Le reste (alternative → articles → legal → lineup → review → write) suit dans l'ordre existant.
 - **Rollback** :
   - `cp archives/v070_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+## v071 — 2026-08-11 — fix sticky ZoneFilters parent wrapper (root cause du bug v069)
+
+- **Commit git associé** : (à créer après)
+- **Type** : bug fix
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro` (état AVANT fix)
+- **Root cause** :
+  - Le wrapper `<div class="mt-8"><ZoneFilters/></div>` (introduit en v068 pour espacer du bouton "Read the full case study") avait une hauteur = hauteur du bar (58px). Sticky ne peut pas dépasser la bounding box de son parent → dès qu'on scroll > 58px sous la position naturelle, le bar disparaît. Résultat : sticky "cassé", back-arrow jamais vu.
+  - Post-mortem : après le push v069 (ajout back-arrow reveal), le user a vu que rien ne s'affichait et pensait que le sticky lui-même avait cassé. En vrai la logique v069 était correcte, c'est le wrapper v068 qui limitait la portée du sticky.
+- **Fix** :
+  - Le wrapper `<div class="mt-8">` englobe maintenant `<ZoneFilters/>` **ET** le `{zones.map(...)}`. Parent hauteur = toutes les sections zones → sticky pin correctement tout le long du scroll.
+  - Vérifié en live via IntersectionObserver + backOpacity = 1 après scroll : la classe `.is-stuck` se toggle bien maintenant.
+- **CraftFilters** : pas de wrapper limité (rendu directement au top-level de Layout dans `src/pages/craft.astro`), sticky déjà OK — pas de fix nécessaire.
+- **Rollback** :
+  - `cp archives/v071_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
