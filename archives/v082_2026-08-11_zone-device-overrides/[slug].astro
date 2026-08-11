@@ -21,7 +21,7 @@ const { project } = Astro.props;
 // for legacy Wix imports). See src/lib/zones.ts for the classifier.
 // No in-page lightbox — clicking an image opens the full Cloudinary URL in a
 // new tab so the visitor gets the browser's native zoom / download UI.
-const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
+const zones = groupImagesByZone(project.gallery);
 ---
 
 <Layout title={`${project.title} — David Bitan`}>

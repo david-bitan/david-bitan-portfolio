@@ -1103,6 +1103,27 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - **Ryze motion/craft bullet ajouté** : « Motion and visual craft — SVG micro-interactions and loaders, UI animation, brand logos and marks, 3D concept explorations, and short-form video creation for product and marketing ». David demandait video creation + 3D concept + animation + interaction + logos + loaders — tout regroupé en un bullet dense.
   - **Education** : ajout d'un bloc « Self-taught, continuously — 20+ years ». Hundreds of courses over 2 decades (Udemy, YouTube, Le Site du Zéro → OpenClassrooms). Positionne l'autodidacte + veille tech continue.
   - **Layout Languages / Awards & education** : bump gap horizontal `gap-12` → `sm:gap-24` (48px → 96px sur ≥sm). Les 2 blocs étaient visuellement collés, rythme bizarre. Gap mobile conservé à 12 (blocs stackés).
+
+## v082 — 2026-08-11 — Zones : device overrides pour URLs sans naming convention
+
+- **Commit git associé** : (à créer après)
+- **Type** : classifier / data
+- **Fichiers snapshotés** :
+  - `src/lib/zones.ts` → `zones.ts`
+  - `src/data/allProjects.ts` → `allProjects.ts`
+  - `src/pages/work/[slug].astro` → `slug.astro`
+- **Changement** :
+  - Nouveau champ optionnel `FullProject.imageDeviceOverrides?: Record<string, 'desktop'|'mobile'>` — map substring URL → device.
+  - `groupImagesByZone(gallery, overrides?)` : second param optionnel. Si device classification par pattern URL retourne `unknown`, on cherche le 1er override matching (par `url.includes(key)`) et on applique.
+  - `[slug].astro` : passe `project.imageDeviceOverrides` au classifier.
+  - **Sonary Website** : ajout override pour `article-hub/article-hub-1` → mobile et `article-hub/article-hub.webp` → desktop. Les 2 fichiers étaient classés Other (rendu 2-col object-contain max-h-720 = mobile invisible, desktop trop petit) alors qu'ils sont juste un desktop + un mobile screenshot du hub d'articles.
+- **Rationale** : ces 2 files ont été uploadés Cloudinary avant que la convention `-desktop`/`-mobile` soit systématique. Renommer côté Cloudinary demanderait re-upload + URL change. L'override data-driven règle le problème sans toucher les assets, et le pattern URL reste le classifier principal (override ne s'applique QUE si device=unknown → aucun risque de conflit).
+- **Effet visuel** : les 2 images réintègrent les zones Desktop et Mobile correctement. Le desktop screenshot passe en stack full-width 1200px (au lieu de 560px cadré). Le mobile long screenshot passe en grid 3-col cappé 375px width, hauteur libre (au lieu d'écrasé à 720px max height).
+- **Rollback** :
+  - `cp archives/v082_.../zones.ts src/lib/zones.ts`
+  - `cp archives/v082_.../allProjects.ts src/data/allProjects.ts`
+  - `cp archives/v082_.../slug.astro src/pages/work/[slug].astro`
+
 - **Rationale** : corrections directes suite feedback David session 11. La phrase « two junior designers » était inexacte et se lisait comme de la vantardise ; la nouvelle formulation dit la même chose mais en montrant le partage de savoir plutôt que la hiérarchie. Video/3D/animation/logos/loaders manquaient — c'est une grosse part du craft real de David sur Ryze. L'autodidacte 20 ans + siteduzero/OpenClassrooms montre la trajectoire d'apprentissage continue, différenciant.
 - **Rollback** :
   - `cp archives/v081_.../about.astro.bak src/pages/about.astro`

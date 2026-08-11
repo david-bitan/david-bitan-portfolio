@@ -28,11 +28,6 @@ export interface FullProject {
 	/** Optional CTA to the live product. Rendered as a button after the
 	 * case study body. */
 	liveUrl?: string;
-	/** Optional per-URL device hint. Used when a gallery file lacks the usual
-	 * `-desktop` / `-mobile` token (legacy uploads, single-name files). Key =
-	 * substring matched against the image URL; first match wins. Consumed by
-	 * `groupImagesByZone` in src/lib/zones.ts. */
-	imageDeviceOverrides?: Record<string, 'desktop' | 'mobile'>;
 	thumbnail: string;
 	gallery: string[];
 	tags: string[];
@@ -209,15 +204,6 @@ The design system also paid off later: several downstream Ryze Beyond products (
 		categories: ['SaaS', 'UI/UX'],
 		shortDesc: `Marketing site with review hub, comparison pages and content architecture — designed for SEO scale from day one.`,
 		fullDesc: `PLACEHOLDER : Design du site marketing Sonary. Sections : Homepage, Review Hub, Review Page, Article Hub, Articles, Lineup, Alternative Prod Info, Write a Review, Legal. Approche : storytelling produit + SEO-optimized, structure content-heavy scalable.`,
-		// article-hub/ files were uploaded before the -desktop / -mobile naming
-		// convention was locked in. Match by unique substring so the URL patch
-		// stays scoped to these two files. Ordering matters: the "-1" suffix
-		// key must come before the bare key so a startsWith-style substring
-		// match hits the mobile variant first.
-		imageDeviceOverrides: {
-			'article-hub/article-hub-1': 'mobile',
-			'article-hub/article-hub.webp': 'desktop',
-		},
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342185/portfolio/sonary-website/homepage/home-page-desktop.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785342185/portfolio/sonary-website/homepage/home-page-desktop.webp',

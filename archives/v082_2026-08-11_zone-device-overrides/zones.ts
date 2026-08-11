@@ -44,26 +44,12 @@ function classify(url: string): {
 	};
 }
 
-// Optional per-project override map. Keys are substrings matched against the
-// image URL — the FIRST matching key wins. Used when a filename doesn't carry
-// the usual `-desktop` / `-mobile` token (e.g. Sonary Website "article-hub"
-// which was uploaded before David settled on the naming convention).
-export type DeviceOverrides = Record<string, 'desktop' | 'mobile'>;
-
-export function groupImagesByZone(
-	gallery: string[],
-	deviceOverrides?: DeviceOverrides,
-): Zone[] {
-	const overrideKeys = deviceOverrides ? Object.keys(deviceOverrides) : [];
-
-	const classified = gallery.map((url, i) => {
-		const base = classify(url);
-		if (overrideKeys.length && base.device === 'unknown') {
-			const hit = overrideKeys.find((k) => url.includes(k));
-			if (hit) base.device = deviceOverrides![hit];
-		}
-		return { url, globalIndex: i, ...base };
-	});
+export function groupImagesByZone(gallery: string[]): Zone[] {
+	const classified = gallery.map((url, i) => ({
+		url,
+		globalIndex: i,
+		...classify(url),
+	}));
 
 	const anyTheme = classified.some((c) => c.theme !== 'unknown');
 	const anyDevice = classified.some((c) => c.device !== 'unknown');
