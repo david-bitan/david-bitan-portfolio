@@ -943,3 +943,22 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **CraftFilters** : pas de wrapper limité (rendu directement au top-level de Layout dans `src/pages/craft.astro`), sticky déjà OK — pas de fix nécessaire.
 - **Rollback** :
   - `cp archives/v071_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+## v072 — 2026-08-11 — fix animation (Tailwind arbitrary values dropped by JIT)
+
+- **Commit git associé** : (à créer après)
+- **Type** : bug fix (anim)
+- **Fichiers snapshotés** :
+  - `src/components/ZoneFilters.astro` (état APRÈS v069, avant fix anim)
+  - `src/components/CraftFilters.astro` (idem)
+- **Root cause** :
+  - Les classes `transition-all duration-[400ms] ease-[cubic-bezier(0.22,0.61,0.36,1)]` posées sur les éléments back-arrow + content ne compilaient PAS. Vérifié via `getComputedStyle` en live : `transition-property` = "background-color, border-color, color" seulement. Les virgules dans `cubic-bezier(0.22,0.61,0.36,1)` cassent le scanner JIT Tailwind 4 → la classe est ignorée silencieusement.
+  - Résultat visible : opacity + transform + padding-left changeaient instantanément (pas d'anim), donnant l'impression que back-arrow "apparaissait" sans fade et content sans slide.
+- **Fix** :
+  - Retrait des classes Tailwind arbitraires cassées.
+  - Transitions déplacées dans le `<style is:global>` en CSS natif :
+    - `.zone-filters-back` / `.craft-filters-back` : `transition: opacity 400ms cubic-bezier(...), transform 400ms cubic-bezier(...), border-color 200ms ease, color 200ms ease;` + `will-change: opacity, transform`
+    - `.zone-filters-content` / `.craft-filters-content` : `transition: padding-left 400ms cubic-bezier(...);` + `will-change: padding-left`
+- **Rollback** :
+  - `cp archives/v072_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
+  - `cp archives/v072_.../src__components__CraftFilters.astro src/components/CraftFilters.astro`
