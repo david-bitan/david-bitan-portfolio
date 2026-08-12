@@ -1211,6 +1211,21 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - `cp archives/v087_.../cloudinary.ts.before-revert src/lib/cloudinary.ts` (retourne à v086 = f_webp partout)
 
+## v088 — 2026-08-11 — landscapeSrcset : w_1800 → w_1600 (Cloudinary 25 MP limit)
+
+- **Commit git associé** : (à créer après)
+- **Type** : fix rendering — variant broken sur très longs screenshots
+- **Fichiers snapshotés** :
+  - `src/lib/cloudinary.ts` → `cloudinary.ts.bak`
+- **Changement** :
+  - `landscapeSrcset` : widths `[1200, 1800, 2400, 3200]` → `[1200, 1600, 2400, 3200]`.
+- **Rationale** : sur Sonary Website, l'image `review-page---desktop-side-table-of-content` a une source 1920×15613 (~30 MP, très long scroll desktop). La variante `c_limit,w_1800` calculée donnait 1800×14640 = 26.4 MP, **au-dessus de la limite Cloudinary Free tier de 25 MP output** → HTTP 400. Les autres variantes du srcset (1200, 2400, 3200) marchaient (1200 sous limite, 2400/3200 = source-cap donc pas de transformation calculée). Chrome selon DPR/slot pouvait chercher la 1800 → broken image icon.
+  - Diagnostic : test `HEAD` sur les 4 URLs srcset → seule w_1800 retournait 400.
+  - Fix : w_1600 → cap h à ~13010 → ~20.8 MP → safe pour toutes les sources jusqu'à ~2500 wide.
+- **Trade-off** : perte d'une variante intermediate — browser à DPR intermédiaire ira de 1600 direct à 2400 au lieu de 1800. Overhead bandwidth ~30% sur ces cas rares, invisible perceptuellement.
+- **Rollback** :
+  - `cp archives/v088_.../cloudinary.ts.bak src/lib/cloudinary.ts`
+
 - **Rationale** : corrections directes suite feedback David session 11. La phrase « two junior designers » était inexacte et se lisait comme de la vantardise ; la nouvelle formulation dit la même chose mais en montrant le partage de savoir plutôt que la hiérarchie. Video/3D/animation/logos/loaders manquaient — c'est une grosse part du craft real de David sur Ryze. L'autodidacte 20 ans + siteduzero/OpenClassrooms montre la trajectoire d'apprentissage continue, différenciant.
 - **Rollback** :
   - `cp archives/v081_.../about.astro.bak src/pages/about.astro`

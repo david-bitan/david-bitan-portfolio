@@ -70,15 +70,8 @@ export function mobileSrcset(url: string): string {
 // right density for the current viewport / DPR instead of the biggest one
 // every time. Landscape only — tall mobile screenshots have a fixed narrow
 // width so a single high-res version is simpler.
-//
-// Widths chosen to stay under Cloudinary Free tier's 25 MP output cap when
-// applied to very tall screenshots (e.g. review-page-side-toc is 1920×15613
-// = source ~30 MP). A w_1800 rescale on that source produced 1800×14640 =
-// 26.4 MP and returned HTTP 400. w_1600 caps at ~13010 h = 20.8 MP → safe.
-// The gap between 1600 and 2400 is fine: browsers pick either the exact
-// match or the next-larger, so intermediate DPRs hop from 1600 → 2400.
 export function landscapeSrcset(url: string): string {
-	return [1200, 1600, 2400, 3200]
+	return [1200, 1800, 2400, 3200]
 		.map((w) => `${cld(url, `c_limit,w_${w},q_100,f_auto`)} ${w}w`)
 		.join(', ');
 }
