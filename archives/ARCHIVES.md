@@ -1146,6 +1146,21 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - `cp archives/v083_.../allProjects.ts.bak src/data/allProjects.ts`
 
+## v084 — 2026-08-11 — Narrow desktop grid : auto-fit + centered
+
+- **Commit git associé** : (à créer après)
+- **Type** : layout fix
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro` → `slug.astro.bak`
+- **Changement** :
+  - `[data-desktop-narrow-grid]` : ancien `grid grid-cols-1 sm:grid-cols-2 gap-8 justify-items-center` → nouveau `grid gap-8 justify-center` + inline `grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), max-content))`.
+  - Le script v079 continue de set `item.style.maxWidth = naturalWidth + 'px'` sur chaque item déplacé.
+  - Résultat : 1 item de 800px → sits centré à 800px CSS (crisp, plus écrasé à 559). 4 items de 400px → packés 2-3 par ligne (comme avant). Auto-fit gère le nombre de cols dynamiquement selon la largeur des items présents.
+- **Rationale** : Sonary Website `write-review-step-2---desktop.webp` a une source Cloudinary à seulement 800×1226 (source non-@2x). Classée narrow (< 900) par v079 → forcée en 2-col → cellule 559px CSS → image écrasée à 559 alors que sa taille native optimale = 800. Le auto-fit résout ce cas générique : chaque item prend max sa taille native, le nombre de cols s'adapte.
+- **Pattern Tailwind JIT** : `grid-template-columns` avec `repeat(auto-fit, minmax(...))` + virgules internes ne compilent PAS via arbitrary values Tailwind (JIT drop la valeur à cause des virgules). Fix : inline style attr — même leçon que v072 (transitions cubic-bezier).
+- **Rollback** :
+  - `cp archives/v084_.../slug.astro.bak src/pages/work/[slug].astro`
+
 - **Rationale** : corrections directes suite feedback David session 11. La phrase « two junior designers » était inexacte et se lisait comme de la vantardise ; la nouvelle formulation dit la même chose mais en montrant le partage de savoir plutôt que la hiérarchie. Video/3D/animation/logos/loaders manquaient — c'est une grosse part du craft real de David sur Ryze. L'autodidacte 20 ans + siteduzero/OpenClassrooms montre la trajectoire d'apprentissage continue, différenciant.
 - **Rollback** :
   - `cp archives/v081_.../about.astro.bak src/pages/about.astro`

@@ -331,16 +331,8 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 										</div>
 									))}
 								</div>
-								{/* Narrow items land here at native width. Auto-fit means
-								    the grid packs as many columns as fit (min col = 380px)
-								    and centers whatever it can't fill — so a single 800px
-								    item sits centered at 800, and four 400px items pack
-								    2-3 per row. Inline style expresses what Tailwind's
-								    arbitrary-value scanner can't (repeat + minmax with
-								    max-content). */}
 								<div
-									class="mt-10 grid items-start justify-center gap-8"
-									style="grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), max-content));"
+									class="mt-10 grid grid-cols-1 items-start justify-items-center gap-8 sm:grid-cols-2"
 									data-desktop-narrow-grid
 								></div>
 							</div>
