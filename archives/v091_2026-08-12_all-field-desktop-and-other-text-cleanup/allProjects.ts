@@ -276,13 +276,10 @@ The design system also paid off later: several downstream Ryze Beyond products (
 		shortDesc: `Visual identity system for Ryze Beyond — logo, palette, motion and web-facing brand elements.`,
 		fullDesc: `PLACEHOLDER : Éléments d'identité de marque pour Ryze Beyond.`,
 		// Full site captures organised by David into 10 numbered folders (01-09
-		// + Other). Every filename with -desktop / -mobile tokens is auto-
-		// classified. "All Field" is a wide form-field spec board and David
-		// wants it rendered full-width (1200px) alongside the other desktop
-		// captures, so we override it to desktop — the Other zone disappears.
-		imageDeviceOverrides: {
-			'other/all-field': 'desktop',
-		},
+		// + Other). Every filename now carries `-desktop` / `-mobile` so the
+		// zone classifier picks them up automatically — no overrides needed.
+		// "All Field" in Other/ is intentional (misc, doesn't fit dev/mobile
+		// split).
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---example-of-lines-per-section---desktop.png',
 		gallery: [
 			// 01 — Homepage (2 desktop variants + 2 mobile variants)

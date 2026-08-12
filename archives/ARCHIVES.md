@@ -1273,6 +1273,26 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - `cp archives/v090_.../allProjects.ts.bak src/data/allProjects.ts`
 
+## v091 — 2026-08-12 — Ryze Brand All Field → desktop + Other zone description cleanup
+
+- **Commit git associé** : (à créer après)
+- **Type** : contenu + polish micro-copy
+- **Fichiers snapshotés** :
+  - `src/data/allProjects.ts`
+  - `src/lib/zones.ts`
+  - `src/pages/work/[slug].astro`
+- **Changement 1 — All Field → desktop** (`allProjects.ts`) :
+  - Ajout `imageDeviceOverrides: { 'other/all-field': 'desktop' }` sur ryze-brand.
+  - Effet : la seule image de la zone Other (`all-field.png`, wide form-field spec board) est reclassée desktop → rendue full-width 1200 dans le stack Desktop en fin de liste. Zone Other disparaît entièrement, pill "Other" ne s'affiche plus.
+- **Changement 2 — Retrait texte placeholder de TOUTES les zones** (`zones.ts` + `[slug].astro`) :
+  - `zoneDescription` retourne désormais `''` pour tous les labels (Desktop, Mobile, Desktop·Dark, Desktop·Light, Mobile·Dark, Mobile·Light, Other, Gallery, …). Toutes les phrases auto-générées (« 3 desktop layouts. Optimized for 1200–1920 viewports. », etc.) disparaissent.
+  - Template `[slug].astro` : condition ajoutée pour skip rendering du `<p>` entier quand la description est vide → chaque zone n'a plus que son h2 (label seul, pas de dead-space).
+- **Rationale** : David a signalé ces phrases « je ne veux pas les voir ». La fonction `zoneDescription` reste dans le code (signature préservée) au cas où on veut revenir à du copy per-project custom plus tard — mais l'implém retourne '' par défaut.
+- **Rollback** :
+  - `cp archives/v091_.../allProjects.ts src/data/allProjects.ts`
+  - `cp archives/v091_.../zones.ts src/lib/zones.ts`
+  - `cp archives/v091_.../slug.astro src/pages/work/[slug].astro`
+
 - **Rationale** : corrections directes suite feedback David session 11. La phrase « two junior designers » était inexacte et se lisait comme de la vantardise ; la nouvelle formulation dit la même chose mais en montrant le partage de savoir plutôt que la hiérarchie. Video/3D/animation/logos/loaders manquaient — c'est une grosse part du craft real de David sur Ryze. L'autodidacte 20 ans + siteduzero/OpenClassrooms montre la trajectoire d'apprentissage continue, différenciant.
 - **Rollback** :
   - `cp archives/v081_.../about.astro.bak src/pages/about.astro`

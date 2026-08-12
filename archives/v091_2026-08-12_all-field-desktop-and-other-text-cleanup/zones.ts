@@ -117,10 +117,26 @@ export function groupImagesByZone(
 	return zones;
 }
 
-// Auto-generated zone descriptions removed per David's ask — the h2 (zone
-// label) stands on its own. Function signature kept in case we want to bring
-// back per-project custom copy later; the template already skips rendering
-// the <p> when this returns an empty string.
-export function zoneDescription(_label: string, _count: number): string {
-	return '';
+// Placeholder copy for the right column of each zone. Auto-generated so the
+// page is never empty — David can rewrite these per project when he's ready.
+export function zoneDescription(label: string, count: number): string {
+	const s = count > 1 ? 's' : '';
+	switch (label) {
+		case 'Desktop · Dark':
+			return `${count} desktop frame${s} in dark mode. Full-bleed layouts at 1440+, showcasing the primary product surface.`;
+		case 'Desktop · Light':
+			return `${count} desktop frame${s} in light mode. Same layouts as the dark variant, tuned for high-ambient environments.`;
+		case 'Mobile · Dark':
+			return `${count} mobile screen${s} in dark mode. Native-feel touch targets, bottom-sheet interactions, condensed nav.`;
+		case 'Mobile · Light':
+			return `${count} mobile screen${s} in light mode. Content-forward layouts optimized for outdoor legibility.`;
+		case 'Desktop':
+			return `${count} desktop layout${s}. Optimized for 1200–1920 viewports.`;
+		case 'Mobile':
+			return `${count} mobile screen${s}. Portrait-first, thumb-reach navigation.`;
+		case 'Other':
+			return `Additional exploration${s} that didn't fit the responsive split above.`;
+		default:
+			return `${count} image${s}.`;
+	}
 }

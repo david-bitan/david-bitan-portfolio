@@ -224,17 +224,9 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 						<h2 class="col-span-12 text-3xl font-extrabold tracking-tight text-ink sm:col-span-4 sm:text-4xl">
 							{zone.label}
 						</h2>
-						{
-							/* Zone description is optional — some zones (e.g. "Other")
-							   intentionally return an empty string. Skip rendering the
-							   <p> entirely when empty so the header doesn't collapse
-							   with dead whitespace. */
-							zoneDescription(zone.label, zone.images.length) && (
-								<p class="col-span-12 text-lg leading-relaxed text-muted sm:col-span-6 sm:col-start-7">
-									{zoneDescription(zone.label, zone.images.length)}
-								</p>
-							)
-						}
+						<p class="col-span-12 text-lg leading-relaxed text-muted sm:col-span-6 sm:col-start-7">
+							{zoneDescription(zone.label, zone.images.length)}
+						</p>
 					</header>
 
 					{
