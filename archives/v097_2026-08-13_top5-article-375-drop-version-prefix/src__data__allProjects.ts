@@ -255,7 +255,7 @@ The design system also paid off later: several downstream Ryze Beyond products (
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342213/portfolio/top5/article/article-side-bar-1920.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785342213/portfolio/top5/article/article-side-bar-1920.webp',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/top5/article/article-375.webp',
+			'https://res.cloudinary.com/akael/image/upload/v1785342215/portfolio/top5/article/article-375.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342217/portfolio/top5/comparison/comparison-page---desktop-1920.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342219/portfolio/top5/comparison/mobile---375---inner-343.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342222/portfolio/top5/lineup/website-width-1920---container-1140---lineup-950.webp',

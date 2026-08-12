@@ -1406,3 +1406,18 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Wide compositions (ratio > 1) inchangées** : le script client-side les sort du grid vers le `data-mobile-wide-stack` full-width.
 - **Rollback** :
   - `cp archives/v096_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v097 — 2026-08-13 — Top5 article-375 : re-upload PNG + drop version prefix pour servir latest
+
+- **Commit git associé** : (à créer après upload + push David)
+- **Type** : remplacement asset — David a régénéré `Portfolio images/Top5/Article/Article 375.png` (fichier daté 2026-08-13 02:36)
+- **Fichiers snapshotés** :
+  - `src/data/allProjects.ts`
+- **Contexte** : l'ancien article-375 était rendu buggé en live (compression / artefacts). David a ré-exporté un nouveau PNG. Sandbox Cowork ne peut pas atteindre api.cloudinary.com (bloqué par proxy allowlist), donc David lance l'upload lui-même depuis PowerShell via le pipeline `scripts/upload-pngs.cjs`.
+- **Changement code** : URL Cloudinary `v1785342215/portfolio/top5/article/article-375.webp` → `portfolio/top5/article/article-375.webp` (drop du prefix version). Sans prefix, Cloudinary sert la version courante du public_id. Après upload, le browser refetch le nouveau PNG (bonus : `invalidate: true` dans le script purge le CDN cache immédiatement).
+- **Note pipeline** : le script `upload-pngs.cjs` a `overwrite: true` + `invalidate: true`. Le public_id `portfolio/top5/article/article-375` reste identique, la source PNG remplace l'ancienne, l'URL non-versioned dans le code auto-tire la nouvelle.
+- **Rollback** :
+  - Code : `cp archives/v097_.../src__data__allProjects.ts src/data/allProjects.ts`
+  - Asset : re-uploader l'ancien PNG (pas conservé — Cloudinary garde l'historique via version prefix, l'ancien = `v1785342215` toujours accessible en dur si besoin)
