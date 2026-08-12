@@ -1196,6 +1196,21 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - `cp archives/v086_.../cloudinary.ts.bak src/lib/cloudinary.ts`
 
+## v087 — 2026-08-11 — REVERT v086 : back to f_auto (mobile screenshots re-flouted)
+
+- **Commit git associé** : (à créer après)
+- **Type** : revert / correction diagnostic
+- **Fichiers snapshotés** :
+  - `src/lib/cloudinary.ts` → `cloudinary.ts.before-revert` (état v086 = f_webp partout)
+- **Changement** : Restore de tous les `f_webp` → `f_auto` (revert v086).
+- **Rationale du revert** :
+  1. Tests pixel-par-pixel via canvas sur `home-page-desktop.webp` : les artefacts « bleutés » autour du texte blanc sur bouton rouge sont IDENTIQUES entre `f_auto`, `f_webp` et **la source raw sans aucun transform** (~102-105 purplish edge pixels dans les 3). Le bleuté vient de la conversion PNG→WebP@q90 originale — c'est dans le fichier source sur Cloudinary, pas dans le transform.
+  2. Sur mobile screenshots (`home-page-mobile.webp`), `f_auto` était INTELLIGENT : il retournait **PNG lossless** (2 MB, meilleure qualité possible sur UI + texte + aplats). En forçant `f_webp` on remplaçait ce PNG par WebP lossy 1.3 MB → **régression visible signalée par David**.
+  3. `f_auto` fait du content-aware format picking : screenshots UI → PNG/WebP lossless, photos → JPEG. Vaut mieux que forcer un format unique.
+- **Vrai fix pour le bleuté** : ré-uploader les screenshots sources en PNG ou WebP lossless depuis Figma (export sans compression). Cloudinary gardera le PNG intact et servira du PNG au browser via `f_auto` sur les screenshots UI.
+- **Rollback** :
+  - `cp archives/v087_.../cloudinary.ts.before-revert src/lib/cloudinary.ts` (retourne à v086 = f_webp partout)
+
 - **Rationale** : corrections directes suite feedback David session 11. La phrase « two junior designers » était inexacte et se lisait comme de la vantardise ; la nouvelle formulation dit la même chose mais en montrant le partage de savoir plutôt que la hiérarchie. Video/3D/animation/logos/loaders manquaient — c'est une grosse part du craft real de David sur Ryze. L'autodidacte 20 ans + siteduzero/OpenClassrooms montre la trajectoire d'apprentissage continue, différenciant.
 - **Rollback** :
   - `cp archives/v081_.../about.astro.bak src/pages/about.astro`
