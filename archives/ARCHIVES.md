@@ -1320,3 +1320,33 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Retina caveat** : sur écran DPR 2, une source native 375 rendue à 375 CSS = 750 physiques attendus / 375 réels = interpolation browser inévitable. Fix vrai crispness = ré-export mobile Figma @2x/3x (750 ou 1125 native source), pas côté code.
 - **Rollback** :
   - `cp archives/v092_.../[slug].astro src/pages/work/[slug].astro`
+
+---
+
+## v093 — 2026-08-12 — Kill toute "bordure d'espacement" + bump mobile srcset
+
+- **Commit git associé** : (à créer après)
+- **Type** : fix continuité v092 — David toujours frustré par un vide horizontal autour des images + flou mobile
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro`
+  - `src/lib/cloudinary.ts`
+- **Diagnostic (probe live via fl_getinfo)** :
+  - Source Cloudinary mobile TOP5 (`portfolio/top5/comparison/mobile---375---inner-343`) = **375 × 5589 native**. Export Figma @1x. Sur retina DPR 2, slot 375 CSS = 750 physiques, source 375 → upscale 100 % browser = **flou intrinsèque, impossible à fix côté code**.
+  - Source desktop TOP5 (`comparison-page---desktop-1920`) = **1920 × 4611 native**. Sur slot 1200 CSS DPR 2 = 2400 physiques → upscale ~25 % = léger flou.
+- **Changement 1 — Bump mobileSrcset (`cloudinary.ts`)** :
+  - `[375, 800]` → `[375, 750, 1125]`. Trois variantes matchant DPR 1/2/3 sur une cellule 375 CSS. Cloudinary `c_limit` ne upscale jamais → si la source est 375 native, les trois requêtes retournent 375 (aucune régression, aucun gain). Si David ré-exporte les mobiles en 2x/3x depuis Figma, les browsers retina auront enfin une variante à la bonne densité et l'image sera crisp.
+- **Changement 2 — Section retire son `px-6`, header le récupère** :
+  - `<section class="mx-auto mt-12 max-w-[1200px] scroll-mt-32 px-6">` → sans `px-6`.
+  - `<header class="grid grid-cols-12 gap-8">` → ajout `px-6`.
+  - Effet : les stacks et grids images sont désormais edge-to-edge du container 1200. Plus de 24 px de vide gris entre l'image et le bord de la section (« la bordure d'espacement » signalée par David). Le h2 + description gardent leurs 24 px de padding pour rester lisibles sur mobile viewport.
+- **Changement 3 — Grid mobile en auto-fit fixé à 375** :
+  - `class="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-3"` → `class="grid items-start justify-center gap-3"` + `style="grid-template-columns: repeat(auto-fit, minmax(min(100%, 375px), 375px));"`.
+  - Cellules toujours 375 wide (le mobile design), packées autant que fit dans les 1200 dispos, centrées. Sur viewport < 375 la cellule shrink à 100 %.
+  - Gap 24 → 12 px pour serrer.
+  - Résultat : la cellule EST le slot image. L'image `w-full` remplit exactement la cellule 375. Aucun vide horizontal entre l'image et son slot. Aucun étirement au-delà de 375 CSS.
+- **Changement 4 — Image mobile `w-[375px] max-w-full mx-auto` → `w-full`** :
+  - Puisque la cellule est cap à 375, l'image `w-full` s'aligne pile dessus. Plus besoin de `w-[375px]` explicite, plus besoin de `mx-auto`. Border+shadow (light) ou nu (dark) directement sur l'`<img>`.
+- **Retina caveat (identique v092, non-fixable côté code)** : sur retina DPR 2, source 375 native + slot 375 CSS → flou 2× tant que les sources ne sont pas ré-exportées @2x/@3x. Pareil desktop 1920 native + slot 1200 CSS DPR 2 → flou léger 25 %. Solution unique = ré-export Figma en 2400+ desktop et 750/1125 mobile.
+- **Rollback** :
+  - `cp archives/v093_.../[slug].astro src/pages/work/[slug].astro`
+  - `cp archives/v093_.../cloudinary.ts src/lib/cloudinary.ts`

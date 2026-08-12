@@ -57,13 +57,11 @@ export const FULL_TALL = 'c_limit,w_1200,q_100,f_auto';
 // browser stretch on UI mockups (soft type, halos on borders).
 export const MOBILE = 'c_limit,w_800,q_100,f_auto';
 
-// srcset only proposes widths ≤ source width — c_limit never upscales.
-// v093 bump: added 1125 (mobile design @3x) so if David re-exports mobile
-// screens at Figma 2x/3x, the retina browsers can actually fetch a matching
-// variant. Sources currently at 375 native (1x export) will still return 375
-// for all three requests — no gain in that case, no regression either.
+// srcset only proposes widths ≤ source width — nothing that would trigger
+// Cloudinary upscaling. The browser picks between 375 (fits any DPR≥1
+// viewport) and 800 (best it can do with the native source).
 export function mobileSrcset(url: string): string {
-	return [375, 750, 1125]
+	return [375, 800]
 		.map((w) => `${cld(url, `c_limit,w_${w},q_100,f_auto`)} ${w}w`)
 		.join(', ');
 }

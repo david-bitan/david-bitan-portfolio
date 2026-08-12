@@ -217,10 +217,10 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 			return (
 				<section
 					data-zone-label={zone.label}
-					class="mx-auto mt-12 max-w-[1200px] scroll-mt-32"
+					class="mx-auto mt-12 max-w-[1200px] scroll-mt-32 px-6"
 					data-reveal
 				>
-					<header class="grid grid-cols-12 gap-8 px-6">
+					<header class="grid grid-cols-12 gap-8">
 						<h2 class="col-span-12 text-3xl font-extrabold tracking-tight text-ink sm:col-span-4 sm:text-4xl">
 							{zone.label}
 						</h2>
@@ -253,23 +253,9 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 							//     (via CSS order = -height) so similar heights sit
 							//     side-by-side and the grid packs cleanly.
 							<div class="mt-12" data-mobile-zone>
-								{/* v093: switched from fixed 1/2/3 col grid to
-								    auto-fit cells of exactly 375px (the mobile
-								    design width). Cells never grow past 375, so
-								    images never get stretched by the layout.
-								    Rows center-align, so no wasted "gray strip"
-								    between image and cell edge — the cell IS
-								    the image slot. Gap tightened 24→12. */}
-								<div
-									class="grid items-start justify-center gap-3"
-									style="grid-template-columns: repeat(auto-fit, minmax(min(100%, 375px), 375px));"
-									data-mobile-grid
-								>
+								<div class="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-3" data-mobile-grid>
 									{zone.images.map(({ url }) =>
 										isDarkZone ? (
-											// Dark mobile: image fills the 375-wide cell exactly
-											// (cell = image slot). No border — dark mockup provides
-											// its own contrast against the near-white body.
 											<img
 												src={cld(url, MOBILE)}
 												srcset={mobileSrcset(url)}
@@ -277,16 +263,19 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 												alt={project.title}
 												loading="lazy"
 												width="375"
-												class="block h-auto w-full rounded-xl"
+												class="mx-auto block h-auto w-[375px] max-w-full rounded-xl"
 												data-mobile-item
 												data-full-src={cld(url, FULL)}
 												data-full-srcset={landscapeSrcset(url)}
 												data-is-dark="1"
 											/>
 										) : (
-											// Light mobile: image fills its 375-wide cell exactly.
-											// Border + shadow directly on <img> — the visible frame
-											// is the image's edge, no padded gray strip anywhere.
+											// Light mobile: NO card wrapper. Image IS the item.
+											// Border + shadow live directly on the <img> so the
+											// visible frame is exactly the image's own edge —
+											// no more padded gray strip around a smaller image.
+											// v092: script probes source width and caps
+											// max-width so browser never upscales past source.
 											<img
 												src={cld(url, MOBILE)}
 												srcset={mobileSrcset(url)}
@@ -294,7 +283,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 												alt={project.title}
 												loading="lazy"
 												width="375"
-												class="block h-auto w-full rounded-xl border border-ink/15 shadow-md"
+												class="mx-auto block h-auto w-[375px] max-w-full rounded-xl border border-ink/15 shadow-md"
 												data-mobile-item
 												data-full-src={cld(url, FULL)}
 												data-full-srcset={landscapeSrcset(url)}
