@@ -275,42 +275,18 @@ The design system also paid off later: several downstream Ryze Beyond products (
 		category: 'UI/UX',
 		shortDesc: `Visual identity system for Ryze Beyond — logo, palette, motion and web-facing brand elements.`,
 		fullDesc: `PLACEHOLDER : Éléments d'identité de marque pour Ryze Beyond.`,
-		// Full site captures organised by David into 10 numbered folders (01-09
-		// + Other). Every filename now carries `-desktop` / `-mobile` so the
-		// zone classifier picks them up automatically — no overrides needed.
-		// "All Field" in Other/ is intentional (misc, doesn't fit dev/mobile
-		// split).
-		thumbnail: 'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---example-of-lines-per-section---desktop.png',
+		// The "example-of-lines-per-section" file is a desktop capture but its
+		// filename lacks the `-desktop` token, so the URL classifier lands it
+		// in "Other" (rendered as a 2-col object-contain, unusable for a wide
+		// desktop shot). Override to desktop so it stacks full-width above the
+		// mobile capture.
+		imageDeviceOverrides: {
+			'ryze-website---homepage---example-of-lines-per-section': 'desktop',
+		},
+		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342005/portfolio/ryze/ryze-website---homepage---example-of-lines-per-section.webp',
 		gallery: [
-			// 01 — Homepage (2 desktop variants + 2 mobile variants)
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---example-of-lines-per-section---desktop.png',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---example-of-lines-per-section---desktop-2.png',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---mobile.png',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---mobile-2.png',
-			// 02 — About us
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/02---about-us/ryze-website---about-us---desktop.png',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/02---about-us/ryze-website---about-us---mobile.png',
-			// 03 — What we do
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/03---what-we-do/ryze-website---what-we-do---desktop.png',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/03---what-we-do/ryze-website---what-we-do---mobile.png',
-			// 04 — Careers
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/04---careers/carreer-desktop.png',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/04---careers/carreer-mobile.png',
-			// 05 — Inner Careers
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/05---inner-carerrs/inner-carreer---desktop.png',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/05---inner-carerrs/inner-carreer---mobile.png',
-			// 06 — Case Study (mobile only)
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/06---case-study/case-study---mobile.png',
-			// 07 — Partner with Us
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/07---partner-with-us/partner-with-us---desktop---1.png',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/07---partner-with-us/partner-with-us---mobile---1.png',
-			// 08 — Error 404
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/08---error-404/error-404---desktop.png',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/08---error-404/error-404---mobile.png',
-			// 09 — Legal (mobile only)
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/09---legal/legal-page-mobile---1.png',
-			// Other — All Field (misc, no dev/mobile split)
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/other/all-field.png',
+			'https://res.cloudinary.com/akael/image/upload/v1785342005/portfolio/ryze/ryze-website---homepage---example-of-lines-per-section.webp',
+			'https://res.cloudinary.com/akael/image/upload/v1785342007/portfolio/ryze/ryze-website---homepage---mobile.webp',
 		],
 		tags: ['Branding', 'Identity'],
 		featured: false,

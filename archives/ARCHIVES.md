@@ -1242,6 +1242,37 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - `cp archives/v089_.../allProjects.ts.bak src/data/allProjects.ts`
 
+## v090 — 2026-08-12 — Ryze Brand : full gallery (20 nouveaux captures organisés en 10 folders)
+
+- **Commit git associé** : (à créer après)
+- **Type** : contenu / gallery expansion
+- **Fichiers snapshotés** :
+  - `src/data/allProjects.ts` → `allProjects.ts.bak`
+- **Upload PNG requis avant push** :
+  - `node scripts/upload-pngs.cjs --confirm --only "portfolio/ryze/0"` (matches 01-09)
+  - `node scripts/upload-pngs.cjs --confirm --only "portfolio/ryze/other"` (matches Other folder)
+- **Changement** :
+  - Gallery passe de 2 URLs (homepage desktop + mobile) à **20 URLs** couvrant l'intégralité du site Ryze Beyond.
+  - Nouvelle structure organisée par David en 10 sous-dossiers numérotés :
+    - 01 Homepage (2 desktop + 2 mobile)
+    - 02 About us (desktop + mobile)
+    - 03 What we do (desktop + mobile)
+    - 04 Careers (desktop + mobile)
+    - 05 Inner Careers (desktop + mobile)
+    - 06 Case Study (mobile seul)
+    - 07 Partner with Us (desktop + mobile)
+    - 08 Error 404 (desktop + mobile)
+    - 09 Legal (mobile seul)
+    - Other : "All Field" (misc)
+  - Retrait de `imageDeviceOverrides` — tous les fichiers portent désormais `-desktop` ou `-mobile` dans leur nom → classifier zones.ts pick them up automatically. "All Field" reste unknown → zone Other (correct puisqu'il est dans folder Other/).
+  - Thumbnail bumpé vers la nouvelle desktop v1 (`01---homepage/...---desktop.png`).
+- **Résultat visuel attendu** :
+  - Zone Desktop : 7 images stackées full-width (Homepage 1+2, About Us, What We Do, Careers, Inner Careers, Partner with Us, Error 404)
+  - Zone Mobile : 9 images en grid 3-col (mêmes pages + Case Study + Legal)
+  - Zone Other : 1 image (All Field)
+- **Rollback** :
+  - `cp archives/v090_.../allProjects.ts.bak src/data/allProjects.ts`
+
 - **Rationale** : corrections directes suite feedback David session 11. La phrase « two junior designers » était inexacte et se lisait comme de la vantardise ; la nouvelle formulation dit la même chose mais en montrant le partage de savoir plutôt que la hiérarchie. Video/3D/animation/logos/loaders manquaient — c'est une grosse part du craft real de David sur Ryze. L'autodidacte 20 ans + siteduzero/OpenClassrooms montre la trajectoire d'apprentissage continue, différenciant.
 - **Rollback** :
   - `cp archives/v081_.../about.astro.bak src/pages/about.astro`
