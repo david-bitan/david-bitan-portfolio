@@ -1296,3 +1296,27 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rationale** : corrections directes suite feedback David session 11. La phrase « two junior designers » était inexacte et se lisait comme de la vantardise ; la nouvelle formulation dit la même chose mais en montrant le partage de savoir plutôt que la hiérarchie. Video/3D/animation/logos/loaders manquaient — c'est une grosse part du craft real de David sur Ryze. L'autodidacte 20 ans + siteduzero/OpenClassrooms montre la trajectoire d'apprentissage continue, différenciant.
 - **Rollback** :
   - `cp archives/v081_.../about.astro.bak src/pages/about.astro`
+
+---
+
+## v092 — 2026-08-12 — Mobile zone : image = card + probe source cap (no upscale ever)
+
+- **Commit git associé** : (à créer après)
+- **Type** : fix bug récurrent (border inadaptée + flou upscale)
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro`
+- **Root cause** : deux paths de rendu incohérents dans la zone Mobile Light :
+  1. Portrait (ratio W/H < 1) — image `w-[375px]` dans une card wrapper `p-5 sm:p-6 bg-card border border-ink/15` → le padding + bg de la card crée un cadre gris visible autour de l'image (« bordure inadaptée » signalée par David).
+  2. Wide composition/planche (ratio > 1) — script v078 la déplace dans `data-mobile-wide-stack` avec CSS `width: 100% !important` → si la source Cloudinary est < 1200 native, le browser étire à 1200 CSS = flou visible.
+- **Changement 1 — Kill card wrapper portrait** :
+  - Zone Mobile Light : le `<div class="flex ... bg-card p-5 ...">` disparaît. L'`<img>` **est** désormais le `data-mobile-item` direct, avec `border border-ink/15 shadow-md rounded-xl` sur l'img elle-même. Plus de cadre gris, la bordure épouse exactement l'image.
+- **Changement 2 — Probe source width + cap max-width partout** :
+  - Nouveau `probeSourceWidth(url)` (même pattern que v085 desktop) dans le script mobile. Fetch `c_limit,w_9999` → retourne la vraie source width (`c_limit` ne up-scale jamais, ne down-scale pas sous la source).
+  - Portrait : si source < 375 native → inline `max-width: <sourceW>px` sur l'img. Grid slot ne stretch plus jamais l'image au-delà de sa source.
+  - Wide composition : après swap vers FULL/landscape srcset + move to wide-stack → probe source width, `max-width: <sourceW>px` inline. Plus jamais d'upscale browser sur les planches ; une composition source 900px s'affiche à 900 CSS max, centrée.
+- **Changement 3 — CSS wide-stack override retiré** :
+  - `[data-mobile-wide-stack] > [data-mobile-item]` : plus de `width: 100% !important` ni `max-width: 100% !important`. Le max-width inline du probe pilote. Bordure/shadow/rounded stripped pour les planches (elles ont leur propre background Figma), image centrée edge-to-edge de son slot capé source.
+- **Rationale** : David : « bordure adaptée à l'image, image nette à la bonne taille, jamais de zoom/scale ». Deux problèmes = un seul fix cohérent. Sources mobiles = 375 native → cap 375 CSS = aucun upscale. Compositions source-native = display max source-native = aucun upscale. Card wrapper retiré = border = edge de l'image exactement.
+- **Retina caveat** : sur écran DPR 2, une source native 375 rendue à 375 CSS = 750 physiques attendus / 375 réels = interpolation browser inévitable. Fix vrai crispness = ré-export mobile Figma @2x/3x (750 ou 1125 native source), pas côté code.
+- **Rollback** :
+  - `cp archives/v092_.../[slug].astro src/pages/work/[slug].astro`

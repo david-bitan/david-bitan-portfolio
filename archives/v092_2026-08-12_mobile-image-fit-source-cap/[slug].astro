@@ -270,24 +270,22 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 												data-is-dark="1"
 											/>
 										) : (
-											// Light mobile: NO card wrapper. Image IS the item.
-											// Border + shadow live directly on the <img> so the
-											// visible frame is exactly the image's own edge —
-											// no more padded gray strip around a smaller image.
-											// v092: script probes source width and caps
-											// max-width so browser never upscales past source.
-											<img
-												src={cld(url, MOBILE)}
-												srcset={mobileSrcset(url)}
-												sizes="375px"
-												alt={project.title}
-												loading="lazy"
-												width="375"
-												class="mx-auto block h-auto w-[375px] max-w-full rounded-xl border border-ink/15 shadow-md"
+											<div
+												class="flex items-start justify-center overflow-hidden rounded-lg border border-ink/15 bg-card p-5 shadow-md sm:p-6"
 												data-mobile-item
-												data-full-src={cld(url, FULL)}
-												data-full-srcset={landscapeSrcset(url)}
-											/>
+											>
+												<img
+													src={cld(url, MOBILE)}
+													srcset={mobileSrcset(url)}
+													sizes="375px"
+													alt={project.title}
+													loading="lazy"
+													width="375"
+													class="mx-auto h-auto w-[375px] max-w-full rounded-xl ring-1 ring-ink/15"
+													data-full-src={cld(url, FULL)}
+													data-full-srcset={landscapeSrcset(url)}
+												/>
+											</div>
 										),
 									)}
 								</div>
@@ -366,22 +364,24 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 
 	<style is:global>
 		/* Wide (multi-screen composition) items moved out of the mobile grid
-		   into the full-width stack. v092: no more forced width:100% — the
-		   mobile script probes each composition's TRUE source width and sets
-		   `max-width: <sourceW>px` inline. That means the browser NEVER
-		   upscales past source pixels; a 900-wide composition displays at
-		   900 CSS max, centered. Border/shadow/rounded stripped so planches
-		   (which usually come with their own designed background) render
-		   cleanly edge-to-edge. */
-		[data-mobile-wide-stack] > img[data-mobile-item] {
+		   into the full-width stack. Override the 375px cap + card padding so
+		   the composition fills the 1200px column and is legible. */
+		[data-mobile-wide-stack] > [data-mobile-item] {
 			display: block;
-			width: 100%;
-			height: auto;
-			margin-left: auto;
-			margin-right: auto;
+			padding: 0;
 			border: 0;
-			border-radius: 0;
+			background: transparent;
 			box-shadow: none;
+			border-radius: 0;
+			overflow: visible;
+		}
+		[data-mobile-wide-stack] > [data-mobile-item] > img,
+		[data-mobile-wide-stack] > img[data-mobile-item] {
+			width: 100% !important;
+			max-width: 100% !important;
+			height: auto;
+			margin: 0;
+			border-radius: 0;
 		}
 
 		/* Narrow desktop items (e.g. email templates 400px wide) moved out
@@ -400,44 +400,18 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 	</style>
 
 	<script is:inline>
-		// Mobile zone layout: detect wide compositions vs portrait captures,
-		// AND cap CSS width to the TRUE source width so the browser never
-		// upscales past source pixels (David's rule: no upscale ever).
-		//
-		//   - Aspect ratio > 1 → composition/planche → moved to full-width
-		//     wide stack; src/srcset swapped to the FULL/landscape presets;
-		//     inline `max-width: <sourceW>px` caps the render to source width.
-		//   - Portrait (ratio < 1) → stays in the grid; sorted by height
-		//     DESC via CSS `order = -Math.round(naturalHeight)` so tallest
-		//     items sit adjacent; if the probed source width is below 375,
-		//     inline max-width caps the item so the grid slot never stretches
-		//     the image past its native pixel count.
-		//
-		// Why the probe: `img.naturalWidth` reflects the served srcset variant,
-		// not the Cloudinary source. `c_limit,w_9999` returns the true source
-		// width (never upscales, never downscales below source).
+		// Mobile zone layout: detect wide compositions vs portrait captures.
+		// Runs per-zone (Sonary Dashboard has 4 zones, others 1-2).
+		//   - Aspect ratio > 1 → composition/planche → moved to wide stack,
+		//     src/srcset swapped to the FULL/landscape presets so the browser
+		//     refetches a sharp version for the 1200px slot.
+		//   - Portrait → CSS `order = -Math.round(naturalHeight)` so tallest
+		//     items sort first and similar heights end up adjacent.
+		// Waits per-image via load event (or resolves immediately if already
+		// decoded from cache).
 		(() => {
 			const zones = document.querySelectorAll('[data-mobile-zone]');
 			if (!zones.length) return;
-
-			// Probe true source width (same pattern as the desktop narrow-grid
-			// script). Cached per-URL so re-probes across zones are free.
-			const probeCache = new Map();
-			function probeSourceWidth(imgSrc) {
-				const probeSrc = imgSrc.replace(
-					/\/upload\/(c_[^/]+\/)?/,
-					'/upload/c_limit,w_9999,q_100,f_auto/'
-				);
-				if (probeCache.has(probeSrc)) return probeCache.get(probeSrc);
-				const p = new Promise((resolve) => {
-					const probe = new Image();
-					probe.onload = () => resolve(probe.naturalWidth || 0);
-					probe.onerror = () => resolve(0);
-					probe.src = probeSrc;
-				});
-				probeCache.set(probeSrc, p);
-				return p;
-			}
 
 			zones.forEach((zone) => {
 				const grid = zone.querySelector('[data-mobile-grid]');
@@ -450,7 +424,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 					const img = item.tagName === 'IMG' ? item : item.querySelector('img');
 					if (!img) return;
 
-					const handle = async () => {
+					const handle = () => {
 						const w = img.naturalWidth;
 						const h = img.naturalHeight;
 						if (!w || !h) return;
@@ -459,8 +433,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 
 						if (ratio > 1) {
 							// Wide composition: swap to landscape srcset for sharpness,
-							// move item to wide stack, then probe true source width
-							// and cap max-width so we never upscale past source.
+							// move item to wide stack.
 							const fullSrc = img.dataset.fullSrc;
 							const fullSrcset = img.dataset.fullSrcset;
 							if (fullSrc) img.src = fullSrc;
@@ -470,26 +443,10 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 							}
 							img.removeAttribute('width');
 							wideStack.appendChild(item);
-
-							const trueW = await probeSourceWidth(img.src);
-							if (trueW > 0) {
-								const target = item.tagName === 'IMG' ? item : img;
-								target.style.maxWidth = trueW + 'px';
-							}
 						} else {
 							// Portrait: sort by height DESC via CSS order.
 							// Negative value → CSS treats as smaller → renders first.
 							item.style.order = String(-Math.round(h));
-
-							// If the true source is narrower than 375, cap CSS
-							// max-width to source width so the 375-column slot
-							// doesn't stretch the image past its native pixels.
-							// (Sources ≥ 375 need no cap — grid already tops at 375.)
-							const trueW = await probeSourceWidth(img.src);
-							if (trueW > 0 && trueW < 375) {
-								const target = item.tagName === 'IMG' ? item : img;
-								target.style.maxWidth = trueW + 'px';
-							}
 						}
 					};
 
