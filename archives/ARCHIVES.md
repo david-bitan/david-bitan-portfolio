@@ -1350,3 +1350,21 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - `cp archives/v093_.../[slug].astro src/pages/work/[slug].astro`
   - `cp archives/v093_.../cloudinary.ts src/lib/cloudinary.ts`
+
+---
+
+## v094 — 2026-08-13 — Fix tags SaaS erronés (4 projets) + Playright Gaming + year 2021
+
+- **Commit git associé** : (à créer après)
+- **Type** : correction data — task #7 du backlog
+- **Fichiers snapshotés** :
+  - `src/data/allProjects.ts`
+- **Diagnostic** : seul `sonary-dashboard` est vraiment un SaaS. `sonary-website`, `top5`, `sonary-mailer` étaient taggés SaaS à tort (ce sont des surfaces marketing/éditoriales/emails, pas des SaaS produits). `playright` est un site comparison casinos UK → catégorie **Gaming**, pas SaaS. Year Playright était `2024`, vraie date = `2021`.
+- **Changements** :
+  - `sonary-website` : `category: 'SaaS' → 'UI/UX'` + retrait `categories` (fallback `[category]`) + tags `['SaaS','Marketing Site','Content','SEO'] → ['Marketing Site','Content','SEO']`.
+  - `top5` : `category: 'SaaS' → 'UI/UX'` + retrait `categories` + tags `['SaaS','Editorial','Comparison'] → ['Editorial','Comparison']`.
+  - `sonary-mailer` : `category: 'SaaS' → 'UI/UX'` + retrait `categories`. Tags déjà sans SaaS.
+  - `playright` : `year: '2024' → '2021'` + `category: 'SaaS' → 'Gaming'` + `categories: ['SaaS','UI/UX'] → ['Gaming','UI/UX']` + tags `['SaaS','Product Page','UX'] → ['Gaming','Casino Comparison','UX']`.
+- **Impact pill filter home** (SelectedWork) : la pill **SaaS** ne montre plus que `sonary-dashboard` (seul vrai SaaS). **UI/UX** gagne sonary-website/top5/sonary-mailer. **Gaming** gagne playright (avec casino-work + sport-betting).
+- **Rollback** :
+  - `cp archives/v094_.../src__data__allProjects.ts src/data/allProjects.ts`
