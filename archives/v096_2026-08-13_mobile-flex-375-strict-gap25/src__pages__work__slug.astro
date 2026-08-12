@@ -261,7 +261,8 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 								    between image and cell edge — the cell IS
 								    the image slot. Gap tightened 24→12. */}
 								<div
-									class="flex flex-wrap items-start justify-center gap-[37.5px]"
+									class="grid items-start justify-center gap-3"
+									style="grid-template-columns: repeat(auto-fit, minmax(min(100%, 375px), 375px));"
 									data-mobile-grid
 								>
 									{zone.images.map(({ url }) =>
@@ -276,7 +277,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 												alt={project.title}
 												loading="lazy"
 												width="375"
-												class="block h-auto w-[375px] max-w-full rounded-xl"
+												class="block h-auto w-full rounded-xl"
 												data-mobile-item
 												data-full-src={cld(url, FULL)}
 												data-full-srcset={landscapeSrcset(url)}
@@ -293,7 +294,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 												alt={project.title}
 												loading="lazy"
 												width="375"
-												class="block h-auto w-[375px] max-w-full rounded-xl border border-ink/15 shadow-md"
+												class="block h-auto w-full rounded-xl border border-ink/15 shadow-md"
 												data-mobile-item
 												data-full-src={cld(url, FULL)}
 												data-full-srcset={landscapeSrcset(url)}

@@ -1382,3 +1382,27 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Zones non touchées** : `data-desktop-zone` (garde son intent v093, images stay dans article inner) et zone `Other` (grid 2-col object-contain, layout différent). Si David veut aussi le desktop edge-to-edge 1200, on ajoutera `-mx-6` là aussi.
 - **Rollback** :
   - `cp archives/v095_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v096 — 2026-08-13 — Mobile grid → flex-wrap, image w-[375px] strict, gap 37.5 px
+
+- **Commit git associé** : (à créer après)
+- **Type** : fix demande explicite David — cell = image = 375 pile, gap 37.5 px, peu importe si le 1200 reste avec du vide
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro`
+- **Diagnostic** : le grid `auto-fit + minmax(min(100%, 375px), 375px)` marchait en théorie mais David voyait encore les cells se contracter (probablement combo de l'article `px-6` + du `min(100%, ...)` qui shrink quand parent < 375). Impossible à décoincer sans casser autre chose.
+- **Fix — layout radicalement plus simple (flex)** :
+  - `<div class="grid ..." style="grid-template-columns: repeat(auto-fit, minmax(min(100%, 375px), 375px));" data-mobile-grid>` → `<div class="flex flex-wrap items-start justify-center gap-[25px]" data-mobile-grid>`.
+  - Sur chaque `<img data-mobile-item>` : `w-full` → `w-[375px] max-w-full`. L'image fait toujours 375 pile ; sur viewport < 375 (rare), `max-w-full` empêche l'overflow.
+  - Gap 12 → 37.5 px (demande explicite David — espace entre chaque image mobile).
+  - `justify-center` centre la row, donc sur desktop 1200 les 3 images de 375 se placent centrées, avec l'espace résiduel (1200 − 3×375 − 2×37.5 = 0 px !) — nickel pile-poil.
+- **Comportement viewport par viewport** :
+  - 1200+ (desktop) : 3 images de 375 côte à côte + 25 px gap, ligne centrée dans le 1200. Wrap si plus de 3 items.
+  - 800 (tablet) : 2 images × 375 (+ 25 gap = 775), wrap sur ligne suivante.
+  - 375 (mobile) : 1 image de 375 par ligne, empilées.
+  - 320 (rare) : `max-w-full` clamp à 320.
+- **-mx-6 v095 conservé** : la zone break out toujours du padding article pour que sur mobile 375 l'image ne soit pas contrainte à 327.
+- **Wide compositions (ratio > 1) inchangées** : le script client-side les sort du grid vers le `data-mobile-wide-stack` full-width.
+- **Rollback** :
+  - `cp archives/v096_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
