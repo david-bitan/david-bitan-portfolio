@@ -1368,3 +1368,17 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Impact pill filter home** (SelectedWork) : la pill **SaaS** ne montre plus que `sonary-dashboard` (seul vrai SaaS). **UI/UX** gagne sonary-website/top5/sonary-mailer. **Gaming** gagne playright (avec casino-work + sport-betting).
 - **Rollback** :
   - `cp archives/v094_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+---
+
+## v095 — 2026-08-13 — Mobile zone break out article padding (cell = 375 strict)
+
+- **Commit git associé** : (à créer après)
+- **Type** : fix bug v093 — sur mobile viewport 375, les cellules étaient à 327 CSS (pas 375)
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro`
+- **Diagnostic** : v093 avait retiré `px-6` de la `<section>` pensant régler le vide horizontal. Mais l'`<article>` parent garde `px-6` (24 px chaque côté). Sur viewport 375 : article inner = 327 → section = 327 → grid = 327 → cell `minmax(min(100%, 375px), 375px)` = 327 (contrainte 100 % dominante). L'image `w-full` = 327, pas 375. Sur retina DPR 2, slot 327 CSS avec source 375 → downscale visuel + le browser sert quand même une variante Cloudinary trop petite. David voyait des images « pas 375 de large » à raison.
+- **Fix** : `<div class="mt-12" data-mobile-zone>` → `<div class="mt-12 -mx-6" data-mobile-zone>`. Négatif margin −24 px chaque côté sur la mobile zone → le div break out du padding de l'article. Sur mobile 375 : zone = 375, grid = 375, cell = 375, image = 375. Sur desktop 1200 : article inner = 1152, zone = 1200 → grid = 1200 → 3 cells de 375 (1125) + 2 gaps de 12 (24) = 1149, fit propre dans 1200. Aucun débordement horizontal.
+- **Zones non touchées** : `data-desktop-zone` (garde son intent v093, images stay dans article inner) et zone `Other` (grid 2-col object-contain, layout différent). Si David veut aussi le desktop edge-to-edge 1200, on ajoutera `-mx-6` là aussi.
+- **Rollback** :
+  - `cp archives/v095_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
