@@ -275,14 +275,6 @@ The design system also paid off later: several downstream Ryze Beyond products (
 		category: 'UI/UX',
 		shortDesc: `Visual identity system for Ryze Beyond — logo, palette, motion and web-facing brand elements.`,
 		fullDesc: `PLACEHOLDER : Éléments d'identité de marque pour Ryze Beyond.`,
-		// The "example-of-lines-per-section" file is a desktop capture but its
-		// filename lacks the `-desktop` token, so the URL classifier lands it
-		// in "Other" (rendered as a 2-col object-contain, unusable for a wide
-		// desktop shot). Override to desktop so it stacks full-width above the
-		// mobile capture.
-		imageDeviceOverrides: {
-			'ryze-website---homepage---example-of-lines-per-section': 'desktop',
-		},
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342005/portfolio/ryze/ryze-website---homepage---example-of-lines-per-section.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785342005/portfolio/ryze/ryze-website---homepage---example-of-lines-per-section.webp',

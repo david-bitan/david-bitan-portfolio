@@ -1226,6 +1226,22 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - `cp archives/v088_.../cloudinary.ts.bak src/lib/cloudinary.ts`
 
+## v089 — 2026-08-11 — Ryze Brand : device override pour ryze-website (desktop)
+
+- **Commit git associé** : (à créer après)
+- **Type** : data override
+- **Fichiers snapshotés** :
+  - `src/data/allProjects.ts` → `allProjects.ts.bak`
+- **Changement** :
+  - Sonary Website avait déjà bénéficié de v082 (`imageDeviceOverrides` pour article-hub). Ryze Brand a le même problème sur `ryze-website---homepage---example-of-lines-per-section.webp` — desktop mais filename sans token `-desktop` → tombait en "Other" (rendu 2-col object-contain max-h 720, capture wide invisible).
+  - Ajout override : `'ryze-website---homepage---example-of-lines-per-section': 'desktop'`.
+- **Effet visuel** :
+  - Zone "Other" disparaît de Ryze Brand (2 images → réparties Desktop + Mobile).
+  - Desktop capture stack full-width au-dessus de la mobile capture.
+  - Le pill "Desktop" apparaît automatiquement dans `ZoneFilters` (le composant extrait les zones dynamiquement).
+- **Rollback** :
+  - `cp archives/v089_.../allProjects.ts.bak src/data/allProjects.ts`
+
 - **Rationale** : corrections directes suite feedback David session 11. La phrase « two junior designers » était inexacte et se lisait comme de la vantardise ; la nouvelle formulation dit la même chose mais en montrant le partage de savoir plutôt que la hiérarchie. Video/3D/animation/logos/loaders manquaient — c'est une grosse part du craft real de David sur Ryze. L'autodidacte 20 ans + siteduzero/OpenClassrooms montre la trajectoire d'apprentissage continue, différenciant.
 - **Rollback** :
   - `cp archives/v081_.../about.astro.bak src/pages/about.astro`
