@@ -1182,6 +1182,20 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - `cp archives/v085_.../slug.astro.bak src/pages/work/[slug].astro`
 
+## v086 — 2026-08-11 — Cloudinary : f_auto → f_webp (fixes bleuâtre text sur boutons)
+
+- **Commit git associé** : (à créer après)
+- **Type** : fix rendu couleur
+- **Fichiers snapshotés** :
+  - `src/lib/cloudinary.ts` → `cloudinary.ts.bak`
+- **Changement** :
+  - Remplace toutes les occurrences de `f_auto` par `f_webp` dans les presets Cloudinary : PORTRAIT, LANDSCAPE, SQUARE, FIT_TALL, FULL, FULL_TALL, MOBILE + les 2 srcset generators (mobileSrcset, landscapeSrcset).
+- **Rationale** : David signale texte blanc sur boutons rouges (« Sign Up / Log In ») qui apparaît bleuâtre / difficile à lire sur les screenshots. Test HEAD sur `home-page-desktop.webp` : `f_auto,q_100` retourne **JPEG 2.5 MB** (Cloudinary choisit JPEG malgré source WebP). JPEG utilise chroma subsampling 4:2:0 par défaut → destruction du chroma aux bordures nettes texte-clair / bg-saturé → artefact bleuâtre classique.
+- **Solution** : `f_webp` force retour WebP q_100 (1.7 MB, chroma 4:4:4 natif) → bordures nettes préservées. Bonus perf : file 30% plus petit que le JPEG servi par f_auto.
+- **Trade-off** : compat WebP est à 96%+ browsers en 2026 (tous browsers modernes), négligeable. AVIF (encore plus léger) aurait fonctionné aussi mais support à 94%, moins conservateur.
+- **Rollback** :
+  - `cp archives/v086_.../cloudinary.ts.bak src/lib/cloudinary.ts`
+
 - **Rationale** : corrections directes suite feedback David session 11. La phrase « two junior designers » était inexacte et se lisait comme de la vantardise ; la nouvelle formulation dit la même chose mais en montrant le partage de savoir plutôt que la hiérarchie. Video/3D/animation/logos/loaders manquaient — c'est une grosse part du craft real de David sur Ryze. L'autodidacte 20 ans + siteduzero/OpenClassrooms montre la trajectoire d'apprentissage continue, différenciant.
 - **Rollback** :
   - `cp archives/v081_.../about.astro.bak src/pages/about.astro`
