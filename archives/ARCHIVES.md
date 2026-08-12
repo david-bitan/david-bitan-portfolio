@@ -1161,6 +1161,27 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - `cp archives/v084_.../slug.astro.bak src/pages/work/[slug].astro`
 
+## v085 — 2026-08-11 — Narrow desktop detector : probe true source width via c_limit,w_9999
+
+- **Commit git associé** : (à créer après)
+- **Type** : fix de correctness sur détecteur
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro` → `slug.astro.bak`
+- **Changement** :
+  - Le script v079 lisait `img.naturalWidth` pour classer une image "narrow". Mais `naturalWidth` reflète la variante srcset SERVIE par le browser (qui dépend du slot CSS + sizes hint + DPR), PAS la source Cloudinary. Résultat : write-review-step-2 desktop (source 1200) était servi en variante 800 ou 639 selon le run → classé narrow à tort → déplacé dans narrow-grid → slot encore plus petit → variante encore plus réduite. Boucle qui rétrécit.
+  - Nouveau flow :
+    1. Au load, lire `img.naturalWidth` (variante servie).
+    2. Si `servedW >= 900` → source garantie ≥ servi ≥ 900 → skip probe, image reste full-width.
+    3. Si `servedW < 900` → suspect. Fetch `c_limit,w_9999,q_100,f_auto/<path>` — Cloudinary retourne exactement source width (jamais upscale, jamais réduit).
+    4. Si `trueW < 900` → vraiment narrow → move to narrow-grid, cap max-width à `trueW`.
+    5. Sinon → false positive, image reste full-width dans le stack.
+  - Cache probe par URL (Map) — plusieurs items avec même src ne re-fetchent pas.
+- **Coût réseau** : ~0 pour images sources ≥ 900 (pas de probe). +1 fetch Cloudinary par image narrow candidate. Cloudinary CDN cache agressif → coût réel proche de 0 après premier hit.
+- **Rationale** : le fix v079 était juste dans son intention (crop mailer 400) mais mesurait la mauvaise chose. Le probe donne la vraie source width, seul critère fiable.
+- **Test attendu** : sur Sonary Website, write-review-step-2 (source 1200) → probe → 1200 → skip narrow → reste full-width dans le stack (comme les autres desktop). Sonary Mailer (source 400) → probe → 400 → narrow → 2-col grid capped à 400 comme avant.
+- **Rollback** :
+  - `cp archives/v085_.../slug.astro.bak src/pages/work/[slug].astro`
+
 - **Rationale** : corrections directes suite feedback David session 11. La phrase « two junior designers » était inexacte et se lisait comme de la vantardise ; la nouvelle formulation dit la même chose mais en montrant le partage de savoir plutôt que la hiérarchie. Video/3D/animation/logos/loaders manquaient — c'est une grosse part du craft real de David sur Ryze. L'autodidacte 20 ans + siteduzero/OpenClassrooms montre la trajectoire d'apprentissage continue, différenciant.
 - **Rollback** :
   - `cp archives/v081_.../about.astro.bak src/pages/about.astro`

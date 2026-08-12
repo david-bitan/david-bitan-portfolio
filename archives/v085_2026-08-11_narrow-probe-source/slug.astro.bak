@@ -455,43 +455,15 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 
 	<script is:inline>
 		// Desktop zone: split narrow images (e.g. Sonary Email Templates, 400px
-		// wide) out of the full-width stack into an auto-fit grid. Cap each
-		// moved item's inline max-width to the SOURCE width (not the served
-		// variant width — see probe below). Wide images (≥900px source) stay
-		// in the full-width stack.
-		//
-		// Why the probe: `img.naturalWidth` reflects the srcset variant the
-		// browser actually served, not the Cloudinary source. On a small slot
-		// with `sizes="(min-width:1280px) 1200px, 100vw"`, the browser may
-		// serve a 639px or 800px variant of a 1200px source — my old detector
-		// then classified 1200px sources as "narrow" (false positive) and moved
-		// them into the narrow grid, where they got clamped even smaller.
-		// The probe fetches `c_limit,w_9999` which returns exactly the source
-		// width (Cloudinary caps at source), so we see the truth.
+		// wide) out of the full-width stack into a 2-col grid. Cap each moved
+		// item's inline max-width to its own naturalWidth so the browser never
+		// upscales the source. Wide images (≥900px source) stay in the stack.
+		// Runs per desktop zone (one per project side, or 2 for Sonary Dashboard
+		// theme-split etc.).
 		(() => {
 			const NARROW_THRESHOLD = 900;
 			const zones = document.querySelectorAll('[data-desktop-zone]');
 			if (!zones.length) return;
-
-			// Probe true source width via a Cloudinary transform that always
-			// returns the source's own width (never upscales, never downscales
-			// below source). Cached across probes for the same URL.
-			const probeCache = new Map();
-			function probeSourceWidth(imgSrc) {
-				const probeSrc = imgSrc.replace(
-					/\/upload\/(c_[^/]+\/)?/,
-					'/upload/c_limit,w_9999,q_100,f_auto/'
-				);
-				if (probeCache.has(probeSrc)) return probeCache.get(probeSrc);
-				const p = new Promise((resolve) => {
-					const probe = new Image();
-					probe.onload = () => resolve(probe.naturalWidth || 0);
-					probe.onerror = () => resolve(0);
-					probe.src = probeSrc;
-				});
-				probeCache.set(probeSrc, p);
-				return p;
-			}
 
 			zones.forEach((zone) => {
 				const stack = zone.querySelector('[data-desktop-stack]');
@@ -504,25 +476,18 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 					const img = item.querySelector('img');
 					if (!img) return;
 
-					const handle = async () => {
-						const servedW = img.naturalWidth;
-						if (!servedW) return;
+					const handle = () => {
+						const w = img.naturalWidth;
+						if (!w) return;
 
-						// Only probe if the served variant looks like a narrow
-						// candidate. Skip the probe (0 fetches) when the served
-						// width is already ≥ threshold — the source is definitely
-						// wide enough.
-						if (servedW >= NARROW_THRESHOLD) return;
-
-						const trueW = await probeSourceWidth(img.src);
-						if (!trueW || trueW >= NARROW_THRESHOLD) return;
-
-						// Genuinely narrow source: cap the item's inline
-						// max-width to the true source width so the auto-fit
-						// grid centers it at native size — never upscaled,
-						// never squeezed.
-						item.style.maxWidth = trueW + 'px';
-						narrowGrid.appendChild(item);
+						if (w < NARROW_THRESHOLD) {
+							// Cap the item to the source's natural width so the
+							// browser never has to interpolate beyond available
+							// pixels. Landscape at 400px, portrait at 400px — both
+							// stay crisp at their exact source size.
+							item.style.maxWidth = w + 'px';
+							narrowGrid.appendChild(item);
+						}
 					};
 
 					if (img.complete && img.naturalWidth) {
