@@ -1509,3 +1509,17 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Zone `Other` non touchée** — grid 2-col object-contain différent, layout à part.
 - **Rollback** :
   - `cp archives/v102_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v103 — 2026-08-13 — Header zone break out aussi + kill son px-6 (alignement text ↔ images pile 1200)
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : fix alignement final — David voyait toujours du décalage entre les titres (Desktop/Mobile) et les images
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro`
+- **Diagnostic** : v102 avait aligné image desktop ↔ mobile (les 2 zones font 1200 pile avec `-mx-6`). Mais le `<header>` (contenant les h2 "Desktop"/"Mobile" + description p) gardait son `px-6` interne → texte 24 px inside par rapport au container 1152 → 48 px inside par rapport aux images 1200. **Text décalé vers l'intérieur, images edge-to-edge.**
+- **Fix** : header `grid grid-cols-12 gap-8 px-6` → `-mx-6 grid grid-cols-12 gap-8`. Le header break out du padding article (comme les zones), et retire son propre padding interne. Résultat : header 1200 pile, cols-12 du 1200, h2 col-span-4 démarre à x=0 du 1200 = même x que les images. **Text left-aligned pile sur l'edge gauche des images.**
+- **Impact autres zones** : Other (grid 2-col) non touchée directement mais le header au-dessus est aligné pareil désormais.
+- **Rollback** :
+  - `cp archives/v103_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
