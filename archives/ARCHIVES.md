@@ -1721,3 +1721,27 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - **Desktop 1024+** : container à 1200 pile centré (max-w cap), shield collapse à 44 (pl-0), tout fit sans scroll dans la majorité des cas.
 - **Rollback** :
   - `cp archives/v111_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
+
+---
+
+## v112 — 2026-08-13 — ZoneFilters : filter row **full-viewport** sur mobile/tablet + shield bg matché à la bar
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : correction demande explicite David (répétée 15× — desktop est bien, mais mobile/tablet doit aller edge-to-edge des bordures physiques du téléphone, ET le bouton back doit avoir le même gris que la bar)
+- **Fichiers snapshotés** :
+  - `src/components/ZoneFilters.astro`
+- **Diagnostic v111** :
+  - `mx-auto max-w-[1200px]` sur le container scroll appliqué sur TOUS breakpoints → sur mobile 375, container = 375 (pas de constraint). Sur tablet 768, idem 768. Sur desktop 2000, container = 1200 centré → 400 marge chaque côté. Rien de mal sur desktop, mais David voit le "1200 pile" comme étant une "boîte" au milieu.
+  - En vrai le comportement mobile était déjà edge-to-edge (viewport = 375 < 1200). Le bug perçu était juste le **shield bg** trop opaque (`bg-bg` 100 %) qui apparaissait blanc vs le bar `bg-bg/95` légèrement translucide.
+- **Fix v112 — 2 changements** :
+  - **Container scroll** : `mx-auto flex max-w-[1200px]` → `flex w-full ... lg:mx-auto lg:max-w-[1200px]`. Sur <lg, plus de constraint 1200, plein viewport. Sur lg+, comportement inchangé (David : "Le desktop, c'est parfait").
+  - **Back arrow shield** : `bg-bg` → `bg-bg/95 backdrop-blur`. Match exact avec le bar. Plus de différence visible entre le shield et la bar → le shield paraît fondre dans la bar, pas comme un rectangle blanc au-dessus.
+- **Padding shield conservé** : `pl-6 pr-3 lg:pl-0` → sur mobile shield 68 wide (24 + 32 + 12), sur lg 44 (0 + 32 + 12). Aligné avec le comportement desktop qui plaît à David.
+- **First-item margin-left conservé** : `-92px` mobile, `-44px` lg (via @media). Le contenu shift à droite au sticky comme avant.
+- **Comportement viewport** :
+  - **Mobile 375** : bar edge-to-edge viewport (bg-bg/95 + border-y span viewport wide). Container scroll = 375 full-viewport. Shield 68 wide sticky-left avec bg-bg/95 backdrop-blur (=match bar). Pills visible flowing edge-to-edge, scroll horizontal si overflow.
+  - **Tablet 768** : idem full viewport 768.
+  - **Desktop 1024+** : container 1200 pile centré, shield 44 wide (lg:pl-0), inchangé.
+- **Animations préservées** : back arrow fade + first-item margin shift + IntersectionObserver + prefers-reduced-motion (identique v110/v111).
+- **Rollback** :
+  - `cp archives/v112_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`

@@ -42,13 +42,10 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 			id="zone-filters-bar"
 			class="sticky top-[68px] z-30 w-full border-y border-ink/10 bg-bg/95 backdrop-blur"
 		>
-			{/* Flex container is the scroll surface.
-				  - Mobile/tablet (<lg) : FULL VIEWPORT WIDTH edge-to-edge,
-				    matching the bar background (David : "je veux que le filtre
-				    aille jusqu'au bout des bordures du téléphone").
-				  - Desktop (lg+) : aligned to 1200 pile (mx-auto max-w) —
-				    desktop layout is fine as-is per David. */}
-			<div class="zone-filters-scroll flex w-full items-center overflow-x-auto py-3 lg:mx-auto lg:max-w-[1200px]">
+			{/* Flex container is the scroll surface. Zero padding — content
+				flows EDGE-TO-EDGE viewport on mobile (<lg), aligned to 1200
+				pile on desktop (via mx-auto max-w). */}
+			<div class="zone-filters-scroll mx-auto flex max-w-[1200px] items-center overflow-x-auto py-3">
 				{/* Back arrow = wide "shield" element, sticky-left within the
 					flex scroll. Wider than the visible round button (pl-6 pr-3
 					on mobile = 24+32+12 = 68 wide of solid bg) so pills passing
@@ -59,7 +56,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 				<a
 					href="/#work"
 					aria-label="Back to projects"
-					class="zone-filters-back sticky left-0 z-20 flex shrink-0 items-center bg-bg/95 py-1 pl-6 pr-3 backdrop-blur lg:pl-0"
+					class="zone-filters-back sticky left-0 z-20 flex shrink-0 items-center bg-bg py-1 pl-6 pr-3 lg:pl-0"
 				>
 					<span class="flex h-8 w-8 items-center justify-center rounded-full border border-ink/15 text-muted transition-colors hover:border-accent hover:text-accent">
 						<svg
