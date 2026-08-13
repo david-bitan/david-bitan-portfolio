@@ -1495,3 +1495,17 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Impact** : rows complètes (3 items × 375 + 2 × 37.5 = 1200) restent identiques (justify-start ou center donne le même résultat quand la row remplit tout). Rows partielles (1 ou 2 items) sont désormais alignées à gauche.
 - **Rollback** :
   - `cp archives/v101_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v102 — 2026-08-13 — Desktop zone break out article padding (alignement avec mobile zone)
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : fix alignement — David a spotté que les images mobile étaient décalées à droite par rapport aux images desktop
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro`
+- **Diagnostic** : v095 avait ajouté `-mx-6` sur `data-mobile-zone` pour break out du padding article (24 px chaque côté) et permettre les cellules 375 pile sur mobile 375. Mais j'avais laissé `data-desktop-zone` sans `-mx-6` → les images desktop restaient contraintes à article-inner (1152 sur article 1200), tandis que les images mobile s'étendaient à 1200 pile. Résultat visible : **24 px de décalage** entre les 2 zones sur viewport ≥ 1248. Le "Mobile" title (inside header px-6) restait aligné avec le "Desktop" title (idem header px-6), mais les images en-dessous divergeaient.
+- **Fix** : `<div class="mt-12" data-desktop-zone>` → `<div class="mt-12 -mx-6" data-desktop-zone>`. Cohérence totale : les 2 zones break out du padding article, header reste aligné (px-6 inside), images edge-to-edge 1200 pile pour les 2 device zones. C'est l'intent original de v093 ("images edge-to-edge du 1200") maintenant appliqué partout.
+- **Zone `Other` non touchée** — grid 2-col object-contain différent, layout à part.
+- **Rollback** :
+  - `cp archives/v102_.../src__pages__work__slug.astro src/pages/work/[slug].astro`

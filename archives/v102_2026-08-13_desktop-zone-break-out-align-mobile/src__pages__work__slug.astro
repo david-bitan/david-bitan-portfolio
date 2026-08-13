@@ -333,7 +333,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 							//     capped to natural width so it never upscales.
 							//   - Wide (natW ≥ 900) = normal desktop mockup → stays
 							//     full-width in the stack.
-							<div class="mt-12 -mx-6" data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
+							<div class="mt-12" data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
 								<div class="space-y-10" data-desktop-stack>
 									{zone.images.map(({ url }) => (
 										<div
