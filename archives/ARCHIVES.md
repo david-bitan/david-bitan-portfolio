@@ -1593,3 +1593,100 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - `cp archives/v106_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
   - `cp archives/v106_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v107 — 2026-08-13 — Back button aligné pill row mobile + refonte categories multi-casquettes
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : 2 fixes UX + refonte data categories
+- **Fichiers snapshotés** :
+  - `src/components/ZoneFilters.astro`
+  - `src/data/allProjects.ts`
+- **Fix 1 — Back button position responsive (aligné pill row sur mobile)** :
+  - Bouton avait `top-1/2 -translate-y-1/2` qui centrait dans la bar. Sur mobile avec le nouveau layout flex-col (label above pills), la bar a 2 rows par groupe → center visuellement = entre label et pills. David voulait le back button au niveau pills.
+  - Fix : `top-1/2` → `bottom-3 sm:bottom-auto sm:top-1/2`. Sur mobile, bouton à 12 px du bas de la bar = aligned avec la pill row (row 2 du groupe device). Sur sm+, single row layout, back button re-centré.
+  - CSS animation : `transform: translateY(-50%) translateX(...)` retiré du default (mobile), déplacé dans `@media (min-width: 640px)`. Sur mobile plus de translateY (bottom positioning gère le placement), juste translateX pour le slide-in.
+- **Fix 2 — Update categories per David** (feedback session live, projets peuvent avoir plusieurs casquettes) :
+  - **sonary-website** : `category UI/UX → SaaS`, `categories: ['SaaS', 'UI/UX']`. Sonary est un SaaS produit, marketing site est SaaS aussi.
+  - **top5** : `category UI/UX → SaaS`, `categories: ['SaaS', 'B2B', 'UI/UX']`. **Nouveau tag B2B introduit** — Top5 = plateforme comparison B2B pour SaaS produits.
+  - **sonary-mailer** : `category UI/UX → SaaS`, `categories: ['SaaS', 'UI/UX']`. Email templates du SaaS Sonary.
+  - **ryze-brand** : `category UI/UX → Branding`, `categories: ['Branding', 'UI/UX']`. Ryze site = brand identity + UI/UX.
+  - **ryze-hub** : `category UI/UX → Branding`, `categories: ['Branding', 'UI/UX']`. Ryze Beyond Hub = company hub, branding + UI/UX.
+  - **branding-old** : `category Branding`, ajout `categories: ['Branding', 'UI/UX']`. Publicis/Arc branding work avait aussi du UI.
+  - Autres inchangés : sonary-dashboard (SaaS + UI/UX déjà), playright (Gaming + UI/UX déjà), ui-ux-vintage (UI/UX), casino-work (Gaming), sport-betting (Gaming).
+- **Impact home pills SelectedWork** : nouveau pill "**B2B**" apparaît (dérivé auto de categories). Pills UI/UX/SaaS/Gaming/Branding maintenant chacun a plus de projets multi-tagués.
+- **Rollback** :
+  - `cp archives/v107_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
+  - `cp archives/v107_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+---
+
+## v108 — 2026-08-13 — `lg:px-0` global sur tous les containers 1200 (align nav ↔ hero ↔ zones)
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : consistance globale — David a spotté que sur desktop le "David Bitan" du nav n'était pas aligné avec le hero text des pages projet. Cause : v104 a mis `lg:px-0` sur article et zones wrapper, mais Nav + toutes les autres pages/composants gardaient `px-6` = décalage 24 px sur lg+.
+- **Fichiers snapshotés** (13 fichiers) :
+  - `src/components/Nav.astro`
+  - `src/components/Hero.astro`
+  - `src/components/SelectedWork.astro`
+  - `src/components/CraftSection.astro`
+  - `src/components/AboutPreview.astro`
+  - `src/components/Metrics.astro`
+  - `src/components/CraftFilters.astro`
+  - `src/components/ZoneFilters.astro`
+  - `src/pages/about.astro`
+  - `src/pages/contact.astro`
+  - `src/pages/colophon.astro`
+  - `src/pages/craft.astro`
+  - `src/pages/404.astro`
+- **Changement** : ajouté `lg:px-0` à TOUS les containers qui utilisaient le pattern `mx-auto max-w-[1200px] px-6`. Sur ≥1024 viewport, container = 1200 pile, no padding. Sur <1024, garde `px-6` pour lisibilité mobile/tablet.
+- **Résultat viewport ≥1024** : Nav (David Bitan) + Hero + SelectedWork + CraftSection + Metrics + AboutPreview + Sections about/contact/colophon/craft + ZoneFilters/CraftFilters + article + zones wrapper des pages projet = **tous à 1200 pile, edge-to-edge, alignés à x=0 du 1200**. Le nom "David Bitan" du nav est aligned pile avec le hero text des pages projet, avec les cards SelectedWork, avec toutes les sections.
+- **Résultat viewport <1024** : padding 24 chaque côté préservé (comportement inchangé) — lisibilité sur mobile/tablet.
+- **Rollback** :
+  - `cp archives/v108_.../src__components__*.astro src/components/`
+  - `cp archives/v108_.../src__pages__*.astro src/pages/`
+
+---
+
+## v109 — 2026-08-13 — ZoneFilters : single-row inline scroll horizontal + back arrow sticky-left toujours visible
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : refonte UX filtres — David a fourni un mockup 3-panels précisant exactement ce qu'il veut
+- **Fichiers snapshotés** :
+  - `src/components/ZoneFilters.astro`
+- **Diagnostic** : v106/v107 avait mis les groupes device/theme en flex-col avec labels au-dessus des pills sur mobile → gap horizontal + labels stackés → pas ce que David voulait. Il veut TOUT sur une seule ligne horizontale, scroll horizontal quand overflow, et back button toujours visible.
+- **Refonte complète (rewrite du composant)** :
+  - **Un seul flex row** contenant : back arrow + span "Device" + pills device + separator + span "Theme" + pills theme. Plus de wrapper flex-col par groupe. Tout inline.
+  - **flex-nowrap + overflow-x-auto** : force la ligne, scroll horizontal quand ça dépasse.
+  - **Back arrow `sticky left-6 bg-bg z-10`** : sticky-left dans le contexte de scroll horizontal → reste glued à gauche visible quand user slide, autres pills passent derrière. bg-bg opaque cache le contenu qui passe sous le back arrow. Sur lg+ `left-0` pour aligner pile 1200 edge.
+  - **`-mx-6 px-6 sm:mx-0 sm:px-0 lg:mx-0 lg:px-0`** : scroll edge-to-edge viewport sur mobile via break out du padding parent (le container a `px-6 lg:px-0` depuis v108). Sur sm+ (≥640), plus de break out — le scroll est confiné au parent normal (pas nécessaire vu la taille). Sur lg+, la parent n'a plus de padding donc le scroll aligne pile au 1200.
+  - **Chaque item `shrink-0`** : empêche flex de compresser les items. Ils gardent leur taille, on doit scroller pour voir la suite.
+  - **Back arrow toujours visible** : suppression du système `is-stuck` / IntersectionObserver / animation fade+slide. La back arrow n'apparaît plus "sur sticky", elle est là dès le départ. Plus simple, plus prévisible.
+- **CSS ménage** : suppression de tout le bloc `.zone-filters-back` / `.zone-filters-content` / `#zone-filters-bar.is-stuck` (animation fade + padding-left shift qui n'a plus lieu d'être). Reste juste le `scrollbar-width: none` sur `.zone-filters-scroll`.
+- **JS ménage** : suppression du bloc IntersectionObserver pour `.is-stuck`. Reste juste le click handler filter → apply().
+- **Résultat viewport** :
+  - **Mobile 375** : back arrow x=24 (sticky), Device label + pills All/Desktop/Mobile visible dans les ~280 restants. Si Theme groupe présent (Sonary Dashboard), scroll horizontal révèle Theme + Light/Dark. Back arrow reste glued gauche.
+  - **Tablet 768** : plus large, plupart des projets tout visible sans scroll. Sonary Dashboard avec les 8 pills scroll si nécessaire.
+  - **Desktop lg+ 1024+** : tout fit dans 1200, no scroll. Back arrow aligné pile edge gauche du 1200.
+- **Rollback** :
+  - `cp archives/v109_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
+
+---
+
+## v110 — 2026-08-13 — ZoneFilters : réintégration des animations sticky (back arrow fade+slide + content shift)
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : réintégration feature — v109 avait viré les animations en simplifiant, David les veut back
+- **Fichiers snapshotés** :
+  - `src/components/ZoneFilters.astro`
+- **Comportement final v110** :
+  - **Non-sticky** (bar à sa position naturelle, page pas scrollée) : back arrow `opacity 0 + translateX(-6px)`, pointer-events none. Premier item de contenu (span "Device" ou "Theme" selon le projet) a `margin-left: -40px` → efface l'espace vide où serait le back arrow → tout est aligné à gauche du 1200.
+  - **Sticky** (bar collée sous nav) : `.is-stuck` class ajoutée par IntersectionObserver. Back arrow fade in (opacity 0→1) + slide (translateX -6→0). Simultanément, premier item de contenu shift à droite (margin-left -40→0) → laisse la place au back arrow. Animation 400ms cubic-bezier(0.22, 0.61, 0.36, 1) synchronisée.
+  - **Scroll horizontal des pills** (mobile) : back arrow reste `position: sticky; left: 6` → glued gauche pendant que user swipe. Pills passent derrière (bg-bg opaque cache visuellement).
+  - **prefers-reduced-motion** : animations coupées.
+- **Trick technique — margin-left négatif sur first-item** : au lieu de padding-left sur le container (comme v106 précédent qui shiftait tout à droite), je marque le premier item de contenu avec `.zone-filters-first-item` et applique `margin-left: -40px` (offset back arrow width + gap approximatif). Le back arrow reste physiquement en tête du flex mais avec `opacity: 0` → prend son espace mais est invisible. Le first-item l'"absorbe" via margin-left négatif. Au sticky, margin-left → 0 = first-item glisse à droite, back arrow devient visible. Résultat visuel identique à l'ancien padding-left, mais compatible avec la nouvelle structure single-row.
+- **Impact sur la structure** : ajout de `.zone-filters-first-item` class sur le premier item de contenu (span "Device" si device présent, sinon span "Theme"). Détection au render : le premier span reçoit la class, les autres non.
+- **JS restauré** : IntersectionObserver reactivé pour toggle `.is-stuck` (identique à avant v109).
+- **Rollback** :
+  - `cp archives/v110_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`

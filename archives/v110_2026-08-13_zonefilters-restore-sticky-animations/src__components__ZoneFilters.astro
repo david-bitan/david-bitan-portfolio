@@ -43,23 +43,18 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 			class="sticky top-[68px] z-30 w-full border-y border-ink/10 bg-bg/95 backdrop-blur"
 		>
 			<div class="mx-auto max-w-[1200px] px-6 py-3 lg:px-0">
-				{/* Single horizontal row — Back arrow (revealed on sticky) +
-					Device label + pills + separator + Theme label + pills.
-					flex-nowrap + overflow-x-auto → user swipes horizontally
-					to reveal hidden pills on narrow viewports.
-					`-mx-6 px-6 ... lg:mx-0 lg:px-0` extends the scroll area
-					edge-to-edge viewport on mobile, aligns with 1200 on
-					desktop. */}
+				{/* Single horizontal row — Device label + pills + separator +
+					Theme label + pills. flex-nowrap + overflow-x-auto → user
+					can slide horizontally to reveal hidden pills on narrow
+					viewports. `-mx-6 px-6 sm:mx-0 sm:px-0` extends the scroll
+					area edge-to-edge viewport on mobile. lg:px-0 stays flush
+					with the 1200 container on desktop. */}
 				<div class="zone-filters-scroll -mx-6 flex flex-nowrap items-center gap-3 overflow-x-auto px-6 sm:gap-4 lg:mx-0 lg:px-0">
-					{/* Back arrow — hidden by default (opacity 0, no space
-						taken via negative margin trick). When the bar becomes
-						sticky (user scrolls past its natural position), fades
-						in + slides from -6px, and the following content shifts
-						right via margin-left to make room. During horizontal
-						pill scroll, the arrow is `position: sticky; left: 6`
-						so it stays glued to the left edge of the visible
-						scroll area while other content passes behind. bg-bg
-						opaque so the arrow visually hides content behind it. */}
+					{/* Back arrow — always visible, sticky-left within the
+						horizontal scroll so it stays glued to the left edge
+						of the visible scroll area while other content slides
+						behind it. bg-bg opaque so the arrow hides content
+						passing behind it visually. */}
 					<a
 						href="/#work"
 						aria-label="Back to projects"
@@ -82,7 +77,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 
 					{deviceOptions.length > 1 && (
 						<>
-							<span class="zone-filters-first-item shrink-0 text-[11px] font-semibold uppercase tracking-widest text-muted">Device</span>
+							<span class="shrink-0 text-[11px] font-semibold uppercase tracking-widest text-muted">Device</span>
 							{deviceOptions.map((f, i) => (
 								<button
 									type="button"
@@ -105,12 +100,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 
 					{themeOptions.length > 1 && (
 						<>
-							{deviceOptions.length <= 1 && (
-								<span class="zone-filters-first-item shrink-0 text-[11px] font-semibold uppercase tracking-widest text-muted">Theme</span>
-							)}
-							{deviceOptions.length > 1 && (
-								<span class="shrink-0 text-[11px] font-semibold uppercase tracking-widest text-muted">Theme</span>
-							)}
+							<span class="shrink-0 text-[11px] font-semibold uppercase tracking-widest text-muted">Theme</span>
 							{themeOptions.map((f, i) => (
 								<button
 									type="button"
@@ -171,22 +161,6 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 			apply();
 		}),
 	);
-
-	// Sticky detection — toggle `.is-stuck` on the bar when it pins to
-	// top-[68px]. IntersectionObserver with a shrunk root (rootMargin
-	// -69px top) fires when the bar's top edge crosses the 68px line under
-	// the nav. threshold [1] triggers as soon as any pixel of the bar
-	// starts being clipped by that virtual top edge.
-	const bar = document.getElementById('zone-filters-bar');
-	if (bar && 'IntersectionObserver' in window) {
-		const io = new IntersectionObserver(
-			([entry]) => {
-				bar.classList.toggle('is-stuck', entry.intersectionRatio < 1);
-			},
-			{ rootMargin: '-69px 0px 0px 0px', threshold: [1] },
-		);
-		io.observe(bar);
-	}
 </script>
 
 <style is:global>
@@ -198,43 +172,5 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 	}
 	.zone-filters-scroll::-webkit-scrollbar {
 		display: none;
-	}
-
-	/* Back arrow reveal animation — hidden by default (opacity 0 +
-	   translateX(-6px)), fades in + slides right when the bar gets
-	   .is-stuck. Simultaneously, the first content item (Device or Theme
-	   label) shifts right via margin-left to make room, syncing the
-	   entrance. `is:global` so runtime class .is-stuck (added by JS) can
-	   match. Transitions defined here (not via Tailwind arbitrary classes)
-	   because comma-in-arbitrary-value breaks the JIT scanner. */
-	.zone-filters-back {
-		opacity: 0;
-		transform: translateX(-6px);
-		pointer-events: none;
-		transition:
-			opacity 400ms cubic-bezier(0.22, 0.61, 0.36, 1),
-			transform 400ms cubic-bezier(0.22, 0.61, 0.36, 1),
-			border-color 200ms ease,
-			color 200ms ease;
-		will-change: opacity, transform;
-	}
-	.zone-filters-first-item {
-		margin-left: -40px;
-		transition: margin-left 400ms cubic-bezier(0.22, 0.61, 0.36, 1);
-		will-change: margin-left;
-	}
-	#zone-filters-bar.is-stuck .zone-filters-back {
-		opacity: 1;
-		transform: translateX(0);
-		pointer-events: auto;
-	}
-	#zone-filters-bar.is-stuck .zone-filters-first-item {
-		margin-left: 0;
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.zone-filters-back,
-		.zone-filters-first-item {
-			transition: none !important;
-		}
 	}
 </style>

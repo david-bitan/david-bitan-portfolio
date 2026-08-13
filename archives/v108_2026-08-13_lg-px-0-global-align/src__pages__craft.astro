@@ -14,7 +14,7 @@ const categories = Array.from(new Set(craftItems.map((i) => i.category)));
 <Layout title="Personal work — David Bitan">
 	<Nav />
 
-	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 lg:px-0" data-reveal>
+	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20" data-reveal>
 		<a href="/#craft" class="text-sm font-semibold text-accent hover:underline">← Back</a>
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">Craft</p>
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
@@ -28,7 +28,7 @@ const categories = Array.from(new Set(craftItems.map((i) => i.category)));
 
 	<CraftFilters categories={categories} />
 
-	<div class="mx-auto max-w-[1200px] px-6 lg:px-0">
+	<div class="mx-auto max-w-[1200px] px-6">
 		<div class="mt-16 space-y-16">
 			{
 				craftItems.map((item) => (
