@@ -1547,3 +1547,26 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Zone Other** non touchée (grid 2-col object-contain, moins impacté par ce refactor).
 - **Rollback** :
   - `cp archives/v104_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v105 — 2026-08-13 — Zones wrapper max-w-1200 (les zones étaient hors article, edge-to-edge viewport)
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : root cause discovered — je pensais que les zones étaient dans article, mais l'`<article>` se ferme à la ligne 128. Le `<div class="mt-8">` qui wrappe ZoneFilters + zones est un sibling de article, sans layout. Mon v104 modifiait le padding de article, mais ça n'a jamais touché les zones.
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro`
+- **Diagnostic live via Chrome MCP** :
+  - Viewport 768, mesures : `<article>` = 752 wide (viewport minus scrollbar) avec `px-6` → hero content correct à x=24, width 704.
+  - `<section data-zone-label>` = 752 wide, `left=0` → **section spans full viewport, ignore max-w-1200**. Parce que son parent est `<div class="mt-8">` sans layout → prend 100 % Layout width.
+  - `<header>` = 752 wide, texte "Desktop"/"Mobile" au x=0 pile de viewport.
+  - `<div data-mobile-zone>` = 800 wide (752 + 48 pour -mx-6), `left=-24` → **déborde du viewport, causing horizontal scroll**. Body scrollWidth 777 > viewport 768.
+- **Fix v105** : ajoute le layout aux zones wrapper. `<div class="mt-8">` → `<div class="mx-auto mt-8 max-w-[1200px] px-6 lg:px-0">`. Cohérent avec article.
+- **Comportement responsive après v105** :
+  - Viewport 2000+ : wrapper = 1200 centré (mx-auto max-w), no padding (lg:px-0). Section = 1200. Header = 1200 aligné. Mobile-zone with `-mx-6 lg:mx-0` → sur lg+, mx-0 gagne = pas de break out = 1200 pile. Desktop-zone = 1200. **Tout à 1200 pile edge-to-edge du wrapper centré.** ✓
+  - Viewport 1024 (lg exact) : wrapper = 1024, no padding, section = 1024. Cells mobile 2 par ligne (2×375 + 37.5 = 787 < 1024).
+  - Viewport 800 (< lg) : wrapper = 800 avec `px-6` → content 752. Section = 752. Header = 752, text à x=24 (dans padding du wrapper). Mobile-zone with -mx-6 = 800 (breaks out du padding wrapper) = viewport-wide, no h-scroll. Cell 375 dans 800 = 1 par ligne + reste vide à droite (justify-start). Desktop-zone = 752 (no -mx-6). Images desktop w-full = 752.
+  - Viewport 375 (mobile réel) : wrapper = 375 avec px-6 → content 327. Mobile-zone -mx-6 = 375. Cell 375 pile ✓. Hero text avec padding 24 lisible.
+- **Résultat clé** : plus de horizontal scroll sur mobile/tablet. Text (hero + zones) tous alignés à x=24 du viewport (dans padding). Images mobile break out à viewport wide pour garder 375 pile. Sur desktop lg+, tout à 1200 pile aligné.
+- **Rollback** :
+  - `cp archives/v105_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
