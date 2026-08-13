@@ -1769,3 +1769,20 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - `cp archives/v113_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
   - `cp archives/v113_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v114 — 2026-08-13 — ZoneFilters bar : desktop retour à 1200 centré, mobile edge-to-edge conservé
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : correctif v113 — David : "le mobile c'est parfait, le desktop je le veux comme il était avant (1200 pile centré)"
+- **Fichiers snapshotés** :
+  - `src/components/ZoneFilters.astro`
+- **Diagnostic v113** : le bar entier passait `w-full` sans breakpoint constraint → viewport wide sur toutes tailles → cassait le desktop qui doit être à 1200 pile.
+- **Fix v114** : ajout `lg:mx-auto lg:max-w-[1200px]` sur le bar sticky (`sticky top-[68px] z-30 w-full border-y border-ink/10 bg-bg` → `... lg:mx-auto lg:max-w-[1200px]`).
+- **Résultat** :
+  - **Mobile/tablet (<lg)** : bar `w-full` = viewport wide, edge-to-edge (comportement v113 mobile conservé, "parfait" selon David).
+  - **Desktop (lg+)** : bar `lg:max-w-[1200px] lg:mx-auto` = 1200 centré (retour au comportement d'avant v113). Border-y à 1200 wide, plus edge-to-edge du viewport.
+- **Position sticky + mx-auto** : compatible. Sticky respecte les marges normal-flow ; mx-auto centre horizontalement dans le containing block ; max-w cape la largeur.
+- **Rollback** :
+  - `cp archives/v114_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
