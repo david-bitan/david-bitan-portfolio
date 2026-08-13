@@ -1690,3 +1690,34 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **JS restauré** : IntersectionObserver reactivé pour toggle `.is-stuck` (identique à avant v109).
 - **Rollback** :
   - `cp archives/v110_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
+
+---
+
+## v111 — 2026-08-13 — ZoneFilters : edge-to-edge STRICT + back arrow shield opaque (cache pills)
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : refonte structurelle sur demande explicite David (répétée 10× — "je veux que le filtre aille de bout à bout, sans avoir de padding ou de margin. Les pills doivent être cachées quand elles slident sous le back button")
+- **Fichiers snapshotés** :
+  - `src/components/ZoneFilters.astro`
+- **Diagnostic v110 (rejeté)** :
+  - Le container avait encore `px-6` héritage v108 → padding 24 px chaque côté sur mobile → PAS edge-to-edge.
+  - Back arrow 32×32 avec bg-bg opaque, mais label "Device" (>32 wide) passait derrière → texte visible sur les côtés du bouton rond.
+- **Fix v111 — refonte structurelle** :
+  - **Container scroll = flex direct sans padding** : `<div class="zone-filters-scroll mx-auto flex max-w-[1200px] items-center overflow-x-auto py-3">`. AUCUN `px-*` sur le container. Sur mobile, container = viewport wide (edge-to-edge). Sur desktop, container = 1200 max centré (mx-auto). Le border-y et le bg-bg/95 sont sur l'outer sticky div, edge-to-edge full viewport.
+  - **Back arrow = SHIELD WIDE (opaque)** : `<a class="zone-filters-back sticky left-0 z-20 flex shrink-0 items-center bg-bg py-1 pl-6 pr-3 lg:pl-0">` avec bouton rond 32×32 à l'intérieur. Le shield fait **68 px de large sur mobile** (24 pl-6 + 32 button + 12 pr-3), aligné pile 1200 sur lg+ (0 + 32 + 12 = 44). Sticky left-0 → glued à gauche du scroll visible. bg-bg 100 % opaque → tout ce qui passe derrière est INVISIBLE.
+  - **First item margin trick** : le premier item de contenu (span "Device" ou "Theme" si device absent) reçoit `.zone-filters-first-item` avec `margin-left: -92px` sur mobile (compensation du shield 68 + son propre pl-6 24 = 92) et `-44px` sur lg+. Sur non-sticky, ce margin absorbe l'espace du shield → contenu commence pile à x=24 du viewport (mobile) ou x=0 du 1200 (desktop). Sur sticky, animation `margin-left: 0` → contenu shift right, shield devient visible.
+  - **Trailing spacer** : `<div class="w-6 shrink-0 lg:w-0" />` en fin de row pour laisser un peu d'air quand user scroll jusqu'au bout.
+- **Animations toutes préservées** :
+  - Back arrow : `opacity 0 → 1` + `translateX(-6px) → 0` en 400 ms cubic-bezier(0.22, 0.61, 0.36, 1).
+  - First item shift : `margin-left: -92px → 0` synchronisé.
+  - Sticky detection : IntersectionObserver rootMargin -69px, threshold [1] → toggle `.is-stuck` sur bar.
+  - prefers-reduced-motion : transitions coupées.
+- **Comportement scroll horizontal** :
+  - Non-sticky : back arrow invisible (opacity 0), pills alignés à gauche du viewport (margin-left -92 absorbe l'espace). User peut swiper → pills se décalent, shield reste dans le flex mais invisible.
+  - Sticky : back arrow visible dans son shield opaque 68 wide. User swipe → pills passent DERRIÈRE le shield → **complètement cachés** par le bg-bg 100 % opaque. Pattern iOS "sticky sidebar over scroll".
+- **Résultat viewport** :
+  - **Mobile 375** : filter bar edge-to-edge viewport, back arrow shield à gauche opaque, pills scrollables horizontalement en passant derrière le shield.
+  - **Tablet 768** : idem, plus de pills visibles.
+  - **Desktop 1024+** : container à 1200 pile centré (max-w cap), shield collapse à 44 (pl-0), tout fit sans scroll dans la majorité des cas.
+- **Rollback** :
+  - `cp archives/v111_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`

@@ -42,29 +42,23 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 			id="zone-filters-bar"
 			class="sticky top-[68px] z-30 w-full border-y border-ink/10 bg-bg/95 backdrop-blur"
 		>
-			<div class="mx-auto max-w-[1200px] px-6 py-3 lg:px-0">
-				{/* Single horizontal row — Back arrow (revealed on sticky) +
-					Device label + pills + separator + Theme label + pills.
-					flex-nowrap + overflow-x-auto → user swipes horizontally
-					to reveal hidden pills on narrow viewports.
-					`-mx-6 px-6 ... lg:mx-0 lg:px-0` extends the scroll area
-					edge-to-edge viewport on mobile, aligns with 1200 on
-					desktop. */}
-				<div class="zone-filters-scroll -mx-6 flex flex-nowrap items-center gap-3 overflow-x-auto px-6 sm:gap-4 lg:mx-0 lg:px-0">
-					{/* Back arrow — hidden by default (opacity 0, no space
-						taken via negative margin trick). When the bar becomes
-						sticky (user scrolls past its natural position), fades
-						in + slides from -6px, and the following content shifts
-						right via margin-left to make room. During horizontal
-						pill scroll, the arrow is `position: sticky; left: 6`
-						so it stays glued to the left edge of the visible
-						scroll area while other content passes behind. bg-bg
-						opaque so the arrow visually hides content behind it. */}
-					<a
-						href="/#work"
-						aria-label="Back to projects"
-						class="zone-filters-back sticky left-6 z-10 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ink/15 bg-bg text-muted hover:border-accent hover:text-accent lg:left-0"
-					>
+			{/* Flex container is the scroll surface. Zero padding — content
+				flows EDGE-TO-EDGE viewport on mobile (<lg), aligned to 1200
+				pile on desktop (via mx-auto max-w). */}
+			<div class="zone-filters-scroll mx-auto flex max-w-[1200px] items-center overflow-x-auto py-3">
+				{/* Back arrow = wide "shield" element, sticky-left within the
+					flex scroll. Wider than the visible round button (pl-6 pr-3
+					on mobile = 24+32+12 = 68 wide of solid bg) so pills passing
+					behind it during horizontal scroll are FULLY HIDDEN by the
+					opaque bg-bg. On lg+, the shield's left padding shrinks to
+					0 (aligned pile 1200). Animated: opacity 0 → 1 + translateX
+					when the bar becomes sticky. */}
+				<a
+					href="/#work"
+					aria-label="Back to projects"
+					class="zone-filters-back sticky left-0 z-20 flex shrink-0 items-center bg-bg py-1 pl-6 pr-3 lg:pl-0"
+				>
+					<span class="flex h-8 w-8 items-center justify-center rounded-full border border-ink/15 text-muted transition-colors hover:border-accent hover:text-accent">
 						<svg
 							aria-hidden="true"
 							xmlns="http://www.w3.org/2000/svg"
@@ -78,53 +72,63 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 						>
 							<path d="M15 18l-6-6 6-6" />
 						</svg>
-					</a>
+					</span>
+				</a>
 
-					{deviceOptions.length > 1 && (
-						<>
-							<span class="zone-filters-first-item shrink-0 text-[11px] font-semibold uppercase tracking-widest text-muted">Device</span>
-							{deviceOptions.map((f, i) => (
-								<button
-									type="button"
-									data-filter-group="device"
-									data-filter-key={f.key}
-									data-active={i === 0 ? 'true' : 'false'}
-									class="zone-filter-btn shrink-0 rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
-								>
-									{f.label}
-								</button>
-							))}
-						</>
-					)}
+				{/* First content item — has negative margin-left equal to the
+					back arrow shield's width on non-sticky, so content starts
+					flush at viewport-left (edge-to-edge). On sticky, margin
+					animates to 0, revealing the shield + back arrow. */}
+				{deviceOptions.length > 1 && (
+					<>
+						<span class="zone-filters-first-item shrink-0 pl-6 text-[11px] font-semibold uppercase tracking-widest text-muted lg:pl-0">
+							Device
+						</span>
+						{deviceOptions.map((f, i) => (
+							<button
+								type="button"
+								data-filter-group="device"
+								data-filter-key={f.key}
+								data-active={i === 0 ? 'true' : 'false'}
+								class="zone-filter-btn ml-2 shrink-0 rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink sm:ml-3"
+							>
+								{f.label}
+							</button>
+						))}
+					</>
+				)}
 
-					{/* Vertical separator between Device and Theme groups —
-						only rendered when both groups are present. */}
-					{deviceOptions.length > 1 && themeOptions.length > 1 && (
-						<div class="h-6 w-px shrink-0 bg-ink/15" aria-hidden="true" />
-					)}
+				{deviceOptions.length > 1 && themeOptions.length > 1 && (
+					<div class="ml-3 h-6 w-px shrink-0 bg-ink/15 sm:ml-4" aria-hidden="true" />
+				)}
 
-					{themeOptions.length > 1 && (
-						<>
-							{deviceOptions.length <= 1 && (
-								<span class="zone-filters-first-item shrink-0 text-[11px] font-semibold uppercase tracking-widest text-muted">Theme</span>
-							)}
-							{deviceOptions.length > 1 && (
-								<span class="shrink-0 text-[11px] font-semibold uppercase tracking-widest text-muted">Theme</span>
-							)}
-							{themeOptions.map((f, i) => (
-								<button
-									type="button"
-									data-filter-group="theme"
-									data-filter-key={f.key}
-									data-active={i === 0 ? 'true' : 'false'}
-									class="zone-filter-btn shrink-0 rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
-								>
-									{f.label}
-								</button>
-							))}
-						</>
-					)}
-				</div>
+				{themeOptions.length > 1 && (
+					<>
+						<span
+							class:list={[
+								'shrink-0 text-[11px] font-semibold uppercase tracking-widest text-muted',
+								deviceOptions.length > 1 ? 'ml-3 sm:ml-4' : 'zone-filters-first-item pl-6 lg:pl-0',
+							]}
+						>
+							Theme
+						</span>
+						{themeOptions.map((f, i) => (
+							<button
+								type="button"
+								data-filter-group="theme"
+								data-filter-key={f.key}
+								data-active={i === 0 ? 'true' : 'false'}
+								class="zone-filter-btn ml-2 shrink-0 rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink sm:ml-3"
+							>
+								{f.label}
+							</button>
+						))}
+					</>
+				)}
+
+				{/* Trailing spacer so the last pill has a bit of air on the
+					right when scrolled to the end. */}
+				<div class="w-6 shrink-0 lg:w-0" aria-hidden="true" />
 			</div>
 		</div>
 	)
@@ -173,10 +177,8 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 	);
 
 	// Sticky detection — toggle `.is-stuck` on the bar when it pins to
-	// top-[68px]. IntersectionObserver with a shrunk root (rootMargin
-	// -69px top) fires when the bar's top edge crosses the 68px line under
-	// the nav. threshold [1] triggers as soon as any pixel of the bar
-	// starts being clipped by that virtual top edge.
+	// top-[68px]. IntersectionObserver with rootMargin -69px top fires when
+	// the bar's top edge crosses the 68px line under the nav.
 	const bar = document.getElementById('zone-filters-bar');
 	if (bar && 'IntersectionObserver' in window) {
 		const io = new IntersectionObserver(
@@ -190,9 +192,8 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 </script>
 
 <style is:global>
-	/* Hide the horizontal scrollbar on the pills row while keeping scroll
-	   functional (touch swipe / trackpad / scroll wheel). Cleaner look on
-	   both mobile and desktop for the short pill list. */
+	/* Hide the horizontal scrollbar on the filter row while keeping scroll
+	   functional (touch swipe / trackpad / scroll wheel). */
 	.zone-filters-scroll {
 		scrollbar-width: none;
 	}
@@ -200,28 +201,45 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 		display: none;
 	}
 
-	/* Back arrow reveal animation — hidden by default (opacity 0 +
-	   translateX(-6px)), fades in + slides right when the bar gets
-	   .is-stuck. Simultaneously, the first content item (Device or Theme
-	   label) shifts right via margin-left to make room, syncing the
-	   entrance. `is:global` so runtime class .is-stuck (added by JS) can
-	   match. Transitions defined here (not via Tailwind arbitrary classes)
-	   because comma-in-arbitrary-value breaks the JIT scanner. */
+	/* Back arrow reveal + first-item shift animation.
+
+	   Non-sticky (default) : back arrow opacity 0 + translated left, shield
+	     still takes flex space but is invisible. First content item has a
+	     negative margin-left that absorbs the shield's width → content
+	     appears flush at container-left (edge-to-edge viewport on mobile).
+
+	   Sticky (`.is-stuck` added by JS) : back arrow fades in + slides to
+	     natural position. First-item margin-left animates to 0 → content
+	     shifts right, revealing the visible back arrow.
+
+	   During horizontal scroll (mobile) : back arrow shield is `position:
+	     sticky; left: 0` with opaque `bg-bg`, so pills passing behind it are
+	     visually hidden by the solid bg strip (68 px wide on mobile). */
 	.zone-filters-back {
 		opacity: 0;
 		transform: translateX(-6px);
 		pointer-events: none;
 		transition:
 			opacity 400ms cubic-bezier(0.22, 0.61, 0.36, 1),
-			transform 400ms cubic-bezier(0.22, 0.61, 0.36, 1),
-			border-color 200ms ease,
-			color 200ms ease;
+			transform 400ms cubic-bezier(0.22, 0.61, 0.36, 1);
 		will-change: opacity, transform;
 	}
 	.zone-filters-first-item {
-		margin-left: -40px;
+		/* Mobile shield width: 24 pl-6 + 32 button + 12 pr-3 = 68. First item
+		   also has pl-6 (24) that overlaps → total negative offset = -68 to
+		   land content at container-left (x=0) on non-sticky. Plus its own
+		   pl-6 the effective shift = -92 so text lands at x=24 (comfortable
+		   inset from viewport edge without touching it). */
+		margin-left: -92px;
 		transition: margin-left 400ms cubic-bezier(0.22, 0.61, 0.36, 1);
 		will-change: margin-left;
+	}
+	@media (min-width: 1024px) {
+		.zone-filters-first-item {
+			/* lg: shield pl-0, so button 32 + pr-3 12 = 44. First item pl-0
+			   too. Negative offset = -44 to overlap shield exactly. */
+			margin-left: -44px;
+		}
 	}
 	#zone-filters-bar.is-stuck .zone-filters-back {
 		opacity: 1;
