@@ -1421,3 +1421,21 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rollback** :
   - Code : `cp archives/v097_.../src__data__allProjects.ts src/data/allProjects.ts`
   - Asset : re-uploader l'ancien PNG (pas conservé — Cloudinary garde l'historique via version prefix, l'ancien = `v1785342215` toujours accessible en dur si besoin)
+
+---
+
+## v098 — 2026-08-13 — Top5 comparison + lineup mobile : drop version prefix + test @2x
+
+- **Commit git associé** : (à créer après upload + push David)
+- **Type** : préparation code pour test qualité @2x sur comparison + lineup mobile
+- **Fichiers snapshotés** :
+  - `src/data/allProjects.ts`
+- **Contexte** : après le test @2x sur article-375 (v097), David veut valider la qualité retina sur les 2 autres mobiles du projet Top5. Renaming local des exports @2x pour qu'ils écrasent les public_ids existants :
+  - `Comparison/Mobile - 375 - inner 343.png` (@1x 375×5589) → `.png.bak` (script upload skip)
+  - `Comparison/Mobile - 375x2 - inner 343.png` (@2x 750×11178) → renommé `Mobile - 375 - inner 343.png`
+  - `Lineup/Website width 375x2 - Container 343 - Lineup 344.png` (@2x 750×28775) → renommé sans le `x2`
+  - `Article/Article 375x2.png` (@1x backup 375×15473) → `.png.bak`
+- **Changement code** : drop version prefixes sur les 2 URLs comparison + lineup mobile (`v1785342219` et `v1785342225`) → non-versioned = Cloudinary sert la version courante du public_id après upload+invalidate.
+- **Bénéfice attendu** : retina crisp sur DPR 2 (majorité des devices récents). Server-side Lanczos downscale sur DPR 1 (750→375) supérieur au browser scaling du @1x.
+- **Rollback code** :
+  - `cp archives/v098_.../src__data__allProjects.ts src/data/allProjects.ts`
