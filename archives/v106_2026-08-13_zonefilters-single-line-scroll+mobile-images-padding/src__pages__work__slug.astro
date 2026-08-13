@@ -252,7 +252,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 							//   - Portrait = real mobile capture → sorted by height DESC
 							//     (via CSS order = -height) so similar heights sit
 							//     side-by-side and the grid packs cleanly.
-							<div class="mt-12" data-mobile-zone>
+							<div class="mt-12 -mx-6 lg:mx-0" data-mobile-zone>
 								{/* v093: switched from fixed 1/2/3 col grid to
 								    auto-fit cells of exactly 375px (the mobile
 								    design width). Cells never grow past 375, so

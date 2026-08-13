@@ -1570,3 +1570,26 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Résultat clé** : plus de horizontal scroll sur mobile/tablet. Text (hero + zones) tous alignés à x=24 du viewport (dans padding). Images mobile break out à viewport wide pour garder 375 pile. Sur desktop lg+, tout à 1200 pile aligné.
 - **Rollback** :
   - `cp archives/v105_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v106 — 2026-08-13 — ZoneFilters single-line horizontal scroll + mobile images padding
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : 2 fixes UX demandés par David
+- **Fichiers snapshotés** :
+  - `src/components/ZoneFilters.astro`
+  - `src/pages/work/[slug].astro`
+- **Fix 1 — ZoneFilters pills single-line scrollable** :
+  - Structure device group : `flex flex-wrap items-center gap-2` avec label inline → `flex flex-col gap-2 sm:flex-row sm:items-center` (label au-dessus pills sur mobile, inline sur sm+).
+  - Pills row : nouveau wrapper `zone-filters-pills-row -mx-6 flex flex-nowrap items-center gap-2 overflow-x-auto px-6 sm:mx-0 sm:px-0`. `flex-nowrap` empêche le wrap sur 2 lignes. `overflow-x-auto` autorise scroll horizontal. `-mx-6 px-6` sur mobile fait scroller de bord à bord viewport (pattern iOS-style), avec pills visuellement inset 24 px. Sur sm+, `sm:mx-0 sm:px-0` = comportement normal.
+  - Chaque pill button : ajout `shrink-0` pour éviter que flex compresse les pills en cas de peu de space.
+  - CSS `.zone-filters-pills-row` : `scrollbar-width: none` + `::-webkit-scrollbar { display: none }` → scrollbar visuellement caché, scroll fonctionnel préservé.
+  - Idem pour Theme group.
+- **Fix 2 — Mobile images padding sur smartphone view** :
+  - `data-mobile-zone` : `mt-12 -mx-6 lg:mx-0` → `mt-12`. Retire le break out complètement. Sur toute résolution, mobile-zone = wrapper-inner (avec padding respecté).
+  - Impact : sur mobile 375, cellule mobile n'est plus 375 pile mais 327 (= 375 − 48 padding). Images `w-[375px] max-w-full` = 327. **Trade-off assumé par David** : "padding comme desktop sur les côtés" > "cellule 375 pile edge-to-edge". Cohérent avec l'ask.
+  - Sur desktop lg+, wrapper n'a pas de padding (`lg:px-0`), donc mobile-zone = 1200 pile → 3 cellules 375 pile + gaps ✓
+- **Rollback** :
+  - `cp archives/v106_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
+  - `cp archives/v106_.../src__pages__work__slug.astro src/pages/work/[slug].astro`

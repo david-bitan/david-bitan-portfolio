@@ -70,21 +70,19 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 				</a>
 				<div class="zone-filters-content flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
 					{deviceOptions.length > 1 && (
-						<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+						<div class="flex flex-wrap items-center gap-2">
 							<span class="text-[11px] font-semibold uppercase tracking-widest text-muted">Device</span>
-							<div class="zone-filters-pills-row -mx-6 flex flex-nowrap items-center gap-2 overflow-x-auto px-6 sm:mx-0 sm:px-0">
-								{deviceOptions.map((f, i) => (
-									<button
-										type="button"
-										data-filter-group="device"
-										data-filter-key={f.key}
-										data-active={i === 0 ? 'true' : 'false'}
-										class="zone-filter-btn shrink-0 rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
-									>
-										{f.label}
-									</button>
-								))}
-							</div>
+							{deviceOptions.map((f, i) => (
+								<button
+									type="button"
+									data-filter-group="device"
+									data-filter-key={f.key}
+									data-active={i === 0 ? 'true' : 'false'}
+									class="zone-filter-btn rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
+								>
+									{f.label}
+								</button>
+							))}
 						</div>
 					)}
 
@@ -95,21 +93,19 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 						<div class="hidden h-6 w-px shrink-0 bg-ink/15 sm:block" aria-hidden="true" />
 					)}
 					{themeOptions.length > 1 && (
-						<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+						<div class="flex flex-wrap items-center gap-2">
 							<span class="text-[11px] font-semibold uppercase tracking-widest text-muted">Theme</span>
-							<div class="zone-filters-pills-row -mx-6 flex flex-nowrap items-center gap-2 overflow-x-auto px-6 sm:mx-0 sm:px-0">
-								{themeOptions.map((f, i) => (
-									<button
-										type="button"
-										data-filter-group="theme"
-										data-filter-key={f.key}
-										data-active={i === 0 ? 'true' : 'false'}
-										class="zone-filter-btn shrink-0 rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
-									>
-										{f.label}
-									</button>
-								))}
-							</div>
+							{themeOptions.map((f, i) => (
+								<button
+									type="button"
+									data-filter-group="theme"
+									data-filter-key={f.key}
+									data-active={i === 0 ? 'true' : 'false'}
+									class="zone-filter-btn rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
+								>
+									{f.label}
+								</button>
+							))}
 						</div>
 					)}
 				</div>
@@ -214,15 +210,5 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 		.zone-filters-content {
 			transition: none !important;
 		}
-	}
-
-	/* Hide the horizontal scrollbar on the pills row while keeping scroll
-	   functional. Row scrolls edge-to-edge on mobile/tablet, but the
-	   scrollbar itself is visually noisy for a small pill list. */
-	.zone-filters-pills-row {
-		scrollbar-width: none;
-	}
-	.zone-filters-pills-row::-webkit-scrollbar {
-		display: none;
 	}
 </style>
