@@ -1786,3 +1786,32 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Position sticky + mx-auto** : compatible. Sticky respecte les marges normal-flow ; mx-auto centre horizontalement dans le containing block ; max-w cape la largeur.
 - **Rollback** :
   - `cp archives/v114_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
+
+---
+
+## v115 — 2026-08-13 — ZoneFilters : shield ABSOLUTE (plus dans le flex) + padding-left shift, content pas coupé
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : refonte mécanique animation — 2 bugs mobile signalés par David :
+  1. **Non-sticky** : "DEVICE" coupé en "VICE" (start décalé négatif)
+  2. **Sticky** : séparateur "|" pas visible après Mobile pill (trop de shift)
+- **Fichiers snapshotés** :
+  - `src/components/ZoneFilters.astro`
+- **Diagnostic v114** :
+  - Shield était flex item avec width fixe 68 (mobile). First-item avait `margin-left: -92px` pour compenser (shield 68 + son pl-6 24 = 92) → texte devait commencer à x=0.
+  - Sur mesure live, quelque chose fait que text est coupé à x ≈ -20 (les 2 premières lettres "DE" clippées par le container overflow-x-auto). Peut-être un décalage lié à comment `pl-6` et negative margin s'appliquent sur un span shrink-0.
+  - Sur sticky, shift de -92 → 0 = 92 px de content pushed right → séparateur "|" et Theme group qui étaient déjà proches du right edge se retrouvent hors viewport.
+- **Fix v115 — refonte mécanique** :
+  - **Shield sort du flex** : `<a class="zone-filters-back absolute left-6 top-1/2 z-20 ...">` — position absolute avec `top-1/2` + CSS transform `translateY(-50%)` pour center vertical. Absolute = ne prend PAS d'espace dans le flex → content flex commence naturellement à x=0.
+  - **Content padding-left animé** : sur `.zone-filters-scroll`, `pl-6 lg:pl-0` par défaut (24 mobile / 0 lg). Sur sticky, `padding-left: 64px` (mobile) / `40px` (lg) via CSS `.is-stuck`. Transition 400ms cubic-bezier.
+  - **Shift réduit** : 40-64 px de shift au lieu de 92 → **beaucoup plus de content reste visible** quand sticky, séparateur + Theme group ont plus de chance de fitter.
+  - **Shield opacity + translateX animation** : conservée. Fade in + slide from left-6px + translateY(-50%) pour center vertical (car top-1/2 sur absolute).
+- **Bénéfice — plus de margin-left négatif = plus de bug de clipping** : le content flex démarre naturellement au container-left (à x=24 mobile via pl-6, x=0 lg). Non-sticky : "DEVICE" démarre pile à 24 du viewport, tout visible.
+- **Structure** :
+  - Bar sticky (v114) : `w-full lg:mx-auto lg:max-w-[1200px]` — mobile viewport, desktop 1200 centré.
+  - Wrapper `<div class="relative py-3">` — pour positionner l'absolute shield.
+  - Shield `<a class="absolute ...">` — animation opacity + transform.
+  - Scroll `<div class="zone-filters-scroll flex overflow-x-auto pl-6 lg:pl-0">` — content, padding animé.
+- **Animations conservées** : fade back arrow + content padding-shift + IntersectionObserver sticky + prefers-reduced-motion. Structure différente mais visuellement équivalent (+ mieux car pas de bug clipping).
+- **Rollback** :
+  - `cp archives/v115_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
