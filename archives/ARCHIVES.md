@@ -1464,4 +1464,20 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
   - **Gallery** : passe de 6 → 10 URLs. Nouveau pattern : article/comparison/lineup (existants) puis about-us + review-page (nouveaux). L'ordre au sein d'une device zone (Desktop, Mobile) suit ce pattern après classifier.
 - **Rollback code** :
   - `cp archives/v099_.../src__data__allProjects.ts src/data/allProjects.ts`
-- **Note qualité** : Cloudinary Free tier a la limite 25 MP par transformation output (patterné v088). Article desktop 3896×19972 = 77.8 MP en source. `c_limit,w_2400` output = 2400×12297 = 29.5 MP → **dépasse la limite**. Le variant w_2400 va probablement 400. **À surveiller**. Fix : réduire le max de `landscapeSrcset` de `[1200, 1600, 2400, 3200]` à `[1200, 1600, 2400]` si constaté, ou downscale la source côté Figma.
+- **Note qualité** : Cloudinary Free tier a la limite 25 MP par transformation output (patterné v088). Article desktop 3896×19972 = 77.8 MP en source. `c_limit,w_2400` output = 2400×12297 = 29.5 MP → **dépasse la limite**. Confirmé broken par David → fixé en v100.
+
+---
+
+## v100 — 2026-08-13 — Cloudinary 25 MP cap : landscapeSrcset + FULL réduits à w_2000
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : fix bloquant — plusieurs images Top5 broken/non-affichées après upload @2x (confirmé par David)
+- **Fichiers snapshotés** :
+  - `src/lib/cloudinary.ts`
+- **Diagnostic** : après le bulk @2x Top5 (v099), sources passent de ~2000×N à ~3900×N. Le variant `c_limit,w_2400` sur Article 3896×19972 output = 2400×12303 = **29.5 MP** → dépasse la limite Cloudinary Free tier 25 MP → HTTP 400 → images broken côté navigateur. Idem pour Lineup 3840×18530 et Review page 3840×14510.
+- **Changement** :
+  - `landscapeSrcset` : `[1200, 1600, 2400, 3200]` → `[1200, 1600, 2000]`. Max 2000 output sur source 3896 wide = 2000×10252 = **20.5 MP** → safe.
+  - `FULL` (preset lightbox / wide stack) : `c_limit,w_2400,q_100,f_auto` → `c_limit,w_2000,q_100,f_auto`. Idem safety.
+- **Trade-off** : perte de crispness marginale sur écrans 4K (variant max = 2000 au lieu de 2400). Le vrai gros gain qualité reste sur DPR 2 (majorité des devices) où on sert le 2000w — nickel. Alternative future : re-uploader sources @1.5x au lieu de @2x pour retrouver le 2400 crisp. Ou passer au tier Cloudinary payant.
+- **Rollback** :
+  - `cp archives/v100_.../src__lib__cloudinary.ts src/lib/cloudinary.ts`
