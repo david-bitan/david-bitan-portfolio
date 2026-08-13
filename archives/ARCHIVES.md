@@ -1523,3 +1523,27 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Impact autres zones** : Other (grid 2-col) non touchée directement mais le header au-dessus est aligné pareil désormais.
 - **Rollback** :
   - `cp archives/v103_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
+
+---
+
+## v104 — 2026-08-13 — Article max-w 1200 pile sur desktop, tout aligné (refactor propre)
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : refactor structurel — David a répété 10 fois qu'il veut TOUT à 1200 pile, texte et images alignés à gauche. Les patchs `-mx-6` successifs sortaient les images à 1248 (article max 1200 + 48 breakout). Cassé.
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro`
+- **Diagnostic root cause** : depuis le début l'`<article>` a `mx-auto max-w-[1200px] px-6`. Le `px-6` fait que l'article-inner = 1152 (pas 1200). Les enfants (texte hero) sont à 1152. Les zones (`data-*-zone` avec `-mx-6`) se retrouvaient à 1152 + 48 = 1200… mais si on interprète le `-mx-6` comme "aller à article-outer + 24" (au lieu de "compenser le padding et revenir à article-outer"), on peut aller à 1248. Bref le mix `px-6` + `-mx-6` était fragile et générait de la variance.
+- **Fix radical** :
+  - **Article** : `max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20` → `max-w-[1200px] px-6 pt-16 pb-8 lg:px-0 sm:pt-20`. Le padding horizontal est retiré au breakpoint lg+ (≥ 1024 px viewport). Sur desktop, article = 1200 pile, no padding, tous les enfants héritent naturellement du 1200. Sur mobile réel (< 640), le px-6 reste pour la lisibilité du texte hero.
+  - **Header (h2 + description dans zones)** : `-mx-6 grid grid-cols-12 gap-8` → `grid grid-cols-12 gap-8`. Plus besoin de break out, header = article width = 1200 sur desktop directement.
+  - **data-mobile-zone** : `mt-12 -mx-6` → `mt-12 -mx-6 lg:mx-0`. Sur desktop, ne break out pas (article = 1200, zone = 1200 pile). Sur mobile 375 viewport (< sm), garde le break out pour que les cellules 375 pile soient possibles (article a encore son px-6 à ce breakpoint).
+  - **data-desktop-zone** : `mt-12 -mx-6` → `mt-12`. Plus besoin de break out. Sur desktop, zone = article = 1200 pile.
+- **Résultat viewport par viewport** :
+  - 1400+ : article = 1200 centré (mx-auto), no padding, hero texte 1200 pile, zone header 1200 pile aligné, zone images 1200 pile aligné. **Tout aligné.**
+  - 800 : article = 800, no padding, tout 800 pile.
+  - 640 : article = 640 (borderline sm), no padding, tout 640.
+  - 400 (<sm) : article = 400 avec px-6, article-inner = 352. Hero texte 352 wide (dans padding), zone header 352 wide, zone mobile avec `-mx-6` → 400 wide (breaks out du padding pour permettre cellule 375). Zone desktop 352 wide.
+  - 375 (<sm) : article = 375 avec px-6, inner = 327. Hero texte 327. Mobile zone -mx-6 → 375. Cell mobile 375 pile ✓
+- **Zone Other** non touchée (grid 2-col object-contain, moins impacté par ce refactor).
+- **Rollback** :
+  - `cp archives/v104_.../src__pages__work__slug.astro src/pages/work/[slug].astro`

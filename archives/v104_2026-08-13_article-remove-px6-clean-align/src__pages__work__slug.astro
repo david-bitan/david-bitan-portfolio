@@ -27,7 +27,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 <Layout title={`${project.title} — David Bitan`}>
 	<Nav />
 
-	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 lg:px-0" data-reveal>
+	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20" data-reveal>
 		<a href="/#work" class="text-sm font-semibold text-accent hover:underline">← Back to work</a>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">{project.category}</p>
@@ -220,7 +220,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 					class="mx-auto mt-12 max-w-[1200px] scroll-mt-32"
 					data-reveal
 				>
-					<header class="grid grid-cols-12 gap-8">
+					<header class="-mx-6 grid grid-cols-12 gap-8">
 						<h2 class="col-span-12 text-3xl font-extrabold tracking-tight text-ink sm:col-span-4 sm:text-4xl">
 							{zone.label}
 						</h2>
@@ -252,7 +252,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 							//   - Portrait = real mobile capture → sorted by height DESC
 							//     (via CSS order = -height) so similar heights sit
 							//     side-by-side and the grid packs cleanly.
-							<div class="mt-12 -mx-6 lg:mx-0" data-mobile-zone>
+							<div class="mt-12 -mx-6" data-mobile-zone>
 								{/* v093: switched from fixed 1/2/3 col grid to
 								    auto-fit cells of exactly 375px (the mobile
 								    design width). Cells never grow past 375, so
@@ -333,7 +333,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 							//     capped to natural width so it never upscales.
 							//   - Wide (natW ≥ 900) = normal desktop mockup → stays
 							//     full-width in the stack.
-							<div class="mt-12" data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
+							<div class="mt-12 -mx-6" data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
 								<div class="space-y-10" data-desktop-stack>
 									{zone.images.map(({ url }) => (
 										<div
