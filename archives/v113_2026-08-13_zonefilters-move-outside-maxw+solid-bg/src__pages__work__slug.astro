@@ -202,12 +202,8 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 	    ZoneFilters (height = 58px) killed the sticky as soon as you
 	    scrolled past that height. mt-8 keeps the 32px gap below the
 	    "Read the full case study" toggle. */}
-	{/* mt-8 wrapper — spans full viewport (no max-w constraint) so
-		ZoneFilters bar can extend edge-to-edge viewport (David's ask).
-		Zones are wrapped in an inner max-w-1200 container below. */}
-	<div class="mt-8">
+	<div class="mx-auto mt-8 max-w-[1200px] px-6 lg:px-0">
 		<ZoneFilters zones={zones} />
-		<div class="mx-auto max-w-[1200px] px-6 lg:px-0">
 
 		{
 			zones.map((zone) => {
@@ -374,7 +370,6 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 			);
 		})
 	}
-		</div>
 	</div>
 
 	<div class="pb-24"></div>

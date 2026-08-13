@@ -1745,3 +1745,27 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Animations préservées** : back arrow fade + first-item margin shift + IntersectionObserver + prefers-reduced-motion (identique v110/v111).
 - **Rollback** :
   - `cp archives/v112_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
+
+---
+
+## v113 — 2026-08-13 — ZoneFilters SORTIE du parent max-w-1200 + solid bg (bar edge-to-edge viewport VRAIMENT)
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : root cause enfin trouvée grâce à un mockup annoté explicite de David
+- **Fichiers snapshotés** :
+  - `src/components/ZoneFilters.astro`
+  - `src/pages/work/[slug].astro`
+- **Root cause enfin claire** : le `<ZoneFilters>` était rendered INSIDE `<div class="mx-auto mt-8 max-w-[1200px] px-6 lg:px-0">` — donc la bar `w-full` = 100 % de ce parent contraint = **1200 max**, PAS viewport wide. Sur desktop 1400+ viewport, la bar apparaissait à 1200 pile centrée, avec 100 px de bg body de chaque côté visible → David voyait la bar "s'arrêter" au bord du 1200 et le body autour. C'est ce que ses arrows rouges soulignaient : "je veux que le filtre aille jusqu'au bout, sans s'arrêter à cette limite".
+- **Fix v113 — 3 changements** :
+  - **[slug].astro** : le wrapper `<div class="mx-auto mt-8 max-w-[1200px] px-6 lg:px-0">` (v105) split en deux niveaux : outer `<div class="mt-8">` (no max-w, spans viewport) contient ZoneFilters + un inner `<div class="mx-auto max-w-[1200px] px-6 lg:px-0">` qui contient uniquement les sections zones. Ferme le nouveau div avant le pb-24.
+  - **ZoneFilters bar bg** : `bg-bg/95 backdrop-blur` → `bg-bg` solide. Kill le frosted-glass effect pour avoir un bg 100 % opaque qui ne laisse rien passer.
+  - **ZoneFilters shield bg** : `bg-bg/95 backdrop-blur` → `bg-bg` solide. Match parfait avec la bar. Shield cache TOTALEMENT les pills qui passent derrière (David : "je veux ceci completement opaque base sur la couleur du bg du filtre").
+- **Résultat viewport final** :
+  - **Mobile 375** : bar edge-to-edge viewport (spans 375). Shield 68 wide à gauche opaque. Pills scroll horizontal, cachées par shield.
+  - **Tablet 768/1024** : bar edge-to-edge viewport (spans 768/1024). Idem.
+  - **Desktop 1400+** : bar edge-to-edge viewport (spans 1400+). Container scroll interne à `w-full` sur <lg / `lg:mx-auto lg:max-w-[1200px]` sur lg+ garde le contenu aligned 1200 pile sur desktop.
+- **Animations toutes préservées** : fade back arrow + margin shift first-item + IntersectionObserver sticky detect + prefers-reduced-motion. Identique v110-v112.
+- **Sticky range** : le sticky de la bar dépend de son containing block = le `<div class="mt-8">` outer wrapper qui contient ZoneFilters + zones. Sticky pin fonctionne pareil qu'avant (bar reste sticky tant que les zones scrollent, unpin quand tout scroll passé).
+- **Rollback** :
+  - `cp archives/v113_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
+  - `cp archives/v113_.../src__pages__work__slug.astro src/pages/work/[slug].astro`

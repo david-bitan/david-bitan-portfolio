@@ -40,7 +40,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 	showBar && (
 		<div
 			id="zone-filters-bar"
-			class="sticky top-[68px] z-30 w-full border-y border-ink/10 bg-bg"
+			class="sticky top-[68px] z-30 w-full border-y border-ink/10 bg-bg/95 backdrop-blur"
 		>
 			{/* Flex container is the scroll surface.
 				  - Mobile/tablet (<lg) : FULL VIEWPORT WIDTH edge-to-edge,
@@ -59,7 +59,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 				<a
 					href="/#work"
 					aria-label="Back to projects"
-					class="zone-filters-back sticky left-0 z-20 flex shrink-0 items-center bg-bg py-1 pl-6 pr-3 lg:pl-0"
+					class="zone-filters-back sticky left-0 z-20 flex shrink-0 items-center bg-bg/95 py-1 pl-6 pr-3 backdrop-blur lg:pl-0"
 				>
 					<span class="flex h-8 w-8 items-center justify-center rounded-full border border-ink/15 text-muted transition-colors hover:border-accent hover:text-accent">
 						<svg
