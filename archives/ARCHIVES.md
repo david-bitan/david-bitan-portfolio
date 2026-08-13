@@ -1481,3 +1481,17 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Trade-off** : perte de crispness marginale sur écrans 4K (variant max = 2000 au lieu de 2400). Le vrai gros gain qualité reste sur DPR 2 (majorité des devices) où on sert le 2000w — nickel. Alternative future : re-uploader sources @1.5x au lieu de @2x pour retrouver le 2400 crisp. Ou passer au tier Cloudinary payant.
 - **Rollback** :
   - `cp archives/v100_.../src__lib__cloudinary.ts src/lib/cloudinary.ts`
+
+---
+
+## v101 — 2026-08-13 — Mobile grid : justify-center → justify-start (left-align)
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : polish layout — demande explicite David
+- **Fichiers snapshotés** :
+  - `src/pages/work/[slug].astro`
+- **Diagnostic** : sur Top5 avec maintenant 5 mobiles (Article, Comparison, Lineup, About us, Review page), le desktop 1200 affiche 3 items par row (3×375 + 2×37.5 = 1200 pile). Row 2 = 2 items (About us + Review page). Avec `justify-center`, la row 2 centre les 2 items → grande zone vide à gauche et à droite. David préfère left-align : row 2 collée à gauche, espace vide seulement à droite.
+- **Changement** : `flex flex-wrap items-start justify-center gap-[37.5px]` → `flex flex-wrap items-start justify-start gap-[37.5px]`.
+- **Impact** : rows complètes (3 items × 375 + 2 × 37.5 = 1200) restent identiques (justify-start ou center donne le même résultat quand la row remplit tout). Rows partielles (1 ou 2 items) sont désormais alignées à gauche.
+- **Rollback** :
+  - `cp archives/v101_.../src__pages__work__slug.astro src/pages/work/[slug].astro`
