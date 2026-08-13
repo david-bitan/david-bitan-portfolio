@@ -1815,3 +1815,26 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Animations conservées** : fade back arrow + content padding-shift + IntersectionObserver sticky + prefers-reduced-motion. Structure différente mais visuellement équivalent (+ mieux car pas de bug clipping).
 - **Rollback** :
   - `cp archives/v115_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
+
+---
+
+## v116 — 2026-08-13 — ZoneFilters : shield ABSOLUTE mais WIDER (inset-y-0 + pl-6 pr-3) → pills totalement cachées sur scroll horizontal
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : correctif ciblé — David : "quand je slide, les pills passent sous le bouton mais on les voit, avant on l'avait corrigé, tu l'as décorrigé"
+- **Fichiers snapshotés** :
+  - `src/components/ZoneFilters.astro`
+- **Diagnostic v115** : le shield était juste le bouton rond 32×32 en absolute. Trop étroit → pills passant derrière visibles sur les côtés du cercle.
+- **Fix v116 — shield wider (comme v113/v114) MAIS conservé en absolute (pas de flex clipping)** :
+  - Structure shield : `<a class="zone-filters-back absolute inset-y-0 left-0 z-20 flex items-center bg-bg pl-6 pr-3 lg:pl-0">` contenant un `<span class="flex h-8 w-8 rounded-full border ...">` avec le svg dedans.
+  - **`inset-y-0`** = top:0 + bottom:0 → shield couvre TOUTE la hauteur de la bar (pas juste le bouton).
+  - **`pl-6 pr-3`** → shield 68 wide mobile (24 + 32 bouton + 12) / 44 wide lg (0 + 32 + 12).
+  - **`bg-bg` solid opaque** → tout ce qui passe derrière est CACHÉ.
+- **Sticky padding-left** : `64px → 76px` mobile / `40px → 52px` lg (= shield width + 8 gap). Content shift right pour laisser 8 px de gap entre shield et first pill.
+- **Animation** : conservée (opacity + translateX 400ms cubic-bezier). Retrait de `translateY(-50%)` car inset-y-0 + items-center gère le center vertical (pas besoin de top-1/2 + translate).
+- **Résultat scroll horizontal** :
+  - User swipe les pills vers la gauche → pills glissent sous le shield (rectangle opaque 68 wide sur toute la hauteur bar) → **totalement invisibles**.
+  - Séparateur "|" et Theme group qui deviennent visibles à droite en scrollant → OK.
+- **Rien d'autre changé** : structure `[slug].astro` conservée (mt-8 outer + max-w-1200 inner wrapper), bar `lg:mx-auto lg:max-w-[1200px]` conservé (v114), bar bg-bg solid conservé (v113), padding-left animation conservée (v115).
+- **Rollback** :
+  - `cp archives/v116_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
