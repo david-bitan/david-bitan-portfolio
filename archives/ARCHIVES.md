@@ -1439,3 +1439,29 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Bénéfice attendu** : retina crisp sur DPR 2 (majorité des devices récents). Server-side Lanczos downscale sur DPR 1 (750→375) supérieur au browser scaling du @1x.
 - **Rollback code** :
   - `cp archives/v098_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+---
+
+## v099 — 2026-08-13 — Top5 full @2x + ajout About us & Review page (10 URLs total)
+
+- **Commit git associé** : (à créer après upload + push David)
+- **Type** : contenu — David a fourni 2 nouvelles pages Top5 (About us + Review page) et re-export TOUTES les captures Top5 en @2x
+- **Fichiers snapshotés** :
+  - `src/data/allProjects.ts`
+- **Renames locaux préparés pour upload script** :
+  - `Article/Article + Side bar 1920.png` → `Article Side bar 1920.png` (kill le `+`, maintient public_id `article-side-bar-1920` existant)
+  - `Review page/Desktop.png` → `Review page - Desktop 1920.png` (convention +suffix résolution)
+  - `Review page/Mobile.png` → `Review page - Mobile 375.png`
+- **Résolutions finales** (toutes @2x) :
+  - Article desktop 3896×19972 (léger overflow +56 vs 3840 target, non-critique) / mobile 750×32328
+  - Comparison desktop 3840×9434 / mobile 750×10954
+  - Lineup desktop 3840×18530 / mobile 750×28419
+  - About us desktop 3840×3463 / mobile 750×6955 (**nouveau**)
+  - Review page desktop 3840×14510 / mobile 750×21694 (**nouveau**)
+- **Changement code** :
+  - Drop version prefixes restants sur les 3 desktop Top5 (`v1785342213`, `v1785342217`, `v1785342222`) → toutes les URLs Top5 sont maintenant non-versioned = servent latest source Cloudinary après upload+invalidate.
+  - **Thumbnail Top5** : idem, drop version prefix pour cohérence.
+  - **Gallery** : passe de 6 → 10 URLs. Nouveau pattern : article/comparison/lineup (existants) puis about-us + review-page (nouveaux). L'ordre au sein d'une device zone (Desktop, Mobile) suit ce pattern après classifier.
+- **Rollback code** :
+  - `cp archives/v099_.../src__data__allProjects.ts src/data/allProjects.ts`
+- **Note qualité** : Cloudinary Free tier a la limite 25 MP par transformation output (patterné v088). Article desktop 3896×19972 = 77.8 MP en source. `c_limit,w_2400` output = 2400×12297 = 29.5 MP → **dépasse la limite**. Le variant w_2400 va probablement 400. **À surveiller**. Fix : réduire le max de `landscapeSrcset` de `[1200, 1600, 2400, 3200]` à `[1200, 1600, 2400]` si constaté, ou downscale la source côté Figma.
