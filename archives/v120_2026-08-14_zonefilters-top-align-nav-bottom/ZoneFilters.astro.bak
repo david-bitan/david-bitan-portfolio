@@ -40,7 +40,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 	showBar && (
 		<div
 			id="zone-filters-bar"
-			class="sticky top-[76px] z-30 w-full border-y border-ink/10 bg-bg"
+			class="sticky top-[68px] z-30 w-full border-y border-ink/10 bg-bg"
 		>
 			{/* Bar bg spans FULL viewport (w-full outer). Inner container
 				max-w-[1200px] mx-auto centres the content (pills + arrows)
@@ -189,7 +189,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 			([entry]) => {
 				bar.classList.toggle('is-stuck', entry.intersectionRatio < 1);
 			},
-			{ rootMargin: '-77px 0px 0px 0px', threshold: [1] },
+			{ rootMargin: '-69px 0px 0px 0px', threshold: [1] },
 		);
 		io.observe(bar);
 	}
