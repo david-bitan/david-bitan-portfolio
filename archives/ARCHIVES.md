@@ -17,6 +17,32 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v121 — 2026-08-14 — case study Sonary Website (sections + liveUrl + year span)
+
+- **Commit git associé** : à venir
+- **Type** : content — case study #2 pilote sur Sonary Website
+- **Fichiers** :
+  - `src/data/allProjects.ts`
+- **Changement** :
+  - `sonary-website` : ajout champ `liveUrl: 'https://sonary.com'`
+  - Ajout `sections[]` avec 6 sections (Context / Role / Approach / Key challenge / Deliverables / What I took from it)
+  - `year: '2025'` → `'2019 – 2026'` (sept ans de refontes)
+  - `shortDesc` réécrit (mention sole designer + 37 verticals + 3 refontes)
+  - `fullDesc` re-écrit (retire placeholder, ajoute mention Design system origine → Dashboard)
+- **Pourquoi** : deuxième case study structuré après Sonary Dashboard, format aligné (Context/Role/Approach/Key challenge/Deliverables/What I took). Draft FR validé David, traduit EN.
+- **Faits clés du case study** :
+  - Sole designer 2019 → 2026, 3 refontes espacées ~2 ans, itérations continues entre.
+  - 37 verticals, ~3 000 pages via CMS.
+  - Design system créé POUR Website (2019), étendu au Dashboard (2026) — NOT the other way (à corriger dans Dashboard case study aussi).
+  - Migration WordPress → Webflow lors de la dernière refonte.
+  - Typo Inter (pas Manrope).
+  - AI recherche (Midjourney/Firefly/Figma AI) sur la DERNIÈRE refonte uniquement.
+  - Team cross-fonctionnelle : PM + dev front/back + content writers + marketing + SEO.
+  - Composants marquants : homepage, mega menu 37 catégories, review card, comparison table, interactive lineup.
+- **Rollback** : `cp archives/v121_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+---
+
 ## v001 — 2026-08-06 — fix contraste mobile cards (light mode)
 
 - **Commit git associé** : `e46ae0c`

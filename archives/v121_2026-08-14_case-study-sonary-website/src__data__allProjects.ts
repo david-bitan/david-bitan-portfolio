@@ -205,46 +205,11 @@ The design system also paid off later: several downstream Ryze Beyond products (
 		slug: 'sonary-website',
 		title: `Sonary — Marketing Website`,
 		client: `Ryze Beyond`,
-		year: '2019 – 2026',
+		year: '2025',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Sole designer since 2019 on Sonary's SaaS comparison platform — 37 verticals, ~3,000 CMS pages, three major redesigns.`,
-		fullDesc: `Sole designer on Sonary's SaaS comparison and review platform since 2019. Design system that later seeded the Sonary Dashboard product. See structured case study below.`,
-		liveUrl: 'https://sonary.com',
-		sections: [
-			{
-				heading: 'Context',
-				body: `Sonary is a SaaS software comparison and review platform for SMBs, published by Ryze Beyond. The site covers 37 verticals (AI, E-commerce, Design, Development, Finance, HR, IT, Productivity, Sales & Marketing, and more) through buying guides, side-by-side comparisons, editorial reviews, and category lineups. It complements Sonary Dashboard — the software subscription tracker from the same publisher, shipped in 2026.`,
-			},
-			{
-				heading: 'Role',
-				body: `Sole designer on the site since 2019. Three major redesigns spaced roughly two years apart, each running from research through post-implementation design QA. Between redesigns, continuous iteration: new pages, new features, incremental improvements.`,
-			},
-			{
-				heading: 'Approach',
-				body: `Constant benchmarking of domain references (G2, Capterra, Software Advice) cross-referenced with Dribbble and Pinterest to avoid the "directory" look. On the latest redesign, the research phase was accelerated with Midjourney, Firefly and Figma AI for moodboards and concept exploration.
-
-The design system was built for the site starting in 2019 (color tokens, Inter typography, radius, light and dark modes) — later extended to the Sonary Dashboard product shipped in 2026. Components were designed from day one as editable templates so the content team could add reviews without design intervention.`,
-			},
-			{
-				heading: 'Key challenge',
-				body: `Designing a system that could absorb the site's growth — 37 very different verticals (finance, AI, HR, e-commerce…) and close to 3,000 CMS-generated pages — without losing consistency or editorial tone. Every template needed to feel warm and inviting despite the functional density (comparison tables, review cards, scoring, lineups).
-
-Addressed through a strict smart-component hierarchy and a library of editorial patterns (illustrated headers, quote blocks, category chips) that break up the dense sections.`,
-			},
-			{
-				heading: 'Deliverables',
-				body: `Templates covering homepage, article hub, article, review, comparison, alternative/lineup, about and category pages — close to 3,000 pages generated through the CMS across 37 verticals.
-
-Notable components: homepage, 37-category mega menu, review card, comparison table, interactive lineup — all built as smart components reused across templates.
-
-Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress → Webflow migration on the latest redesign, with a full design system rebuild in Webflow and handoff to the content team. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
-			},
-			{
-				heading: 'What I took from it',
-				body: `Seven years on the same site taught me that a design system lasts when it makes the team autonomous — content, marketing, developers — not when it piles on rules.`,
-			},
-		],
+		shortDesc: `Marketing site with review hub, comparison pages and content architecture — designed for SEO scale from day one.`,
+		fullDesc: `PLACEHOLDER : Design du site marketing Sonary. Sections : Homepage, Review Hub, Review Page, Article Hub, Articles, Lineup, Alternative Prod Info, Write a Review, Legal. Approche : storytelling produit + SEO-optimized, structure content-heavy scalable.`,
 		// article-hub/ files were uploaded before the -desktop / -mobile naming
 		// convention was locked in. Match by unique substring so the URL patch
 		// stays scoped to these two files. Ordering matters: the "-1" suffix
