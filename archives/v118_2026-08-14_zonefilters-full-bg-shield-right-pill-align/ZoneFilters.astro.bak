@@ -40,15 +40,9 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 	showBar && (
 		<div
 			id="zone-filters-bar"
-			class="sticky top-[68px] z-30 w-full border-y border-ink/10 bg-bg"
+			class="sticky top-[68px] z-30 w-full border-y border-ink/10 bg-bg lg:mx-auto lg:max-w-[1200px]"
 		>
-			{/* Bar bg spans FULL viewport (w-full outer). Inner container
-				max-w-[1200px] mx-auto centres the content (pills + arrows)
-				and matches the site-wide 1200 alignment.
-				This ensures the bar bg opacity cover ANY content that scrolls
-				underneath on wide viewports (>1200 CSS), preventing image
-				bleed / shadow visible on the sides. */}
-			<div class="relative mx-auto h-14 max-w-[1200px]">
+			<div class="relative h-14">
 				{/* Back arrow — ABSOLUTE positioned (not a flex item), so it
 					takes no space in the scroll flow. Invisible by default via
 					opacity, revealed with fade + slide animation when the bar
@@ -78,18 +72,6 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 					</span>
 				</a>
 
-				{/* Right shield miroir — masks pills scrolling behind the
-					right edge of the 1200 container. Same z-20 + bg-bg opaque
-					pattern as the left back-arrow shield. No content (purely
-					visual mask). pointer-events-none so it never intercepts
-					clicks on real elements underneath.
-					Mobile : w-6 (24 wide, matches left pl-6).
-					Desktop lg+ : w-3 (12 wide, subtle mask at edge). */}
-				<div
-					aria-hidden="true"
-					class="zone-filters-shield-right pointer-events-none absolute inset-y-0 right-0 z-20 w-6 bg-bg lg:w-3"
-				/>
-
 				{/* Scroll container — full-width single row. Padding-left
 					animates from small (non-sticky : content flush left) to
 					larger (sticky : content shifted right to make room for
@@ -104,7 +86,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 									data-filter-group="device"
 									data-filter-key={f.key}
 									data-active={i === 0 ? 'true' : 'false'}
-									class="zone-filter-btn inline-flex shrink-0 items-center rounded-pill border border-ink/15 px-4 py-2 text-sm font-medium leading-none text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
+									class="zone-filter-btn shrink-0 rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
 								>
 									{f.label}
 								</button>
@@ -125,7 +107,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 									data-filter-group="theme"
 									data-filter-key={f.key}
 									data-active={i === 0 ? 'true' : 'false'}
-									class="zone-filter-btn inline-flex shrink-0 items-center rounded-pill border border-ink/15 px-4 py-2 text-sm font-medium leading-none text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
+									class="zone-filter-btn shrink-0 rounded-pill border border-ink/15 px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-ink/40 hover:text-ink data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-ink"
 								>
 									{f.label}
 								</button>
