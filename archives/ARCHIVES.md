@@ -1838,3 +1838,24 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 - **Rien d'autre changé** : structure `[slug].astro` conservée (mt-8 outer + max-w-1200 inner wrapper), bar `lg:mx-auto lg:max-w-[1200px]` conservé (v114), bar bg-bg solid conservé (v113), padding-left animation conservée (v115).
 - **Rollback** :
   - `cp archives/v116_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`
+
+---
+
+## v117 — 2026-08-13 — Nav opaque au scroll + filter bar padding symétrique explicite
+
+- **Commit git associé** : (à créer après push David)
+- **Type** : 2 fixes visuels ciblés (David image annotée)
+- **Fichiers snapshotés** :
+  - `src/components/Nav.astro`
+  - `src/components/ZoneFilters.astro`
+- **Fix 1 — Nav opaque** :
+  - `<header class="sticky top-0 z-50 border-b border-ink/5 bg-bg/80 backdrop-blur">` → `<header class="sticky top-0 z-50 border-b border-ink/5 bg-bg">`
+  - Kill l'opacité 80 % et le backdrop-blur. Nav bg 100 % solide = David voit plus le contenu (table sombre) transparaître à travers le nav quand il scroll. Consistent avec le filter bar (bg-bg solid depuis v113).
+- **Fix 2 — Filter bar padding symétrique via height fixe** :
+  - Wrapper interne `<div class="relative py-3">` → `<div class="relative h-14">` (56 px height fixe, pas de padding).
+  - Scroll container : ajout `h-full` → `<div class="zone-filters-scroll flex h-full items-center gap-2 overflow-x-auto ...">`. Scroll fills 100 % de la hauteur du wrapper (56).
+  - Résultat : container 56 px fixe, `items-center` centre verticalement pills + labels + shield exactement au milieu. Plus de dépendance à `py-3` ou aux hauteurs des items individuels. Padding visuel top/bottom garanti identique = (56 - pill_height) / 2 pour chaque côté.
+  - Bar total height = 56 + 2 (border-y) = 58.
+- **Rollback** :
+  - `cp archives/v117_.../src__components__Nav.astro src/components/Nav.astro`
+  - `cp archives/v117_.../src__components__ZoneFilters.astro src/components/ZoneFilters.astro`

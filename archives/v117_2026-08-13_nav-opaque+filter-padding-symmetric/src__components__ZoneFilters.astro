@@ -42,7 +42,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 			id="zone-filters-bar"
 			class="sticky top-[68px] z-30 w-full border-y border-ink/10 bg-bg lg:mx-auto lg:max-w-[1200px]"
 		>
-			<div class="relative h-14">
+			<div class="relative py-3">
 				{/* Back arrow — ABSOLUTE positioned (not a flex item), so it
 					takes no space in the scroll flow. Invisible by default via
 					opacity, revealed with fade + slide animation when the bar
@@ -76,7 +76,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 					animates from small (non-sticky : content flush left) to
 					larger (sticky : content shifted right to make room for
 					back arrow). Padding-right for tail spacing. */}
-				<div class="zone-filters-scroll flex h-full items-center gap-2 overflow-x-auto pl-6 pr-6 sm:gap-3 lg:pl-0 lg:pr-0">
+				<div class="zone-filters-scroll flex items-center gap-2 overflow-x-auto pl-6 pr-6 sm:gap-3 lg:pl-0 lg:pr-0">
 					{deviceOptions.length > 1 && (
 						<>
 							<span class="shrink-0 text-[11px] font-semibold uppercase tracking-widest text-muted">Device</span>
