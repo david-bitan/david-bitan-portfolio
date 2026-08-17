@@ -17,6 +17,32 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v123 — 2026-08-14 — case study Top5 (sections + liveUrl + year span)
+
+- **Commit git associé** : à venir
+- **Type** : content — case study #3 (Top5)
+- **Fichiers** :
+  - `src/data/allProjects.ts`
+- **Changement** :
+  - `top5` : ajout `liveUrl: 'https://top5-mattresses.com'` (mattresses en 1er par choix David)
+  - Ajout `sections[]` avec 6 headings (Context / Role / Approach / Key challenge / Deliverables / What I took from it)
+  - `year: '2024'` → `'2020 – 2026'` (7 ans, 3 refontes)
+  - `shortDesc` réécrit (mention sole designer + ~37 verticaux + smart component system)
+  - `fullDesc` re-écrit (retire placeholder, mention parametric Figma design system)
+- **Pourquoi** : troisième case study structuré. Format aligné Dashboard/Website. Draft FR validé David, traduit EN.
+- **Faits clés du case study** :
+  - Sole designer 2020 → 2026, 3 refontes + itérations continues.
+  - ~37 sites verticaux distincts (mattresses, POS, merchant services, dating sites, website builders…) sur domaines séparés (top5-mattresses.com, top-posproviders.com, top-merchantservices.com, top5-datingsites.com…).
+  - **Key challenge = parametric design system Figma** : smart components lisent leur accent color depuis leur frame parent via Figma variables → drag & drop dans une section pré-thémée re-badge auto tous les éléments colorés. Un asset unique servant 37 sites.
+  - 4 thèmes de base (extensibles).
+  - Migration WordPress → Webflow sur la dernière refonte.
+  - Team cross-fonctionnelle standard Ryze (PM + dev front/back + content writers + marketing + SEO).
+  - Dernière refonte 2023, visible dans vidéo Figma POS partagée par David.
+- **À venir (v124)** : David va fournir homepage mattresses → mettre en position 1 gallery + thumbnail.
+- **Rollback** : `cp archives/v123_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+---
+
 ## v122 — 2026-08-14 — Dashboard case study : design system origin fix
 
 - **Commit git associé** : à venir

@@ -284,40 +284,11 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 		slug: 'top5',
 		title: `Top5`,
 		client: `Ryze Beyond`,
-		year: '2020 – 2026',
+		year: '2024',
 		category: 'SaaS',
 		categories: ['SaaS', 'B2B', 'UI/UX'],
-		shortDesc: `Sole designer on a family of ~37 vertical comparison sites (mattresses, POS, merchant services, dating…) powered by a single parametric Figma design system.`,
-		fullDesc: `Sole designer on Top5 since 2020 — a family of ~37 vertical comparison sites all powered by one parametric Figma design system (smart components that inherit color tokens from their parent frame). See structured case study below.`,
-		liveUrl: 'https://top5-mattresses.com',
-		sections: [
-			{
-				heading: 'Context',
-				body: `Top5 is a family of comparison sites for products and services aimed at SMBs, published by Ryze Beyond. The family currently spans about 37 vertical spinoffs — mattresses, POS providers, merchant services, dating sites, website builders, and more — each on its own domain (top5-mattresses.com, top-posproviders.com, top-merchantservices.com, top5-datingsites.com…) but all powered by a shared parametric design system.`,
-			},
-			{
-				heading: 'Role',
-				body: `Sole designer on Top5 since 2020. Three major redesigns and continuous iteration between them: new smart components, incremental improvements. From research through post-implementation design QA.`,
-			},
-			{
-				heading: 'Approach',
-				body: `Benchmarking of premium comparison sites (G2, Capterra, NerdWallet, Wirecutter) cross-referenced with Dribbble and Pinterest. On the latest redesign (2023, visible in the shared POS Figma video), the research phase was accelerated with Midjourney, Firefly and Figma AI for moodboards and concepts. Components were designed from day one as editable smart components so the content team could add reviews and lineups without design intervention.`,
-			},
-			{
-				heading: 'Key challenge',
-				body: `Designing a system that could serve 37 distinct vertical sites — entirely different content, its own color identity per site — without duplicating components manually. Every site needed its own accent (from four base themes, extensible to more) while sharing the same UI architecture and behavior.
-
-Addressed through a parametric design system in Figma: each smart component reads its color tokens from its parent frame via Figma variables. Result: a drag-and-drop into a pre-themed section re-skins all colored elements automatically (buttons, chips, cards, accents) — a single asset serving all 37 sites, just by changing the parent container.`,
-			},
-			{
-				heading: 'Deliverables',
-				body: `Parametric design system covering homepage, article, comparison, lineup, review, about and category pages, deployed across ~37 vertical sites. Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress → Webflow migration on the latest redesign, with a full design system rebuild in Webflow and handoff to the content team. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
-			},
-			{
-				heading: 'What I took from it',
-				body: `A well-architected smart component system — one that inherits tokens from its container rather than binding manually — multiplies production velocity. What could have cost 37 sites × N components becomes one design system × 37 parametric variants. The discipline required upfront (structured Figma variables, container-first thinking) pays off across the entire lifespan of the project.`,
-			},
-		],
+		shortDesc: `Editorial comparison system — article, comparison and lineup pages built for premium content at scale.`,
+		fullDesc: `PLACEHOLDER : Design Top5 : Article, Comparison, Lineup pages. Approche éditoriale premium pour aider les users à comparer produits/services.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/portfolio/top5/article/article-side-bar-1920.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/portfolio/top5/article/article-side-bar-1920.webp',
