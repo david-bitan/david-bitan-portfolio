@@ -468,40 +468,11 @@ Addressed through a master template with two strict breakpoints (Desktop 600, Mo
 		slug: 'playright',
 		title: `Playright`,
 		client: `Ryze Beyond`,
-		year: '2019 – 2026',
+		year: '2021',
 		category: 'Gaming',
 		categories: ['Gaming', 'UI/UX'],
-		shortDesc: `Sole designer on Playright since 2019 — UK online casino comparison platform. Initial 4-month delivery, then years of continuous design iteration. Full redesign underway.`,
-		fullDesc: `Sole designer on Playright since 2019 — Ryze Beyond's UK online casino comparison platform. Initial delivery in ~4 months (2019-2020), then continuous design iteration over the following years, with a full redesign currently underway. See structured case study below.`,
-		liveUrl: 'https://playright.co.uk/casino/reviews/',
-		sections: [
-			{
-				heading: 'Context',
-				body: `Playright is an online casino comparison platform for the UK market, published by Ryze Beyond. The site guides players toward the best offers through editorial reviews, side-by-side comparisons, top listings, and vertical pages by game type or payment method. The domain is geo-restricted — UK-only access; a VPN is required to view it from outside the UK.`,
-			},
-			{
-				heading: 'Role',
-				body: `Sole designer on Playright since 2019. Initial delivery: about four months of concentrated work in late 2019, shipped to production in 2020. Since then: continuous design iteration (new pages, progressive redesigns, retroactive design system).`,
-			},
-			{
-				heading: 'Approach',
-				body: `Benchmarking of casino comparison sites (AskGamblers, Casino.org, Gambling.com) and visual references from Dribbble and Pinterest. On initial delivery (2019-2020), no design system yet — design produced page by page. The design system was built retroactively as the site grew, capitalizing on recurring patterns. On more recent redesigns, research accelerated with Midjourney, Firefly and Figma AI for moodboards and concepts.`,
-			},
-			{
-				heading: 'Key challenge',
-				body: `Balancing UK regulatory constraints (UKGC framework, responsible gambling notices, transparency on bonuses and wagering) with a compelling design that had to convert on a saturated market of comparators. Adding trust blocks (18+, GamStop, responsible gambling) without crushing the visual hierarchy.
-
-The project also held a particular status in the Ryze roadmap: design often ran ahead of production, with engineering priorities allocated elsewhere. My contribution continued steadily over the years — some designs integrated quickly, others still pending.`,
-			},
-			{
-				heading: 'Deliverables',
-				body: `Initial 2019-2020 delivery (~4 months): homepage, review page, comparison, lineup, category pages, casino profile, article. Since then: iterations across dozens of pages, section redesigns, retroactive design system, new verticals and payment methods. Three breakpoints originally requested (Desktop, Mobile, Tablet portrait); now expanded to five for the ongoing full redesign (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress CMS throughout; the current redesign's stack is not yet finalized. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO. A full site redesign is currently underway.`,
-			},
-			{
-				heading: 'What I took from it',
-				body: `A project that spans several years reveals one simple lesson: a design system's value shows up when you have to revisit your own work two years later. Playright pushed me to retroactively formalize what could have stayed ad hoc — and to accept that design has its own pace, sometimes running ahead of production.`,
-			},
-		],
+		shortDesc: `Homepage and product list for Playright — focused on conversion and product clarity.`,
+		fullDesc: `PLACEHOLDER : Design de Playright. Focus sur la conversion et la présentation produit.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785341989/portfolio/playright/home-page/desktop---1200px---container-1140px.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785341989/portfolio/playright/home-page/desktop---1200px---container-1140px.webp',

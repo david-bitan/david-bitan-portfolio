@@ -17,6 +17,32 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v129 — 2026-08-14 — case study Playright (sections + liveUrl UK + year span)
+
+- **Commit git associé** : à venir
+- **Type** : content — case study #5 (Playright)
+- **Fichiers** :
+  - `src/data/allProjects.ts`
+- **Changement** :
+  - `playright` : ajout `liveUrl: 'https://playright.co.uk/casino/reviews/'` (geo-restreint UK)
+  - Ajout `sections[]` avec 6 headings (Context / Role / Approach / Key challenge / Deliverables / What I took from it)
+  - `year: '2021'` → `'2019 – 2026'` (7 ans, sole designer)
+  - `shortDesc` réécrit
+  - `fullDesc` re-écrit (retire placeholder)
+- **Pourquoi** : cinquième case study structuré.
+- **Faits clés** :
+  - Sole designer 2019 → 2026.
+  - Livraison initiale ~4 mois fin 2019 → prod 2020.
+  - PAS de design system à l'époque, ajouté rétroactivement pendant les 6 années suivantes.
+  - Refonte complète en cours aujourd'hui.
+  - 3 breakpoints à l'époque (Desktop, Mobile, Tablet Portrait) → 5 pour la refonte en cours.
+  - CMS WordPress toujours; stack refonte pas encore décidé (Webflow possible).
+  - Marché UK, geo-restreint, UKGC compliance, trust blocks (18+, GamStop, responsible gambling).
+  - **Statut particulier dans roadmap Ryze** : design a devancé la prod pendant plusieurs années, priorités engineering ailleurs. Formulation neutre sans blâme.
+- **Rollback** : `cp archives/v129_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+---
+
 ## v128 — 2026-08-14 — case study Sonary Mailer (sections)
 
 - **Commit git associé** : à venir
