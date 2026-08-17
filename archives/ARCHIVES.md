@@ -17,6 +17,34 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v130 — 2026-08-14 — case study Ryze Brand (sections + liveUrl + year fix)
+
+- **Commit git associé** : à venir
+- **Type** : content — case study #6 (Ryze Brand)
+- **Fichiers** :
+  - `src/data/allProjects.ts`
+- **Changement** :
+  - `ryze-brand` : ajout `liveUrl: 'https://ryzebeyond.com/'`
+  - Ajout `sections[]` avec 6 headings (Context / Role / Approach / Key challenge / Deliverables / What I took from it)
+  - `year: '2024'` → `'2026'` (correction — refonte 2026)
+  - `shortDesc` réécrit
+  - `fullDesc` re-écrit (retire placeholder)
+- **Pourquoi** : sixième case study structuré. Ryze Beyond corporate/marketing website.
+- **Faits clés** :
+  - Sole designer 2026, 2 mois de travail.
+  - Troisième refonte totale : 1ère par designer précédent ~2019, 2ème par agence externe ~2023, 3ème par David 2026.
+  - Design system créé de toutes pièces (hérite couleurs signature + quelques éléments graphiques de la version précédente).
+  - Key challenge : équilibre identité tech-forward + personnalité chaleureuse (audiences clients/investisseurs/hiring).
+  - Solution : illustrations abstraites (formes géométriques + motifs texturés) comme fil conducteur.
+  - Mention explorations narratives (personnages illustrés) qui restent visibles dans certaines captures — n'est pas la ligne finale, subtilité rendue au visiteur.
+  - AI utilisés : Midjourney, Firefly, Figma AI, ChatGPT, Leonardo AI.
+  - Team standard Ryze : PM + dev front/back + content writers + marketing + SEO.
+  - CMS WordPress.
+- **Sensitive-check narratif** : 0 mention HR/patronne/grand patron. 0 mention "ma 1ère version était meilleure". Ton neutre, factuel, itératif ("plusieurs directions explorées en collaboration").
+- **Rollback** : `cp archives/v130_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+---
+
 ## v129 — 2026-08-14 — case study Playright (sections + liveUrl UK + year span)
 
 - **Commit git associé** : à venir

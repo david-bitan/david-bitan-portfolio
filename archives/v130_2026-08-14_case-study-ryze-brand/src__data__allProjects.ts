@@ -342,40 +342,11 @@ Addressed through a parametric design system in Figma: each smart component read
 		slug: 'ryze-brand',
 		title: `Ryze Beyond — Brand`,
 		client: `Ryze Beyond`,
-		year: '2026',
+		year: '2024',
 		category: 'Branding',
 		categories: ['Branding', 'UI/UX'],
-		shortDesc: `Sole designer on the third full redesign of Ryze Beyond's marketing website (2026). Abstract-illustration design system built from scratch.`,
-		fullDesc: `Sole designer on the 2026 redesign of ryzebeyond.com — the marketing website for the company behind Sonary Dashboard, Sonary Website, Top5, Playright and other products. Third full redesign of the site; ~2 months of work with an abstract-illustration design system built from scratch. See structured case study below.`,
-		liveUrl: 'https://ryzebeyond.com/',
-		sections: [
-			{
-				heading: 'Context',
-				body: `Ryze Brand is the marketing website for Ryze Beyond, the company behind Sonary Dashboard, Sonary Website, Top5, Playright and other products. The site presents the mission, products, team, and hiring opportunities. Third full redesign of the site since its creation: the first by a previous designer (~2019), the second by an external agency (~2023), this one in 2026.`,
-			},
-			{
-				heading: 'Role',
-				body: `Sole designer on the 2026 redesign, about two months of work. From research through post-implementation design QA.`,
-			},
-			{
-				heading: 'Approach',
-				body: `Benchmarking of tech corporate sites (Linear, Vercel, Stripe, Notion, Figma) and the marketing sites of the domain's main comparison platforms (G2, Capterra, Top10), cross-referenced with Dribbble, Pinterest and Behance to avoid the "generic corporate" look. Research phase accelerated with Midjourney, Firefly, Figma AI, ChatGPT and Leonardo AI for moodboards, illustrative concepts and exploratory tests. Design system built from scratch for this project, drawing on elements inherited from the previous version (signature brand colors, a few graphic elements kept for visual continuity).`,
-			},
-			{
-				heading: 'Key challenge',
-				body: `Several visual directions were explored collaboratively before landing on the final line. One of the challenges was finding the right balance between a tech-forward identity (positioning Ryze as a modern SaaS publisher) and a warm personality that could speak equally to hiring talent and to business partners.
-
-The solution: a system of abstract illustrations — colored geometric shapes, textured patterns — used as a visual thread across the entire site. More narrative explorations (illustrated characters) were carried out during the process — a few remain visible in the selection presented here.`,
-			},
-			{
-				heading: 'Deliverables',
-				body: `Full marketing website: homepage, product showcases (Sonary Dashboard, Website, Top5, Playright), about, team, careers, legal. Design system built for this project (typography, palette derived from the existing brand, radius, illustration system, light and dark modes). Five breakpoints (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress CMS. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
-			},
-			{
-				heading: 'What I took from it',
-				body: `A corporate site has multiple simultaneous audiences — customers, investors, hiring talent — and each reads a visual through its own filter. Designing a system that lets the same page speak to these different audiences takes more iteration rounds than a product site aimed at a single audience. The final compromise (abstract illustrations as the visual thread) illustrates that tension well.`,
-			},
-		],
+		shortDesc: `Visual identity system for Ryze Beyond — logo, palette, motion and web-facing brand elements.`,
+		fullDesc: `PLACEHOLDER : Éléments d'identité de marque pour Ryze Beyond.`,
 		// Full site captures organised by David into 10 numbered folders (01-09
 		// + Other). Every filename with -desktop / -mobile tokens is auto-
 		// classified. "All Field" is a wide form-field spec board and David
