@@ -20,9 +20,9 @@ export function isMobileShot(url: string): boolean {
 // noticeably softening UI screenshots (menus, text, thin lines). We force
 // `q_100` so Cloudinary re-encodes at the maximum quality — bigger files,
 // but the visual fidelity matches what David sees in Figma.
-export const PORTRAIT = 'c_fill,ar_3:4,g_north,q_100,f_auto,fl_progressive,w_1200';
-export const LANDSCAPE = 'c_fill,ar_4:3,g_north,q_100,f_auto,fl_progressive,w_1200';
-export const SQUARE = 'c_fill,ar_1:1,g_north,q_100,f_auto,fl_progressive,w_800';
+export const PORTRAIT = 'c_fill,ar_3:4,g_north,q_100,f_auto,w_1200';
+export const LANDSCAPE = 'c_fill,ar_4:3,g_north,q_100,f_auto,w_1200';
+export const SQUARE = 'c_fill,ar_1:1,g_north,q_100,f_auto,w_800';
 
 // For mobile screenshots INSIDE the project-page grid thumbnail (aspect 4/3
 // frame, ~280px CSS wide at 4-col): h_800 is enough. c_limit only ever
@@ -30,14 +30,14 @@ export const SQUARE = 'c_fill,ar_1:1,g_north,q_100,f_auto,fl_progressive,w_800';
 // stay sharp inside the small frame.
 // (fl_no_upscale would express the same intent on top of c_fit, but this
 // Cloudinary account rejects it with a 400, so c_limit is used instead.)
-export const FIT_TALL = 'c_limit,h_800,q_100,f_auto,fl_progressive';
+export const FIT_TALL = 'c_limit,h_800,q_100,f_auto';
 
 // Lightbox main image, LANDSCAPE. v100: capped w_2400 → w_2000 because @2x
 // source uploads (Top5 Article 3896×19972, Lineup 3840×18530) blow past the
 // Cloudinary Free tier 25 MP output cap when transformed to w_2400 (~29-32 MP
 // output → HTTP 400). w_2000 output on Article = 2000×10252 = 20.5 MP → safe.
 // Trade-off: slightly less crisp on 4K displays, but no broken images.
-export const FULL = 'c_limit,w_2000,q_100,f_auto,fl_progressive';
+export const FULL = 'c_limit,w_2000,q_100,f_auto';
 
 // Lightbox main image, TALL (mobile screenshots up to 16000px high).
 // Was `c_limit,h_2400`, but that capped HEIGHT — a 375x16000 source came out
@@ -48,7 +48,7 @@ export const FULL = 'c_limit,w_2000,q_100,f_auto,fl_progressive';
 // c_limit (never upscale) instead of c_scale — David's rule: no upscale ever.
 // A tall mobile source narrower than 1200px is served at its true native
 // width; the browser handles fit-to-viewport in the (now unused) lightbox.
-export const FULL_TALL = 'c_limit,w_1200,q_100,f_auto,fl_progressive';
+export const FULL_TALL = 'c_limit,w_1200,q_100,f_auto';
 
 // Mobile screenshot preset for the project-page grid. Rendered at 375px CSS
 // (the true native width of the source designs). c_limit (never upscale) is
@@ -56,7 +56,7 @@ export const FULL_TALL = 'c_limit,w_1200,q_100,f_auto,fl_progressive';
 // the 375 source to 750 device pixels rather than serving an interpolated
 // 750-wide file, because interpolated upscales look worse than a straight
 // browser stretch on UI mockups (soft type, halos on borders).
-export const MOBILE = 'c_limit,w_800,q_100,f_auto,fl_progressive';
+export const MOBILE = 'c_limit,w_800,q_100,f_auto';
 
 // srcset only proposes widths ≤ source width — c_limit never upscales.
 // v093 bump: added 1125 (mobile design @3x) so if David re-exports mobile
@@ -65,7 +65,7 @@ export const MOBILE = 'c_limit,w_800,q_100,f_auto,fl_progressive';
 // for all three requests — no gain in that case, no regression either.
 export function mobileSrcset(url: string): string {
 	return [375, 750, 1125]
-		.map((w) => `${cld(url, `c_limit,w_${w},q_100,f_auto,fl_progressive`)} ${w}w`)
+		.map((w) => `${cld(url, `c_limit,w_${w},q_100,f_auto`)} ${w}w`)
 		.join(', ');
 }
 
@@ -83,6 +83,6 @@ export function mobileSrcset(url: string): string {
 // of crispness on 4K screens (no >2000w variant) but no broken images.
 export function landscapeSrcset(url: string): string {
 	return [1200, 1600, 2000]
-		.map((w) => `${cld(url, `c_limit,w_${w},q_100,f_auto,fl_progressive`)} ${w}w`)
+		.map((w) => `${cld(url, `c_limit,w_${w},q_100,f_auto`)} ${w}w`)
 		.join(', ');
 }

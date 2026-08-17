@@ -17,6 +17,25 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v125 — 2026-08-14 — perf : fl_progressive + fetchpriority first images (Option D)
+
+- **Commit git associé** : à venir
+- **Type** : perf — feedback visuel loading, priorité download
+- **Fichiers** :
+  - `src/lib/cloudinary.ts`
+  - `src/pages/work/[slug].astro`
+- **Changement** :
+  - `cloudinary.ts` : ajout `fl_progressive` aux 7 transforms static (PORTRAIT, LANDSCAPE, SQUARE, FIT_TALL, FULL, FULL_TALL, MOBILE) + aux 2 srcset helpers (mobileSrcset, landscapeSrcset). Total 9 occurrences.
+  - `[slug].astro` : ajout `zoneIdx` sur zones.map + `imgIdx` sur les 4 zone.images.map (mobile dark, mobile light, other zone, desktop stack) + `fetchpriority={zoneIdx===0 && imgIdx<2 ? "high" : undefined}` sur les 4 `<img>` gallery.
+- **Pourquoi** : re-upload @2x source PNG (session 13 + Top5 v124) rend les images beaucoup plus lourdes (mattresses desktop 8.6 MB source, servi ~1-2 MB WebP par le browser). Sur slow connection, pas de feedback = confusion utilisateur. Solution simple Option D :
+  - `fl_progressive` fait charger l'image en passes (basse → haute résolution) au lieu de line-by-line. Effet visible sur JPEG legacy fallback. Ignoré silencieusement par Cloudinary si format servi ne le supporte pas (WebP/AVIF) → safe, zero régression.
+  - `fetchpriority="high"` sur les 2 premières images de la 1ère zone = browser priorise leur download au détriment du reste. Combiné avec `loading="lazy"` sur toutes : les 2 premières prioritaires (above the fold), le reste stream au scroll.
+- **Effort** : 15 min. Option B' (LQIP blur-up avec pré-calcul dimensions via fetchinfo Cloudinary + manifest JSON) restait à faire pour un look plus premium — parked pour plus tard.
+- **⚠️ TODO à rappeler à David** : re-visiter Option B' (LQIP blur-up premium) après les case studies restants si envie de polish supplémentaire.
+- **Rollback** : `cp archives/v125_.../src__lib__cloudinary.ts src/lib/cloudinary.ts && cp archives/v125_.../src__pages__work__slug.astro 'src/pages/work/[slug].astro'`
+
+---
+
 ## v124 — 2026-08-14 — Top5 homepage : mattresses + voip desktops + mattresses mobile
 
 - **Commit git associé** : à venir

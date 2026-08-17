@@ -210,7 +210,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 		<div class="mx-auto max-w-[1200px] px-6 lg:px-0">
 
 		{
-			zones.map((zone, zoneIdx) => {
+			zones.map((zone) => {
 			// Dark mockups already have a distinct dark background of their
 			// own, so they don't need the wrapper border/shadow/bg treatment
 			// that light mockups need to stand out from the near-white body.
@@ -268,7 +268,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 									class="flex flex-wrap items-start justify-start gap-[37.5px]"
 									data-mobile-grid
 								>
-									{zone.images.map(({ url }, imgIdx) =>
+									{zone.images.map(({ url }) =>
 										isDarkZone ? (
 											// Dark mobile: image fills the 375-wide cell exactly
 											// (cell = image slot). No border — dark mockup provides
@@ -279,7 +279,6 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 												sizes="375px"
 												alt={project.title}
 												loading="lazy"
-												fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
 												width="375"
 												class="block h-auto w-[375px] max-w-full rounded-xl"
 												data-mobile-item
@@ -297,7 +296,6 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 												sizes="375px"
 												alt={project.title}
 												loading="lazy"
-												fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
 												width="375"
 												class="block h-auto w-[375px] max-w-full rounded-xl border border-ink/15 shadow-md"
 												data-mobile-item
@@ -315,14 +313,13 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 							// a smaller image than the card). Ring + shadow
 							// live on the <img> itself.
 							<div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
-								{zone.images.map(({ url }, imgIdx) => (
+								{zone.images.map(({ url }) => (
 									<img
 										src={cld(url, FULL)}
 										srcset={landscapeSrcset(url)}
 										sizes="(min-width: 1024px) 560px, 100vw"
 										alt={project.title}
 										loading="lazy"
-												fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
 										class="mx-auto block h-auto max-h-[720px] w-auto max-w-full rounded-lg object-contain shadow-md ring-1 ring-ink/15"
 									/>
 								))}
@@ -342,7 +339,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 							//     full-width in the stack.
 							<div class="mt-12" data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
 								<div class="space-y-10" data-desktop-stack>
-									{zone.images.map(({ url }, imgIdx) => (
+									{zone.images.map(({ url }) => (
 										<div
 											class={isDarkZone ? 'w-full' : 'w-full border border-ink/15 shadow-md'}
 											data-desktop-item
@@ -353,7 +350,6 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 												sizes="(min-width: 1280px) 1200px, 100vw"
 												alt={project.title}
 												loading="lazy"
-												fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
 												class="block h-auto w-full"
 											/>
 										</div>
