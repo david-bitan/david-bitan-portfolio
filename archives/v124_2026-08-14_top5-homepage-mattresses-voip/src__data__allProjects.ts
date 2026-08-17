@@ -318,11 +318,8 @@ Addressed through a parametric design system in Figma: each smart component read
 				body: `A well-architected smart component system — one that inherits tokens from its container rather than binding manually — multiplies production velocity. What could have cost 37 sites × N components becomes one design system × 37 parametric variants. The discipline required upfront (structured Figma variables, container-first thinking) pays off across the entire lifespan of the project.`,
 			},
 		],
-		thumbnail: 'https://res.cloudinary.com/akael/image/upload/portfolio/top5/homepage/mattresses-desktop-1920.webp',
+		thumbnail: 'https://res.cloudinary.com/akael/image/upload/portfolio/top5/article/article-side-bar-1920.webp',
 		gallery: [
-			'https://res.cloudinary.com/akael/image/upload/portfolio/top5/homepage/mattresses-desktop-1920.webp',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/top5/homepage/voip-desktop-1920.webp',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/top5/homepage/mattresses-mobile-375.webp',
 			'https://res.cloudinary.com/akael/image/upload/portfolio/top5/article/article-side-bar-1920.webp',
 			'https://res.cloudinary.com/akael/image/upload/portfolio/top5/article/article-375.webp',
 			'https://res.cloudinary.com/akael/image/upload/portfolio/top5/comparison/comparison-page---desktop-1920.webp',

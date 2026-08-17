@@ -17,6 +17,24 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v124 — 2026-08-14 — Top5 homepage : mattresses + voip desktops + mattresses mobile
+
+- **Commit git associé** : à venir
+- **Type** : content — 3 nouvelles URLs Cloudinary + reorder gallery + new thumbnail
+- **Fichiers** :
+  - `src/data/allProjects.ts`
+  - **Cloudinary uploads (via `scripts/upload-pngs.cjs --only "top5/homepage" --confirm`)** :
+    - `portfolio/top5/homepage/mattresses-desktop-1920` (source PNG, 8.6 MB)
+    - `portfolio/top5/homepage/voip-desktop-1920` (source PNG, 5.0 MB)
+    - `portfolio/top5/homepage/mattresses-mobile-375` (source PNG, 2.3 MB)
+- **Changement** :
+  - `top5.thumbnail` : `article/article-side-bar-1920` → `homepage/mattresses-desktop-1920`
+  - `top5.gallery` : 3 URLs insérées en tête (mattresses-desktop, voip-desktop, mattresses-mobile), gallery existante conservée après
+- **Pourquoi** : David a fourni nouvelles homepages Top5 pour illustrer la variation couleur (mattresses purple + voip green). Ordre voulu : mattresses desktop 1, voip desktop 2, mattresses mobile 1er des mobiles.
+- **Rollback** : `cp archives/v124_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+---
+
 ## v123 — 2026-08-14 — case study Top5 (sections + liveUrl + year span)
 
 - **Commit git associé** : à venir
