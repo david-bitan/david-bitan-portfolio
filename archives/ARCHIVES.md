@@ -17,6 +17,31 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v131 — 2026-08-14 — case study Ryze Hub + liveUrlNote (Dashboard + Playright)
+
+- **Commit git associé** : à venir
+- **Type** : content + feature — case study #7 (Ryze Hub) + nouveau champ optional `liveUrlNote` rendu au-dessus du CTA "Visit live site"
+- **Fichiers** :
+  - `src/data/allProjects.ts`
+  - `src/pages/work/[slug].astro`
+- **Changement** :
+  - **Nouveau champ** `liveUrlNote?: string` sur `FullProject` interface — texte optionnel court rendu en `<p class="mb-3 text-sm text-muted">` au-dessus du bouton CTA "Visit live site".
+  - **Template `[slug].astro`** : CTA re-wrappée dans `<div class="mt-10">` qui contient (optionnellement) le `<p>` liveUrlNote puis le `<a>` (mt-10 déplacé du a au div wrapper pour préserver le spacing).
+  - **Sonary Dashboard** : ajout `liveUrlNote` "Note: to reach the actual dashboard, click 'Login/Sign up' at the top right. Alternatively, 'Get started' leads to a landing page with a Sign up button."
+  - **Playright** : ajout `liveUrlNote` "Note: the site is geo-restricted to the UK. A VPN is required to view it from outside."
+  - **Ryze Hub** : case study complet (sections × 6). Year '2024' → '2025'. shortDesc + fullDesc réécrits. PLACEHOLDER retiré. Pas de liveUrl (projet non déployé).
+- **Pourquoi** :
+  - David a fait remarquer que sans indication, l'utilisateur cliquant "Visit live site" sur Sonary Dashboard atterrissait sur le site marketing sans savoir comment accéder au produit. Idem Playright bloqué par geo-restriction. Le champ `liveUrlNote` répond ces deux cas.
+  - Ryze Hub = 7ème case study structuré. Projet solo initié par David en interne, design terminé mais non déployé (roadmap change).
+- **Faits clés Ryze Hub** :
+  - Portail intranet employés Ryze Beyond (brand assets + verticals info + product access).
+  - Solo, 2025.
+  - Design system propre (pas héritage).
+  - Livré au niveau design ; passage en production paused suite à changement roadmap interne (formulation neutre, pas de mention du départ du patron).
+- **Rollback** : `cp archives/v131_.../src__data__allProjects.ts src/data/allProjects.ts && cp archives/v131_.../src__pages__work__slug.astro 'src/pages/work/[slug].astro'`
+
+---
+
 ## v130 — 2026-08-14 — case study Ryze Brand (sections + liveUrl + year fix)
 
 - **Commit git associé** : à venir

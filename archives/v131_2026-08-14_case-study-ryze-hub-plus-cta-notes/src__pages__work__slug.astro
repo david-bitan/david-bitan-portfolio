@@ -72,33 +72,28 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 							</section>
 						))}
 						{project.liveUrl && (
-							<div class="mt-10">
-								{project.liveUrlNote && (
-									<p class="mb-3 text-sm text-muted">{project.liveUrlNote}</p>
-								)}
-								<a
-									href={project.liveUrl}
-									target="_blank"
-									rel="noopener"
-									class="inline-flex items-center gap-2 rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-colors hover:bg-ink"
+							<a
+								href={project.liveUrl}
+								target="_blank"
+								rel="noopener"
+								class="mt-10 inline-flex items-center gap-2 rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-colors hover:bg-ink"
+							>
+								Visit live site
+								<svg
+									aria-hidden="true"
+									xmlns="http://www.w3.org/2000/svg"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.4"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="h-4 w-4"
 								>
-									Visit live site
-									<svg
-										aria-hidden="true"
-										xmlns="http://www.w3.org/2000/svg"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2.4"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										class="h-4 w-4"
-									>
-										<path d="M5 12h14" />
-										<path d="M13 5l7 7-7 7" />
-									</svg>
-								</a>
-							</div>
+									<path d="M5 12h14" />
+									<path d="M13 5l7 7-7 7" />
+								</svg>
+							</a>
 						)}
 					</div>
 

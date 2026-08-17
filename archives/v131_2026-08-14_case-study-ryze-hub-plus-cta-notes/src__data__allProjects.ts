@@ -28,10 +28,6 @@ export interface FullProject {
 	/** Optional CTA to the live product. Rendered as a button after the
 	 * case study body. */
 	liveUrl?: string;
-	/** Optional short note rendered above the "Visit live site" button.
-	 * Use it when the visitor needs extra context to actually reach the
-	 * live experience (e.g. geo-restrictions, sign-up flow, VPN needed). */
-	liveUrlNote?: string;
 	/** Optional per-URL device hint. Used when a gallery file lacks the usual
 	 * `-desktop` / `-mobile` token (legacy uploads, single-name files). Key =
 	 * substring matched against the image URL; first match wins. Consumed by
@@ -58,7 +54,6 @@ export const allProjects: FullProject[] = [
 		shortDesc: `Sole-designed a SaaS to track software subscriptions — full dark/light design system, 96+ shipped frames, AI-powered flows.`,
 		fullDesc: `Sole-designed a SaaS to track software subscriptions — full dark/light design system, 2,000+ frames, AI chat bot for natural-language queries. See structured case study below.`,
 		liveUrl: 'https://sonary.com',
-		liveUrlNote: `Note: to reach the actual dashboard, click 'Login/Sign up' at the top right. Alternatively, 'Get started' leads to a landing page with a Sign up button.`,
 		sections: [
 			{
 				heading: 'Context',
@@ -429,37 +424,11 @@ The solution: a system of abstract illustrations — colored geometric shapes, t
 		slug: 'ryze-hub',
 		title: `Ryze Beyond Hub`,
 		client: `Ryze Beyond`,
-		year: '2025',
+		year: '2024',
 		category: 'Branding',
 		categories: ['Branding', 'UI/UX'],
-		shortDesc: `Sole-designed internal portal for Ryze Beyond employees — brand assets, product info and quick access in one place. Personal initiative from concept to full design system.`,
-		fullDesc: `Sole designer on Ryze Hub — an internal employee portal I proposed and led end-to-end (2025). Concept, structure, dedicated design system, and templates. Delivered at full design level; production paused with an internal roadmap change. See structured case study below.`,
-		sections: [
-			{
-				heading: 'Context',
-				body: `Ryze Hub is a centralized intranet portal designed for Ryze Beyond employees. The idea: gather in one place the brand resources (fonts, logos, palettes, graphic elements), information on the company's verticals and products (Sonary Dashboard, Sonary Website, Top5, Playright…), and provide direct access to each product. Typical use case: preparing a presentation, a PDF, a social post before a meeting or a conference.`,
-			},
-			{
-				heading: 'Role',
-				body: `Sole designer on the project, from the initial idea — proposed internally — through the full design system, site structure, and templates. Solo delivery with direct validation from the manager.`,
-			},
-			{
-				heading: 'Approach',
-				body: `Research through direct observation of internal needs (recurring requests for brand assets and product information). Benchmarking of internal tech portals (brand asset portals like Frontify/Brandfolder, team wikis like Notion, Confluence-based sites) and visual references from Dribbble and Behance. Design system built from scratch for this project, with its own "internal hub" identity — modular, geared toward fast navigation and scannable reading.`,
-			},
-			{
-				heading: 'Key challenge',
-				body: `Bringing together highly heterogeneous content in a single portal (graphic assets, product docs, external links, usage guides) without turning it into a flat catalog. Solution: structure by use case rather than by content type, with dedicated components that pull together the assets of a same family in a single view (for example: "Ryze Logo" = variants + tokens + fonts + usage in one block).`,
-			},
-			{
-				heading: 'Deliverables',
-				body: `Full portal design: use-case-driven homepage, brand center (logos, colors, typography, iconography), vertical sections by product (Sonary, Top5, Playright…), quick access to live products. Dedicated design system (typography, palette, radius, asset-card and quick-access components, light and dark modes). Five breakpoints (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). The project was delivered at full design level; production was paused following an internal roadmap change.`,
-			},
-			{
-				heading: 'What I took from it',
-				body: `Carrying an idea from an observed need through to a delivered design system is a different exercise than a commissioned project: the vision has to be clear enough to convince before it even exists. Ryze Hub illustrates this full path (idea → concept → system → templates) — a methodological framework I've been reusing since.`,
-			},
-		],
+		shortDesc: `Company hub and portfolio landing — a single surface tying Ryze Beyond's product line together.`,
+		fullDesc: `PLACEHOLDER : Design du hub Ryze Beyond, présentation portfolio produits + landing pages Desktop et Mobile.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342009/portfolio/ryze-hub/desktop/company-hub---home-page---step-01.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785342009/portfolio/ryze-hub/desktop/company-hub---home-page---step-01.webp',
@@ -534,7 +503,6 @@ Addressed through a master template with two strict breakpoints (Desktop 600, Mo
 		shortDesc: `Sole designer on Playright since 2019 — UK online casino comparison platform. Initial 4-month delivery, then years of continuous design iteration. Full redesign underway.`,
 		fullDesc: `Sole designer on Playright since 2019 — Ryze Beyond's UK online casino comparison platform. Initial delivery in ~4 months (2019-2020), then continuous design iteration over the following years, with a full redesign currently underway. See structured case study below.`,
 		liveUrl: 'https://playright.co.uk/casino/reviews/',
-		liveUrlNote: `Note: the site is geo-restricted to the UK. A VPN is required to view it from outside.`,
 		sections: [
 			{
 				heading: 'Context',
