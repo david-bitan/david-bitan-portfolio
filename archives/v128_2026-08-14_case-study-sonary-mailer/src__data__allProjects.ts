@@ -419,36 +419,8 @@ Addressed through a parametric design system in Figma: each smart component read
 		year: '2025',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Sole designer on a modular master email template for the Sonary ecosystem — 600/375 breakpoints, dark-mode aware, on-brand.`,
-		fullDesc: `Sole designer on the Sonary email marketing and newsletter template system (2025). Built on the existing Sonary design system tokens; a master template spinning off into multiple campaign variants. See structured case study below.`,
-		sections: [
-			{
-				heading: 'Context',
-				body: `Sonary Mailer is an email marketing and newsletter template system built for Ryze Beyond in 2025. It complements the Sonary ecosystem (Dashboard product + Website comparison platform) by enabling marketing campaigns, editorial digests, and communications in a visual style consistent with the rest of the brand.`,
-			},
-			{
-				heading: 'Role',
-				body: `Sole designer on the mailer, owning art direction end-to-end. Collaborated with the content writer on editorial structure. Delivered from research through design, template specs, dev handoff, and QA.`,
-			},
-			{
-				heading: 'Approach',
-				body: `Benchmarking of email marketing references (Mailchimp, HubSpot, Substack) cross-referenced with Dribbble and Pinterest. Research phase accelerated with Midjourney, Firefly and Figma AI for moodboards and concepts. No new design system — templates built on the existing Sonary design system tokens (Inter typography, palette, radius, light and dark modes) for immediate brand consistency. A master template designed to spin off into multiple variants depending on the campaign type.`,
-			},
-			{
-				heading: 'Key challenge',
-				body: `Email client technical constraints are rigid: maximum 600-pixel width on desktop (past that, clients truncate or zoom), and mobile rendering that must adapt automatically to the device's width, with a design reference at 375 pixels. This means a much narrower grid than standard web, and a mobile-first layout designed at 375 and scaled up to 600.
-
-Addressed through a master template with two strict breakpoints (Desktop 600, Mobile 375) and components that restructure vertically on mobile — each block designed to be added, removed, or duplicated without breaking the layout.`,
-			},
-			{
-				heading: 'Deliverables',
-				body: `Master email template (header, hero, article sections, CTA, footer) ready to spin off into multiple variants (editorial newsletter, product campaign, alert, digest). Two breakpoints designed (Desktop 600, Mobile 375). Light and dark modes consistent with the rest of the Sonary ecosystem. Dev handoff.`,
-			},
-			{
-				heading: 'What I took from it',
-				body: `An email isn't a web page: technical constraints (width, heterogeneous email clients, table-based rendering) force a different discipline. Designing a master template modular enough to absorb every future campaign is more valuable than one polished one-off — it's a design system in a very small footprint.`,
-			},
-		],
+		shortDesc: `Full email system — 4 mailer templates × responsive, dark-mode aware, on-brand across the funnel.`,
+		fullDesc: `PLACEHOLDER : Design de la suite email Sonary. 4 mailers Desktop + 4 Mobile. Focus : cohérence design system, lisibilité, dark mode support, CTAs clairs.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342153/portfolio/sonary-mailer/desktop/mailer-1-desktop.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785342153/portfolio/sonary-mailer/desktop/mailer-1-desktop.webp',

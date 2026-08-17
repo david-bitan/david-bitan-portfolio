@@ -17,6 +17,31 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v128 — 2026-08-14 — case study Sonary Mailer (sections)
+
+- **Commit git associé** : à venir
+- **Type** : content — case study #4 (Sonary Mailer)
+- **Fichiers** :
+  - `src/data/allProjects.ts`
+- **Changement** :
+  - `sonary-mailer` : ajout `sections[]` avec 6 headings (Context / Role / Approach / Key challenge / Deliverables / What I took from it)
+  - `shortDesc` réécrit (mention sole designer + master template + breakpoints 600/375)
+  - `fullDesc` re-écrit (retire placeholder)
+  - Pas de `liveUrl` (produit interne, non publique)
+  - `year: '2025'` inchangé
+- **Pourquoi** : quatrième case study structuré. Format aligné Dashboard/Website/Top5.
+- **Faits clés** :
+  - Sole designer 2025, direction artistique en propre (personne n'a interféré sur le design).
+  - Collaboration : content writer (aussi la boss de David) pour structure éditoriale.
+  - Pas de refonte (récent).
+  - Design system : hérite du DS Sonary existant (Inter typo + tokens + light/dark).
+  - Key challenge : contraintes clients email (600 px max desktop, mobile responsive auto à 375 ref).
+  - Template maître modulaire pour spin off en plusieurs variantes (newsletter, campagne, alerte, digest).
+  - Handoff dev (details techniques non détaillés dans le case study).
+- **Rollback** : `cp archives/v128_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+---
+
 ## v127 — 2026-08-14 — perf skeleton shimmer étendu au mobile grid
 
 - **Commit git associé** : à venir
