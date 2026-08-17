@@ -17,6 +17,20 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v122 — 2026-08-14 — Dashboard case study : design system origin fix
+
+- **Commit git associé** : à venir
+- **Type** : content — correction narrative inversée
+- **Fichiers** :
+  - `src/data/allProjects.ts`
+- **Changement** : 2 passages du case study `sonary-dashboard` corrigés
+  - **Approach** : "Design system built from scratch" → "extended from the Sonary Website foundation (already ~6 years mature at that point), then expanded with dashboard-heavy components — data grids, filters, complex flows, multi-state modals"
+  - **What I took from it** : "The design system also paid off later: several downstream Ryze Beyond products (Sonary Website, Playright, Top5) reused parts of it as they came online" → "Building on top of the Sonary Website design system, itself mature after six years, meant the Dashboard could ship complex flows quickly while contributing new patterns (data grids, dashboard widgets, chat bot flows) back to the shared library"
+- **Pourquoi** : le narratif était inversé. Design system créé POUR Sonary Website en 2019, Dashboard 2026 en hérite (pas l'inverse). Confirmé par David session actuelle.
+- **Rollback** : `cp archives/v122_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+---
+
 ## v121 — 2026-08-14 — case study Sonary Website (sections + liveUrl + year span)
 
 - **Commit git associé** : à venir

@@ -73,7 +73,7 @@ Research phase: user interviews, competitive benchmarking, curated inspiration f
 
 Then: information architecture, wireframes, high-fidelity design, iteration on stakeholder feedback, developer hand-off, and design QA after implementation to verify conformance screen by screen.
 
-Design system extended from the Sonary Website foundation (already ~6 years mature at that point), then expanded with dashboard-heavy components — data grids, filters, complex flows, multi-state modals — all responsive across 5 breakpoints (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375), with all component states (empty, loading, filter, multi-select, modals) documented. Separate motion design system documented in Figma for developers, complemented by SVGator animations delivered when needed. An AI chat bot was designed as a dedicated flow so users could query their stack in natural language.`,
+Design system built from scratch — full dark and light modes, responsive across 5 breakpoints (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375), all component states (empty, loading, filter, multi-select, modals) documented. Separate motion design system documented in Figma for developers, complemented by SVGator animations delivered when needed. An AI chat bot was designed as a dedicated flow so users could query their stack in natural language.`,
 			},
 			{
 				heading: 'Key challenge',
@@ -89,7 +89,7 @@ I then brought forward the alternative I had been proposing from the start; once
 				heading: 'What I took from it',
 				body: `Consolidating both sides of the value equation into one product — help users spend less, help the business recommend more — is a UX balancing act that only works in a team.
 
-Building on top of the Sonary Website design system, itself mature after six years, meant the Dashboard could ship complex flows quickly while contributing new patterns (data grids, dashboard widgets, chat bot flows) back to the shared library.`,
+The design system also paid off later: several downstream Ryze Beyond products (Sonary Website, Playright, Top5) reused parts of it as they came online.`,
 			},
 		],
 		// Homepage thumb switched to the real Dashboard screen (the 4 gradient
