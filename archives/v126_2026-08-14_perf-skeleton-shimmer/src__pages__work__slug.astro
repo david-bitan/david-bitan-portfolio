@@ -316,19 +316,15 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 							// live on the <img> itself.
 							<div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
 								{zone.images.map(({ url }, imgIdx) => (
-									<div class="img-skeleton rounded-lg">
-										<img
-											src={cld(url, FULL)}
-											srcset={landscapeSrcset(url)}
-											sizes="(min-width: 1024px) 560px, 100vw"
-											alt={project.title}
-											loading="lazy"
-											fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
-											class="mx-auto block h-auto max-h-[720px] w-auto max-w-full rounded-lg object-contain shadow-md ring-1 ring-ink/15"
-											onload="this.parentElement.classList.add('is-loaded')"
-											onerror="this.parentElement.classList.add('is-loaded')"
-										/>
-									</div>
+									<img
+										src={cld(url, FULL)}
+										srcset={landscapeSrcset(url)}
+										sizes="(min-width: 1024px) 560px, 100vw"
+										alt={project.title}
+										loading="lazy"
+												fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
+										class="mx-auto block h-auto max-h-[720px] w-auto max-w-full rounded-lg object-contain shadow-md ring-1 ring-ink/15"
+									/>
 								))}
 							</div>
 						) : (
@@ -348,7 +344,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 								<div class="space-y-10" data-desktop-stack>
 									{zone.images.map(({ url }, imgIdx) => (
 										<div
-											class={(isDarkZone ? 'w-full' : 'w-full border border-ink/15 shadow-md') + ' img-skeleton'}
+											class={isDarkZone ? 'w-full' : 'w-full border border-ink/15 shadow-md'}
 											data-desktop-item
 										>
 											<img
@@ -359,8 +355,6 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 												loading="lazy"
 												fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
 												class="block h-auto w-full"
-												onload="this.parentElement.classList.add('is-loaded')"
-												onerror="this.parentElement.classList.add('is-loaded')"
 											/>
 										</div>
 									))}
@@ -390,44 +384,6 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 	<div class="pb-24"></div>
 
 	<style is:global>
-		/* Skeleton shimmer for image containers. Wrapper shows a pulsing gradient
-		   while the HD image loads underneath (opacity:0), then fades in on load.
-		   Preserves 100% source quality — placeholder is purely visual. Applied on
-		   desktop stack items + Other zone items. Mobile grid skipped (script
-		   mutation interferes; parked for future LQIP blur-up if needed). */
-		.img-skeleton {
-			position: relative;
-			background: linear-gradient(90deg,
-				rgb(0 0 0 / 0.04) 0%,
-				rgb(0 0 0 / 0.09) 50%,
-				rgb(0 0 0 / 0.04) 100%);
-			background-size: 200% 100%;
-			animation: img-skeleton-shimmer 1.6s ease-in-out infinite;
-			min-height: 200px;
-		}
-		.img-skeleton > img {
-			opacity: 0;
-			transition: opacity 0.4s ease-out;
-			position: relative;
-			z-index: 1;
-		}
-		.img-skeleton.is-loaded {
-			animation: none;
-			background: transparent;
-			min-height: 0;
-		}
-		.img-skeleton.is-loaded > img {
-			opacity: 1;
-		}
-		@keyframes img-skeleton-shimmer {
-			0%   { background-position: 200% 0; }
-			100% { background-position: -200% 0; }
-		}
-		@media (prefers-reduced-motion: reduce) {
-			.img-skeleton { animation: none; }
-			.img-skeleton > img { transition: none; }
-		}
-
 		/* Wide (multi-screen composition) items moved out of the mobile grid
 		   into the full-width stack. v092: no more forced width:100% — the
 		   mobile script probes each composition's TRUE source width and sets

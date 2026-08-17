@@ -17,6 +17,26 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v126 — 2026-08-14 — perf : skeleton shimmer (Option C', complète Option A)
+
+- **Commit git associé** : à venir
+- **Type** : perf UX — feedback visuel loading
+- **Fichiers** :
+  - `src/pages/work/[slug].astro`
+- **Changement** :
+  - Nouveau CSS class `.img-skeleton` dans le `<style is:global>` : wrapper avec gradient shimmer animé (1.6s ease-in-out infinite), min-height 200px fallback. Au `.is-loaded`, animation stop + bg transparent + min-height 0.
+  - CSS `.img-skeleton > img` : opacity-0 par défaut, transition 0.4s. Au `.is-loaded`, opacity 1.
+  - `@media (prefers-reduced-motion: reduce)` respecté (skip anim + skip transition).
+  - Desktop stack `<div data-desktop-item>` : ajout classe `img-skeleton` sur le wrapper existant + `onload="this.parentElement.classList.add('is-loaded')"` sur `<img>` (+ `onerror` same).
+  - Other zone : nouveau wrapper `<div class="img-skeleton rounded-lg">` autour de chaque `<img>` + onload/onerror handlers.
+- **Impact utilisateur** : sur slow connection ou premier load non-caché, l'utilisateur voit un shimmer gris pulsant à l'emplacement de chaque image desktop ou other. Au load HD, shimmer disparaît smooth (fade 0.4s) et l'image apparaît. Feedback visuel clair "quelque chose se charge".
+- **Qualité HD** : ZÉRO impact. Le shimmer est purement CSS, l'image HD est chargée identique avec `q_100` + `f_auto` + `fl_progressive`.
+- **Skipped** : mobile grid `[data-mobile-item]`. Raison : le script mobile complexe (probe naturalWidth + move wide items to wide-stack + sort by height) interfère avec un wrapper span. Refactor à faire en Option B' plus tard.
+- **⚠️ TODO à rappeler à David** : Option B' (LQIP blur-up premium avec dimensions pré-calculées via `fl_getinfo` Cloudinary + manifest JSON) reste disponible pour polish final avant deploy `.is-a.dev`. Coverage mobile viendra avec B'.
+- **Rollback** : `cp archives/v126_.../src__pages__work__slug.astro 'src/pages/work/[slug].astro'`
+
+---
+
 ## v125 — 2026-08-14 — perf : fl_progressive + fetchpriority first images (Option D)
 
 - **Commit git associé** : à venir
