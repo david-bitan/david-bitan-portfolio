@@ -273,49 +273,37 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 											// Dark mobile: image fills the 375-wide cell exactly
 											// (cell = image slot). No border — dark mockup provides
 											// its own contrast against the near-white body.
-											<span
-												class="img-skeleton block w-[375px] max-w-full rounded-xl overflow-hidden"
+											<img
+												src={cld(url, MOBILE)}
+												srcset={mobileSrcset(url)}
+												sizes="375px"
+												alt={project.title}
+												loading="lazy"
+												fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
+												width="375"
+												class="block h-auto w-[375px] max-w-full rounded-xl"
 												data-mobile-item
+												data-full-src={cld(url, FULL)}
+												data-full-srcset={landscapeSrcset(url)}
 												data-is-dark="1"
-											>
-												<img
-													src={cld(url, MOBILE)}
-													srcset={mobileSrcset(url)}
-													sizes="375px"
-													alt={project.title}
-													loading="lazy"
-													fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
-													width="375"
-													class="block h-auto w-full"
-													data-full-src={cld(url, FULL)}
-													data-full-srcset={landscapeSrcset(url)}
-													onload="this.parentElement.classList.add('is-loaded')"
-													onerror="this.parentElement.classList.add('is-loaded')"
-												/>
-											</span>
+											/>
 										) : (
 											// Light mobile: image fills its 375-wide cell exactly.
 											// Border + shadow directly on <img> — the visible frame
 											// is the image's edge, no padded gray strip anywhere.
-											<span
-												class="img-skeleton block w-[375px] max-w-full rounded-xl border border-ink/15 shadow-md overflow-hidden"
+											<img
+												src={cld(url, MOBILE)}
+												srcset={mobileSrcset(url)}
+												sizes="375px"
+												alt={project.title}
+												loading="lazy"
+												fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
+												width="375"
+												class="block h-auto w-[375px] max-w-full rounded-xl border border-ink/15 shadow-md"
 												data-mobile-item
-											>
-												<img
-													src={cld(url, MOBILE)}
-													srcset={mobileSrcset(url)}
-													sizes="375px"
-													alt={project.title}
-													loading="lazy"
-													fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
-													width="375"
-													class="block h-auto w-full"
-													data-full-src={cld(url, FULL)}
-													data-full-srcset={landscapeSrcset(url)}
-													onload="this.parentElement.classList.add('is-loaded')"
-													onerror="this.parentElement.classList.add('is-loaded')"
-												/>
-											</span>
+												data-full-src={cld(url, FULL)}
+												data-full-srcset={landscapeSrcset(url)}
+											/>
 										),
 									)}
 								</div>
@@ -448,29 +436,15 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 		   900 CSS max, centered. Border/shadow/rounded stripped so planches
 		   (which usually come with their own designed background) render
 		   cleanly edge-to-edge. */
-		/* Wide (multi-screen composition) items moved out of the mobile grid.
-		   v127: since mobile items are now <span> wrappers (for skeleton shimmer),
-		   the wide-stack override targets the span + its inner img. Kill min-height
-		   and shimmer bg on the span (image is already loaded when script moves it). */
-		[data-mobile-wide-stack] > [data-mobile-item] {
-			display: block;
-			width: 100%;
-			margin-left: auto;
-			margin-right: auto;
-			border: 0;
-			border-radius: 0;
-			box-shadow: none;
-			min-height: 0;
-			background: none;
-			animation: none;
-			overflow: visible;
-		}
-		[data-mobile-wide-stack] > [data-mobile-item] > img {
+		[data-mobile-wide-stack] > img[data-mobile-item] {
 			display: block;
 			width: 100%;
 			height: auto;
 			margin-left: auto;
 			margin-right: auto;
+			border: 0;
+			border-radius: 0;
+			box-shadow: none;
 		}
 
 		/* Narrow desktop items (e.g. email templates 400px wide) moved out

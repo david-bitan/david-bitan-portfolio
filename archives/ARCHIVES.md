@@ -17,6 +17,24 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v127 — 2026-08-14 — perf skeleton shimmer étendu au mobile grid
+
+- **Commit git associé** : à venir
+- **Type** : perf UX — extension coverage skeleton shimmer
+- **Fichiers** :
+  - `src/pages/work/[slug].astro`
+- **Changement** :
+  - Mobile grid dark : wrap `<img>` dans `<span class="img-skeleton block w-[375px] max-w-full rounded-xl overflow-hidden" data-mobile-item data-is-dark="1">`. img devient `class="block h-auto w-full"` + onload handler.
+  - Mobile grid light : idem, border/shadow migrés sur span (le frame du mockup).
+  - Data-mobile-item déplacé de img vers span (le script mobile déjà compatible via `item.tagName === 'IMG' ? item : item.querySelector('img')`).
+  - data-full-src, data-full-srcset restent sur img (script les lit sur img via querySelector).
+  - CSS wide-stack override adapté : `[data-mobile-wide-stack] > img[data-mobile-item]` → `[data-mobile-wide-stack] > [data-mobile-item]` + rule séparée pour img child. Kill min-height/bg/animation dans wide stack (image déjà chargée quand script move).
+- **Pourquoi** : David a signalé que shimmer ne s'affichait pas sur mobile. En effet v126 avait explicitement skippé mobile grid (script mutation risque). Refactor propre : span wrapper porte data-mobile-item + classes visuelles, script continue de trouver img via querySelector.
+- **Script mobile intact** : probe naturalWidth + move wide items to wide-stack + sort by height via CSS order — aucun changement nécessaire, le pattern `item.tagName === 'IMG' ? item : item.querySelector('img')` gère les deux cas dès le départ.
+- **Rollback** : `cp archives/v127_.../src__pages__work__slug.astro 'src/pages/work/[slug].astro'`
+
+---
+
 ## v126 — 2026-08-14 — perf : skeleton shimmer (Option C', complète Option A)
 
 - **Commit git associé** : à venir
