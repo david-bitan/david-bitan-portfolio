@@ -645,7 +645,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 
 				const items = Array.from(stack.querySelectorAll('[data-desktop-item]'));
 
-				items.forEach((item, idx) => {
+				items.forEach((item) => {
 					const img = item.querySelector('img');
 					if (!img) return;
 
@@ -666,12 +666,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 						// max-width to the true source width so the auto-fit
 						// grid centers it at native size — never upscaled,
 						// never squeezed.
-						// Preserve gallery order in the narrow grid via
-						// `style.order = idx` — items are appended in
-						// probe-resolution order (async race), but CSS order
-						// forces them back into the original DOM order.
 						item.style.maxWidth = trueW + 'px';
-						item.style.order = String(idx);
 						narrowGrid.appendChild(item);
 					};
 

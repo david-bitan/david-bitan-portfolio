@@ -17,6 +17,32 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v136 — 2026-08-18 — gamingtech reorder first 6 (David screenshot) + narrow-grid order preservation
+
+- **Commit git associé** : à venir
+- **Type** : content reorder + micro-refactor script
+- **Fichiers** :
+  - `src/data/allProjects.ts`
+  - `src/pages/work/[slug].astro`
+- **Demande David (session 16, screenshot)** : dans le narrow-grid de gamingtech, arranger 6 items spécifiques en 3 rangées de 2 (grandes en haut, sport au milieu, casinos en bas). Le reste des 39 URLs reste à sa place actuelle.
+- **Mapping des 6 (identifiés via PIL montage → Read multimodal sur 15 sport-betting + 36 casino WebP locaux)** :
+  1. `sport-betting-06` — €100 WELCOME ALL-ACTION APRIL (Barça, Messi + Suárez)
+  2. `sport-betting-09` — €100 WELCOME MARCH OF GLORY (Ibrahimović + Aubameyang + Pogba)
+  3. `sport-betting-03` — BEST ODDS GUARANTEED UK & IRELAND HORSE RACING
+  4. `sport-betting-01` — THE OPEN NOV 13-15 (horse race, "who'll cross the line first?")
+  5. `casino-04` — 20 FREE SPINS + €100 EXTRA CLOUD QUEST (wizard + warrior)
+  6. `casino-03` — GUARANTEED PRIZES (actrice + cartes + film reel)
+- **Changement 1 — reorder gallery `gamingtech`** : les 6 URLs cibles remontent en positions 0-5 de `gallery: [...]`. Les 39 autres URLs conservent leur ordre relatif. Total inchangé (45 URLs).
+- **Changement 2 — préservation ordre dans narrow-grid** : le script `[data-desktop-narrow-grid]` fait `narrowGrid.appendChild(item)` DANS L'ORDRE DE RÉSOLUTION DES PROBES `await probeSourceWidth(...)` (async race), pas dans l'ordre de la gallery. Ajout de `item.style.order = String(idx)` (idx = position dans le stack initial = position dans gallery) → CSS grid réordonne les items par `order` ascendant → ordre visuel final respecte gallery peu importe la latence des probes.
+- **Impact visuel attendu** :
+  - Narrow-grid gamingtech affiche les 6 items dans l'ordre demandé au TOP de la section narrow-grid (auto-fit 2 col sur viewport 1200 avec items 528px de large).
+  - Les 3 autres items narrow (COME BACK FREE SPINS = casino-11, SUGARPOP = casino-17, + 1 autre) restent en dessous des 6, dans leur ordre relatif.
+  - Desktop stack (36 items wide) inchangé visuellement — les items narrow sont extraits comme avant.
+- **Autres projets impactés par le changement 2** : le fix `style.order` s'applique à tous les projets qui ont un narrow-grid (uniquement gamingtech pour l'instant, mais safety-net pour futurs projets Gallery 1-zone avec bannières mixtes).
+- **Bug pattern catalogué** : `async-race-scrambles-dom-order-in-loop-append` — quand une boucle `forEach` fait `await` + `appendChild`, l'ordre final DOM suit la résolution des promises, pas l'ordre d'itération. Fix : capturer l'index d'itération et le mettre dans `style.order` (grid/flex) pour découpler ordre DOM et ordre visuel.
+
+---
+
 ## v135 — 2026-08-18 — fix bordure wrapper narrow-grid (bug bannières gaming)
 
 - **Commit git associé** : à venir
