@@ -17,6 +17,19 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v133 — 2026-08-14 — UI/UX Vintage : wireframes remontés après MUSIK
+
+- **Commit git associé** : à venir
+- **Type** : content — micro-fix ordre gallery
+- **Fichiers** :
+  - `src/data/allProjects.ts`
+- **Changement** :
+  - `ui-ux-vintage.gallery` : les 3 wireframes (06, 08, 13) remontées après le trio MUSIK (02, 04, 15). Raison : David a précisé que ces wireframes sont ceux de l'app MUSIK.
+  - Nouvel ordre : Wochat (17, 09, 20, 03) → ADVANCE (19, 16, 18, 05, 01) → MUSIK (02, 04, 15) → **Wireframes MUSIK (06, 08, 13)** → HitShot (10, 14) → ALEXIA (12) → UBS (07) → MPC7 (11).
+- **Rollback** : `cp archives/v133_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+---
+
 ## v132 — 2026-08-14 — case study UI/UX Vintage (regroupé + texte global 2 paragraphes)
 
 - **Commit git associé** : à venir
