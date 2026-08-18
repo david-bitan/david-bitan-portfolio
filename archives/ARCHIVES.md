@@ -17,6 +17,30 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v132 — 2026-08-14 — case study UI/UX Vintage (regroupé + texte global 2 paragraphes)
+
+- **Commit git associé** : à venir
+- **Type** : content — case study #8 (UI/UX Vintage 2011-2018) — format spécial (pas les 6 sections, texte global inline)
+- **Fichiers** :
+  - `src/data/allProjects.ts`
+- **Changement** :
+  - `ui-ux-vintage` : réécriture complète header + gallery.
+  - `year: '2015'` → `'2011 – 2018'` (span).
+  - `shortDesc` réécrit (mention Wochat + SaaS dashboard + perso).
+  - `fullDesc` re-écrit en 2 paragraphes EN (whitespace-pre-line rendra le blank line en break).
+  - PLACEHOLDER retiré.
+  - `thumbnail` : `ui-ux-01.webp` (ADVANCE Chat Room) → `ui-ux-20.webp` (Wochat multiscreen, plus impactful visuellement).
+  - `gallery` : 20 URLs réordonnées en 3 groupes visuels.
+    - **Wochat** (4) : 17 (splash phone), 09 (Apple Watch), 20 (multiscreen), 03 (dating/meet peoples).
+    - **ADVANCE Dashboard bandeau vert** (5) : 19 (Overview full menu), 16 (MacBook mockup), 18 (Overview menu collapsed), 05 (Customers), 01 (Chat Room).
+    - **Autres en vrac / perso** (11) : MUSIK 02, 04, 15 · HitShot 10, 14 · ALEXIA landing 12 · UBS Ultra Bright System 07 · MPC 7 Model Photos Creation 11 · Wireframes low-fi 06, 08, 13.
+- **Pourquoi** : format spécifique demandé par David — texte global (pas les 6 sections structurées comme les autres) + regroupement thématique gallery pour montrer la cohérence par famille de design.
+- **Analyse visuelle** : 20 fichiers `ui-ux-NN.webp` étaient renommés numérotés (aucune info dans le nom). Analyse faite via `Read` sur chaque image en local (staged via `device_stage_files`).
+- **Format rendu page** : pas d'accordion "Read the full case study" (car pas de `sections`). Le texte global s'affiche INLINE directement via le fallback legacy `<p class="mt-10 max-w-3xl whitespace-pre-line leading-relaxed text-ink">`.
+- **Rollback** : `cp archives/v132_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+---
+
 ## v131 — 2026-08-14 — case study Ryze Hub + liveUrlNote (Dashboard + Playright)
 
 - **Commit git associé** : à venir
