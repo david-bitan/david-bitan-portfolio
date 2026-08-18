@@ -365,7 +365,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 								<div class="space-y-10" data-desktop-stack>
 									{zone.images.map(({ url }, imgIdx) => (
 										<div
-											class="w-full img-skeleton"
+											class={(isDarkZone ? 'w-full' : 'w-full border border-ink/15 shadow-md') + ' img-skeleton'}
 											data-desktop-item
 										>
 											<img
@@ -375,7 +375,7 @@ const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 												alt={project.title}
 												loading="lazy"
 												fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
-												class={'block h-auto w-full' + (isDarkZone ? '' : ' border border-ink/15 shadow-md')}
+												class="block h-auto w-full"
 												onload="this.parentElement.classList.add('is-loaded')"
 												onerror="this.parentElement.classList.add('is-loaded')"
 											/>

@@ -17,6 +17,25 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v135 — 2026-08-18 — fix bordure wrapper narrow-grid (bug bannières gaming)
+
+- **Commit git associé** : à venir
+- **Type** : bug fix — visual (bordure disproportionnée autour d'espace vide)
+- **Fichier** :
+  - `src/pages/work/[slug].astro`
+- **Bug (David screenshot session 16, gamingtech)** : bannières gaming au format variable (300-700px de large) affichent une bordure `border-ink/15 shadow-md` qui flotte autour de la cellule du narrow-grid alors que l'image est plus petite → grosse bande vide bordée à droite de chaque bannière.
+- **Root cause** : dans le path Desktop de `[slug].astro`, le wrapper `<div data-desktop-item>` portait `w-full border border-ink/15 shadow-md`. Quand une image narrow (< 900 source width) est déplacée par le script vers `[data-desktop-narrow-grid]`, l'override CSS `width: auto` (spécificité attribut = classe, source order gagne, et Tailwind charge après → `w-full` gagne) fait que le wrapper stretche à la cellule (~380-600px) alors que l'image interne (`w-auto` via override) reste à sa taille native. Résultat : bordure sur wrapper autour d'espace vide.
+- **Fix** : déplacer `border border-ink/15 shadow-md` du wrapper vers l'`<img>` interne (même pattern que la zone Other qui n'a jamais eu ce bug). Wrapper devient `class="w-full img-skeleton"` (transparent après is-loaded). Img devient `class={'block h-auto w-full' + (isDarkZone ? '' : ' border border-ink/15 shadow-md')}`. La bordure épouse maintenant la taille naturelle de l'image en narrow-grid, et reste identique visuellement en full-width stack.
+- **Pages affectées** (1-zone "Gallery" mode via `zones.ts` → Desktop stack path → narrow-grid) :
+  - `/work/gamingtech` (45 URLs, bug visible dans screenshot)
+  - `/work/tradologic` (6 URLs)
+  - `/work/branding-old` (13 URLs — Digital Campaigns & Ad Design)
+  - `/work/ui-ux-vintage` (20 URLs)
+- **Aucune régression** attendue sur les 7 autres projets (sonary-*, top5, ryze-*, playright) : ils passent en 2-zone ou 4-zone mode avec tokens `-desktop`/`-mobile`, path identique mais images toujours full-width source ≥ 900 → jamais déplacées en narrow-grid, la bordure sur img au lieu du wrapper donne exactement le même rendu visuel.
+- **Bug pattern catalogué** : `border-on-wrapper-stretched-by-grid-cell` — quand un wrapper porte une bordure visible ET est stretché par le layout (grid cell, flex fill), la bordure entoure de l'espace vide. Fix : mettre la bordure sur le contenu (img) qui a la taille réelle, laisser le wrapper transparent.
+
+---
+
 ## v134 — 2026-08-14 — refactor gaming employer-based + branding old rewrite
 
 - **Commit git associé** : à venir
