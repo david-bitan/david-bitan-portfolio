@@ -17,6 +17,28 @@ Journal des versions locales. Chaque entrée = snapshot du/des fichier(s) **AVAN
 
 ---
 
+## v134 — 2026-08-14 — refactor gaming employer-based + branding old rewrite
+
+- **Commit git associé** : à venir
+- **Type** : content — refactor structurel majeur (3 case studies)
+- **Fichiers** :
+  - `src/data/allProjects.ts`
+- **Changement (gros refactor)** :
+  - **SUPPRIMÉ** slugs `casino-work` et `sport-betting` (URLs live `/work/casino-work` et `/work/sport-betting` = 404 à partir de ce push).
+  - **CRÉÉ** nouveau slug `gamingtech` — titre "Gamingtech — Casino & Sport Betting Platforms" — year 2015-2017 — 45 URLs gallery (30 Gamingtech casino + 15 sport betting).
+  - **CRÉÉ** nouveau slug `tradologic` — titre "Tradologic — Casino Platforms" — year 2011-2013 — 6 URLs gallery (Crown Europe, City Club Casino, City Tower Casino).
+  - **UPDATED** `branding-old` — titre changé "Branding & Identity Work" → "Digital Campaigns & Ad Design (2006-2011)". Year '2010' → '2006 – 2011'. shortDesc + fullDesc réécrits (mini-sites, mini-jeux, bannières Flash + HTML/CSS chez Arc Interactive agence média Publicis, clients Banque Leumi/Afeka/UMI Motors, Cactus awards Israël).
+- **Classification casino images (Gamingtech vs Tradologic)** — méthode :
+  - Analyse visuelle via montage PIL des 36 casino images en un fichier de 733 KB, Read multimodal.
+  - Zoom sur 15 ambigus via 2ème montage plus grand.
+  - 4 ambigus finaux (01, 03, 04, 25) → validation David = Gamingtech.
+  - Résultat : 30 Gamingtech casino + 6 Tradologic casino + 15 Sport betting (tous Gamingtech).
+- **Pourquoi refactor** : structure précédente était split par DOMAINE (casino/sport-betting mixed employers). David a préféré split par EMPLOYEUR (Gamingtech regroupant ses 3 marques × 2 verticales + Tradologic séparé). Narrative plus clair par case study = 1 employeur = 1 histoire cohérente.
+- **Format** : fullDesc simple 2 paragraphes (pas les 6 sections structurées), même pattern que UI/UX Vintage et Ryze Brand vintage.
+- **Rollback** : `cp archives/v134_.../src__data__allProjects.ts src/data/allProjects.ts`
+
+---
+
 ## v133 — 2026-08-14 — UI/UX Vintage : wireframes remontés après MUSIK
 
 - **Commit git associé** : à venir
