@@ -22,27 +22,6 @@
 html.entering body { opacity: 0; }
 html.loaded body { opacity: 1; transition: opacity 0.5s ease-out; }
 
-/* v145 : Reveal-on-scroll for text blocks — fade + rise as they enter viewport.
-   Uses IntersectionObserver + [data-reveal] tagging (added by JS at load time).
-   Respects prefers-reduced-motion. One-shot: unobserved after reveal to avoid
-   re-triggering on scroll-up. */
-[data-reveal] {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.9s cubic-bezier(0.22, 0.61, 0.36, 1),
-              transform 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
-  transition-delay: var(--reveal-delay, 0s);
-  will-change: opacity, transform;
-}
-[data-reveal].is-revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-@media (prefers-reduced-motion: reduce) {
-  [data-reveal] { opacity: 1; transform: none; transition: none; }
-}
-
-
 /* ============================================================
    Trattoria Fiori — Design system
    AI Lab experiment by David Bitan · v1
@@ -1084,72 +1063,6 @@ section[id] { scroll-margin-top: 92px; }
   window.addEventListener('load', () => {
     requestAnimationFrame(() => document.documentElement.classList.add('loaded'));
   });
-
-
-  // v145 : Reveal-on-scroll — tags text blocks and reveals them as they enter
-  // the viewport. Adjacent siblings get staggered delays (up to 300ms cap) so
-  // groups don't all pop at once.
-  const REVEAL_SELECTORS = [
-    '.eyebrow',
-    '.section-title',
-    '.section-lede',
-    '.story-copy p',
-    '.story-signature',
-    '.dish-name', '.dish-desc', '.dish-tag',
-    '.menu-item-name', '.menu-item-desc', '.menu-item-tag',
-    '.wine-region-name', '.wine-region-note',
-    '.info-meta-label', '.info-meta-value',
-    '.footer-brand',
-    '.course-header-caption',
-    '.menu-header-meta',
-    '.closing-note-label', '.closing-note-value',
-  ].join(',');
-  document.querySelectorAll(REVEAL_SELECTORS).forEach(el => el.setAttribute('data-reveal', ''));
-  // Stagger delay by index within each parent (children of same parent cascade)
-  document.querySelectorAll('[data-reveal]').forEach(el => {
-    const siblings = Array.from(el.parentElement?.children || []).filter(c => c.hasAttribute('data-reveal'));
-    const idx = siblings.indexOf(el);
-    if (idx > 0) el.style.setProperty('--reveal-delay', Math.min(idx * 90, 360) + 'ms');
-  });
-  if ('IntersectionObserver' in window) {
-    const revealObs = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('is-revealed');
-          revealObs.unobserve(e.target);
-        }
-      });
-    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
-    document.querySelectorAll('[data-reveal]').forEach(el => revealObs.observe(el));
-  } else {
-    document.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('is-revealed'));
-  }
-
-  // v145 : Hero parallax — content drifts up slower than the scroll, giving
-  // depth to the opening. Kicks in AFTER the load fadeUp animation completes
-  // (1.2s) so it doesn't fight it. Disabled for reduced-motion users. Also
-  // no-op if there's no .hero on the page (e.g. menu.html).
-  const heroContent = document.querySelector('.hero-content');
-  const heroSection = document.querySelector('.hero');
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (heroContent && heroSection && !reducedMotion) {
-    setTimeout(() => {
-      let ticking = false;
-      const onParallax = () => {
-        const y = window.scrollY;
-        const h = heroSection.offsetHeight;
-        if (y < h) {
-          heroContent.style.transform = 'translate3d(0,' + (y * 0.35) + 'px,0)';
-          heroContent.style.opacity = String(Math.max(0, 1 - (y / h) * 1.3));
-        }
-        ticking = false;
-      };
-      window.addEventListener('scroll', () => {
-        if (!ticking) { requestAnimationFrame(onParallax); ticking = true; }
-      }, { passive: true });
-      onParallax();
-    }, 1200);
-  }
 </script>
 </body>
 </html>
