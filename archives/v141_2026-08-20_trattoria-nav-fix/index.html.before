@@ -169,8 +169,7 @@ a { color: inherit; text-decoration: none; }
   transition: color 0.4s ease, border-color 0.3s ease;
 }
 .nav.is-scrolled .nav-links a { color: var(--ivoire); }
-.nav-links a:hover,
-.nav-links a[aria-current] { color: var(--or-clair); border-bottom-color: var(--or-clair); }
+.nav-links a:hover { color: var(--or-clair); border-bottom-color: var(--or-clair); }
 
 .nav-cta {
   padding: 12px 28px;
@@ -1006,32 +1005,6 @@ section { padding: clamp(120px, 15vw, 200px) 0; }
   };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
-
-
-  // Scroll-spy — highlights the nav link matching the section currently in view.
-  // Uses IntersectionObserver with a rootMargin that treats "in view" as the
-  // vertical middle strip of the viewport (top 40% and bottom 55% ignored) so
-  // the active link changes when a section actually reaches the reader's eye,
-  // not the instant its edge touches the fold. Only in-page anchors qualify
-  // (story / wine / info) — "Menu" and "Reserve" point to other pages and are
-  // handled by aria-current='page' on those pages.
-  const spyIds = ['story', 'wine', 'info'];
-  const spyLinks = new Map(spyIds.map(id => [id, document.querySelector('.nav-links a[href="#' + id + '"]')]));
-  const clearSpy = () => spyLinks.forEach(l => l && l.removeAttribute('aria-current'));
-  const setSpy = (id) => {
-    clearSpy();
-    const link = spyLinks.get(id);
-    if (link) link.setAttribute('aria-current', 'location');
-  };
-  const spyObserver = new IntersectionObserver((entries) => {
-    const visible = entries.filter(e => e.isIntersecting)
-      .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-    if (visible.length) setSpy(visible[0].target.id);
-  }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
-  spyIds.forEach(id => {
-    const sec = document.getElementById(id);
-    if (sec) spyObserver.observe(sec);
-  });
 </script>
 
 </body>
