@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<script>document.documentElement.classList.add('entering');document.documentElement.classList.add('js-reveal-ready');</script>
+<script>document.documentElement.classList.add('entering');</script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Menu — Trattoria Fiori</title>
@@ -25,21 +25,11 @@
 html.entering body { opacity: 0; }
 html.loaded body { opacity: 1; transition: opacity 0.5s ease-out; }
 
-/* v147 : Reveal-on-scroll — pre-hidden via .js-reveal-ready class */
-html.js-reveal-ready .eyebrow,
-html.js-reveal-ready .section-title,
-html.js-reveal-ready .section-lede,
-html.js-reveal-ready .menu-header-meta,
-html.js-reveal-ready .course-header-caption,
-html.js-reveal-ready .story-copy p,
-html.js-reveal-ready .story-signature,
-html.js-reveal-ready .wine-region-name,
-html.js-reveal-ready .wine-region-note,
-html.js-reveal-ready .info-meta-label,
-html.js-reveal-ready .info-meta-value,
-html.js-reveal-ready .closing-note-label,
-html.js-reveal-ready .closing-note-value,
-html.js-reveal-ready .footer-brand {
+/* v145 : Reveal-on-scroll for text blocks — fade + rise as they enter viewport.
+   Uses IntersectionObserver + [data-reveal] tagging (added by JS at load time).
+   Respects prefers-reduced-motion. One-shot: unobserved after reveal to avoid
+   re-triggering on scroll-up. */
+[data-reveal] {
   opacity: 0;
   transform: translateY(28px);
   transition: opacity 0.9s cubic-bezier(0.22, 0.61, 0.36, 1),
@@ -47,12 +37,12 @@ html.js-reveal-ready .footer-brand {
   transition-delay: var(--reveal-delay, 0s);
   will-change: opacity, transform;
 }
-html.js-reveal-ready .is-revealed {
-  opacity: 1 !important;
-  transform: translateY(0) !important;
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
 }
 @media (prefers-reduced-motion: reduce) {
-  html.js-reveal-ready [class] { opacity: 1 !important; transform: none !important; transition: none !important; }
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
 }
 
 
@@ -897,7 +887,7 @@ section[id] { scroll-margin-top: 96px; }
 
       <article class="menu-item">
         <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=900&q=80" alt="Melanzane alla parmigiana" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1595475207225-428b7819e5be?auto=format&fit=crop&w=900&q=80" alt="Melanzane alla parmigiana" loading="lazy" />
         </div>
         <div class="menu-item-body">
           <div class="menu-item-top">
@@ -1071,27 +1061,31 @@ section[id] { scroll-margin-top: 96px; }
 <script>
   // v144 : fire the fade-in — rAF ensures the browser has painted the initial
   // opacity:0 frame before we flip to opacity:1, so the transition actually plays.
-  // v147 : Fire fade-in ASAP once DOM is parsed. window.load waits for ALL images
-  // (24 lazy Unsplash on menu.html), which never fires in dev — body stays opacity 0
-  // forever. DOMContentLoaded + rAF is instant and reliable.
-  (function() {
-    const fire = () => requestAnimationFrame(() => document.documentElement.classList.add('loaded'));
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', fire);
-    } else {
-      fire();
-    }
-  })();
+  window.addEventListener('load', () => {
+    requestAnimationFrame(() => document.documentElement.classList.add('loaded'));
+  });
 
-  // v147 : Robust reveal — CSS pre-hides target selectors from first paint
-  // (via .js-reveal-ready class set in <head>), then IntersectionObserver adds
-  // .is-revealed which triggers the transition. No JS-tagging race.
-  const REVEAL_SELECTORS = '.eyebrow, .section-title, .section-lede, .menu-header-meta, .course-header-caption, .story-copy p, .story-signature, .wine-region-name, .wine-region-note, .info-meta-label, .info-meta-value, .closing-note-label, .closing-note-value, .footer-brand';
-  // Stagger delays for siblings within the same parent (cap 360ms so long lists don't drag)
-  document.querySelectorAll(REVEAL_SELECTORS).forEach((el) => {
-    const parent = el.parentElement;
-    if (!parent) return;
-    const siblings = Array.from(parent.children).filter(c => c.matches(REVEAL_SELECTORS));
+
+  // v145 : Reveal-on-scroll — tags text blocks and reveals them as they enter
+  // the viewport. Adjacent siblings get staggered delays (up to 300ms cap) so
+  // groups don't all pop at once.
+  const REVEAL_SELECTORS = [
+    '.eyebrow',
+    '.section-title',
+    '.section-lede',
+    '.story-copy p',
+    '.story-signature',
+    '.wine-region-name', '.wine-region-note',
+    '.info-meta-label', '.info-meta-value',
+    '.footer-brand',
+    '.course-header-caption',
+    '.menu-header-meta',
+    '.closing-note-label', '.closing-note-value',
+  ].join(',');
+  document.querySelectorAll(REVEAL_SELECTORS).forEach(el => el.setAttribute('data-reveal', ''));
+  // Stagger delay by index within each parent (children of same parent cascade)
+  document.querySelectorAll('[data-reveal]').forEach(el => {
+    const siblings = Array.from(el.parentElement?.children || []).filter(c => c.hasAttribute('data-reveal'));
     const idx = siblings.indexOf(el);
     if (idx > 0) el.style.setProperty('--reveal-delay', Math.min(idx * 90, 360) + 'ms');
   });
@@ -1104,12 +1098,15 @@ section[id] { scroll-margin-top: 96px; }
         }
       });
     }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
-    document.querySelectorAll(REVEAL_SELECTORS).forEach(el => revealObs.observe(el));
+    document.querySelectorAll('[data-reveal]').forEach(el => revealObs.observe(el));
   } else {
-    document.querySelectorAll(REVEAL_SELECTORS).forEach(el => el.classList.add('is-revealed'));
+    document.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('is-revealed'));
   }
 
-  // v147 : Hero parallax (only on home; no-op on menu).
+  // v145 : Hero parallax — content drifts up slower than the scroll, giving
+  // depth to the opening. Kicks in AFTER the load fadeUp animation completes
+  // (1.2s) so it doesn't fight it. Disabled for reduced-motion users. Also
+  // no-op if there's no .hero on the page (e.g. menu.html).
   const heroContent = document.querySelector('.hero-content');
   const heroSection = document.querySelector('.hero');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1131,15 +1128,6 @@ section[id] { scroll-margin-top: 96px; }
       onParallax();
     }, 1200);
   }
-
-  // v147 : Immediate aria-current on nav anchor click (moved from v142 to keep
-  // grouped with other user-facing behaviors).
-  document.querySelectorAll('.nav-links a[href^="#"]').forEach(link => {
-    link.addEventListener('click', () => {
-      document.querySelectorAll('.nav-links a[aria-current]').forEach(a => a.removeAttribute('aria-current'));
-      link.setAttribute('aria-current', 'location');
-    });
-  });
 </script>
 </body>
 </html>
