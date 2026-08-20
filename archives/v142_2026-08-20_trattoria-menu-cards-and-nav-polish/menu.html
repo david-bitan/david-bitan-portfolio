@@ -11,13 +11,11 @@
 
 <style>
 /* ============================================================
-   Trattoria Fiori — Menu page (v142 : card layout with photos)
+   Trattoria Fiori — Menu page
+   Shares the home's design system (palette, typo, nav, buttons,
+   footer). Adds menu-specific rules for the printed-menu layout:
+   course headers, dish rows, dotted leaders, italian sub-lines.
    ============================================================ */
-
-/* v142 : cross-document view transition + fade-in fallback. */
-@view-transition { navigation: auto; }
-body { animation: pageFadeIn 0.5s ease-out both; }
-@keyframes pageFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 :root {
   --noir: #0F0E0C;
@@ -60,7 +58,7 @@ img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
 .container { max-width: 1240px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 48px); }
 
-/* ---------- NAV (compact, always) ---------- */
+/* ---------- NAV (shared with home) ---------- */
 
 .nav {
   position: fixed;
@@ -133,7 +131,7 @@ a { color: inherit; text-decoration: none; }
   transition: color 0.4s ease, border-color 0.3s ease;
 }
 .nav-links a:hover,
-.nav-links a[aria-current] { color: var(--or-clair); border-bottom-color: var(--or-clair); }
+.nav-links a[aria-current='page'] { color: var(--or-clair); border-bottom-color: var(--or-clair); }
 .nav-cta {
   padding: 12px 28px;
   border: 1px solid var(--or);
@@ -152,7 +150,7 @@ a { color: inherit; text-decoration: none; }
 }
 .nav-toggle { display: none; background: none; border: 0; cursor: pointer; }
 
-/* ---------- BUTTONS ---------- */
+/* ---------- BUTTONS (shared) ---------- */
 
 .btn {
   display: inline-flex;
@@ -207,7 +205,6 @@ a { color: inherit; text-decoration: none; }
 /* ---------- SHARED TYPO ---------- */
 
 section { padding: clamp(96px, 12vw, 160px) 0; }
-section[id] { scroll-margin-top: 96px; }
 
 .eyebrow {
   font-family: var(--sans);
@@ -289,8 +286,10 @@ section[id] { scroll-margin-top: 96px; }
 .course-header { text-align: center; max-width: 640px; margin: 0 auto clamp(56px, 7vw, 88px); }
 .course-header .section-lede { margin: 0 auto; }
 
+/* Course sub-header eyebrow uses italian; upright small caps mark below. */
 .course-header .eyebrow { color: var(--or); }
 .course-header .section-title { font-size: clamp(38px, 5.5vw, 62px); margin-bottom: 20px; }
+
 .course-header-caption {
   font-family: var(--serif);
   font-style: italic;
@@ -301,67 +300,37 @@ section[id] { scroll-margin-top: 96px; }
   letter-spacing: 0.04em;
 }
 
-/* v142 — dishes as cards with photo. Two columns on desktop, one on mobile. */
+/* Dish rows — printed-menu layout. Two columns on desktop for compact reading,
+   collapses to one on mobile. Each row is its own flex line with dotted leader
+   between name/price so every price aligns to the right edge. */
+
 .menu-list {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: clamp(32px, 4vw, 56px);
-  max-width: 1180px;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 5vw, 72px) clamp(48px, 6vw, 96px);
+  max-width: 1140px;
   margin: 0 auto;
 }
 
 .menu-item {
-  background: var(--ivoire);
-  border: 1px solid rgba(15, 14, 12, 0.06);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  transition: transform 0.6s ease, box-shadow 0.6s ease, border-color 0.6s ease;
-  box-shadow: 0 12px 30px -18px rgba(15, 14, 12, 0.15);
-}
-.course:nth-child(even) .menu-item {
-  background: var(--ivoire);
-}
-.menu-item:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-hard);
-  border-color: rgba(176, 141, 75, 0.3);
-}
-.menu-item-image {
-  aspect-ratio: 4/3;
-  overflow: hidden;
-  background: var(--marbre);
-}
-.menu-item-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.9s ease;
-}
-.menu-item:hover .menu-item-image img {
-  transform: scale(1.06);
-}
-.menu-item-body {
-  padding: 32px 30px 36px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  flex: 1;
+  gap: 10px;
 }
 .menu-item-top {
   display: flex;
   align-items: baseline;
-  gap: 14px;
+  gap: 16px;
 }
 .menu-item-name {
   font-family: var(--serif-display);
   font-weight: 400;
-  font-size: 26px;
-  line-height: 1.2;
+  font-size: clamp(24px, 2.4vw, 28px);
+  line-height: 1.15;
   letter-spacing: -0.005em;
   color: var(--noir);
-  flex: 1;
-  min-width: 0;
+  flex-shrink: 0;
+  max-width: 65%;
 }
 .menu-item-name em {
   font-family: var(--serif);
@@ -370,21 +339,18 @@ section[id] { scroll-margin-top: 96px; }
   color: var(--or);
   font-size: 0.85em;
   letter-spacing: 0.02em;
-  margin-left: 6px;
+  margin-left: 8px;
 }
 .menu-item-leader {
-  flex: 1 1 12px;
-  min-width: 12px;
-  height: 1px;
+  flex: 1;
   border-bottom: 1px dotted rgba(15, 14, 12, 0.28);
   position: relative;
   top: -6px;
-  align-self: flex-end;
-  margin-bottom: 10px;
+  min-width: 24px;
 }
 .menu-item-price {
   font-family: var(--serif-display);
-  font-size: 24px;
+  font-size: clamp(22px, 2.2vw, 26px);
   color: var(--noir);
   font-weight: 500;
   letter-spacing: -0.01em;
@@ -399,6 +365,7 @@ section[id] { scroll-margin-top: 96px; }
   line-height: 1.55;
   color: var(--charcoal-soft);
   font-weight: 400;
+  max-width: 92%;
 }
 .menu-item-tag {
   display: inline-flex;
@@ -410,8 +377,7 @@ section[id] { scroll-margin-top: 96px; }
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--or);
-  margin-top: auto;
-  padding-top: 6px;
+  margin-top: 4px;
 }
 .menu-item-tag::before {
   content: '✦';
@@ -469,7 +435,7 @@ section[id] { scroll-margin-top: 96px; }
   color: rgba(242, 236, 226, 0.85);
 }
 
-/* ---------- FOOTER ---------- */
+/* ---------- FOOTER (shared) ---------- */
 
 .footer {
   background: var(--charcoal);
@@ -527,7 +493,7 @@ section[id] { scroll-margin-top: 96px; }
   .nav-links, .nav-cta { display: none; }
   .nav-toggle { display: block; color: var(--cream); font-size: 22px; }
   .menu-list { grid-template-columns: 1fr; }
-  .menu-item-name { font-size: 22px; }
+  .menu-item-name { max-width: 70%; font-size: 22px; }
   .menu-item-price { font-size: 20px; }
   .closing-notes { flex-direction: column; gap: 32px; align-items: center; }
   .footer-inner { flex-direction: column; text-align: center; }
@@ -582,91 +548,61 @@ section[id] { scroll-margin-top: 96px; }
     <div class="menu-list">
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&w=900&q=80" alt="Bruschette al pomodoro" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Bruschette al pomodoro <em>tre modi</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€12</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Bruschette al pomodoro <em>tre modi</em></h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€12</p>
-          </div>
-          <p class="menu-item-desc">Wood-oven bread, three preparations of San Marzano tomato — raw, slow-roasted, and confit — new-press olive oil, garden basil.</p>
-          <span class="menu-item-tag">Vegetarian</span>
-        </div>
+        <p class="menu-item-desc">Wood-oven bread, three preparations of San Marzano tomato — raw, slow-roasted, and confit — new-press olive oil, garden basil.</p>
+        <span class="menu-item-tag">Vegetarian</span>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1608897013039-887f21d8c804?auto=format&fit=crop&w=900&q=80" alt="Burrata di Andria and grilled aubergine" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Burrata di Andria <em>&amp; melanzane</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€16</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Burrata di Andria <em>&amp; melanzane</em></h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€16</p>
-          </div>
-          <p class="menu-item-desc">A whole burrata flown weekly from Puglia, chargrilled aubergine, basil oil, sourdough crostini.</p>
-          <span class="menu-item-tag">Vegetarian</span>
-        </div>
+        <p class="menu-item-desc">A whole burrata flown weekly from Puglia, chargrilled aubergine, basil oil, sourdough crostini.</p>
+        <span class="menu-item-tag">Vegetarian</span>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1541014741259-de529411b96a?auto=format&fit=crop&w=900&q=80" alt="Tagliere della casa charcuterie board" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Tagliere della casa</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€22</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Tagliere della casa</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€22</p>
-          </div>
-          <p class="menu-item-desc">Prosciutto di Parma aged 24 months, finocchiona toscana, pecorino di Pienza, house pickles and honeycomb. For two.</p>
-        </div>
+        <p class="menu-item-desc">Prosciutto di Parma aged 24 months, finocchiona toscana, pecorino di Pienza, house pickles and honeycomb. For two.</p>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=900&q=80" alt="Vitello tonnato" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Vitello tonnato <em>Piemonte</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€18</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Vitello tonnato <em>Piemonte</em></h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€18</p>
-          </div>
-          <p class="menu-item-desc">Slow-poached veal in fine slices, tuna-caper sauce made à la minute, salted capers, lemon zest.</p>
-        </div>
+        <p class="menu-item-desc">Slow-poached veal in fine slices, tuna-caper sauce made à la minute, salted capers, lemon zest.</p>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1611270629569-8b357cb88da9?auto=format&fit=crop&w=900&q=80" alt="Beef carpaccio with white truffle" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Carpaccio di manzo <em>tartufo bianco</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€26</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Carpaccio di manzo <em>tartufo bianco</em></h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€26</p>
-          </div>
-          <p class="menu-item-desc">Chianina beef sliced paper-thin, aged parmesan curls, rocket, white Alba truffle shaved at the table. In season.</p>
-          <span class="menu-item-tag">Oct – Dec</span>
-        </div>
+        <p class="menu-item-desc">Chianina beef sliced paper-thin, aged parmesan curls, rocket, white Alba truffle shaved at the table. In season.</p>
+        <span class="menu-item-tag">Oct – Dec</span>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=900&q=80" alt="Zuppa di stagione seasonal soup" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Zuppa di stagione</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€11</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Zuppa di stagione</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€11</p>
-          </div>
-          <p class="menu-item-desc">Whatever the garden gives up that week — ribollita in winter, minestra di ceci in autumn, cold cucumber &amp; mint in July. Ask the room.</p>
-          <span class="menu-item-tag">Vegetarian</span>
-        </div>
+        <p class="menu-item-desc">Whatever the garden gives up that week — ribollita in winter, minestra di ceci in autumn, cold cucumber &amp; mint in July. Ask the room.</p>
+        <span class="menu-item-tag">Vegetarian</span>
       </article>
 
     </div>
@@ -685,91 +621,61 @@ section[id] { scroll-margin-top: 96px; }
     <div class="menu-list">
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1473093226795-af9932fe5856?auto=format&fit=crop&w=900&q=80" alt="Tagliatelle al tartufo" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Tagliatelle al tartufo</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€28</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Tagliatelle al tartufo</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€28</p>
-          </div>
-          <p class="menu-item-desc">Fresh tagliatelle, brown butter, aged parmesan, white Alba truffle shaved at the table. The recipe that opened the house — Nonna Elena, 1978.</p>
-          <span class="menu-item-tag">Signature</span>
-        </div>
+        <p class="menu-item-desc">Fresh tagliatelle, brown butter, aged parmesan, white Alba truffle shaved at the table. The recipe that opened the house — Nonna Elena, 1978.</p>
+        <span class="menu-item-tag">Signature</span>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=900&q=80" alt="Pappardelle al cinghiale" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Pappardelle al cinghiale</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€22</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Pappardelle al cinghiale</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€22</p>
-          </div>
-          <p class="menu-item-desc">Wide ribbons, slow-braised wild boar from the surrounding hills, red wine, juniper, tomato, a dusting of pecorino.</p>
-        </div>
+        <p class="menu-item-desc">Wide ribbons, slow-braised wild boar from the surrounding hills, red wine, juniper, tomato, a dusting of pecorino.</p>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80" alt="Ravioli di ricotta e spinaci" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Ravioli di ricotta <em>&amp; spinaci</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€19</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Ravioli di ricotta <em>&amp; spinaci</em></h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€19</p>
-          </div>
-          <p class="menu-item-desc">Hand-folded ravioli, sheep's milk ricotta, wilted spinach, sage-brown butter, toasted pine nuts.</p>
-          <span class="menu-item-tag">Vegetarian</span>
-        </div>
+        <p class="menu-item-desc">Hand-folded ravioli, sheep's milk ricotta, wilted spinach, sage-brown butter, toasted pine nuts.</p>
+        <span class="menu-item-tag">Vegetarian</span>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1595295333158-4742f28fbd85?auto=format&fit=crop&w=900&q=80" alt="Spaghetti alle vongole" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Spaghetti alle vongole</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€24</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Spaghetti alle vongole</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€24</p>
-          </div>
-          <p class="menu-item-desc">Bronze-die spaghetti, day-boat clams from the Ligurian coast, garlic, white wine, parsley, a drop of chilli.</p>
-        </div>
+        <p class="menu-item-desc">Bronze-die spaghetti, day-boat clams from the Ligurian coast, garlic, white wine, parsley, a drop of chilli.</p>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&w=900&q=80" alt="Risotto ai porcini" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Risotto ai porcini</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€24</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Risotto ai porcini</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€24</p>
-          </div>
-          <p class="menu-item-desc">Carnaroli rice from Piemonte, porcini foraged in the surrounding hills, parmesan aged 36 months, a drizzle of new-press oil.</p>
-          <span class="menu-item-tag">Sept – Nov</span>
-        </div>
+        <p class="menu-item-desc">Carnaroli rice from Piemonte, porcini foraged in the surrounding hills, parmesan aged 36 months, a drizzle of new-press oil.</p>
+        <span class="menu-item-tag">Sept – Nov</span>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1633504581786-316c8002b1b9?auto=format&fit=crop&w=900&q=80" alt="Gnocchi alla sorrentina" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Gnocchi alla sorrentina</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€18</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Gnocchi alla sorrentina</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€18</p>
-          </div>
-          <p class="menu-item-desc">Soft potato gnocchi baked in a terracotta dish, tomato sugo, mozzarella di bufala, basil, cracked black pepper.</p>
-          <span class="menu-item-tag">Vegetarian</span>
-        </div>
+        <p class="menu-item-desc">Soft potato gnocchi baked in a terracotta dish, tomato sugo, mozzarella di bufala, basil, cracked black pepper.</p>
+        <span class="menu-item-tag">Vegetarian</span>
       </article>
 
     </div>
@@ -788,89 +694,59 @@ section[id] { scroll-margin-top: 96px; }
     <div class="menu-list">
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1615937657715-bc7b4b7962c1?auto=format&fit=crop&w=900&q=80" alt="Bistecca alla fiorentina" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Bistecca alla fiorentina <em>1 kg</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€68</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Bistecca alla fiorentina <em>1 kg</em></h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€68</p>
-          </div>
-          <p class="menu-item-desc">Chianina T-bone, dry-aged 40 days, seared over embers, rosemary salt, roasted potatoes, wild greens. For two — traditionally rare.</p>
-          <span class="menu-item-tag">For two</span>
-        </div>
+        <p class="menu-item-desc">Chianina T-bone, dry-aged 40 days, seared over embers, rosemary salt, roasted potatoes, wild greens. For two — traditionally rare.</p>
+        <span class="menu-item-tag">For two</span>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80" alt="Coniglio in porchetta" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Coniglio in porchetta</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€28</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Coniglio in porchetta</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€28</p>
-          </div>
-          <p class="menu-item-desc">Free-range rabbit rolled with pancetta, wild fennel and garlic, slow-cooked in the oven, pan juices reduced with white wine.</p>
-        </div>
+        <p class="menu-item-desc">Free-range rabbit rolled with pancetta, wild fennel and garlic, slow-cooked in the oven, pan juices reduced with white wine.</p>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=900&q=80" alt="Branzino al forno di legna" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Branzino al forno <em>di legna</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€32</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Branzino al forno <em>di legna</em></h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€32</p>
-          </div>
-          <p class="menu-item-desc">Whole sea bass from the Tyrrhenian coast, wood-oven baked over rock salt with lemon and thyme, filleted at the table.</p>
-        </div>
+        <p class="menu-item-desc">Whole sea bass from the Tyrrhenian coast, wood-oven baked over rock salt with lemon and thyme, filleted at the table.</p>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1608039755401-742074f0548d?auto=format&fit=crop&w=900&q=80" alt="Ossobuco alla milanese" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Ossobuco alla milanese</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€30</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Ossobuco alla milanese</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€30</p>
-          </div>
-          <p class="menu-item-desc">Veal shank braised four hours in white wine and stock, saffron risotto, gremolata — lemon zest, parsley, a whisper of garlic.</p>
-        </div>
+        <p class="menu-item-desc">Veal shank braised four hours in white wine and stock, saffron risotto, gremolata — lemon zest, parsley, a whisper of garlic.</p>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1598103442097-8b74394b95c6?auto=format&fit=crop&w=900&q=80" alt="Pollo al mattone" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Pollo al mattone</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€24</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Pollo al mattone</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€24</p>
-          </div>
-          <p class="menu-item-desc">Half chicken flattened under a hot brick, wood-grilled with lemon and rosemary, seasonal vegetables from the garden.</p>
-        </div>
+        <p class="menu-item-desc">Half chicken flattened under a hot brick, wood-grilled with lemon and rosemary, seasonal vegetables from the garden.</p>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1516100882582-96c3a05fe590?auto=format&fit=crop&w=900&q=80" alt="Melanzane alla parmigiana" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Melanzane alla parmigiana</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€19</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Melanzane alla parmigiana</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€19</p>
-          </div>
-          <p class="menu-item-desc">Layered aubergine, San Marzano tomato, mozzarella di bufala, parmesan aged 30 months, basil. Baked to order in the wood oven.</p>
-          <span class="menu-item-tag">Vegetarian</span>
-        </div>
+        <p class="menu-item-desc">Layered aubergine, San Marzano tomato, mozzarella di bufala, parmesan aged 30 months, basil. Baked to order in the wood oven.</p>
+        <span class="menu-item-tag">Vegetarian</span>
       </article>
 
     </div>
@@ -889,89 +765,59 @@ section[id] { scroll-margin-top: 96px; }
     <div class="menu-list">
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=900&q=80" alt="Tiramisù" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Tiramisù della Sofia</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€10</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Tiramisù della Sofia</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€10</p>
-          </div>
-          <p class="menu-item-desc">Made at nine in the morning, rested until service. Savoiardi, espresso, mascarpone whipped with Marsala, bitter cocoa.</p>
-          <span class="menu-item-tag">Signature</span>
-        </div>
+        <p class="menu-item-desc">Made at nine in the morning, rested until service. Savoiardi, espresso, mascarpone whipped with Marsala, bitter cocoa.</p>
+        <span class="menu-item-tag">Signature</span>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=900&q=80" alt="Panna cotta ai frutti di bosco" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Panna cotta <em>ai frutti di bosco</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€9</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Panna cotta <em>ai frutti di bosco</em></h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€9</p>
-          </div>
-          <p class="menu-item-desc">Vanilla cream set overnight, warm compote of wild berries picked in the hills, a shard of thin caramel.</p>
-        </div>
+        <p class="menu-item-desc">Vanilla cream set overnight, warm compote of wild berries picked in the hills, a shard of thin caramel.</p>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1607478900766-efe13248b125?auto=format&fit=crop&w=900&q=80" alt="Cannolo Siciliano" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Cannolo Siciliano</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€8</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Cannolo Siciliano</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€8</p>
-          </div>
-          <p class="menu-item-desc">Crisp shell filled to order, sheep's ricotta from Ragusa, candied orange, pistachio from Bronte, dark chocolate.</p>
-        </div>
+        <p class="menu-item-desc">Crisp shell filled to order, sheep's ricotta from Ragusa, candied orange, pistachio from Bronte, dark chocolate.</p>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&w=900&q=80" alt="Torta della Nonna" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Torta della Nonna</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€9</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Torta della Nonna</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€9</p>
-          </div>
-          <p class="menu-item-desc">Elena's Sunday tart — shortcrust, lemon-vanilla custard, toasted pine nuts, powdered sugar. Served warm.</p>
-          <span class="menu-item-tag">Signature</span>
-        </div>
+        <p class="menu-item-desc">Elena's Sunday tart — shortcrust, lemon-vanilla custard, toasted pine nuts, powdered sugar. Served warm.</p>
+        <span class="menu-item-tag">Signature</span>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1567206563064-6f60f40a2b57?auto=format&fit=crop&w=900&q=80" alt="Semifreddo al pistacchio" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Semifreddo al pistacchio</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€10</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Semifreddo al pistacchio</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€10</p>
-          </div>
-          <p class="menu-item-desc">Frozen pistachio parfait, warm bitter chocolate sauce poured at the table, sea salt, olive oil crumbs.</p>
-        </div>
+        <p class="menu-item-desc">Frozen pistachio parfait, warm bitter chocolate sauce poured at the table, sea salt, olive oil crumbs.</p>
       </article>
 
       <article class="menu-item">
-        <div class="menu-item-image">
-          <img src="https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=900&q=80" alt="Selezione di formaggi" loading="lazy" />
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Selezione di formaggi</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€16</p>
         </div>
-        <div class="menu-item-body">
-          <div class="menu-item-top">
-            <h3 class="menu-item-name">Selezione di formaggi</h3>
-            <div class="menu-item-leader"></div>
-            <p class="menu-item-price">€16</p>
-          </div>
-          <p class="menu-item-desc">Five artisan cheeses from Tuscany and Piemonte, house mostarda, chestnut honey, walnut bread.</p>
-        </div>
+        <p class="menu-item-desc">Five artisan cheeses from Tuscany and Piemonte, house mostarda, chestnut honey, walnut bread.</p>
       </article>
 
     </div>

@@ -10,12 +10,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
 <style>
-/* v142 : cross-document view transition + fade-in fallback so the page
-   doesn't pop-in abruptly when navigating between Trattoria pages. */
-@view-transition { navigation: auto; }
-body { animation: pageFadeIn 0.5s ease-out both; }
-@keyframes pageFadeIn { from { opacity: 0; } to { opacity: 1; } }
-
 /* ============================================================
    Trattoria Fiori — Design system
    AI Lab experiment by David Bitan · v1
@@ -174,6 +168,7 @@ a { color: inherit; text-decoration: none; }
   border-bottom: 1px solid transparent;
   transition: color 0.4s ease, border-color 0.3s ease;
 }
+.nav.is-scrolled .nav-links a { color: var(--ivoire); }
 .nav-links a:hover,
 .nav-links a[aria-current] { color: var(--or-clair); border-bottom-color: var(--or-clair); }
 
@@ -400,7 +395,6 @@ a { color: inherit; text-decoration: none; }
 /* ---------- SECTIONS shared ---------- */
 
 section { padding: clamp(120px, 15vw, 200px) 0; }
-section[id] { scroll-margin-top: 92px; }
 
 .eyebrow {
   /* Same reasoning as .hero-eyebrow — upright Inter + wide tracking reads
@@ -1037,17 +1031,6 @@ section[id] { scroll-margin-top: 92px; }
   spyIds.forEach(id => {
     const sec = document.getElementById(id);
     if (sec) spyObserver.observe(sec);
-  });
-
-
-  // v142 : Click on an in-page anchor -> mark that link as aria-current
-  // immediately, so the highlight shows the instant the user clicks (before
-  // scroll-spy catches up). Clears any other currently-marked link first.
-  document.querySelectorAll('.nav-links a[href^="#"]').forEach(link => {
-    link.addEventListener('click', () => {
-      document.querySelectorAll('.nav-links a[aria-current]').forEach(a => a.removeAttribute('aria-current'));
-      link.setAttribute('aria-current', 'location');
-    });
   });
 </script>
 
