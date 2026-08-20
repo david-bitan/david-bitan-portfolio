@@ -4,7 +4,7 @@ import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import ZoneFilters from '../../components/ZoneFilters.astro';
 import { allProjects } from '../../data/allProjects';
-import { cld, FULL, MOBILE, landscapeSrcset, mobileSrcset } from '../../lib/cloudinary';
+import { cld, FULL, LANDSCAPE, MOBILE, landscapeSrcset, mobileSrcset } from '../../lib/cloudinary';
 import { groupImagesByZone, zoneDescription } from '../../lib/zones';
 
 export function getStaticPaths() {
@@ -22,9 +22,41 @@ const { project } = Astro.props;
 // No in-page lightbox — clicking an image opens the full Cloudinary URL in a
 // new tab so the visitor gets the browser's native zoom / download UI.
 const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
+
+// SEO — per-project meta. Description falls back to shortDesc; OG image is
+// the same landscape thumbnail crop used on the Selected Work grid so social
+// previews match what the visitor already saw in the referring context.
+const seoDescription = project.shortDesc;
+const seoOgImage = cld(project.thumbnail, LANDSCAPE);
+
+// Schema.org CreativeWork — surfaces the case study to search engines as a
+// discrete piece of work with a creator, image and year. `about` reflects the
+// primary category; `keywords` reuses the visible tag list so the JSON-LD and
+// the on-page pill row can't drift out of sync.
+const projectJsonLd: Record<string, unknown> = {
+	'@context': 'https://schema.org',
+	'@type': 'CreativeWork',
+	name: project.title,
+	description: project.shortDesc,
+	creator: {
+		'@type': 'Person',
+		name: 'David Bitan',
+	},
+	about: project.category,
+	keywords: project.tags.join(', '),
+	image: seoOgImage,
+	dateCreated: project.year,
+	...(project.client ? { publisher: { '@type': 'Organization', name: project.client } } : {}),
+	...(project.liveUrl ? { url: project.liveUrl } : {}),
+};
 ---
 
-<Layout title={`${project.title} — David Bitan`}>
+<Layout
+	title={`${project.title} — David Bitan`}
+	description={seoDescription}
+	ogImage={seoOgImage}
+	structuredData={projectJsonLd}
+>
 	<Nav />
 
 	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 lg:px-0" data-reveal>

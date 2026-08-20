@@ -4,9 +4,55 @@ import BackToTop from '../components/BackToTop.astro';
 
 interface Props {
 	title?: string;
+	description?: string;
+	/** Absolute URL (starts with http) or root-relative path. Root-relative
+	 * gets resolved against SITE_URL below so OG/Twitter get an absolute URL —
+	 * some scrapers reject relative paths and drop the preview image. */
+	ogImage?: string;
+	/** Optional per-page JSON-LD payload (e.g. a CreativeWork for /work/[slug]).
+	 * Rendered as a second <script type="application/ld+json"> after the global
+	 * Person node. */
+	structuredData?: unknown;
 }
 
-const { title = 'David Bitan — Senior Product Designer' } = Astro.props;
+// Deployed URL. Update when the custom domain lands so canonical + OG URLs
+// stop pointing to the .pages.dev preview address.
+const SITE_URL = 'https://davidbitan.pages.dev';
+const SITE_NAME = 'David Bitan — Portfolio';
+const DEFAULT_TITLE = 'David Bitan — Senior Product Designer';
+const DEFAULT_DESCRIPTION =
+	'Senior Product Designer based in Israel. Case studies in SaaS, UI/UX, gaming and brand systems for Ryze Beyond, Sonary, Playright and more.';
+const DEFAULT_OG = '/og-image.png';
+
+const {
+	title = DEFAULT_TITLE,
+	description = DEFAULT_DESCRIPTION,
+	ogImage = DEFAULT_OG,
+	structuredData,
+} = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, SITE_URL).toString();
+const ogImageUrl = ogImage.startsWith('http')
+	? ogImage
+	: new URL(ogImage, SITE_URL).toString();
+
+const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
+
+// Global Person schema — surfaces name, role and location to search engines
+// and to social previews that consume Schema.org. Rendered on every page so
+// the identity signal is consistent across the site (not only /about).
+const personJsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'Person',
+	name: 'David Bitan',
+	jobTitle: 'Senior Product Designer',
+	url: SITE_URL,
+	email: 'mailto:advance26@gmail.com',
+	address: {
+		'@type': 'PostalAddress',
+		addressCountry: 'IL',
+	},
+};
 ---
 
 <!doctype html>
@@ -14,9 +60,27 @@ const { title = 'David Bitan — Senior Product Designer' } = Astro.props;
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonicalUrl} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
+
+		<!-- Open Graph — Facebook / LinkedIn / iMessage previews. -->
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content={SITE_NAME} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonicalUrl} />
+		<meta property="og:image" content={ogImageUrl} />
+		<meta property="og:locale" content="fr_FR" />
+
+		<!-- Twitter / X card. summary_large_image → full-width preview. -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImageUrl} />
+
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
@@ -24,6 +88,21 @@ const { title = 'David Bitan — Senior Product Designer' } = Astro.props;
 			rel="stylesheet"
 		/>
 		<title>{title}</title>
+
+		<script type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
+		{structuredData && (
+			<script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+		)}
+
+		{umamiId && (
+			<script
+				is:inline
+				defer
+				src="https://cloud.umami.is/script.js"
+				data-website-id={umamiId}
+			></script>
+		)}
+
 		<script is:inline>
 			// Runs before body paint to avoid a light→dark flash. Light is the
 			// default — only a saved "dark" preference switches it, never OS

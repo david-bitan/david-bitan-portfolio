@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Menu — Trattoria Fiori</title>
+<meta name="description" content="The full menu of Trattoria Fiori — antipasti, primi, secondi and dolci. A family kitchen in San Gimignano, Tuscany, since 1978." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   Trattoria Fiori — Menu page
+   Shares the home's design system (palette, typo, nav, buttons,
+   footer). Adds menu-specific rules for the printed-menu layout:
+   course headers, dish rows, dotted leaders, italian sub-lines.
+   ============================================================ */
+
+:root {
+  --noir: #0F0E0C;
+  --noir-soft: #1C1A17;
+  --noir-line: #2B2724;
+  --or: #B08D4B;
+  --or-clair: #D4B87A;
+  --ivoire: #F2ECE2;
+  --marbre: #E8E1D3;
+  --marbre-soft: #F7F2E9;
+  --charcoal-soft: #3A3430;
+  --sang: #6B1F1F;
+
+  --terracotta: var(--or);
+  --cream: var(--ivoire);
+  --charcoal: var(--noir);
+  --gold: var(--or-clair);
+
+  --serif-display: 'Playfair Display', 'Didot', Georgia, serif;
+  --serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --shadow-soft: 0 30px 70px -30px rgba(15, 14, 12, 0.35);
+  --shadow-hard: 0 50px 100px -40px rgba(15, 14, 12, 0.55);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  color: var(--noir);
+  background: var(--ivoire);
+  line-height: 1.65;
+  font-size: 16px;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+.container { max-width: 1240px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 48px); }
+
+/* ---------- NAV (shared with home) ---------- */
+
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  padding: 26px 0;
+  transition: background 0.5s ease, backdrop-filter 0.5s ease, padding 0.4s ease;
+  background: rgba(15, 14, 12, 0.94);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(176, 141, 75, 0.15);
+}
+.nav.is-scrolled { padding: 16px 0; }
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+.nav-brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 14px;
+  color: var(--ivoire);
+  line-height: 1;
+}
+.nav-brand-mark {
+  display: inline-block;
+  padding: 6px 13px 8px;
+  border: 1px solid var(--or);
+  color: var(--or-clair);
+  font-family: var(--serif-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1;
+  border-radius: 0;
+  min-width: 20px;
+  text-align: center;
+  transition: border-color 0.4s ease, color 0.4s ease, background 0.4s ease;
+}
+.nav-brand:hover .nav-brand-mark { background: var(--or); color: var(--noir); }
+.nav-brand-name {
+  font-family: var(--serif-display);
+  font-weight: 500;
+  font-size: 24px;
+  color: var(--ivoire);
+  letter-spacing: 0.01em;
+  line-height: 1;
+  white-space: nowrap;
+}
+.nav-brand-name em {
+  font-family: var(--serif-display);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--or-clair);
+}
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ivoire);
+  padding: 8px 0;
+  border-bottom: 1px solid transparent;
+  transition: color 0.4s ease, border-color 0.3s ease;
+}
+.nav-links a:hover,
+.nav-links a[aria-current='page'] { color: var(--or-clair); border-bottom-color: var(--or-clair); }
+.nav-cta {
+  padding: 12px 28px;
+  border: 1px solid var(--or);
+  color: var(--or-clair);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  border-radius: 0;
+  transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+.nav-cta:hover {
+  background: var(--or);
+  color: var(--noir);
+  border-color: var(--or);
+}
+.nav-toggle { display: none; background: none; border: 0; cursor: pointer; }
+
+/* ---------- BUTTONS (shared) ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 48px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.5s ease, border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease;
+  border: 1px solid transparent;
+  border-radius: 0;
+  position: relative;
+}
+.btn-primary {
+  background: var(--or);
+  color: var(--noir);
+  border-color: var(--or);
+  font-weight: 700;
+}
+.btn-primary:hover {
+  background: var(--or-clair);
+  border-color: var(--or-clair);
+  box-shadow: inset 0 0 0 1px rgba(15, 14, 12, 0.25);
+}
+.btn-ghost {
+  border-color: rgba(242, 236, 226, 0.45);
+  color: var(--ivoire);
+  background: transparent;
+}
+.btn-ghost:hover {
+  border-color: var(--or-clair);
+  color: var(--or-clair);
+  background: rgba(176, 141, 75, 0.08);
+}
+.btn-dark {
+  background: var(--noir);
+  color: var(--ivoire);
+  border-color: var(--noir);
+  font-weight: 700;
+}
+.btn-dark:hover {
+  background: var(--noir-soft);
+  border-color: var(--noir-soft);
+  color: var(--or-clair);
+  box-shadow: inset 0 0 0 1px rgba(176, 141, 75, 0.3);
+}
+
+/* ---------- SHARED TYPO ---------- */
+
+section { padding: clamp(96px, 12vw, 160px) 0; }
+
+.eyebrow {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-style: normal;
+  font-size: 12px;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--or);
+  margin-bottom: 24px;
+}
+.section-title {
+  font-family: var(--serif-display);
+  font-weight: 400;
+  font-size: clamp(44px, 6.5vw, 78px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  margin-bottom: 28px;
+}
+.section-title em {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--or);
+  font-weight: 300;
+}
+.section-lede {
+  font-family: var(--serif);
+  font-size: 20px;
+  line-height: 1.55;
+  color: var(--charcoal-soft);
+  max-width: 620px;
+}
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin: 32px auto;
+  color: var(--gold);
+  font-size: 18px;
+  max-width: 240px;
+}
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* ---------- MENU HEADER ---------- */
+
+.menu-header {
+  padding: clamp(180px, 22vw, 240px) 0 clamp(72px, 10vw, 120px);
+  text-align: center;
+  background: var(--ivoire);
+  border-bottom: 1px solid rgba(15, 14, 12, 0.08);
+}
+.menu-header .section-lede { margin: 0 auto; }
+.menu-header .divider { color: var(--or); }
+.menu-header .divider::before,
+.menu-header .divider::after {
+  background: linear-gradient(90deg, transparent, var(--or), transparent);
+}
+.menu-header-meta {
+  margin-top: 44px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--charcoal-soft);
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
+/* ---------- MENU COURSES ---------- */
+
+.course { padding: clamp(88px, 11vw, 140px) 0; }
+.course:nth-child(even) { background: var(--marbre-soft); }
+.course-header { text-align: center; max-width: 640px; margin: 0 auto clamp(56px, 7vw, 88px); }
+.course-header .section-lede { margin: 0 auto; }
+
+/* Course sub-header eyebrow uses italian; upright small caps mark below. */
+.course-header .eyebrow { color: var(--or); }
+.course-header .section-title { font-size: clamp(38px, 5.5vw, 62px); margin-bottom: 20px; }
+
+.course-header-caption {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--charcoal-soft);
+  opacity: 0.75;
+  margin-top: 16px;
+  letter-spacing: 0.04em;
+}
+
+/* Dish rows — printed-menu layout. Two columns on desktop for compact reading,
+   collapses to one on mobile. Each row is its own flex line with dotted leader
+   between name/price so every price aligns to the right edge. */
+
+.menu-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 5vw, 72px) clamp(48px, 6vw, 96px);
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.menu-item-top {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+.menu-item-name {
+  font-family: var(--serif-display);
+  font-weight: 400;
+  font-size: clamp(24px, 2.4vw, 28px);
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+  color: var(--noir);
+  flex-shrink: 0;
+  max-width: 65%;
+}
+.menu-item-name em {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--or);
+  font-size: 0.85em;
+  letter-spacing: 0.02em;
+  margin-left: 8px;
+}
+.menu-item-leader {
+  flex: 1;
+  border-bottom: 1px dotted rgba(15, 14, 12, 0.28);
+  position: relative;
+  top: -6px;
+  min-width: 24px;
+}
+.menu-item-price {
+  font-family: var(--serif-display);
+  font-size: clamp(22px, 2.2vw, 26px);
+  color: var(--noir);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum", "tnum";
+}
+.menu-item-desc {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--charcoal-soft);
+  font-weight: 400;
+  max-width: 92%;
+}
+.menu-item-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--or);
+  margin-top: 4px;
+}
+.menu-item-tag::before {
+  content: '✦';
+  font-size: 8px;
+  color: var(--or);
+  letter-spacing: 0;
+}
+
+/* ---------- CLOSING NOTE ---------- */
+
+.closing {
+  background: var(--noir);
+  color: var(--ivoire);
+  text-align: center;
+  border-top: 1px solid rgba(176, 141, 75, 0.35);
+}
+.closing .eyebrow { color: var(--or-clair); }
+.closing .section-title { color: var(--ivoire); font-size: clamp(40px, 5.5vw, 68px); }
+.closing .section-title em { color: var(--or-clair); }
+.closing .section-lede { color: rgba(242, 236, 226, 0.78); margin: 0 auto; }
+.closing-cta { margin-top: 44px; }
+
+.closing-notes {
+  display: flex;
+  justify-content: center;
+  gap: clamp(32px, 6vw, 80px);
+  flex-wrap: wrap;
+  margin-top: 64px;
+  padding-top: 44px;
+  border-top: 1px solid rgba(242, 236, 226, 0.18);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.closing-note {
+  flex: 1;
+  min-width: 220px;
+  max-width: 280px;
+  text-align: center;
+}
+.closing-note-label {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--or-clair);
+  margin-bottom: 10px;
+  opacity: 0.9;
+}
+.closing-note-value {
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(242, 236, 226, 0.85);
+}
+
+/* ---------- FOOTER (shared) ---------- */
+
+.footer {
+  background: var(--charcoal);
+  color: rgba(245, 239, 230, 0.65);
+  padding: 60px 0 40px;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.footer-brand {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--cream);
+}
+.footer-links { display: flex; gap: 24px; }
+.footer-links a:hover { color: var(--gold); }
+.footer-note { font-size: 12px; opacity: 0.55; }
+
+/* ---------- LAB BADGE ---------- */
+
+.lab-badge {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 60;
+  background: rgba(15, 14, 12, 0.92);
+  color: var(--ivoire);
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  border-radius: 0;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(176, 141, 75, 0.35);
+  transition: background 0.4s ease, border-color 0.4s ease;
+  font-weight: 500;
+}
+.lab-badge:hover {
+  background: rgba(15, 14, 12, 1);
+  border-color: var(--or-clair);
+}
+.lab-badge span { color: var(--or-clair); font-weight: 600; }
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 900px) {
+  .nav-links, .nav-cta { display: none; }
+  .nav-toggle { display: block; color: var(--cream); font-size: 22px; }
+  .menu-list { grid-template-columns: 1fr; }
+  .menu-item-name { max-width: 70%; font-size: 22px; }
+  .menu-item-price { font-size: 20px; }
+  .closing-notes { flex-direction: column; gap: 32px; align-items: center; }
+  .footer-inner { flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- LAB BADGE -->
+<a href="/#ai-lab" class="lab-badge" title="Back to David Bitan's portfolio">
+  <span>AI Lab</span> · fictional concept
+</a>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-brand" aria-label="Trattoria Fiori — home">
+      <span class="nav-brand-mark" aria-hidden="true">F</span>
+      <span class="nav-brand-name">Trattoria <em>Fiori</em></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#story">Our story</a></li>
+      <li><a href="menu.html" aria-current="page">Menu</a></li>
+      <li><a href="index.html#wine">Cellar</a></li>
+      <li><a href="index.html#info">Contact</a></li>
+    </ul>
+    <a href="reservation.html" class="nav-cta">Reserve</a>
+    <button class="nav-toggle" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- MENU HEADER -->
+<header class="menu-header">
+  <div class="container">
+    <p class="eyebrow">La carta</p>
+    <h1 class="section-title">The <em>menu</em></h1>
+    <div class="divider">✦</div>
+    <p class="section-lede">Everything on the table has passed through our kitchen — the pasta rolled that morning, the bread from the wood oven, the oil from our press. The menu shifts with the season; a few plates have never left the card since 1978.</p>
+    <p class="menu-header-meta">Prices in euros · service included · vegetarian options marked</p>
+  </div>
+</header>
+
+<!-- ANTIPASTI -->
+<section class="course" id="antipasti">
+  <div class="container">
+    <div class="course-header">
+      <p class="eyebrow">Antipasti</p>
+      <h2 class="section-title">To <em>begin.</em></h2>
+      <p class="course-header-caption">Small plates to share, or a first glass with something to slow the evening.</p>
+    </div>
+
+    <div class="menu-list">
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Bruschette al pomodoro <em>tre modi</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€12</p>
+        </div>
+        <p class="menu-item-desc">Wood-oven bread, three preparations of San Marzano tomato — raw, slow-roasted, and confit — new-press olive oil, garden basil.</p>
+        <span class="menu-item-tag">Vegetarian</span>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Burrata di Andria <em>&amp; melanzane</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€16</p>
+        </div>
+        <p class="menu-item-desc">A whole burrata flown weekly from Puglia, chargrilled aubergine, basil oil, sourdough crostini.</p>
+        <span class="menu-item-tag">Vegetarian</span>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Tagliere della casa</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€22</p>
+        </div>
+        <p class="menu-item-desc">Prosciutto di Parma aged 24 months, finocchiona toscana, pecorino di Pienza, house pickles and honeycomb. For two.</p>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Vitello tonnato <em>Piemonte</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€18</p>
+        </div>
+        <p class="menu-item-desc">Slow-poached veal in fine slices, tuna-caper sauce made à la minute, salted capers, lemon zest.</p>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Carpaccio di manzo <em>tartufo bianco</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€26</p>
+        </div>
+        <p class="menu-item-desc">Chianina beef sliced paper-thin, aged parmesan curls, rocket, white Alba truffle shaved at the table. In season.</p>
+        <span class="menu-item-tag">Oct – Dec</span>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Zuppa di stagione</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€11</p>
+        </div>
+        <p class="menu-item-desc">Whatever the garden gives up that week — ribollita in winter, minestra di ceci in autumn, cold cucumber &amp; mint in July. Ask the room.</p>
+        <span class="menu-item-tag">Vegetarian</span>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- PRIMI -->
+<section class="course" id="primi">
+  <div class="container">
+    <div class="course-header">
+      <p class="eyebrow">Primi piatti</p>
+      <h2 class="section-title">Pasta &amp; <em>risotti.</em></h2>
+      <p class="course-header-caption">Fresh pasta rolled every morning on the marble bench behind the kitchen. Risotto to order — please allow twenty minutes.</p>
+    </div>
+
+    <div class="menu-list">
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Tagliatelle al tartufo</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€28</p>
+        </div>
+        <p class="menu-item-desc">Fresh tagliatelle, brown butter, aged parmesan, white Alba truffle shaved at the table. The recipe that opened the house — Nonna Elena, 1978.</p>
+        <span class="menu-item-tag">Signature</span>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Pappardelle al cinghiale</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€22</p>
+        </div>
+        <p class="menu-item-desc">Wide ribbons, slow-braised wild boar from the surrounding hills, red wine, juniper, tomato, a dusting of pecorino.</p>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Ravioli di ricotta <em>&amp; spinaci</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€19</p>
+        </div>
+        <p class="menu-item-desc">Hand-folded ravioli, sheep's milk ricotta, wilted spinach, sage-brown butter, toasted pine nuts.</p>
+        <span class="menu-item-tag">Vegetarian</span>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Spaghetti alle vongole</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€24</p>
+        </div>
+        <p class="menu-item-desc">Bronze-die spaghetti, day-boat clams from the Ligurian coast, garlic, white wine, parsley, a drop of chilli.</p>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Risotto ai porcini</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€24</p>
+        </div>
+        <p class="menu-item-desc">Carnaroli rice from Piemonte, porcini foraged in the surrounding hills, parmesan aged 36 months, a drizzle of new-press oil.</p>
+        <span class="menu-item-tag">Sept – Nov</span>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Gnocchi alla sorrentina</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€18</p>
+        </div>
+        <p class="menu-item-desc">Soft potato gnocchi baked in a terracotta dish, tomato sugo, mozzarella di bufala, basil, cracked black pepper.</p>
+        <span class="menu-item-tag">Vegetarian</span>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- SECONDI -->
+<section class="course" id="secondi">
+  <div class="container">
+    <div class="course-header">
+      <p class="eyebrow">Secondi</p>
+      <h2 class="section-title">From the <em>fire.</em></h2>
+      <p class="course-header-caption">Meat and fish cooked over the wood oven Nonno Piero lit in 1978. Cooked to order.</p>
+    </div>
+
+    <div class="menu-list">
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Bistecca alla fiorentina <em>1 kg</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€68</p>
+        </div>
+        <p class="menu-item-desc">Chianina T-bone, dry-aged 40 days, seared over embers, rosemary salt, roasted potatoes, wild greens. For two — traditionally rare.</p>
+        <span class="menu-item-tag">For two</span>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Coniglio in porchetta</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€28</p>
+        </div>
+        <p class="menu-item-desc">Free-range rabbit rolled with pancetta, wild fennel and garlic, slow-cooked in the oven, pan juices reduced with white wine.</p>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Branzino al forno <em>di legna</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€32</p>
+        </div>
+        <p class="menu-item-desc">Whole sea bass from the Tyrrhenian coast, wood-oven baked over rock salt with lemon and thyme, filleted at the table.</p>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Ossobuco alla milanese</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€30</p>
+        </div>
+        <p class="menu-item-desc">Veal shank braised four hours in white wine and stock, saffron risotto, gremolata — lemon zest, parsley, a whisper of garlic.</p>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Pollo al mattone</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€24</p>
+        </div>
+        <p class="menu-item-desc">Half chicken flattened under a hot brick, wood-grilled with lemon and rosemary, seasonal vegetables from the garden.</p>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Melanzane alla parmigiana</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€19</p>
+        </div>
+        <p class="menu-item-desc">Layered aubergine, San Marzano tomato, mozzarella di bufala, parmesan aged 30 months, basil. Baked to order in the wood oven.</p>
+        <span class="menu-item-tag">Vegetarian</span>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- DOLCI -->
+<section class="course" id="dolci">
+  <div class="container">
+    <div class="course-header">
+      <p class="eyebrow">Dolci</p>
+      <h2 class="section-title">To <em>close.</em></h2>
+      <p class="course-header-caption">Small desserts — Sofia's territory since 1994. Ask about the pastry of the day.</p>
+    </div>
+
+    <div class="menu-list">
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Tiramisù della Sofia</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€10</p>
+        </div>
+        <p class="menu-item-desc">Made at nine in the morning, rested until service. Savoiardi, espresso, mascarpone whipped with Marsala, bitter cocoa.</p>
+        <span class="menu-item-tag">Signature</span>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Panna cotta <em>ai frutti di bosco</em></h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€9</p>
+        </div>
+        <p class="menu-item-desc">Vanilla cream set overnight, warm compote of wild berries picked in the hills, a shard of thin caramel.</p>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Cannolo Siciliano</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€8</p>
+        </div>
+        <p class="menu-item-desc">Crisp shell filled to order, sheep's ricotta from Ragusa, candied orange, pistachio from Bronte, dark chocolate.</p>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Torta della Nonna</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€9</p>
+        </div>
+        <p class="menu-item-desc">Elena's Sunday tart — shortcrust, lemon-vanilla custard, toasted pine nuts, powdered sugar. Served warm.</p>
+        <span class="menu-item-tag">Signature</span>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Semifreddo al pistacchio</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€10</p>
+        </div>
+        <p class="menu-item-desc">Frozen pistachio parfait, warm bitter chocolate sauce poured at the table, sea salt, olive oil crumbs.</p>
+      </article>
+
+      <article class="menu-item">
+        <div class="menu-item-top">
+          <h3 class="menu-item-name">Selezione di formaggi</h3>
+          <div class="menu-item-leader"></div>
+          <p class="menu-item-price">€16</p>
+        </div>
+        <p class="menu-item-desc">Five artisan cheeses from Tuscany and Piemonte, house mostarda, chestnut honey, walnut bread.</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING NOTE + RESERVATION CTA -->
+<section class="closing">
+  <div class="container">
+    <p class="eyebrow">La cantina attende</p>
+    <h2 class="section-title">Pair it with <em>a bottle</em></h2>
+    <div class="divider" style="color: var(--or-clair);">✦</div>
+    <p class="section-lede">Three hundred forty references, chosen by hand. Marco walks the room every evening and will find the right pour — a Chianti to soak the bistecca, a Barolo for the boar, a chilled Etna Bianco for the sea bass.</p>
+
+    <div class="closing-cta">
+      <a href="reservation.html" class="btn btn-primary">Reserve a table</a>
+    </div>
+
+    <div class="closing-notes">
+      <div class="closing-note">
+        <p class="closing-note-label">Allergies</p>
+        <p class="closing-note-value">Please mention any allergy or dietary restriction when reserving — we adapt most plates.</p>
+      </div>
+      <div class="closing-note">
+        <p class="closing-note-label">Seasonality</p>
+        <p class="closing-note-value">The menu turns with what the hills, the coast and the garden give us. A few plates travel the year, most do not.</p>
+      </div>
+      <div class="closing-note">
+        <p class="closing-note-label">Children</p>
+        <p class="closing-note-value">A small menu for younger guests on request — simple pasta, a wood-oven pizza, panna cotta.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <p class="footer-brand">Trattoria <em style="font-family: var(--serif); font-style: italic; color: var(--or-clair); font-weight: 300;">Fiori</em></p>
+    <ul class="footer-links" style="list-style: none;">
+      <li><a href="index.html#story">Our story</a></li>
+      <li><a href="menu.html">Menu</a></li>
+      <li><a href="reservation.html">Reserve</a></li>
+      <li><a href="#" aria-label="Instagram">Instagram</a></li>
+    </ul>
+    <p class="footer-note">© 2026 · Fictional AI Lab experiment · David Bitan</p>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  const onScroll = () => {
+    if (window.scrollY > 80) nav.classList.add('is-scrolled');
+    else nav.classList.remove('is-scrolled');
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
+
+</body>
+</html>

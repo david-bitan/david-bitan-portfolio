@@ -6,9 +6,22 @@ import Footer from '../components/Footer.astro';
 const email = 'advance26@gmail.com';
 const phone = '054-9-248-520';
 const city = 'Israel';
+
+// Read at build time (env is only available in the Astro frontmatter, not in
+// client-side <script>). Injected into the client script via define:vars so
+// the browser can build the POST URL without exposing anything unexpected.
+const formspreeId = import.meta.env.PUBLIC_FORMSPREE_ID;
+const hasFormspree = Boolean(formspreeId);
+
+const defaultNote = hasFormspree
+	? "I usually reply within 24 hours."
+	: 'Opens your email client, pre-filled and ready to send.';
 ---
 
-<Layout title="Contact — David Bitan">
+<Layout
+	title="Contact — David Bitan"
+	description="Get in touch — reach out about product design, SaaS, UI/UX, brand systems or a freelance collaboration."
+>
 	<Nav />
 
 	<section class="mx-auto max-w-[1200px] px-6 pt-16 pb-24 sm:pt-20 lg:px-0" data-reveal>
@@ -55,12 +68,13 @@ const city = 'Israel';
 
 				<div class="flex items-center gap-4">
 					<button
+						id="submit-btn"
 						type="submit"
-						class="rounded-pill bg-accent px-7 py-3.5 text-sm font-semibold text-accent-ink hover:bg-ink transition-colors"
+						class="rounded-pill bg-accent px-7 py-3.5 text-sm font-semibold text-accent-ink hover:bg-ink transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
 					>
 						Send message
 					</button>
-					<p id="form-note" class="text-sm text-muted">Opens your email client, pre-filled and ready to send.</p>
+					<p id="form-note" class="text-sm text-muted">{defaultNote}</p>
 				</div>
 			</form>
 
@@ -88,18 +102,76 @@ const city = 'Israel';
 	<Footer />
 </Layout>
 
-<script define:vars={{ email }}>
+<script define:vars={{ email, formspreeId }}>
 	const form = document.getElementById('contact-form');
+	const note = document.getElementById('form-note');
+	const submitBtn = document.getElementById('submit-btn');
 
-	form?.addEventListener('submit', (event) => {
-		event.preventDefault();
-		const data = new FormData(form);
+	// Keep the original class strings so we can restore them after showing a
+	// transient status ("Sending…", success, error) without wiping the note's
+	// layout. `text-muted` is the resting style used at load; success uses
+	// `text-accent`; error uses a red utility already available in globals.
+	const NOTE_CLASSES = {
+		idle: 'text-sm text-muted',
+		sending: 'text-sm text-muted',
+		success: 'text-sm text-accent',
+		error: 'text-sm text-[#c1121f]',
+	};
+
+	function setNote(state, text) {
+		if (!note) return;
+		note.className = NOTE_CLASSES[state] ?? NOTE_CLASSES.idle;
+		note.textContent = text;
+	}
+
+	function fallbackMailto(data) {
+		// Used when PUBLIC_FORMSPREE_ID isn't set — opens the visitor's email
+		// client pre-filled with the message body so the form still works in
+		// local dev before the ID is provisioned.
 		const name = String(data.get('name') ?? '');
 		const from = String(data.get('email') ?? '');
 		const message = String(data.get('message') ?? '');
-
 		const subject = `Portfolio contact from ${name}`;
 		const body = `${message}\n\n— ${name} (${from})`;
 		window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+	}
+
+	form?.addEventListener('submit', async (event) => {
+		event.preventDefault();
+		const data = new FormData(form);
+
+		if (!formspreeId) {
+			fallbackMailto(data);
+			return;
+		}
+
+		submitBtn?.setAttribute('disabled', 'true');
+		setNote('sending', 'Sending…');
+
+		try {
+			const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
+				method: 'POST',
+				headers: { Accept: 'application/json' },
+				body: data,
+			});
+
+			if (res.ok) {
+				form.reset();
+				setNote('success', "Thanks — I'll get back to you shortly.");
+			} else {
+				// Formspree returns JSON with a helpful `errors` array on 4xx
+				// (missing field, spam trap, etc.). We surface a generic message
+				// but keep the raw response in the console for debugging.
+				const payload = await res.json().catch(() => null);
+				console.error('Formspree responded with', res.status, payload);
+				setNote('error', 'Send failed. Please email me directly.');
+			}
+		} catch (err) {
+			// Network error, ad-blocker on the Formspree domain, etc.
+			console.error('Contact form fetch failed', err);
+			setNote('error', 'Network error. Please email me directly.');
+		} finally {
+			submitBtn?.removeAttribute('disabled');
+		}
 	});
 </script>
