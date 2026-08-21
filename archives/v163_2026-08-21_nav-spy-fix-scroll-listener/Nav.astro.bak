@@ -1,14 +1,16 @@
 ---
 /**
  * Top nav.
- * Five items: Work, AI Lab, Craft (home anchors), About, Contact (pages).
+ * Five items: Work, AI Lab, Craft (all anchor-linked to home sections),
+ * plus About and Contact (separate pages).
  *
  * Active state:
- *  - /about and /contact → server-side, rendered as <span aria-current="page">
- *  - Home hash links (#work, #ai-lab, #craft) → client-side scroll spy on
- *    the home page: whichever section the user is currently reading gets
- *    `.nav-link-active` promoted onto its <a>. Same look as the server
- *    active state (orange text + underline + not clickable).
+ *  - /about and /contact — server-side, matched by pathname
+ *  - Home hash links (#work, #ai-lab, #craft) — client-side scroll spy
+ *    tracks which section is in view and toggles `.nav-link-active` on
+ *    the matching nav item. Active item is text-accent + underline bar +
+ *    `pointer-events: none` (non-clickable) — same look/behaviour as the
+ *    server-rendered active state, just driven by scroll position.
  */
 const links = [
 	{ href: '/#work', label: 'Work', spy: 'work' },
@@ -19,9 +21,10 @@ const links = [
 ];
 
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isHome = pathname === '/';
 
-// Server-side active for /about and /contact only. Home hash links get
-// their active state from the scroll spy on the client.
+// Server-side active only for /about and /contact. Home hash links are
+// resolved client-side by the scroll spy.
 function isActive(href: string) {
 	if (href === '/about') return pathname === '/about';
 	if (href === '/contact') return pathname === '/contact';
@@ -116,9 +119,10 @@ function isActive(href: string) {
 </div>
 
 <style>
-	/* Active nav item — orange text + underline bar + non-clickable.
-	   Applies to both <span aria-current> (server-rendered for /about,
-	   /contact) and <a> promoted by the scroll spy on the home page. */
+	/* Active nav item: orange text (applied inline) + underline bar sized to
+	   the word only. Non-clickable — applied to both `<span aria-current>`
+	   (server-rendered for /about, /contact) and `<a>` promoted to active by
+	   the scroll spy on the home page. */
 	.nav-link-active {
 		position: relative;
 		color: var(--color-accent) !important;
@@ -137,7 +141,7 @@ function isActive(href: string) {
 	}
 </style>
 
-<script>
+<script is:inline define:vars={{ isHome }}>
 	// --- Mobile menu open/close ---
 	const toggle = document.getElementById('nav-toggle');
 	const close = document.getElementById('nav-close');
@@ -182,95 +186,121 @@ function isActive(href: string) {
 	});
 
 	// --- Scroll spy (home only) ---
-	// Not IntersectionObserver — plain scroll listener with a small rAF
-	// throttle. We compute which section top is closest above an activation
-	// line placed ~120px under the nav (so the flip happens as the section
-	// heading crosses under the nav). Simpler and more predictable than
-	// IO rootMargin tuning at page top/bottom edges.
-	(function initScrollSpy() {
-		const path = window.location.pathname.replace(/\/$/, '') || '/';
-		if (path !== '/') return;
-
-		const spyLinks = new Map();
+	// Watches #work, #ai-lab, #craft. Whichever section is most in view
+	// gets its nav item promoted to `.nav-link-active` (adds text-accent,
+	// underline, and pointer-events:none). Runs on scroll via
+	// IntersectionObserver with a rootMargin biased to the upper third of
+	// the viewport so the active item flips cleanly as sections cross a
+	// consistent line under the sticky nav.
+	if (isHome) {
+		const desktopLinks = new Map();
+		const mobileLinks = new Map();
 		document.querySelectorAll('[data-spy]').forEach((el) => {
-			spyLinks.set(el.getAttribute('data-spy'), el);
+			desktopLinks.set(el.getAttribute('data-spy'), el);
 		});
 		document.querySelectorAll('[data-spy-mobile]').forEach((el) => {
-			// Store mobile counterparts under a distinct key so setActive
-			// can find both together.
-			const id = el.getAttribute('data-spy-mobile');
-			const bucket = spyLinks.get(id + ':all') || [spyLinks.get(id)].filter(Boolean);
-			bucket.push(el);
-			spyLinks.set(id + ':all', bucket);
+			mobileLinks.set(el.getAttribute('data-spy-mobile'), el);
 		});
 
 		const sectionIds = ['work', 'ai-lab', 'craft'];
 		const sections = sectionIds
-			.map((id) => ({ id, el: document.getElementById(id) }))
-			.filter((s) => s.el);
-		if (!sections.length) return;
+			.map((id) => document.getElementById(id))
+			.filter(Boolean);
 
-		let currentId = null;
-
-		function applyActive(el, active) {
-			if (!el) return;
-			if (active) {
-				el.classList.add('nav-link-active', 'text-accent', 'font-semibold');
-				el.classList.remove('text-muted', 'hover:text-ink', 'transition-colors', 'font-medium');
-			} else {
-				el.classList.remove('nav-link-active', 'text-accent');
-				// Desktop-only default classes — mobile links stay font-semibold.
-				if (el.classList.contains('nav-link')) {
-					el.classList.add('text-muted', 'hover:text-ink', 'transition-colors', 'font-medium');
-					el.classList.remove('font-semibold');
-				}
-			}
-		}
+		let currentActive = null;
 
 		function setActive(id) {
-			if (id === currentId) return;
-			currentId = id;
-			sectionIds.forEach((sid) => {
-				const bucket = spyLinks.get(sid + ':all');
-				if (bucket) {
-					bucket.forEach((el) => applyActive(el, sid === id));
-				} else {
-					// Fallback if mobile counterpart is missing
-					applyActive(spyLinks.get(sid), sid === id);
-				}
-			});
-		}
-
-		function pickActive() {
-			// Activation line: 140px under the top of the viewport (~ nav
-			// height + a small buffer). Section is "current" when its top
-			// is at or above the line and next section's top is below.
-			const line = 140;
-			let picked = sections[0].id;
-			for (let i = 0; i < sections.length; i++) {
-				const top = sections[i].el.getBoundingClientRect().top;
-				if (top <= line) {
-					picked = sections[i].id;
-				} else {
-					break;
-				}
+			if (id === currentActive) return;
+			currentActive = id;
+			// Clear
+			for (const map of [desktopLinks, mobileLinks]) {
+				map.forEach((el, key) => {
+					const active = key === id;
+					if (active) {
+						el.classList.add('nav-link-active', 'text-accent');
+						el.classList.remove('text-muted', 'hover:text-ink', 'transition-colors', 'font-medium');
+						el.classList.add('font-semibold');
+					} else {
+						el.classList.remove('nav-link-active', 'text-accent');
+						// Restore default look (desktop only — mobile keeps font-semibold always)
+						if (map === desktopLinks) {
+							el.classList.add('text-muted', 'hover:text-ink', 'transition-colors', 'font-medium');
+							el.classList.remove('font-semibold');
+						}
+					}
+				});
 			}
-			setActive(picked);
 		}
 
-		let ticking = false;
-		function onScroll() {
-			if (ticking) return;
-			ticking = true;
-			window.requestAnimationFrame(() => {
-				pickActive();
-				ticking = false;
-			});
-		}
+		if (sections.length) {
+			// Track intersection ratios and pick the section with highest
+			// visibility above the middle of the viewport.
+			const io = new IntersectionObserver(
+				(entries) => {
+					// Aggregate: for each observed section, keep its latest
+					// intersectionRatio. Pick the one with the largest ratio
+					// that is currently intersecting; fallback to whichever
+					// section top is nearest above the viewport middle.
+					const ratios = new Map();
+					entries.forEach((e) => {
+						ratios.set(e.target.id, {
+							ratio: e.intersectionRatio,
+							top: e.boundingClientRect.top,
+							isIntersecting: e.isIntersecting,
+						});
+					});
+					// Merge with previous state (IO only reports changes)
+					sections.forEach((s) => {
+						if (!ratios.has(s.id)) {
+							const rect = s.getBoundingClientRect();
+							ratios.set(s.id, {
+								ratio: 0,
+								top: rect.top,
+								isIntersecting: rect.top < window.innerHeight && rect.bottom > 0,
+							});
+						}
+					});
 
-		window.addEventListener('scroll', onScroll, { passive: true });
-		window.addEventListener('resize', onScroll);
-		// Run once on load so the initial paint has an active item.
-		pickActive();
-	})();
+					// Best pick: section that is intersecting with the largest
+					// ratio. If none, pick the last one whose top is above the
+					// viewport middle (user scrolled past it).
+					let bestId = null;
+					let bestRatio = -1;
+					ratios.forEach((v, id) => {
+						if (v.isIntersecting && v.ratio > bestRatio) {
+							bestRatio = v.ratio;
+							bestId = id;
+						}
+					});
+					if (!bestId) {
+						const mid = window.innerHeight / 2;
+						let closest = null;
+						let closestDist = Infinity;
+						ratios.forEach((v, id) => {
+							if (v.top <= mid) {
+								const d = mid - v.top;
+								if (d < closestDist) {
+									closestDist = d;
+									closest = id;
+								}
+							}
+						});
+						bestId = closest;
+					}
+					if (bestId) setActive(bestId);
+				},
+				{
+					// Trigger when a section crosses the upper third of the
+					// viewport — feels natural under the sticky nav.
+					rootMargin: '-25% 0px -55% 0px',
+					threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+				},
+			);
+			sections.forEach((s) => io.observe(s));
+
+			// Initial pick — pre-select #work at page load so nothing is empty
+			// before the first IO callback fires.
+			setActive('work');
+		}
+	}
 </script>
