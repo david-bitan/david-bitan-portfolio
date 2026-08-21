@@ -1,9 +1,9 @@
 ---
 /**
  * AI Lab — home section rendered after Selected Work. Grid of fictional
- * design experiments built end-to-end. Distinct visual treatment from
- * SelectedWork (larger cards, no filters, warm accent) so the two zones
- * read as separate universes.
+ * design experiments built end-to-end. Same card size + grid as
+ * SelectedWork (4-col) so the section reads as a coherent continuation,
+ * with a warm accent eyebrow kept as the distinguishing signal.
  */
 import { aiLabProjects } from '../data/aiLabProjects';
 ---
@@ -23,43 +23,30 @@ import { aiLabProjects } from '../data/aiLabProjects';
 		</p>
 	</div>
 
-	<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+	<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 		{
 			aiLabProjects.map((project) => (
 				<a
 					href={`/lab/${project.slug}`}
-					class="ai-lab-card group relative block overflow-hidden rounded-md bg-card"
+					class="ai-lab-card group block overflow-hidden rounded-md bg-card"
 				>
 					<div class="aspect-[4/3] overflow-hidden">
 						<img
 							src={project.thumbnail}
 							alt={project.title}
 							loading="lazy"
-							class="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+							class="thumb-hover-zoom h-full w-full object-cover object-top"
 						/>
 					</div>
-					<div class="p-5">
-						<p class="text-xs font-semibold uppercase tracking-widest text-accent">
+					<div class="p-4">
+						<p class="text-[11px] font-semibold uppercase tracking-widest text-accent">
 							{project.eyebrow}
 						</p>
-						<h3 class="mt-2 text-xl font-extrabold tracking-tight">
-							{project.title}
-						</h3>
-						<p class="mt-2 line-clamp-3 text-sm text-muted">{project.shortDesc}</p>
+						<h3 class="mt-1.5 text-base font-bold tracking-tight">{project.title}</h3>
+						<p class="mt-1.5 line-clamp-2 text-sm text-muted">{project.shortDesc}</p>
 					</div>
 				</a>
 			))
 		}
 	</div>
 </section>
-
-<style>
-	.ai-lab-card {
-		border: 1px solid transparent;
-		transition: border-color 0.4s ease, box-shadow 0.4s ease;
-	}
-	.ai-lab-card:hover {
-		border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
-		box-shadow: 0 20px 40px -24px color-mix(in srgb, var(--color-ink) 30%, transparent);
-	}
-</style>

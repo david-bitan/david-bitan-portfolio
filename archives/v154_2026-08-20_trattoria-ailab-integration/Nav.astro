@@ -1,0 +1,169 @@
+---
+const links = [
+	{ href: '/#work', label: 'Projects' },
+	{ href: '/about', label: 'About' },
+	{ href: '/contact', label: 'Contact' },
+];
+
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+
+// The link matching the current page is active AND non-clickable —
+// applies uniformly to Projects (home), About, and Contact.
+function isActive(href: string) {
+	if (href === '/#work') return pathname === '/';
+	if (href === '/about') return pathname === '/about';
+	if (href === '/contact') return pathname === '/contact';
+	return false;
+}
+---
+
+<header class="sticky top-0 z-50 border-b border-ink/5 bg-bg">
+	<nav class="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-5 lg:px-0">
+		<a href="/" class="text-lg font-extrabold tracking-tight">David Bitan</a>
+
+		<div class="hidden items-center gap-8 lg:flex">
+			{
+				links.map((link) => {
+					const active = isActive(link.href);
+					const cls = active
+						? 'nav-link nav-link-active text-sm font-semibold text-accent'
+						: 'nav-link text-sm font-medium text-muted hover:text-ink transition-colors';
+					return active ? (
+						<span aria-current="page" class={cls}>
+							{link.label}
+						</span>
+					) : (
+						<a href={link.href} class={cls}>
+							{link.label}
+						</a>
+					);
+				})
+			}
+		</div>
+
+		<div class="flex items-center gap-3">
+			<button
+				id="theme-toggle"
+				type="button"
+				aria-label="Toggle dark mode"
+				class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ink/15 text-ink hover:border-ink/40 transition-colors"
+			>
+				<svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path>
+				</svg>
+				<svg id="theme-icon-sun" class="hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="12" cy="12" r="4"></circle>
+					<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+				</svg>
+			</button>
+
+			<button
+				id="nav-toggle"
+			type="button"
+			aria-label="Open menu"
+			aria-expanded="false"
+			aria-controls="mobile-nav"
+			class="flex flex-col gap-1.5 p-2 lg:hidden"
+		>
+			<span class="block h-0.5 w-6 bg-ink"></span>
+			<span class="block h-0.5 w-6 bg-ink"></span>
+			<span class="block h-0.5 w-6 bg-ink"></span>
+		</button>
+		</div>
+	</nav>
+</header>
+
+<div
+	id="mobile-nav"
+	class="fixed inset-0 z-[60] flex translate-x-full flex-col items-center justify-center gap-8 bg-bg transition-transform duration-300 ease-out lg:hidden"
+>
+	<button id="nav-close" type="button" aria-label="Close menu" class="absolute right-6 top-5 p-2">
+		<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+			<path d="M6 6l12 12M18 6L6 18"></path>
+		</svg>
+	</button>
+	{
+		links.map((link) => {
+			const active = isActive(link.href);
+			const cls = active
+				? 'mobile-nav-link nav-link-active text-3xl font-semibold text-accent'
+				: 'mobile-nav-link text-3xl font-semibold';
+			return active ? (
+				<span aria-current="page" class={cls}>
+					{link.label}
+				</span>
+			) : (
+				<a href={link.href} class={cls}>
+					{link.label}
+				</a>
+			);
+		})
+	}
+</div>
+
+<style>
+	/* Active nav item: orange text (applied inline) + underline bar sized to
+	   the word only. Locked variant disables interaction on the current page. */
+	.nav-link-active {
+		position: relative;
+	}
+	.nav-link-active::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: -6px;
+		height: 2px;
+		background: var(--color-accent);
+		border-radius: 1px;
+	}
+	span.nav-link-active {
+		cursor: default;
+		pointer-events: none;
+	}
+</style>
+
+<script>
+	const toggle = document.getElementById('nav-toggle');
+	const close = document.getElementById('nav-close');
+	const overlay = document.getElementById('mobile-nav');
+
+	function openMenu() {
+		overlay?.classList.remove('translate-x-full');
+		toggle?.setAttribute('aria-expanded', 'true');
+		document.body.style.overflow = 'hidden';
+	}
+
+	function closeMenu() {
+		overlay?.classList.add('translate-x-full');
+		toggle?.setAttribute('aria-expanded', 'false');
+		document.body.style.overflow = '';
+	}
+
+	toggle?.addEventListener('click', openMenu);
+	close?.addEventListener('click', closeMenu);
+	overlay?.querySelectorAll('.mobile-nav-link').forEach((link) => link.addEventListener('click', closeMenu));
+
+	const themeToggle = document.getElementById('theme-toggle');
+	const moonIcon = document.getElementById('theme-icon-moon');
+	const sunIcon = document.getElementById('theme-icon-sun');
+
+	function syncThemeIcon() {
+		const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+		moonIcon?.classList.toggle('hidden', isDark);
+		sunIcon?.classList.toggle('hidden', !isDark);
+	}
+	syncThemeIcon();
+
+	themeToggle?.addEventListener('click', () => {
+		const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+		if (isDark) {
+			document.documentElement.removeAttribute('data-theme');
+			localStorage.setItem('theme', 'light');
+		} else {
+			document.documentElement.setAttribute('data-theme', 'dark');
+			localStorage.setItem('theme', 'dark');
+		}
+		syncThemeIcon();
+	});
+</script>
