@@ -1,8 +1,13 @@
 ---
 /**
  * AI Lab case study — format allégé (no client/role/year, just intro paragraphs
- * + gallery + live demo). Distinct from /work/[slug] which is the full
- * 6-section case study for client work.
+ * + design system + gallery + live demo). Distinct from /work/[slug] which is
+ * the full 6-section case study for client work.
+ *
+ * Intro pattern: first paragraph always visible, remaining paragraphs behind a
+ * Show more / Show less toggle. Same accordion mechanics as the Work case
+ * study "Read the full case study" toggle (measured scrollHeight for the
+ * expand transition).
  */
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
@@ -21,8 +26,11 @@ const { project } = Astro.props;
 const seoDescription = project.shortDesc;
 const seoOgImage = project.thumbnail;
 
-// Paragraphs — split intro on blank lines, keep original spacing for readability.
+// Split intro on blank lines. First paragraph is the visible teaser; the
+// remaining paragraphs are hidden behind the Show more toggle.
 const paragraphs = project.intro.split(/\n\s*\n/).filter((p) => p.trim().length > 0);
+const firstPara = paragraphs[0] ?? '';
+const restParas = paragraphs.slice(1);
 
 const projectJsonLd = {
 	'@context': 'https://schema.org',
@@ -34,6 +42,8 @@ const projectJsonLd = {
 	image: seoOgImage,
 	url: project.demoUrl,
 };
+
+const ds = project.designSystem;
 ---
 
 <Layout
@@ -87,9 +97,124 @@ const projectJsonLd = {
 
 	<section class="mx-auto max-w-[1000px] px-6 pt-8 pb-12 sm:pt-10 sm:pb-16 lg:px-0" data-reveal>
 		<div class="prose-lab max-w-[68ch]">
-			{paragraphs.map((p) => <p>{p}</p>)}
+			<p class="prose-lead">{firstPara}</p>
+
+			{
+				restParas.length > 0 && (
+					<>
+						<div id="intro-more" class="intro-more" aria-hidden="true">
+							{restParas.map((p) => (
+								<p>{p}</p>
+							))}
+						</div>
+
+						<button
+							type="button"
+							id="intro-toggle"
+							aria-controls="intro-more"
+							aria-expanded="false"
+							class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
+						>
+							<span data-toggle-label>Show more</span>
+							<svg
+								aria-hidden="true"
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2.4"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="h-4 w-4 transition-transform"
+								data-toggle-chevron
+							>
+								<path d="M6 9l6 6 6-6" />
+							</svg>
+						</button>
+					</>
+				)
+			}
 		</div>
 	</section>
+
+	{
+		ds && (
+			<section
+				class="mx-auto max-w-[1000px] px-6 pt-4 pb-12 sm:pt-6 sm:pb-16 lg:px-0"
+				data-reveal
+			>
+				<p class="text-sm font-semibold uppercase tracking-widest text-muted">
+					Under the hood
+				</p>
+				<h2 class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+					Design system
+				</h2>
+
+				{/* Colors */}
+				<div class="mt-10">
+					<h3 class="ds-h3">Palette</h3>
+					<div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+						{ds.colors.map((c) => (
+							<div class="ds-swatch">
+								<div class="ds-swatch-chip" style={`background:${c.hex}`} />
+								<p class="mt-3 text-sm font-semibold text-ink">{c.name}</p>
+								<p class="mt-0.5 font-mono text-xs text-muted">{c.hex}</p>
+								<p class="mt-1 text-xs text-muted">{c.role}</p>
+							</div>
+						))}
+					</div>
+				</div>
+
+				{/* Typography */}
+				<div class="mt-12">
+					<h3 class="ds-h3">Typography</h3>
+					<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+						{ds.typography.map((t) => (
+							<div class="ds-type">
+								<p
+									class="ds-type-sample"
+									style={`font-family:'${t.family}',serif`}
+								>
+									{t.sample}
+								</p>
+								<p class="mt-3 text-sm font-semibold text-ink">{t.family}</p>
+								<p class="mt-0.5 text-xs text-muted">{t.weights}</p>
+								<p class="mt-1 text-xs text-muted">{t.role}</p>
+							</div>
+						))}
+					</div>
+				</div>
+
+				{/* Three-column lists */}
+				<div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
+					<div>
+						<h3 class="ds-h3">Micro-typography</h3>
+						<ul class="ds-list">
+							{ds.micro.map((item) => (
+								<li>{item}</li>
+							))}
+						</ul>
+					</div>
+					<div>
+						<h3 class="ds-h3">Interactions</h3>
+						<ul class="ds-list">
+							{ds.interactions.map((item) => (
+								<li>{item}</li>
+							))}
+						</ul>
+					</div>
+					<div>
+						<h3 class="ds-h3">Constraints</h3>
+						<ul class="ds-list">
+							{ds.constraints.map((item) => (
+								<li>{item}</li>
+							))}
+						</ul>
+					</div>
+				</div>
+			</section>
+		)
+	}
 
 	<section
 		class="mx-auto max-w-[1000px] px-6 py-8 sm:py-12 lg:px-0"
@@ -152,6 +277,69 @@ const projectJsonLd = {
 	.prose-lab p + p {
 		margin-top: 1.25rem;
 	}
+	.prose-lead {
+		/* first visible paragraph slightly larger for hierarchy */
+		font-size: 1.125rem !important;
+	}
+
+	/* Show more accordion — same mechanics as work case study */
+	.intro-more {
+		overflow: hidden;
+		max-height: 0;
+		opacity: 0;
+		transition:
+			max-height 500ms cubic-bezier(0.22, 0.61, 0.36, 1),
+			opacity 350ms ease-out;
+	}
+	.intro-more[aria-hidden='false'] {
+		opacity: 1;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.intro-more {
+			transition: none;
+		}
+	}
+
+	/* Design system section */
+	.ds-h3 {
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+	}
+	.ds-swatch {
+		display: block;
+	}
+	.ds-swatch-chip {
+		aspect-ratio: 1 / 1;
+		width: 100%;
+		border-radius: 12px;
+		border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+	}
+	.ds-type {
+		border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+		border-radius: 12px;
+		padding: 1.25rem 1.25rem 1.1rem;
+		background: var(--color-card);
+	}
+	.ds-type-sample {
+		font-size: 1.5rem;
+		line-height: 1.2;
+		color: var(--color-ink);
+	}
+	.ds-list {
+		margin-top: 0.9rem;
+		padding-left: 1rem;
+		list-style: disc;
+		color: var(--color-ink);
+	}
+	.ds-list li {
+		font-size: 0.9375rem;
+		line-height: 1.55;
+		margin-top: 0.5rem;
+	}
+
 	.ai-lab-shot img {
 		transition: transform 0.7s ease;
 	}
@@ -159,3 +347,47 @@ const projectJsonLd = {
 		transform: scale(1.01);
 	}
 </style>
+
+<script is:inline>
+	// Intro Show more / Show less accordion — same measured scrollHeight
+	// pattern as the work case study toggle so the animation lands cleanly
+	// on any content length.
+	(() => {
+		const btn = document.getElementById('intro-toggle');
+		const body = document.getElementById('intro-more');
+		if (!btn || !body) return;
+
+		const labelEl = btn.querySelector('[data-toggle-label]');
+		const chevron = btn.querySelector('[data-toggle-chevron]');
+
+		function setExpanded(next) {
+			btn.setAttribute('aria-expanded', String(next));
+			body.setAttribute('aria-hidden', String(!next));
+
+			if (next) {
+				body.style.maxHeight = body.scrollHeight + 'px';
+				const clear = () => {
+					body.style.maxHeight = 'none';
+					body.removeEventListener('transitionend', clear);
+				};
+				body.addEventListener('transitionend', clear);
+			} else {
+				body.style.maxHeight = body.scrollHeight + 'px';
+				void body.offsetHeight;
+				body.style.maxHeight = '0px';
+			}
+
+			if (labelEl) {
+				labelEl.textContent = next ? 'Show less' : 'Show more';
+			}
+			if (chevron) {
+				chevron.style.transform = next ? 'rotate(180deg)' : '';
+			}
+		}
+
+		btn.addEventListener('click', () => {
+			const expanded = btn.getAttribute('aria-expanded') === 'true';
+			setExpanded(!expanded);
+		});
+	})();
+</script>
