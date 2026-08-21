@@ -54,7 +54,7 @@ const ds = project.designSystem;
 >
 	<Nav />
 
-	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-2 sm:pt-20 lg:px-0" data-reveal>
+	<article class="mx-auto max-w-[1000px] px-6 pt-16 pb-2 sm:pt-20 lg:px-0" data-reveal>
 		<a href="/#ai-lab" class="text-sm font-semibold text-accent hover:underline"
 			>← Back to AI Lab</a
 		>
@@ -95,7 +95,7 @@ const ds = project.designSystem;
 		</div>
 	</article>
 
-	<section class="mx-auto max-w-[1200px] px-6 pt-8 pb-12 sm:pt-10 sm:pb-16 lg:px-0" data-reveal>
+	<section class="mx-auto max-w-[1000px] px-6 pt-8 pb-12 sm:pt-10 sm:pb-16 lg:px-0" data-reveal>
 		<div class="prose-lab max-w-[68ch]">
 			<p class="prose-lead">{firstPara}</p>
 
@@ -140,7 +140,7 @@ const ds = project.designSystem;
 	{
 		ds && (
 			<section
-				class="mx-auto max-w-[1200px] px-6 pt-4 pb-12 sm:pt-6 sm:pb-16 lg:px-0"
+				class="mx-auto max-w-[1000px] px-6 pt-4 pb-12 sm:pt-6 sm:pb-16 lg:px-0"
 				data-reveal
 			>
 				<p class="text-sm font-semibold uppercase tracking-widest text-muted">
@@ -217,7 +217,7 @@ const ds = project.designSystem;
 	}
 
 	<section
-		class="mx-auto max-w-[1200px] px-6 py-8 sm:py-12 lg:px-0"
+		class="mx-auto max-w-[1000px] px-6 py-8 sm:py-12 lg:px-0"
 		data-reveal
 	>
 		<div class="grid grid-cols-1 gap-6">
@@ -241,7 +241,7 @@ const ds = project.designSystem;
 		</div>
 	</section>
 
-	<section class="mx-auto max-w-[1200px] px-6 py-12 text-center sm:py-16 lg:px-0" data-reveal>
+	<section class="mx-auto max-w-[1000px] px-6 py-12 text-center sm:py-16 lg:px-0" data-reveal>
 		<a
 			href={project.demoUrl}
 			target="_blank"
