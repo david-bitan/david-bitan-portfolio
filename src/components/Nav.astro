@@ -1,17 +1,31 @@
 ---
+/**
+ * Top nav.
+ * Five items: Work, AI Lab, Craft (all anchor-linked to home sections),
+ * plus About and Contact (separate pages).
+ *
+ * Active state:
+ *  - /about and /contact — server-side, matched by pathname
+ *  - Home hash links (#work, #ai-lab, #craft) — client-side scroll spy
+ *    tracks which section is in view and toggles `.nav-link-active` on
+ *    the matching nav item. Active item is text-accent + underline bar +
+ *    `pointer-events: none` (non-clickable) — same look/behaviour as the
+ *    server-rendered active state, just driven by scroll position.
+ */
 const links = [
-	{ href: '/#work', label: 'Projects' },
-	{ href: '/#ai-lab', label: 'AI Lab' },
-	{ href: '/about', label: 'About' },
-	{ href: '/contact', label: 'Contact' },
+	{ href: '/#work', label: 'Work', spy: 'work' },
+	{ href: '/#ai-lab', label: 'AI Lab', spy: 'ai-lab' },
+	{ href: '/#craft', label: 'Craft', spy: 'craft' },
+	{ href: '/about', label: 'About', spy: null },
+	{ href: '/contact', label: 'Contact', spy: null },
 ];
 
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isHome = pathname === '/';
 
-// The link matching the current page is active AND non-clickable —
-// applies uniformly to Projects (home), About, and Contact.
+// Server-side active only for /about and /contact. Home hash links are
+// resolved client-side by the scroll spy.
 function isActive(href: string) {
-	if (href === '/#work') return pathname === '/';
 	if (href === '/about') return pathname === '/about';
 	if (href === '/contact') return pathname === '/contact';
 	return false;
@@ -29,12 +43,13 @@ function isActive(href: string) {
 					const cls = active
 						? 'nav-link nav-link-active text-sm font-semibold text-accent'
 						: 'nav-link text-sm font-medium text-muted hover:text-ink transition-colors';
+					const dataSpy = link.spy ? { 'data-spy': link.spy } : {};
 					return active ? (
-						<span aria-current="page" class={cls}>
+						<span aria-current="page" class={cls} {...dataSpy}>
 							{link.label}
 						</span>
 					) : (
-						<a href={link.href} class={cls}>
+						<a href={link.href} class={cls} {...dataSpy}>
 							{link.label}
 						</a>
 					);
@@ -89,12 +104,13 @@ function isActive(href: string) {
 			const cls = active
 				? 'mobile-nav-link nav-link-active text-3xl font-semibold text-accent'
 				: 'mobile-nav-link text-3xl font-semibold';
+			const dataSpy = link.spy ? { 'data-spy-mobile': link.spy } : {};
 			return active ? (
-				<span aria-current="page" class={cls}>
+				<span aria-current="page" class={cls} {...dataSpy}>
 					{link.label}
 				</span>
 			) : (
-				<a href={link.href} class={cls}>
+				<a href={link.href} class={cls} {...dataSpy}>
 					{link.label}
 				</a>
 			);
@@ -104,9 +120,14 @@ function isActive(href: string) {
 
 <style>
 	/* Active nav item: orange text (applied inline) + underline bar sized to
-	   the word only. Locked variant disables interaction on the current page. */
+	   the word only. Non-clickable — applied to both `<span aria-current>`
+	   (server-rendered for /about, /contact) and `<a>` promoted to active by
+	   the scroll spy on the home page. */
 	.nav-link-active {
 		position: relative;
+		color: var(--color-accent) !important;
+		cursor: default;
+		pointer-events: none;
 	}
 	.nav-link-active::after {
 		content: '';
@@ -118,13 +139,10 @@ function isActive(href: string) {
 		background: var(--color-accent);
 		border-radius: 1px;
 	}
-	span.nav-link-active {
-		cursor: default;
-		pointer-events: none;
-	}
 </style>
 
-<script>
+<script is:inline define:vars={{ isHome }}>
+	// --- Mobile menu open/close ---
 	const toggle = document.getElementById('nav-toggle');
 	const close = document.getElementById('nav-close');
 	const overlay = document.getElementById('mobile-nav');
@@ -134,17 +152,16 @@ function isActive(href: string) {
 		toggle?.setAttribute('aria-expanded', 'true');
 		document.body.style.overflow = 'hidden';
 	}
-
 	function closeMenu() {
 		overlay?.classList.add('translate-x-full');
 		toggle?.setAttribute('aria-expanded', 'false');
 		document.body.style.overflow = '';
 	}
-
 	toggle?.addEventListener('click', openMenu);
 	close?.addEventListener('click', closeMenu);
 	overlay?.querySelectorAll('.mobile-nav-link').forEach((link) => link.addEventListener('click', closeMenu));
 
+	// --- Theme toggle ---
 	const themeToggle = document.getElementById('theme-toggle');
 	const moonIcon = document.getElementById('theme-icon-moon');
 	const sunIcon = document.getElementById('theme-icon-sun');
@@ -167,4 +184,123 @@ function isActive(href: string) {
 		}
 		syncThemeIcon();
 	});
+
+	// --- Scroll spy (home only) ---
+	// Watches #work, #ai-lab, #craft. Whichever section is most in view
+	// gets its nav item promoted to `.nav-link-active` (adds text-accent,
+	// underline, and pointer-events:none). Runs on scroll via
+	// IntersectionObserver with a rootMargin biased to the upper third of
+	// the viewport so the active item flips cleanly as sections cross a
+	// consistent line under the sticky nav.
+	if (isHome) {
+		const desktopLinks = new Map();
+		const mobileLinks = new Map();
+		document.querySelectorAll('[data-spy]').forEach((el) => {
+			desktopLinks.set(el.getAttribute('data-spy'), el);
+		});
+		document.querySelectorAll('[data-spy-mobile]').forEach((el) => {
+			mobileLinks.set(el.getAttribute('data-spy-mobile'), el);
+		});
+
+		const sectionIds = ['work', 'ai-lab', 'craft'];
+		const sections = sectionIds
+			.map((id) => document.getElementById(id))
+			.filter(Boolean);
+
+		let currentActive = null;
+
+		function setActive(id) {
+			if (id === currentActive) return;
+			currentActive = id;
+			// Clear
+			for (const map of [desktopLinks, mobileLinks]) {
+				map.forEach((el, key) => {
+					const active = key === id;
+					if (active) {
+						el.classList.add('nav-link-active', 'text-accent');
+						el.classList.remove('text-muted', 'hover:text-ink', 'transition-colors', 'font-medium');
+						el.classList.add('font-semibold');
+					} else {
+						el.classList.remove('nav-link-active', 'text-accent');
+						// Restore default look (desktop only — mobile keeps font-semibold always)
+						if (map === desktopLinks) {
+							el.classList.add('text-muted', 'hover:text-ink', 'transition-colors', 'font-medium');
+							el.classList.remove('font-semibold');
+						}
+					}
+				});
+			}
+		}
+
+		if (sections.length) {
+			// Track intersection ratios and pick the section with highest
+			// visibility above the middle of the viewport.
+			const io = new IntersectionObserver(
+				(entries) => {
+					// Aggregate: for each observed section, keep its latest
+					// intersectionRatio. Pick the one with the largest ratio
+					// that is currently intersecting; fallback to whichever
+					// section top is nearest above the viewport middle.
+					const ratios = new Map();
+					entries.forEach((e) => {
+						ratios.set(e.target.id, {
+							ratio: e.intersectionRatio,
+							top: e.boundingClientRect.top,
+							isIntersecting: e.isIntersecting,
+						});
+					});
+					// Merge with previous state (IO only reports changes)
+					sections.forEach((s) => {
+						if (!ratios.has(s.id)) {
+							const rect = s.getBoundingClientRect();
+							ratios.set(s.id, {
+								ratio: 0,
+								top: rect.top,
+								isIntersecting: rect.top < window.innerHeight && rect.bottom > 0,
+							});
+						}
+					});
+
+					// Best pick: section that is intersecting with the largest
+					// ratio. If none, pick the last one whose top is above the
+					// viewport middle (user scrolled past it).
+					let bestId = null;
+					let bestRatio = -1;
+					ratios.forEach((v, id) => {
+						if (v.isIntersecting && v.ratio > bestRatio) {
+							bestRatio = v.ratio;
+							bestId = id;
+						}
+					});
+					if (!bestId) {
+						const mid = window.innerHeight / 2;
+						let closest = null;
+						let closestDist = Infinity;
+						ratios.forEach((v, id) => {
+							if (v.top <= mid) {
+								const d = mid - v.top;
+								if (d < closestDist) {
+									closestDist = d;
+									closest = id;
+								}
+							}
+						});
+						bestId = closest;
+					}
+					if (bestId) setActive(bestId);
+				},
+				{
+					// Trigger when a section crosses the upper third of the
+					// viewport — feels natural under the sticky nav.
+					rootMargin: '-25% 0px -55% 0px',
+					threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+				},
+			);
+			sections.forEach((s) => io.observe(s));
+
+			// Initial pick — pre-select #work at page load so nothing is empty
+			// before the first IO callback fires.
+			setActive('work');
+		}
+	}
 </script>
