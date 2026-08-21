@@ -258,39 +258,18 @@ function isActive(href: string) {
 			setActive(picked);
 		}
 
-		// Lock: when the user clicks a nav anchor, we flip the active state
-		// *immediately* (no wait for the smooth scroll to finish). During
-		// the scroll animation, ignore pickActive() so we don't flicker
-		// through intermediate sections the scroll passes over.
-		let lockUntil = 0;
-
 		let ticking = false;
 		function onScroll() {
 			if (ticking) return;
 			ticking = true;
 			window.requestAnimationFrame(() => {
-				if (Date.now() >= lockUntil) pickActive();
+				pickActive();
 				ticking = false;
 			});
 		}
 
 		window.addEventListener('scroll', onScroll, { passive: true });
 		window.addEventListener('resize', onScroll);
-
-		// Instant click feedback — same behaviour as the server-rendered
-		// active state for /about and /contact.
-		function bindClickInstant(el) {
-			if (!el) return;
-			const id = el.getAttribute('data-spy') || el.getAttribute('data-spy-mobile');
-			if (!id) return;
-			el.addEventListener('click', () => {
-				setActive(id);
-				lockUntil = Date.now() + 800; // cover a smooth-scroll pass
-			});
-		}
-		document.querySelectorAll('[data-spy]').forEach(bindClickInstant);
-		document.querySelectorAll('[data-spy-mobile]').forEach(bindClickInstant);
-
 		// Run once on load so the initial paint has an active item.
 		pickActive();
 	})();
