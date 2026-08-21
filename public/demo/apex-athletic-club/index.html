@@ -1,0 +1,2048 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0A0F" />
+<title>APEX Athletic Club — Miami</title>
+<meta name="description" content="Miami's oceanfront strength and recovery club. Signature gym floor, ocean-view pool, sauna, jacuzzi, cryotherapy, and coaching that keeps you accountable." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+	/* ============================================================
+	   APEX Athletic Club — Miami
+	   Design system:
+	   - Palette: ink #0A0A0F · hot pink #FF2E7E · electric mint #00E5A0
+	     · off-white #F5F5F7. Deep-ink canvas, pink as primary CTA and
+	     accent-of-attention, mint as fresh secondary (health, recovery,
+	     stats), off-white for on-dark type and utility surfaces.
+	   - Type: Space Grotesk display (uppercase, tight tracking) +
+	     Inter body + JetBrains Mono for numbers/stats/counters.
+	   - Voice: modern grotesk, athletic tech premium. No serif anywhere.
+	   ============================================================ */
+
+	:root {
+		--ink: #0A0A0F;
+		--ink-2: #14141C;
+		--ink-3: #1E1E28;
+		--line: rgba(245, 245, 247, 0.10);
+		--line-strong: rgba(245, 245, 247, 0.22);
+		--white: #F5F5F7;
+		--white-soft: rgba(245, 245, 247, 0.72);
+		--white-mute: rgba(245, 245, 247, 0.52);
+		--pink: #FF2E7E;
+		--pink-dim: #C9265E;
+		--mint: #00E5A0;
+		--mint-dim: #06B37D;
+		--sig: #FF5A1F; /* signal orange, sparingly */
+
+		--font-display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+		--font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+		--font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+		--maxw: 1240px;
+		--pad-x: clamp(20px, 4vw, 48px);
+
+		--nav-h: 72px;
+
+		color-scheme: dark;
+	}
+
+	*, *::before, *::after { box-sizing: border-box; }
+	html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+	body {
+		margin: 0;
+		background: var(--ink);
+		color: var(--white);
+		font-family: var(--font-body);
+		font-size: 16px;
+		line-height: 1.55;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	img, video { max-width: 100%; height: auto; display: block; }
+	a { color: inherit; text-decoration: none; }
+	button { font: inherit; color: inherit; background: transparent; border: 0; cursor: pointer; }
+
+	/* Reveal pre-hide via class on html — set inline in <head> before
+	   paint, then flipped by the JS scroll observer. */
+	html.js-reveal-ready [data-reveal] { opacity: 0; transform: translateY(18px); }
+	[data-reveal] {
+		transition: opacity 700ms cubic-bezier(0.22, 0.61, 0.36, 1),
+		            transform 700ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	[data-reveal].is-in { opacity: 1; transform: none; }
+	@media (prefers-reduced-motion: reduce) {
+		html.js-reveal-ready [data-reveal] { opacity: 1; transform: none; }
+		[data-reveal] { transition: none; }
+	}
+
+	/* Typography scale */
+	.eyebrow {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 12px;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: var(--mint);
+	}
+	.eyebrow.pink { color: var(--pink); }
+	.h1 {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(40px, 6.4vw, 88px);
+		line-height: 0.96;
+		letter-spacing: -0.02em;
+		text-transform: uppercase;
+	}
+	.h2 {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(32px, 4.4vw, 56px);
+		line-height: 1.02;
+		letter-spacing: -0.015em;
+		text-transform: uppercase;
+	}
+	.h3 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: clamp(22px, 2.4vw, 30px);
+		line-height: 1.15;
+		letter-spacing: -0.01em;
+		text-transform: uppercase;
+	}
+	.h4 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 18px;
+		line-height: 1.2;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+	}
+	.lead {
+		font-size: clamp(16px, 1.6vw, 20px);
+		line-height: 1.55;
+		color: var(--white-soft);
+		max-width: 62ch;
+	}
+	.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+	/* Container */
+	.wrap {
+		max-width: var(--maxw);
+		margin: 0 auto;
+		padding-left: var(--pad-x);
+		padding-right: var(--pad-x);
+	}
+
+	/* Buttons */
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 14px 26px;
+		border-radius: 999px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 13px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease;
+		white-space: nowrap;
+	}
+	.btn-primary { background: var(--pink); color: var(--ink); }
+	.btn-primary:hover { background: var(--white); }
+	.btn-ghost { border: 1px solid var(--line-strong); color: var(--white); }
+	.btn-ghost:hover { border-color: var(--white); }
+	.btn-mint { background: var(--mint); color: var(--ink); }
+	.btn-mint:hover { background: var(--white); }
+	.btn-dark { background: var(--ink); color: var(--white); border: 1px solid var(--line-strong); }
+	.btn-dark:hover { background: var(--ink-2); border-color: var(--white); }
+
+	/* ============================================================
+	   NAV
+	   ============================================================ */
+	.nav {
+		position: sticky;
+		top: 0;
+		z-index: 60;
+		background: rgba(10, 10, 15, 0.82);
+		backdrop-filter: saturate(140%) blur(14px);
+		-webkit-backdrop-filter: saturate(140%) blur(14px);
+		border-bottom: 1px solid var(--line);
+	}
+	.nav-inner {
+		max-width: var(--maxw);
+		margin: 0 auto;
+		padding: 0 var(--pad-x);
+		height: var(--nav-h);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 24px;
+	}
+	.nav-brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: 18px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+	.nav-brand .apex-mark {
+		width: 26px; height: 26px;
+		display: inline-block;
+		background:
+			conic-gradient(from 135deg at 50% 50%, var(--pink) 0deg 90deg, var(--mint) 90deg 180deg, var(--white) 180deg 270deg, var(--pink) 270deg 360deg);
+		clip-path: polygon(50% 0, 100% 100%, 0 100%);
+	}
+	.nav-links {
+		display: flex;
+		align-items: center;
+		gap: 28px;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.nav-links a, .nav-links span {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 12px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		position: relative;
+		padding: 6px 0;
+		transition: color 200ms ease;
+	}
+	.nav-links a:hover { color: var(--white); }
+	.nav-links .active {
+		color: var(--pink);
+		pointer-events: none;
+		cursor: default;
+	}
+	.nav-links .active::after {
+		content: "";
+		position: absolute;
+		left: 0; right: 0;
+		bottom: -2px;
+		height: 2px;
+		background: var(--pink);
+	}
+	.nav-cta {
+		display: inline-flex;
+		gap: 10px;
+	}
+	.nav-toggle {
+		display: none;
+		width: 40px; height: 40px;
+		border: 1px solid var(--line-strong);
+		border-radius: 10px;
+	}
+	.nav-toggle svg { margin: 0 auto; }
+
+	/* Mobile nav overlay */
+	.mobile-nav {
+		position: fixed; inset: 0;
+		z-index: 80;
+		background: var(--ink);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 24px;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 240ms ease;
+	}
+	.mobile-nav.open { opacity: 1; pointer-events: auto; }
+	.mobile-nav a, .mobile-nav span {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 24px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white);
+	}
+	.mobile-nav .active { color: var(--pink); pointer-events: none; }
+	.mobile-nav-close {
+		position: absolute;
+		top: 20px; right: 20px;
+		width: 44px; height: 44px;
+		border-radius: 12px;
+		border: 1px solid var(--line-strong);
+	}
+
+	/* ============================================================
+	   HERO
+	   ============================================================ */
+	.hero {
+		position: relative;
+		min-height: calc(100vh - var(--nav-h));
+		display: flex;
+		align-items: flex-end;
+		overflow: hidden;
+		background: linear-gradient(180deg, #0F0F18 0%, #06060A 100%);
+	}
+	.hero-media {
+		position: absolute;
+		inset: 0;
+		background-image:
+			linear-gradient(180deg, rgba(10,10,15,0.20) 0%, rgba(10,10,15,0.55) 55%, rgba(10,10,15,0.95) 100%),
+			url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=2000&q=80");
+		background-size: cover;
+		background-position: center;
+		z-index: 0;
+	}
+	.hero-inner {
+		position: relative;
+		z-index: 1;
+		max-width: var(--maxw);
+		margin: 0 auto;
+		padding: clamp(80px, 12vw, 160px) var(--pad-x) clamp(60px, 8vw, 120px);
+		width: 100%;
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 40px;
+	}
+	.hero-eyebrow-row {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
+	.hero-eyebrow-row .dot {
+		width: 6px; height: 6px; border-radius: 50%;
+		background: var(--mint);
+		animation: pulse 1.8s ease-in-out infinite;
+	}
+	@keyframes pulse {
+		0%, 100% { opacity: 1; transform: scale(1); }
+		50% { opacity: 0.4; transform: scale(1.4); }
+	}
+	.hero-title { max-width: 15ch; }
+	.hero-title .pink { color: var(--pink); }
+	.hero-title .mint { color: var(--mint); }
+	.hero-sub {
+		max-width: 56ch;
+		font-size: clamp(16px, 1.6vw, 19px);
+		color: var(--white-soft);
+	}
+	.hero-actions {
+		display: flex;
+		gap: 12px;
+		flex-wrap: wrap;
+		margin-top: 8px;
+	}
+	.hero-meta {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 24px;
+		margin-top: 44px;
+		padding-top: 28px;
+		border-top: 1px solid var(--line);
+	}
+	.hero-meta .stat {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+	.hero-meta .stat-num {
+		font-family: var(--font-mono);
+		font-weight: 700;
+		font-size: clamp(24px, 3vw, 36px);
+		color: var(--white);
+		letter-spacing: -0.01em;
+	}
+	.hero-meta .stat-num .accent { color: var(--mint); }
+	.hero-meta .stat-lbl {
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+
+	/* ============================================================
+	   ABOUT
+	   ============================================================ */
+	.section {
+		padding: clamp(80px, 10vw, 140px) 0;
+		position: relative;
+	}
+	.section .head {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 60px;
+		margin-bottom: 60px;
+		align-items: end;
+	}
+	.section .head p.lead { margin: 0; }
+	.about-body {
+		display: grid;
+		grid-template-columns: 1fr 1.2fr;
+		gap: 60px;
+		align-items: start;
+	}
+	.about-photo {
+		position: relative;
+		aspect-ratio: 4 / 5;
+		overflow: hidden;
+		border-radius: 4px;
+		background: var(--ink-2);
+	}
+	.about-photo img {
+		width: 100%; height: 100%;
+		object-fit: cover;
+	}
+	.about-photo .tag {
+		position: absolute;
+		top: 20px; left: 20px;
+		padding: 6px 12px;
+		background: var(--ink);
+		border: 1px solid var(--pink);
+		color: var(--pink);
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+	}
+	.about-text p {
+		font-size: 17px;
+		line-height: 1.65;
+		color: var(--white-soft);
+		margin: 0 0 18px;
+	}
+	.about-values {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 24px;
+		margin-top: 32px;
+	}
+	.about-value {
+		border-top: 1px solid var(--line);
+		padding-top: 16px;
+	}
+	.about-value .num {
+		font-family: var(--font-mono);
+		font-size: 12px;
+		color: var(--mint);
+		letter-spacing: 0.06em;
+	}
+	.about-value .label {
+		font-family: var(--font-display);
+		font-size: 15px;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		margin-top: 4px;
+	}
+	.about-value p {
+		margin: 8px 0 0;
+		font-size: 14px;
+		color: var(--white-mute);
+		line-height: 1.55;
+	}
+
+	/* ============================================================
+	   FACILITIES — asymmetric 6-block grid
+	   ============================================================ */
+	.facilities-grid {
+		display: grid;
+		grid-template-columns: repeat(12, 1fr);
+		grid-auto-rows: 240px;
+		gap: 16px;
+	}
+	.facility {
+		position: relative;
+		overflow: hidden;
+		border-radius: 4px;
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		display: block;
+	}
+	.facility img {
+		width: 100%; height: 100%;
+		object-fit: cover;
+		transition: transform 900ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	.facility:hover img { transform: scale(1.06); }
+	.facility-overlay {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(180deg, rgba(10,10,15,0.10) 0%, rgba(10,10,15,0.85) 100%);
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		padding: 24px;
+		transition: background 300ms ease;
+	}
+	.facility:hover .facility-overlay {
+		background: linear-gradient(180deg, rgba(255,46,126,0.10) 0%, rgba(10,10,15,0.90) 100%);
+	}
+	.facility-label {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 20px;
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+		color: var(--white);
+		margin: 0 0 6px;
+	}
+	.facility-meta {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.08em;
+		color: var(--mint);
+		text-transform: uppercase;
+	}
+	/* asymmetric spans */
+	.f-1 { grid-column: span 7; grid-row: span 2; }
+	.f-2 { grid-column: span 5; grid-row: span 1; }
+	.f-3 { grid-column: span 5; grid-row: span 1; }
+	.f-4 { grid-column: span 4; grid-row: span 1; }
+	.f-5 { grid-column: span 4; grid-row: span 1; }
+	.f-6 { grid-column: span 4; grid-row: span 1; }
+
+	/* ============================================================
+	   MEMBERSHIP TIERS
+	   ============================================================ */
+	.tiers {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 20px;
+	}
+	.tier {
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: 36px 32px 32px;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		position: relative;
+		overflow: hidden;
+		transition: border-color 300ms ease, transform 300ms ease;
+	}
+	.tier:hover { border-color: var(--line-strong); transform: translateY(-4px); }
+	.tier.featured {
+		border-color: var(--pink);
+		background: linear-gradient(180deg, rgba(255,46,126,0.06) 0%, var(--ink-2) 100%);
+	}
+	.tier.featured::before {
+		content: "MOST POPULAR";
+		position: absolute;
+		top: 16px; right: 16px;
+		background: var(--pink);
+		color: var(--ink);
+		padding: 4px 10px;
+		font-family: var(--font-display);
+		font-size: 10px;
+		letter-spacing: 0.14em;
+		border-radius: 999px;
+	}
+	.tier .tier-name {
+		font-family: var(--font-display);
+		font-size: 14px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.tier .tier-price {
+		display: flex;
+		align-items: baseline;
+		gap: 6px;
+	}
+	.tier .tier-price .amount {
+		font-family: var(--font-mono);
+		font-weight: 700;
+		font-size: 56px;
+		line-height: 1;
+		letter-spacing: -0.02em;
+	}
+	.tier .tier-price .per {
+		color: var(--white-mute);
+		font-size: 14px;
+	}
+	.tier .tier-tagline {
+		color: var(--white-soft);
+		font-size: 15px;
+		line-height: 1.55;
+	}
+	.tier .tier-perks {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		border-top: 1px solid var(--line);
+		padding-top: 20px;
+	}
+	.tier .tier-perks li {
+		display: flex;
+		align-items: flex-start;
+		gap: 10px;
+		font-size: 14px;
+		color: var(--white-soft);
+	}
+	.tier .tier-perks li::before {
+		content: "";
+		flex-shrink: 0;
+		width: 14px; height: 14px;
+		margin-top: 4px;
+		background: var(--mint);
+		clip-path: polygon(20% 55%, 40% 75%, 85% 25%, 90% 30%, 45% 82%, 15% 60%);
+	}
+	.tier .tier-perks li.absent { color: var(--white-mute); text-decoration: line-through; }
+	.tier .tier-perks li.absent::before { background: var(--line-strong); }
+	.tier .tier-cta { margin-top: auto; }
+
+	/* ============================================================
+	   CLASSES — mini weekly schedule
+	   ============================================================ */
+	.classes-grid {
+		display: grid;
+		grid-template-columns: 100px repeat(5, 1fr);
+		gap: 8px;
+		background: var(--ink-2);
+		padding: 8px;
+		border-radius: 4px;
+		border: 1px solid var(--line);
+		overflow-x: auto;
+	}
+	.classes-cell {
+		min-width: 130px;
+		padding: 14px 12px;
+		border-radius: 4px;
+	}
+	.classes-cell.head {
+		background: transparent;
+		font-family: var(--font-display);
+		font-size: 12px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		text-align: center;
+		padding-top: 20px;
+		padding-bottom: 20px;
+	}
+	.classes-cell.time {
+		font-family: var(--font-mono);
+		font-size: 13px;
+		color: var(--mint);
+		display: flex;
+		align-items: center;
+		padding-left: 8px;
+	}
+	.classes-cell.slot {
+		background: var(--ink);
+		border: 1px solid var(--line);
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		transition: border-color 200ms ease, background 200ms ease;
+		cursor: pointer;
+	}
+	.classes-cell.slot:hover {
+		border-color: var(--pink);
+		background: rgba(255,46,126,0.06);
+	}
+	.classes-cell.slot .name {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 13px;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+	.classes-cell.slot .coach {
+		font-size: 11px;
+		color: var(--white-mute);
+	}
+	.classes-cell.slot.pink .name { color: var(--pink); }
+	.classes-cell.slot.mint .name { color: var(--mint); }
+	.classes-cell.empty {
+		background: transparent;
+	}
+
+	/* ============================================================
+	   STAFF
+	   ============================================================ */
+	.staff-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 20px;
+	}
+	.staff-card {
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		overflow: hidden;
+		transition: border-color 300ms ease, transform 300ms ease;
+	}
+	.staff-card:hover { border-color: var(--pink); transform: translateY(-3px); }
+	.staff-photo {
+		aspect-ratio: 4 / 5;
+		overflow: hidden;
+		background: var(--ink);
+	}
+	.staff-photo img {
+		width: 100%; height: 100%;
+		object-fit: cover;
+		transition: transform 900ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	.staff-card:hover .staff-photo img { transform: scale(1.05); }
+	.staff-body {
+		padding: 22px 22px 24px;
+	}
+	.staff-role {
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--mint);
+	}
+	.staff-name {
+		font-family: var(--font-display);
+		font-size: 22px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.01em;
+		margin: 6px 0 10px;
+	}
+	.staff-bio {
+		font-size: 14px;
+		line-height: 1.6;
+		color: var(--white-soft);
+		margin: 0;
+	}
+	.staff-certs {
+		list-style: none;
+		margin: 14px 0 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+	.staff-certs li {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		color: var(--white-mute);
+		border: 1px solid var(--line);
+		padding: 4px 8px;
+		border-radius: 999px;
+	}
+
+	/* ============================================================
+	   TESTIMONIALS
+	   ============================================================ */
+	.testimonials {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 20px;
+	}
+	.testimonial {
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: 32px;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+	.testimonial .quote {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 20px;
+		line-height: 1.35;
+		letter-spacing: -0.005em;
+		color: var(--white);
+		margin: 0;
+	}
+	.testimonial .quote .hl { color: var(--pink); }
+	.testimonial .by {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		margin-top: auto;
+	}
+	.testimonial .avatar {
+		width: 44px; height: 44px;
+		border-radius: 50%;
+		overflow: hidden;
+		background: var(--ink);
+		flex-shrink: 0;
+	}
+	.testimonial .avatar img {
+		width: 100%; height: 100%;
+		object-fit: cover;
+	}
+	.testimonial .who-name {
+		font-family: var(--font-display);
+		font-size: 14px;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
+	.testimonial .who-meta {
+		font-size: 12px;
+		color: var(--white-mute);
+	}
+
+	/* ============================================================
+	   CTA FINAL
+	   ============================================================ */
+	.cta-final {
+		background: var(--ink-2);
+		border-top: 1px solid var(--line);
+		border-bottom: 1px solid var(--line);
+	}
+	.cta-final .inner {
+		display: grid;
+		grid-template-columns: 1.4fr 1fr;
+		gap: 60px;
+		align-items: center;
+	}
+	.cta-final .h1 { text-transform: uppercase; }
+	.cta-final .h1 .accent { color: var(--pink); font-style: italic; }
+	.cta-final .side {
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+	.cta-final .side p {
+		color: var(--white-soft);
+		font-size: 16px;
+		margin: 0;
+	}
+
+	/* ============================================================
+	   CONTACT SNIPPET
+	   ============================================================ */
+	.contact-snippet {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 60px;
+	}
+	.contact-col h3 {
+		font-family: var(--font-display);
+		font-size: 16px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		margin: 0 0 20px;
+	}
+	.hours-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.hours-list li {
+		display: flex;
+		justify-content: space-between;
+		padding: 12px 0;
+		border-bottom: 1px solid var(--line);
+		font-size: 14px;
+	}
+	.hours-list li .day {
+		font-family: var(--font-display);
+		font-size: 13px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+	.hours-list li .time {
+		font-family: var(--font-mono);
+		color: var(--white-soft);
+	}
+	.hours-list li.today .day { color: var(--pink); }
+	.hours-list li.today .time { color: var(--pink); }
+	.address-block p {
+		color: var(--white-soft);
+		font-size: 15px;
+		line-height: 1.6;
+		margin: 0 0 6px;
+	}
+	.contact-actions {
+		display: flex;
+		gap: 12px;
+		margin-top: 24px;
+		flex-wrap: wrap;
+	}
+
+	/* ============================================================
+	   FOOTER
+	   ============================================================ */
+	.footer {
+		background: #06060A;
+		border-top: 1px solid var(--line);
+		padding: 60px 0 40px;
+	}
+	.footer-inner {
+		display: grid;
+		grid-template-columns: 1.4fr repeat(3, 1fr);
+		gap: 40px;
+	}
+	.footer-brand-block p {
+		color: var(--white-mute);
+		font-size: 13px;
+		margin: 12px 0 0;
+		max-width: 34ch;
+	}
+	.footer-col h4 {
+		font-family: var(--font-display);
+		font-size: 12px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white);
+		margin: 0 0 16px;
+	}
+	.footer-col ul {
+		list-style: none;
+		margin: 0; padding: 0;
+		display: flex; flex-direction: column;
+		gap: 10px;
+	}
+	.footer-col a {
+		font-size: 13px;
+		color: var(--white-mute);
+		transition: color 200ms ease;
+	}
+	.footer-col a:hover { color: var(--pink); }
+	.footer-bottom {
+		max-width: var(--maxw);
+		margin: 40px auto 0;
+		padding: 20px var(--pad-x) 0;
+		border-top: 1px solid var(--line);
+		display: flex;
+		justify-content: space-between;
+		font-size: 12px;
+		color: var(--white-mute);
+		font-family: var(--font-mono);
+	}
+
+	/* ============================================================
+	   MODAL / OVERLAY
+	   ============================================================ */
+	.overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 90;
+		background: rgba(6, 6, 10, 0.72);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 20px;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 240ms ease;
+	}
+	.overlay.open { opacity: 1; pointer-events: auto; }
+	.modal {
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		max-width: 480px;
+		width: 100%;
+		max-height: 92vh;
+		overflow-y: auto;
+		padding: 32px;
+		position: relative;
+		transform: translateY(12px);
+		transition: transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	.overlay.open .modal { transform: none; }
+	.modal-close {
+		position: absolute;
+		top: 12px; right: 12px;
+		width: 40px; height: 40px;
+		border-radius: 8px;
+	}
+	.modal-close:hover { background: var(--ink-3); }
+	.modal h3 {
+		font-family: var(--font-display);
+		font-size: 24px;
+		text-transform: uppercase;
+		margin: 0 0 6px;
+	}
+	.modal p.hint {
+		font-size: 14px;
+		color: var(--white-mute);
+		margin: 0 0 24px;
+	}
+	.field {
+		display: flex; flex-direction: column;
+		gap: 8px;
+		margin-bottom: 16px;
+	}
+	.field label {
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.field input, .field select, .field textarea {
+		background: var(--ink);
+		border: 1px solid var(--line-strong);
+		color: var(--white);
+		padding: 12px 14px;
+		border-radius: 4px;
+		font: 14px/1.4 var(--font-body);
+		outline: none;
+		transition: border-color 200ms ease;
+	}
+	.field input:focus, .field select:focus, .field textarea:focus {
+		border-color: var(--pink);
+	}
+	.modal-actions {
+		display: flex; gap: 10px;
+		margin-top: 8px;
+	}
+	.modal-google-btn {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		background: var(--white);
+		color: #1a1a1a;
+		border-radius: 999px;
+		padding: 12px 18px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 13px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		transition: background 200ms ease;
+	}
+	.modal-google-btn:hover { background: #eaeaea; }
+	.modal-separator {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		margin: 20px 0;
+		color: var(--white-mute);
+		font-size: 11px;
+		letter-spacing: 0.14em;
+	}
+	.modal-separator::before, .modal-separator::after {
+		content: ""; flex: 1;
+		height: 1px;
+		background: var(--line);
+	}
+
+	/* Toast */
+	.toast {
+		position: fixed;
+		bottom: 30px;
+		left: 50%;
+		transform: translate(-50%, 20px);
+		background: var(--mint);
+		color: var(--ink);
+		padding: 14px 22px;
+		border-radius: 999px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 13px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		z-index: 100;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 240ms ease, transform 240ms ease;
+	}
+	.toast.show {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+
+	/* ============================================================
+	   RESPONSIVE
+	   ============================================================ */
+	@media (max-width: 1023px) {
+		.nav-links, .nav-cta { display: none; }
+		.nav-toggle { display: flex; align-items: center; justify-content: center; }
+		.section .head { grid-template-columns: 1fr; gap: 20px; margin-bottom: 40px; }
+		.about-body { grid-template-columns: 1fr; gap: 32px; }
+		.hero-meta { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+		.facilities-grid { grid-template-columns: repeat(6, 1fr); grid-auto-rows: 200px; }
+		.f-1 { grid-column: span 6; grid-row: span 2; }
+		.f-2, .f-3 { grid-column: span 3; grid-row: span 1; }
+		.f-4, .f-5, .f-6 { grid-column: span 2; grid-row: span 1; }
+		.tiers { grid-template-columns: 1fr; }
+		.staff-grid { grid-template-columns: repeat(2, 1fr); }
+		.testimonials { grid-template-columns: 1fr; }
+		.cta-final .inner { grid-template-columns: 1fr; gap: 32px; }
+		.contact-snippet { grid-template-columns: 1fr; gap: 32px; }
+		.footer-inner { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+	}
+	@media (max-width: 640px) {
+		.hero { min-height: calc(100vh - var(--nav-h)); }
+		.hero-meta { grid-template-columns: 1fr 1fr; }
+		.facilities-grid { grid-template-columns: 1fr; grid-auto-rows: 180px; }
+		.f-1, .f-2, .f-3, .f-4, .f-5, .f-6 { grid-column: 1 / -1; grid-row: span 1; }
+		.staff-grid { grid-template-columns: 1fr; }
+		.footer-inner { grid-template-columns: 1fr; }
+		.classes-grid { grid-template-columns: 80px repeat(3, 1fr); }
+		.classes-grid .col-hide-sm { display: none; }
+		.about-values { grid-template-columns: 1fr; }
+		.footer-bottom { flex-direction: column; gap: 8px; }
+	}
+</style>
+
+<!-- Pre-hide reveal blocks BEFORE first paint to avoid a flash of visible
+     content that then animates in. JS flips the class as soon as it runs. -->
+<script>document.documentElement.classList.add("js-reveal-ready");</script>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<header class="nav">
+	<div class="nav-inner">
+		<a href="/demo/apex-athletic-club/" class="nav-brand" aria-label="APEX Athletic Club home">
+			<span class="apex-mark" aria-hidden="true"></span>
+			APEX
+		</a>
+
+		<nav>
+			<ul class="nav-links" id="desk-nav">
+				<li><span class="active" data-nav="home">Home</span></li>
+				<li><a href="shop.html" data-nav="shop">Shop</a></li>
+				<li><a href="#classes" data-nav="classes">Classes</a></li>
+				<li><a href="#membership" data-nav="membership">Membership</a></li>
+				<li><a href="contact.html" data-nav="contact">Contact</a></li>
+			</ul>
+		</nav>
+
+		<div class="nav-cta">
+			<button class="btn btn-ghost" data-open="auth" id="nav-signin-btn">Sign in</button>
+			<a href="#membership" class="btn btn-primary">Join</a>
+		</div>
+
+		<button class="nav-toggle" id="nav-toggle" aria-label="Open menu">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+				<path d="M3 7h18M3 12h18M3 17h18" />
+			</svg>
+		</button>
+	</div>
+</header>
+
+<div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+	<button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">
+		<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+			<path d="M6 6l12 12M18 6L6 18" />
+		</svg>
+	</button>
+	<span class="active" data-nav-m="home">Home</span>
+	<a href="shop.html" data-nav-m="shop">Shop</a>
+	<a href="#classes" data-nav-m="classes">Classes</a>
+	<a href="#membership" data-nav-m="membership">Membership</a>
+	<a href="contact.html" data-nav-m="contact">Contact</a>
+	<button class="btn btn-primary" data-open="auth" id="mobile-signin-btn" style="margin-top: 20px;">Sign in</button>
+</div>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="hero">
+	<div class="hero-media" aria-hidden="true"></div>
+	<div class="hero-inner">
+		<div data-reveal>
+			<div class="hero-eyebrow-row">
+				<span class="dot" aria-hidden="true"></span>
+				<span class="eyebrow">Miami Beach · Est. 2019</span>
+			</div>
+			<h1 class="h1 hero-title" style="margin-top: 20px;">
+				Train where the <span class="pink">ocean</span><br />
+				starts.
+			</h1>
+			<p class="hero-sub" style="margin-top: 24px;">
+				APEX is Miami's oceanfront strength and recovery club — a private facility built for
+				athletes who want serious training, medical-grade recovery, and coaches who know
+				your name by week two.
+			</p>
+			<div class="hero-actions">
+				<a href="#membership" class="btn btn-primary">See membership</a>
+				<button class="btn btn-ghost" data-open="guestpass">Get a free guest pass</button>
+			</div>
+		</div>
+
+		<div class="hero-meta" data-reveal>
+			<div class="stat">
+				<div class="stat-num">18,400 <span class="accent">sqft</span></div>
+				<div class="stat-lbl">Facility</div>
+			</div>
+			<div class="stat">
+				<div class="stat-num">42</div>
+				<div class="stat-lbl">Weekly classes</div>
+			</div>
+			<div class="stat">
+				<div class="stat-num">24</div>
+				<div class="stat-lbl">Staff on floor</div>
+			</div>
+			<div class="stat">
+				<div class="stat-num">05:30–23:00</div>
+				<div class="stat-lbl">Daily hours</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     ABOUT
+     ============================================================ -->
+<section class="section" id="about">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div>
+				<div class="eyebrow">About APEX</div>
+				<h2 class="h2" style="margin-top: 14px;">A private club for people<br />who take training seriously.</h2>
+			</div>
+			<p class="lead">
+				Founded in 2019 by former Olympic strength coaches, APEX blends a heritage
+				weight room with a modern medical wing. Small memberships, high touch —
+				the whole team knows you.
+			</p>
+		</div>
+
+		<div class="about-body">
+			<div class="about-photo" data-reveal>
+				<img
+					src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=1200&q=80"
+					alt="APEX gym floor at sunrise" />
+				<span class="tag">The Floor</span>
+			</div>
+			<div class="about-text" data-reveal>
+				<p>
+					You won't find a spinning studio at APEX. What you'll find is a 8,000 sq ft
+					strength floor with 12 competition-grade platforms, an Olympic lifting
+					pit, a full sled track, and enough plates for anyone to work at the same
+					time on a Saturday morning.
+				</p>
+				<p>
+					You'll also find an ocean-view lap pool, a Finnish sauna, a hot jacuzzi,
+					a cold plunge, a recovery wing with cryotherapy, red-light beds, and
+					manual therapy rooms — plus a staff dietitian, an on-call sports medicine
+					doctor, and a physio who works with the Miami Heat during off-season.
+				</p>
+				<div class="about-values">
+					<div class="about-value">
+						<div class="num">01</div>
+						<div class="label">Small membership</div>
+						<p>Capped at 1,800 members. You'll never wait for a rack.</p>
+					</div>
+					<div class="about-value">
+						<div class="num">02</div>
+						<div class="label">Full-service</div>
+						<p>Coaches, medical staff, recovery, nutrition — under one roof.</p>
+					</div>
+					<div class="about-value">
+						<div class="num">03</div>
+						<div class="label">Ocean access</div>
+						<p>Direct boardwalk to South Beach. Sunrise runs included.</p>
+					</div>
+					<div class="about-value">
+						<div class="num">04</div>
+						<div class="label">Open early, late</div>
+						<p>05:30 to 23:00, 7 days a week. Holidays too.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     FACILITIES
+     ============================================================ -->
+<section class="section" id="facilities" style="padding-top: 0;">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div>
+				<div class="eyebrow">Facilities</div>
+				<h2 class="h2" style="margin-top: 14px;">Six spaces.<br />One membership.</h2>
+			</div>
+			<p class="lead">
+				Every square foot of the club is designed around one question: does it make you
+				train, or does it get in the way? If it's in the way, it's not here.
+			</p>
+		</div>
+
+		<div class="facilities-grid" data-reveal>
+			<a href="#" class="facility f-1">
+				<img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1600&q=80" alt="Strength floor" />
+				<div class="facility-overlay">
+					<div class="facility-meta">8,000 sq ft · 12 platforms</div>
+					<h3 class="facility-label">The Strength Floor</h3>
+				</div>
+			</a>
+			<a href="#" class="facility f-2">
+				<img src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=1400&q=80" alt="Ocean-view pool" />
+				<div class="facility-overlay">
+					<div class="facility-meta">25 m · Ocean view</div>
+					<h3 class="facility-label">Lap Pool</h3>
+				</div>
+			</a>
+			<a href="#" class="facility f-3">
+				<img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1400&q=80" alt="Recovery wing" />
+				<div class="facility-overlay">
+					<div class="facility-meta">Cryo · Red light · Massage</div>
+					<h3 class="facility-label">Recovery Wing</h3>
+				</div>
+			</a>
+			<a href="#" class="facility f-4">
+				<img src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=1200&q=80" alt="Finnish sauna" />
+				<div class="facility-overlay">
+					<div class="facility-meta">Traditional Finnish</div>
+					<h3 class="facility-label">Sauna</h3>
+				</div>
+			</a>
+			<a href="#" class="facility f-5">
+				<img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1200&q=80" alt="Jacuzzi and cold plunge" />
+				<div class="facility-overlay">
+					<div class="facility-meta">Hot + cold contrast</div>
+					<h3 class="facility-label">Jacuzzi &amp; Plunge</h3>
+				</div>
+			</a>
+			<a href="#" class="facility f-6">
+				<img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80" alt="Group studios" />
+				<div class="facility-overlay">
+					<div class="facility-meta">Kickboxing · Yoga · HIIT</div>
+					<h3 class="facility-label">Group Studios</h3>
+				</div>
+			</a>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     MEMBERSHIP TIERS
+     ============================================================ -->
+<section class="section" id="membership" style="background: #06060A; padding-top: clamp(80px, 10vw, 140px);">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div>
+				<div class="eyebrow pink">Membership</div>
+				<h2 class="h2" style="margin-top: 14px;">Three ways in.<br />No contracts.</h2>
+			</div>
+			<p class="lead">
+				All memberships are month-to-month. Cancel any time with 30 days notice —
+				no cancellation fees, but no refunds on the current cycle.
+			</p>
+		</div>
+
+		<div class="tiers" data-reveal>
+			<article class="tier">
+				<div class="tier-name">Basic</div>
+				<div class="tier-price">
+					<span class="amount">$149</span><span class="per">/ month</span>
+				</div>
+				<p class="tier-tagline">Strength floor, sauna, and group studios. Everything you need to lift and sweat.</p>
+				<ul class="tier-perks">
+					<li>Strength floor · 24/7 within club hours</li>
+					<li>Sauna &amp; locker room</li>
+					<li>Group studios · unlimited classes</li>
+					<li class="absent">Pool &amp; jacuzzi access</li>
+					<li class="absent">Recovery wing (cryo, red light)</li>
+					<li class="absent">Personal training credits</li>
+					<li class="absent">Dietitian consultation</li>
+				</ul>
+				<a href="#" class="btn btn-dark tier-cta" data-open="join" data-tier="Basic">Join Basic</a>
+			</article>
+
+			<article class="tier featured">
+				<div class="tier-name">Signature</div>
+				<div class="tier-price">
+					<span class="amount">$289</span><span class="per">/ month</span>
+				</div>
+				<p class="tier-tagline">Full club access. What most members choose. Recovery included.</p>
+				<ul class="tier-perks">
+					<li>Everything in Basic</li>
+					<li>Pool &amp; jacuzzi access</li>
+					<li>Cold plunge</li>
+					<li>Recovery wing · 8 sessions / month</li>
+					<li>Dietitian · quarterly review</li>
+					<li class="absent">Personal training credits</li>
+					<li class="absent">On-call sports medicine doctor</li>
+				</ul>
+				<a href="#" class="btn btn-primary tier-cta" data-open="join" data-tier="Signature">Join Signature</a>
+			</article>
+
+			<article class="tier">
+				<div class="tier-name">Elite</div>
+				<div class="tier-price">
+					<span class="amount">$629</span><span class="per">/ month</span>
+				</div>
+				<p class="tier-tagline">The full team behind you. Coach, doctor, physio, dietitian. Weekly touchpoints.</p>
+				<ul class="tier-perks">
+					<li>Everything in Signature</li>
+					<li>Personal training · 8 sessions / month</li>
+					<li>Recovery wing · unlimited</li>
+					<li>Dietitian · weekly plan</li>
+					<li>On-call sports medicine doctor</li>
+					<li>Physiotherapy · 2 sessions / month</li>
+					<li>Priority booking · classes &amp; recovery</li>
+				</ul>
+				<a href="#" class="btn btn-dark tier-cta" data-open="join" data-tier="Elite">Join Elite</a>
+			</article>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     CLASSES
+     ============================================================ -->
+<section class="section" id="classes">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div>
+				<div class="eyebrow">Classes</div>
+				<h2 class="h2" style="margin-top: 14px;">This week<br />at the studios.</h2>
+			</div>
+			<p class="lead">
+				Kickboxing, salsa, yoga, HIIT, spinning, pilates, mobility. Group studios run seven
+				days a week — 42 classes in a normal week. Members book from My Space.
+			</p>
+		</div>
+
+		<div class="classes-grid" data-reveal>
+			<div class="classes-cell head">Time</div>
+			<div class="classes-cell head">Mon</div>
+			<div class="classes-cell head">Tue</div>
+			<div class="classes-cell head col-hide-sm">Wed</div>
+			<div class="classes-cell head col-hide-sm">Thu</div>
+			<div class="classes-cell head col-hide-sm">Fri</div>
+
+			<div class="classes-cell time">06:30</div>
+			<div class="classes-cell slot mint"><span class="name">Yoga · Sunrise</span><span class="coach">with Priya</span></div>
+			<div class="classes-cell slot"><span class="name">HIIT 45</span><span class="coach">with Marcus</span></div>
+			<div class="classes-cell slot mint col-hide-sm"><span class="name">Yoga · Sunrise</span><span class="coach">with Priya</span></div>
+			<div class="classes-cell slot col-hide-sm"><span class="name">HIIT 45</span><span class="coach">with Marcus</span></div>
+			<div class="classes-cell slot mint col-hide-sm"><span class="name">Mobility Flow</span><span class="coach">with Kai</span></div>
+
+			<div class="classes-cell time">09:00</div>
+			<div class="classes-cell slot pink"><span class="name">Kickboxing 60</span><span class="coach">with Diego</span></div>
+			<div class="classes-cell slot"><span class="name">Spinning</span><span class="coach">with Lena</span></div>
+			<div class="classes-cell slot pink col-hide-sm"><span class="name">Kickboxing 60</span><span class="coach">with Diego</span></div>
+			<div class="classes-cell slot col-hide-sm"><span class="name">Pilates Reformer</span><span class="coach">with Sofia</span></div>
+			<div class="classes-cell slot col-hide-sm"><span class="name">Spinning</span><span class="coach">with Lena</span></div>
+
+			<div class="classes-cell time">12:30</div>
+			<div class="classes-cell slot"><span class="name">Barbell 101</span><span class="coach">with Marcus</span></div>
+			<div class="classes-cell slot mint"><span class="name">Mobility Flow</span><span class="coach">with Kai</span></div>
+			<div class="classes-cell slot col-hide-sm"><span class="name">Barbell 101</span><span class="coach">with Marcus</span></div>
+			<div class="classes-cell slot mint col-hide-sm"><span class="name">Yoga · Slow</span><span class="coach">with Priya</span></div>
+			<div class="classes-cell slot col-hide-sm"><span class="name">HIIT 30</span><span class="coach">with Marcus</span></div>
+
+			<div class="classes-cell time">18:30</div>
+			<div class="classes-cell slot pink"><span class="name">Salsa Fit</span><span class="coach">with Elena</span></div>
+			<div class="classes-cell slot pink"><span class="name">Boxing Sparring</span><span class="coach">with Diego</span></div>
+			<div class="classes-cell slot pink col-hide-sm"><span class="name">Salsa Fit</span><span class="coach">with Elena</span></div>
+			<div class="classes-cell slot pink col-hide-sm"><span class="name">Boxing Sparring</span><span class="coach">with Diego</span></div>
+			<div class="classes-cell slot col-hide-sm"><span class="name">Reformer Advanced</span><span class="coach">with Sofia</span></div>
+
+			<div class="classes-cell time">20:00</div>
+			<div class="classes-cell slot mint"><span class="name">Yoga · Restore</span><span class="coach">with Priya</span></div>
+			<div class="classes-cell slot"><span class="name">Spinning Night</span><span class="coach">with Lena</span></div>
+			<div class="classes-cell slot mint col-hide-sm"><span class="name">Yoga · Restore</span><span class="coach">with Priya</span></div>
+			<div class="classes-cell slot col-hide-sm"><span class="name">HIIT 45</span><span class="coach">with Marcus</span></div>
+			<div class="classes-cell slot mint col-hide-sm"><span class="name">Cool-down Mobility</span><span class="coach">with Kai</span></div>
+		</div>
+
+		<div style="margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap;" data-reveal>
+			<button class="btn btn-primary" data-open="auth">Sign in to book</button>
+			<a href="contact.html" class="btn btn-ghost">See full weekly schedule</a>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     STAFF
+     ============================================================ -->
+<section class="section" id="staff" style="background: #06060A; padding-top: clamp(80px, 10vw, 140px);">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div>
+				<div class="eyebrow pink">The Team</div>
+				<h2 class="h2" style="margin-top: 14px;">People who<br />know your name.</h2>
+			</div>
+			<p class="lead">
+				A club is only as good as its staff. Ours has been coaching, treating, and
+				feeding elite athletes for a combined 90 years. Meet six of them.
+			</p>
+		</div>
+
+		<div class="staff-grid" data-reveal>
+			<article class="staff-card">
+				<div class="staff-photo">
+					<img src="https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&w=800&q=80" alt="Marcus Reyes" />
+				</div>
+				<div class="staff-body">
+					<div class="staff-role">Head Strength Coach</div>
+					<h3 class="staff-name">Marcus Reyes</h3>
+					<p class="staff-bio">Former Team USA weightlifting coach. Programs strength for our Signature and Elite members, and runs the Barbell 101 clinic every Tuesday.</p>
+					<ul class="staff-certs">
+						<li>USAW L3</li><li>CSCS</li><li>15+ yrs</li>
+					</ul>
+				</div>
+			</article>
+
+			<article class="staff-card">
+				<div class="staff-photo">
+					<img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&w=800&q=80" alt="Dr. Lena Okafor" />
+				</div>
+				<div class="staff-body">
+					<div class="staff-role">Sports Medicine · MD</div>
+					<h3 class="staff-name">Dr. Lena Okafor</h3>
+					<p class="staff-bio">Sports medicine physician, on-call for Elite members. Runs quarterly bloodwork reviews and screens for training injuries before they happen.</p>
+					<ul class="staff-certs">
+						<li>MD Miami</li><li>Board Certified</li><li>USOC alumna</li>
+					</ul>
+				</div>
+			</article>
+
+			<article class="staff-card">
+				<div class="staff-photo">
+					<img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=800&q=80" alt="Priya Menon" />
+				</div>
+				<div class="staff-body">
+					<div class="staff-role">Nutrition Lead · RD</div>
+					<h3 class="staff-name">Priya Menon</h3>
+					<p class="staff-bio">Registered dietitian. Writes weekly meal plans for Elite members, quarterly reviews for Signature. Also teaches sunrise yoga three days a week.</p>
+					<ul class="staff-certs">
+						<li>RD</li><li>ISSN CISSN</li><li>200 hr Yoga</li>
+					</ul>
+				</div>
+			</article>
+
+			<article class="staff-card">
+				<div class="staff-photo">
+					<img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=800&q=80" alt="Diego Vasquez" />
+				</div>
+				<div class="staff-body">
+					<div class="staff-role">Head Boxing Coach</div>
+					<h3 class="staff-name">Diego Vasquez</h3>
+					<p class="staff-bio">Former super welterweight, 24–2. Runs kickboxing and sparring classes. Beginners welcome — his 9 am class is half executives, half early-shift lifers.</p>
+					<ul class="staff-certs">
+						<li>USA Boxing coach</li><li>NASM</li>
+					</ul>
+				</div>
+			</article>
+
+			<article class="staff-card">
+				<div class="staff-photo">
+					<img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80" alt="Kai Nakamura" />
+				</div>
+				<div class="staff-body">
+					<div class="staff-role">Physiotherapist · DPT</div>
+					<h3 class="staff-name">Kai Nakamura</h3>
+					<p class="staff-bio">Doctor of physical therapy. Works with the Miami Heat during off-season. In-club two full days a week for Elite members and referrals.</p>
+					<ul class="staff-certs">
+						<li>DPT</li><li>OCS</li><li>Miami Heat alum</li>
+					</ul>
+				</div>
+			</article>
+
+			<article class="staff-card">
+				<div class="staff-photo">
+					<img src="https://images.unsplash.com/photo-1548690312-e3b507d8c110?auto=format&fit=crop&w=800&q=80" alt="Sofia Rossi" />
+				</div>
+				<div class="staff-body">
+					<div class="staff-role">Pilates &amp; Mobility</div>
+					<h3 class="staff-name">Sofia Rossi</h3>
+					<p class="staff-bio">Classical reformer training out of Rome. Runs the pilates studio and morning mobility. Deep tissue focus — every session leaves you two inches taller.</p>
+					<ul class="staff-certs">
+						<li>PMA-CPT</li><li>Reformer L4</li><li>10+ yrs</li>
+					</ul>
+				</div>
+			</article>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     TESTIMONIALS
+     ============================================================ -->
+<section class="section" id="testimonials">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div>
+				<div class="eyebrow">Members</div>
+				<h2 class="h2" style="margin-top: 14px;">The people<br />who train here.</h2>
+			</div>
+			<p class="lead">
+				Doctors, lifters, moms in their fifties, a state senator, and one of the
+				lifeguards from South Beach. Three of them agreed to be quoted.
+			</p>
+		</div>
+
+		<div class="testimonials" data-reveal>
+			<article class="testimonial">
+				<p class="quote">"I've belonged to five gyms in Miami. APEX is the first one where the <span class="hl">head trainer knew my form issue by week three</span> and had a program ready for it."</p>
+				<div class="by">
+					<div class="avatar">
+						<img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" alt="Ethan Park" />
+					</div>
+					<div>
+						<div class="who-name">Ethan Park</div>
+						<div class="who-meta">Member · Signature · 2 years</div>
+					</div>
+				</div>
+			</article>
+
+			<article class="testimonial">
+				<p class="quote">"The dietitian rewrote my meal plan around one blood panel. <span class="hl">Down 22 lbs in six months, PR'd my deadlift in the same window.</span> Never happened at any other gym."</p>
+				<div class="by">
+					<div class="avatar">
+						<img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80" alt="Amara Johnson" />
+					</div>
+					<div>
+						<div class="who-name">Amara Johnson</div>
+						<div class="who-meta">Member · Elite · 1 year</div>
+					</div>
+				</div>
+			</article>
+
+			<article class="testimonial">
+				<p class="quote">"I go for the strength floor. I stay for <span class="hl">the sauna after, the ocean view from the pool, and the fact that nobody's on their phone</span>."</p>
+				<div class="by">
+					<div class="avatar">
+						<img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80" alt="Ravi Sethi" />
+					</div>
+					<div>
+						<div class="who-name">Ravi Sethi</div>
+						<div class="who-meta">Member · Signature · 4 years</div>
+					</div>
+				</div>
+			</article>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     CTA FINAL
+     ============================================================ -->
+<section class="cta-final">
+	<div class="wrap section" style="padding-top: clamp(60px, 8vw, 100px); padding-bottom: clamp(60px, 8vw, 100px);">
+		<div class="inner" data-reveal>
+			<h2 class="h1">Book a tour.<br /><span class="accent">Bring your training shoes.</span></h2>
+			<div class="side">
+				<p>
+					Guided tour with a coach, 30 minutes on the floor, a smoothie at the bar,
+					and no sales pitch. If APEX isn't your speed, we'll tell you.
+				</p>
+				<div style="display: flex; gap: 12px; flex-wrap: wrap;">
+					<button class="btn btn-primary" data-open="guestpass">Get a free guest pass</button>
+					<a href="contact.html" class="btn btn-ghost">Contact us</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     CONTACT SNIPPET
+     ============================================================ -->
+<section class="section" id="visit" style="padding-top: clamp(60px, 8vw, 100px);">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div>
+				<div class="eyebrow">Visit</div>
+				<h2 class="h2" style="margin-top: 14px;">Miami Beach.<br />Ocean Drive.</h2>
+			</div>
+			<p class="lead">
+				Corner of Ocean Drive and 12th, right off the boardwalk. Valet in the front,
+				bike racks in the back. Free guest pass for first-time visitors.
+			</p>
+		</div>
+
+		<div class="contact-snippet" data-reveal>
+			<div class="contact-col">
+				<h3>Club hours</h3>
+				<ul class="hours-list" id="hours-list">
+					<li data-day="1"><span class="day">Monday</span><span class="time">05:30 – 23:00</span></li>
+					<li data-day="2"><span class="day">Tuesday</span><span class="time">05:30 – 23:00</span></li>
+					<li data-day="3"><span class="day">Wednesday</span><span class="time">05:30 – 23:00</span></li>
+					<li data-day="4"><span class="day">Thursday</span><span class="time">05:30 – 23:00</span></li>
+					<li data-day="5"><span class="day">Friday</span><span class="time">05:30 – 22:00</span></li>
+					<li data-day="6"><span class="day">Saturday</span><span class="time">07:00 – 21:00</span></li>
+					<li data-day="0"><span class="day">Sunday</span><span class="time">07:00 – 20:00</span></li>
+				</ul>
+			</div>
+			<div class="contact-col address-block">
+				<h3>The Club</h3>
+				<p><strong style="font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.06em;">APEX Athletic Club</strong></p>
+				<p>1201 Ocean Drive<br />Miami Beach, FL 33139</p>
+				<p style="margin-top: 16px;">
+					<a href="tel:+13055551200" style="color: var(--mint); font-family: var(--font-mono);">+1 (305) 555 1200</a><br />
+					<a href="mailto:hello@apexclub.com" style="color: var(--mint); font-family: var(--font-mono);">hello@apexclub.com</a>
+				</p>
+				<div class="contact-actions">
+					<a href="contact.html" class="btn btn-primary">Contact form</a>
+					<button class="btn btn-ghost" data-open="guestpass">Guest pass</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer">
+	<div class="wrap footer-inner">
+		<div class="footer-brand-block">
+			<div class="nav-brand">
+				<span class="apex-mark" aria-hidden="true"></span>
+				APEX
+			</div>
+			<p>Miami's oceanfront strength and recovery club. Small membership, full team, direct beach access. Est. 2019.</p>
+		</div>
+		<div class="footer-col">
+			<h4>Club</h4>
+			<ul>
+				<li><a href="#facilities">Facilities</a></li>
+				<li><a href="#membership">Membership</a></li>
+				<li><a href="#classes">Classes</a></li>
+				<li><a href="#staff">Team</a></li>
+			</ul>
+		</div>
+		<div class="footer-col">
+			<h4>Shop</h4>
+			<ul>
+				<li><a href="shop.html">Supplements</a></li>
+				<li><a href="shop.html">Weights &amp; equipment</a></li>
+				<li><a href="shop.html">Recovery</a></li>
+				<li><a href="shop.html">Apparel</a></li>
+			</ul>
+		</div>
+		<div class="footer-col">
+			<h4>Info</h4>
+			<ul>
+				<li><a href="contact.html">Contact</a></li>
+				<li><a href="#visit">Hours &amp; address</a></li>
+				<li><a href="user.html">My Space</a></li>
+				<li><a href="#membership">Cancel policy</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="footer-bottom">
+		<div>© 2026 APEX Athletic Club · Miami Beach</div>
+		<div>Fictional concept · Designed &amp; built as portfolio work</div>
+	</div>
+</footer>
+
+<!-- ============================================================
+     MODALS — Auth + Guest pass + Join tier
+     ============================================================ -->
+<div class="overlay" id="auth-overlay" role="dialog" aria-modal="true" aria-label="Sign in">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+				<path d="M6 6l12 12M18 6L6 18" />
+			</svg>
+		</button>
+		<h3>Sign in</h3>
+		<p class="hint">Access your dashboard, class bookings and personal training slots.</p>
+		<button class="modal-google-btn" id="google-signin">
+			<svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.5 2 30.1 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.4 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M47 24.6c0-1.7-.1-3-.4-4.4H24v8.8h13.1c-.5 3-2.1 5.5-4.5 7.3l7.2 5.6c4.2-3.9 6.7-9.6 6.7-17.3z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.3.8-4.7l-7.8-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.8-5.8l-7.2-5.6c-2 1.4-4.6 2.2-8.6 2.2-6.5 0-12-4.4-13.9-10.3l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+			Continue with Google
+		</button>
+		<div class="modal-separator">OR EMAIL</div>
+		<form id="auth-form">
+			<div class="field">
+				<label for="auth-email">Email</label>
+				<input type="email" id="auth-email" required placeholder="you@apexclub.com" />
+			</div>
+			<div class="field">
+				<label for="auth-name">Full name</label>
+				<input type="text" id="auth-name" required placeholder="Alex Reyes" />
+			</div>
+			<div class="modal-actions">
+				<button type="submit" class="btn btn-primary" style="flex: 1;">Continue</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div class="overlay" id="guestpass-overlay" role="dialog" aria-modal="true" aria-label="Get a free guest pass">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+				<path d="M6 6l12 12M18 6L6 18" />
+			</svg>
+		</button>
+		<h3>Free guest pass</h3>
+		<p class="hint">One full day at the club — floor, pool, sauna, jacuzzi, one group class. On us.</p>
+		<form id="guestpass-form">
+			<div class="field">
+				<label for="gp-name">Full name</label>
+				<input type="text" id="gp-name" required placeholder="Alex Reyes" />
+			</div>
+			<div class="field">
+				<label for="gp-email">Email</label>
+				<input type="email" id="gp-email" required placeholder="you@example.com" />
+			</div>
+			<div class="field">
+				<label for="gp-phone">Phone</label>
+				<input type="tel" id="gp-phone" required placeholder="+1 305 555 0000" />
+			</div>
+			<div class="field">
+				<label for="gp-date">Preferred date</label>
+				<input type="date" id="gp-date" required />
+			</div>
+			<div class="modal-actions">
+				<button type="submit" class="btn btn-primary" style="flex: 1;">Request pass</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div class="overlay" id="join-overlay" role="dialog" aria-modal="true" aria-label="Join APEX">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+				<path d="M6 6l12 12M18 6L6 18" />
+			</svg>
+		</button>
+		<h3>Join APEX</h3>
+		<p class="hint">You've picked <strong id="join-tier-name" style="color: var(--pink);">Signature</strong>. Complete the details below — one of the team will confirm within 24 hours.</p>
+		<form id="join-form">
+			<div class="field">
+				<label for="j-name">Full name</label>
+				<input type="text" id="j-name" required placeholder="Alex Reyes" />
+			</div>
+			<div class="field">
+				<label for="j-email">Email</label>
+				<input type="email" id="j-email" required placeholder="you@example.com" />
+			</div>
+			<div class="field">
+				<label for="j-phone">Phone</label>
+				<input type="tel" id="j-phone" required placeholder="+1 305 555 0000" />
+			</div>
+			<div class="field">
+				<label for="j-start">Preferred start date</label>
+				<input type="date" id="j-start" required />
+			</div>
+			<div class="modal-actions">
+				<button type="submit" class="btn btn-primary" style="flex: 1;">Submit application</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">Message sent</div>
+
+<!-- ============================================================
+     JS
+     ============================================================ -->
+<script>
+	(function () {
+		// --- Reveal on scroll ---
+		const revealEls = document.querySelectorAll("[data-reveal]");
+		const io = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((e) => {
+					if (e.isIntersecting) {
+						e.target.classList.add("is-in");
+						io.unobserve(e.target);
+					}
+				});
+			},
+			{ rootMargin: "0px 0px -8% 0px", threshold: 0.06 }
+		);
+		revealEls.forEach((el) => io.observe(el));
+		// Failsafe if IO never fires
+		setTimeout(() => revealEls.forEach((el) => el.classList.add("is-in")), 3000);
+
+		// --- Mobile nav ---
+		const mobileToggle = document.getElementById("nav-toggle");
+		const mobileNav = document.getElementById("mobile-nav");
+		const mobileClose = document.getElementById("mobile-nav-close");
+		function openMobile() {
+			mobileNav.classList.add("open");
+			mobileNav.setAttribute("aria-hidden", "false");
+			document.body.style.overflow = "hidden";
+			lockScrollGutter(true);
+		}
+		function closeMobile() {
+			mobileNav.classList.remove("open");
+			mobileNav.setAttribute("aria-hidden", "true");
+			document.body.style.overflow = "";
+			lockScrollGutter(false);
+		}
+		mobileToggle?.addEventListener("click", openMobile);
+		mobileClose?.addEventListener("click", closeMobile);
+		mobileNav?.querySelectorAll("a, span").forEach((el) =>
+			el.addEventListener("click", closeMobile)
+		);
+
+		// --- Scrollbar gutter lock (prevents flash of light gutter when modals open) ---
+		function lockScrollGutter(on) {
+			document.documentElement.style.scrollbarColor = on ? "#0A0A0F #0A0A0F" : "";
+		}
+
+		// --- Scroll spy for nav (Home / Classes / Membership are same-page anchors) ---
+		const desktopLinks = new Map();
+		document.querySelectorAll("[data-nav]").forEach((el) => desktopLinks.set(el.getAttribute("data-nav"), el));
+		const mobileLinks = new Map();
+		document.querySelectorAll("[data-nav-m]").forEach((el) => mobileLinks.set(el.getAttribute("data-nav-m"), el));
+
+		const spySections = [
+			{ id: "home", el: document.querySelector(".hero") },
+			{ id: "membership", el: document.getElementById("membership") },
+			{ id: "classes", el: document.getElementById("classes") },
+		].filter((s) => s.el);
+
+		let currentActive = "home";
+		let lockUntil = 0;
+		function setActive(id) {
+			if (id === currentActive) return;
+			currentActive = id;
+			[desktopLinks, mobileLinks].forEach((map) => {
+				map.forEach((el, key) => {
+					const active = key === id;
+					el.classList.toggle("active", active);
+				});
+			});
+		}
+		function pickActive() {
+			if (Date.now() < lockUntil) return;
+			const line = 140;
+			let picked = spySections[0].id;
+			for (const s of spySections) {
+				const top = s.el.getBoundingClientRect().top;
+				if (top <= line) picked = s.id;
+				else break;
+			}
+			setActive(picked);
+		}
+		let ticking = false;
+		window.addEventListener("scroll", () => {
+			if (ticking) return;
+			ticking = true;
+			requestAnimationFrame(() => { pickActive(); ticking = false; });
+		}, { passive: true });
+		window.addEventListener("resize", pickActive);
+		pickActive();
+
+		// Instant click feedback on in-page anchor nav links.
+		function bindInstant(el, id) {
+			el.addEventListener("click", () => {
+				setActive(id);
+				lockUntil = Date.now() + 800;
+			});
+		}
+		desktopLinks.forEach((el, key) => { if (["home","membership","classes"].includes(key)) bindInstant(el, key); });
+		mobileLinks.forEach((el, key) => { if (["home","membership","classes"].includes(key)) bindInstant(el, key); });
+
+		// --- Highlight today in club hours list ---
+		const today = new Date().getDay(); // 0 = Sunday
+		document.querySelectorAll("#hours-list li").forEach((li) => {
+			if (parseInt(li.dataset.day, 10) === today) li.classList.add("today");
+		});
+
+		// --- Modal open/close (event delegation) ---
+		function openOverlay(id) {
+			const el = document.getElementById(id + "-overlay");
+			if (!el) return;
+			el.classList.add("open");
+			document.body.style.overflow = "hidden";
+			lockScrollGutter(true);
+		}
+		function closeOverlay(el) {
+			el.classList.remove("open");
+			document.body.style.overflow = "";
+			lockScrollGutter(false);
+		}
+		document.addEventListener("click", (e) => {
+			const opener = e.target.closest("[data-open]");
+			if (opener) {
+				const id = opener.getAttribute("data-open");
+				if (id === "join") {
+					const tier = opener.getAttribute("data-tier") || "Signature";
+					const label = document.getElementById("join-tier-name");
+					if (label) label.textContent = tier;
+				}
+				openOverlay(id);
+				return;
+			}
+			const closer = e.target.closest("[data-close]");
+			if (closer) {
+				const overlay = closer.closest(".overlay");
+				if (overlay) closeOverlay(overlay);
+				return;
+			}
+			// Click on backdrop
+			if (e.target.classList.contains("overlay")) closeOverlay(e.target);
+		});
+		document.addEventListener("keydown", (e) => {
+			if (e.key === "Escape") {
+				document.querySelectorAll(".overlay.open").forEach(closeOverlay);
+				if (mobileNav.classList.contains("open")) closeMobile();
+			}
+		});
+
+		// --- Auth / Guest / Join form submissions (fake, localStorage-backed) ---
+		function saveAccount(email, name) {
+			try {
+				localStorage.setItem("apex_account", JSON.stringify({ email, name, tier: "Signature", joined: Date.now() }));
+			} catch (_) {}
+		}
+		function showToast(msg) {
+			const t = document.getElementById("toast");
+			t.textContent = msg;
+			t.classList.add("show");
+			setTimeout(() => t.classList.remove("show"), 2400);
+		}
+
+		document.getElementById("google-signin")?.addEventListener("click", () => {
+			saveAccount("alex.reyes@gmail.com", "Alex Reyes");
+			closeOverlay(document.getElementById("auth-overlay"));
+			showToast("Signed in — welcome back, Alex");
+			setTimeout(() => (window.location.href = "user.html"), 900);
+		});
+		document.getElementById("auth-form")?.addEventListener("submit", (e) => {
+			e.preventDefault();
+			const email = document.getElementById("auth-email").value.trim();
+			const name = document.getElementById("auth-name").value.trim();
+			if (!email || !name) return;
+			saveAccount(email, name);
+			closeOverlay(document.getElementById("auth-overlay"));
+			showToast("Signed in — welcome, " + name.split(" ")[0]);
+			setTimeout(() => (window.location.href = "user.html"), 900);
+		});
+		document.getElementById("guestpass-form")?.addEventListener("submit", (e) => {
+			e.preventDefault();
+			closeOverlay(document.getElementById("guestpass-overlay"));
+			showToast("Guest pass requested — check your email");
+			e.target.reset();
+		});
+		document.getElementById("join-form")?.addEventListener("submit", (e) => {
+			e.preventDefault();
+			closeOverlay(document.getElementById("join-overlay"));
+			showToast("Application received — we'll be in touch");
+			e.target.reset();
+		});
+
+		// --- If already signed in, swap Sign in button for My Space ---
+		try {
+			const raw = localStorage.getItem("apex_account");
+			if (raw) {
+				const acc = JSON.parse(raw);
+				const signIn = document.getElementById("nav-signin-btn");
+				const signInMobile = document.getElementById("mobile-signin-btn");
+				if (signIn) {
+					signIn.textContent = "My Space";
+					signIn.removeAttribute("data-open");
+					signIn.addEventListener("click", () => (window.location.href = "user.html"));
+				}
+				if (signInMobile) {
+					signInMobile.textContent = "My Space";
+					signInMobile.removeAttribute("data-open");
+					signInMobile.addEventListener("click", () => (window.location.href = "user.html"));
+				}
+			}
+		} catch (_) {}
+	})();
+</script>
