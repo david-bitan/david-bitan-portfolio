@@ -283,7 +283,7 @@
 		position: relative;
 		min-height: calc(100vh - var(--nav-h));
 		display: flex;
-		align-items: center;
+		align-items: flex-end;
 		overflow: hidden;
 		background: linear-gradient(180deg, #0F0F18 0%, #06060A 100%);
 	}
@@ -302,7 +302,7 @@
 		z-index: 1;
 		max-width: var(--maxw);
 		margin: 0 auto;
-		padding: clamp(60px, 8vw, 100px) var(--pad-x);
+		padding: clamp(80px, 12vw, 160px) var(--pad-x) clamp(60px, 8vw, 120px);
 		width: 100%;
 		display: grid;
 		grid-template-columns: 1fr;
@@ -378,21 +378,21 @@
 		grid-template-columns: 1fr 1fr;
 		gap: 60px;
 		margin-bottom: 60px;
-		align-items: start;
+		align-items: end;
 	}
 	.section .head p.lead { margin: 0; }
 	.about-body {
 		display: grid;
 		grid-template-columns: 1fr 1.2fr;
 		gap: 60px;
-		align-items: stretch;
+		align-items: start;
 	}
 	.about-photo {
 		position: relative;
+		aspect-ratio: 4 / 5;
 		overflow: hidden;
 		border-radius: 4px;
 		background: var(--ink-2);
-		min-height: 100%;
 	}
 	.about-photo img {
 		width: 100%; height: 100%;
@@ -509,44 +509,10 @@
 	/* ============================================================
 	   MEMBERSHIP TIERS
 	   ============================================================ */
-	/* Billing period toggle above tier cards. */
-	.billing-toggle {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		padding: 4px;
-		background: var(--ink-2);
-		border: 1px solid var(--line);
-		border-radius: 999px;
-		margin-bottom: 40px;
-	}
-	.billing-toggle button {
-		font-family: var(--font-display);
-		font-weight: 600;
-		font-size: 12px;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		padding: 10px 20px;
-		border-radius: 999px;
-		color: var(--white-mute);
-		transition: color 200ms ease, background 200ms ease;
-	}
-	.billing-toggle button.active {
-		background: var(--pink);
-		color: var(--ink);
-	}
-	.billing-toggle .save-badge {
-		font-family: var(--font-mono);
-		font-size: 10px;
-		color: var(--mint);
-		margin-left: 4px;
-		letter-spacing: 0;
-	}
 	.tiers {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
 		gap: 20px;
-		align-items: stretch;
 	}
 	.tier {
 		background: var(--ink-2);
@@ -839,7 +805,7 @@
 		align-items: center;
 	}
 	.cta-final .h1 { text-transform: uppercase; }
-	.cta-final .h1 .accent { color: var(--pink); }
+	.cta-final .h1 .accent { color: var(--pink); font-style: italic; }
 	.cta-final .side {
 		display: flex;
 		flex-direction: column;
@@ -1033,58 +999,6 @@
 		display: flex; gap: 10px;
 		margin-top: 8px;
 	}
-	/* Plan selector (radio-style cards inside the Join modal step 1) */
-	.plan-radios { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-	.plan-radio {
-		display: flex; align-items: center; gap: 14px;
-		padding: 16px 18px;
-		border: 1px solid var(--line-strong);
-		border-radius: 8px;
-		cursor: pointer;
-		transition: border-color 200ms ease, background 200ms ease;
-	}
-	.plan-radio:hover { border-color: var(--white-mute); }
-	.plan-radio input { display: none; }
-	.plan-radio .radio-dot {
-		width: 18px; height: 18px;
-		border-radius: 50%;
-		border: 1.5px solid var(--line-strong);
-		flex-shrink: 0;
-		position: relative;
-		transition: border-color 200ms ease;
-	}
-	.plan-radio input:checked ~ .radio-dot {
-		border-color: var(--pink);
-	}
-	.plan-radio input:checked ~ .radio-dot::after {
-		content: ""; position: absolute;
-		inset: 3px; border-radius: 50%;
-		background: var(--pink);
-	}
-	.plan-radio:has(input:checked) {
-		border-color: var(--pink);
-		background: rgba(255,46,126,0.05);
-	}
-	.plan-radio .plan-info { flex: 1; }
-	.plan-radio .plan-info-name {
-		font-family: var(--font-display);
-		font-size: 14px;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: var(--white);
-	}
-	.plan-radio .plan-info-desc {
-		font-size: 12px;
-		color: var(--white-mute);
-		margin-top: 2px;
-	}
-	.plan-radio .plan-info-price {
-		font-family: var(--font-mono);
-		font-weight: 700;
-		font-size: 16px;
-		color: var(--mint);
-	}
-	.cc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 	.modal-google-btn {
 		width: 100%;
 		display: flex;
@@ -1194,15 +1108,16 @@
 		<nav>
 			<ul class="nav-links" id="desk-nav">
 				<li><span class="active" data-nav="home">Home</span></li>
-				<li><a href="#" data-nav="shop" data-soon="Shop">Shop</a></li>
+				<li><a href="shop.html" data-nav="shop">Shop</a></li>
+				<li><a href="#classes" data-nav="classes">Classes</a></li>
 				<li><a href="#membership" data-nav="membership">Membership</a></li>
-				<li><a href="#" data-nav="classes" data-soon="Classes">Classes</a></li>
-				<li><a href="#" data-nav="contact" data-soon="Contact">Contact</a></li>
+				<li><a href="contact.html" data-nav="contact">Contact</a></li>
 			</ul>
 		</nav>
 
 		<div class="nav-cta">
-			<button class="btn btn-primary" data-open="join" id="nav-join-btn">Join</button>
+			<button class="btn btn-ghost" data-open="auth" id="nav-signin-btn">Sign in</button>
+			<a href="#membership" class="btn btn-primary">Join</a>
 		</div>
 
 		<button class="nav-toggle" id="nav-toggle" aria-label="Open menu">
@@ -1220,11 +1135,11 @@
 		</svg>
 	</button>
 	<span class="active" data-nav-m="home">Home</span>
-	<a href="#" data-nav-m="shop" data-soon="Shop">Shop</a>
+	<a href="shop.html" data-nav-m="shop">Shop</a>
+	<a href="#classes" data-nav-m="classes">Classes</a>
 	<a href="#membership" data-nav-m="membership">Membership</a>
-	<a href="#" data-nav-m="classes" data-soon="Classes">Classes</a>
-	<a href="#" data-nav-m="contact" data-soon="Contact">Contact</a>
-	<button class="btn btn-primary" data-open="join" id="mobile-join-btn" style="margin-top: 20px;">Join</button>
+	<a href="contact.html" data-nav-m="contact">Contact</a>
+	<button class="btn btn-primary" data-open="auth" id="mobile-signin-btn" style="margin-top: 20px;">Sign in</button>
 </div>
 
 <!-- ============================================================
@@ -1417,24 +1332,21 @@
 			</p>
 		</div>
 
-		<div data-reveal>
-			<div class="billing-toggle" role="tablist" aria-label="Billing period">
-				<button type="button" class="active" data-billing="monthly">Monthly</button>
-				<button type="button" data-billing="annual">Annual <span class="save-badge">−20%</span></button>
-			</div>
-		</div>
-
 		<div class="tiers" data-reveal>
 			<article class="tier">
 				<div class="tier-name">Basic</div>
 				<div class="tier-price">
-					<span class="amount" data-monthly="25" data-annual="240">$25</span><span class="per" data-per>/ month</span>
+					<span class="amount">$149</span><span class="per">/ month</span>
 				</div>
 				<p class="tier-tagline">Strength floor, sauna, and group studios. Everything you need to lift and sweat.</p>
 				<ul class="tier-perks">
 					<li>Strength floor · 24/7 within club hours</li>
 					<li>Sauna &amp; locker room</li>
 					<li>Group studios · unlimited classes</li>
+					<li class="absent">Pool &amp; jacuzzi access</li>
+					<li class="absent">Recovery wing (cryo, red light)</li>
+					<li class="absent">Personal training credits</li>
+					<li class="absent">Dietitian consultation</li>
 				</ul>
 				<a href="#" class="btn btn-dark tier-cta" data-open="join" data-tier="Basic">Join Basic</a>
 			</article>
@@ -1442,7 +1354,7 @@
 			<article class="tier featured">
 				<div class="tier-name">Signature</div>
 				<div class="tier-price">
-					<span class="amount" data-monthly="30" data-annual="288">$30</span><span class="per" data-per>/ month</span>
+					<span class="amount">$289</span><span class="per">/ month</span>
 				</div>
 				<p class="tier-tagline">Full club access. What most members choose. Recovery included.</p>
 				<ul class="tier-perks">
@@ -1451,6 +1363,8 @@
 					<li>Cold plunge</li>
 					<li>Recovery wing · 8 sessions / month</li>
 					<li>Dietitian · quarterly review</li>
+					<li class="absent">Personal training credits</li>
+					<li class="absent">On-call sports medicine doctor</li>
 				</ul>
 				<a href="#" class="btn btn-primary tier-cta" data-open="join" data-tier="Signature">Join Signature</a>
 			</article>
@@ -1458,7 +1372,7 @@
 			<article class="tier">
 				<div class="tier-name">Elite</div>
 				<div class="tier-price">
-					<span class="amount" data-monthly="32" data-annual="308">$32</span><span class="per" data-per>/ month</span>
+					<span class="amount">$629</span><span class="per">/ month</span>
 				</div>
 				<p class="tier-tagline">The full team behind you. Coach, doctor, physio, dietitian. Weekly touchpoints.</p>
 				<ul class="tier-perks">
@@ -1537,8 +1451,8 @@
 		</div>
 
 		<div style="margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap;" data-reveal>
-			<button class="btn btn-primary" data-open="join">Join to book classes</button>
-			<a href="#" data-soon="Classes" class="btn btn-ghost">See full weekly schedule</a>
+			<button class="btn btn-primary" data-open="auth">Sign in to book</button>
+			<a href="contact.html" class="btn btn-ghost">See full weekly schedule</a>
 		</div>
 	</div>
 </section>
@@ -1590,7 +1504,7 @@
 
 			<article class="staff-card">
 				<div class="staff-photo">
-					<img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80" alt="Priya Menon" />
+					<img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=800&q=80" alt="Priya Menon" />
 				</div>
 				<div class="staff-body">
 					<div class="staff-role">Nutrition Lead · RD</div>
@@ -1604,7 +1518,7 @@
 
 			<article class="staff-card">
 				<div class="staff-photo">
-					<img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=800&q=80" alt="Diego Vasquez" />
+					<img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=800&q=80" alt="Diego Vasquez" />
 				</div>
 				<div class="staff-body">
 					<div class="staff-role">Head Boxing Coach</div>
@@ -1618,7 +1532,7 @@
 
 			<article class="staff-card">
 				<div class="staff-photo">
-					<img src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=800&q=80" alt="Kai Nakamura" />
+					<img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80" alt="Kai Nakamura" />
 				</div>
 				<div class="staff-body">
 					<div class="staff-role">Physiotherapist · DPT</div>
@@ -1720,7 +1634,7 @@
 				</p>
 				<div style="display: flex; gap: 12px; flex-wrap: wrap;">
 					<button class="btn btn-primary" data-open="guestpass">Get a free guest pass</button>
-					<a href="#" data-soon="Contact" class="btn btn-ghost">Contact us</a>
+					<a href="contact.html" class="btn btn-ghost">Contact us</a>
 				</div>
 			</div>
 		</div>
@@ -1765,7 +1679,7 @@
 					<a href="mailto:hello@apexclub.com" style="color: var(--mint); font-family: var(--font-mono);">hello@apexclub.com</a>
 				</p>
 				<div class="contact-actions">
-					<button class="btn btn-primary" data-open="contactform">Contact form</button>
+					<a href="contact.html" class="btn btn-primary">Contact form</a>
 					<button class="btn btn-ghost" data-open="guestpass">Guest pass</button>
 				</div>
 			</div>
@@ -1797,18 +1711,18 @@
 		<div class="footer-col">
 			<h4>Shop</h4>
 			<ul>
-				<li><a href="#" data-soon="Shop">Supplements</a></li>
-				<li><a href="#" data-soon="Shop">Weights &amp; equipment</a></li>
-				<li><a href="#" data-soon="Shop">Recovery</a></li>
-				<li><a href="#" data-soon="Shop">Apparel</a></li>
+				<li><a href="shop.html">Supplements</a></li>
+				<li><a href="shop.html">Weights &amp; equipment</a></li>
+				<li><a href="shop.html">Recovery</a></li>
+				<li><a href="shop.html">Apparel</a></li>
 			</ul>
 		</div>
 		<div class="footer-col">
 			<h4>Info</h4>
 			<ul>
-				<li><a href="#" data-soon="Contact">Contact</a></li>
+				<li><a href="contact.html">Contact</a></li>
 				<li><a href="#visit">Hours &amp; address</a></li>
-				<li><a href="#" data-soon="My Space">My Space</a></li>
+				<li><a href="user.html">My Space</a></li>
 				<li><a href="#membership">Cancel policy</a></li>
 			</ul>
 		</div>
@@ -1820,8 +1734,38 @@
 </footer>
 
 <!-- ============================================================
-     MODALS — Join (multi-step) + Guest pass + Contact form
+     MODALS — Auth + Guest pass + Join tier
      ============================================================ -->
+<div class="overlay" id="auth-overlay" role="dialog" aria-modal="true" aria-label="Sign in">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+				<path d="M6 6l12 12M18 6L6 18" />
+			</svg>
+		</button>
+		<h3>Sign in</h3>
+		<p class="hint">Access your dashboard, class bookings and personal training slots.</p>
+		<button class="modal-google-btn" id="google-signin">
+			<svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.5 2 30.1 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.4 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M47 24.6c0-1.7-.1-3-.4-4.4H24v8.8h13.1c-.5 3-2.1 5.5-4.5 7.3l7.2 5.6c4.2-3.9 6.7-9.6 6.7-17.3z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.3.8-4.7l-7.8-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.8-5.8l-7.2-5.6c-2 1.4-4.6 2.2-8.6 2.2-6.5 0-12-4.4-13.9-10.3l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+			Continue with Google
+		</button>
+		<div class="modal-separator">OR EMAIL</div>
+		<form id="auth-form">
+			<div class="field">
+				<label for="auth-email">Email</label>
+				<input type="email" id="auth-email" required placeholder="you@apexclub.com" />
+			</div>
+			<div class="field">
+				<label for="auth-name">Full name</label>
+				<input type="text" id="auth-name" required placeholder="Alex Reyes" />
+			</div>
+			<div class="modal-actions">
+				<button type="submit" class="btn btn-primary" style="flex: 1;">Continue</button>
+			</div>
+		</form>
+	</div>
+</div>
+
 <div class="overlay" id="guestpass-overlay" role="dialog" aria-modal="true" aria-label="Get a free guest pass">
 	<div class="modal">
 		<button class="modal-close" data-close aria-label="Close">
@@ -1862,111 +1806,27 @@
 				<path d="M6 6l12 12M18 6L6 18" />
 			</svg>
 		</button>
-
-		<!-- STEP 1 — Choose plan -->
-		<div class="join-step" data-step="1">
-			<h3>Join APEX</h3>
-			<p class="hint">Step 1 of 2 — Pick your plan. Cancel any time with 30 days notice.</p>
-			<div class="plan-radios">
-				<label class="plan-radio">
-					<input type="radio" name="plan" value="Basic" data-monthly="25" data-annual="240" />
-					<span class="radio-dot"></span>
-					<div class="plan-info">
-						<div class="plan-info-name">Basic</div>
-						<div class="plan-info-desc">Strength floor, sauna, group studios.</div>
-					</div>
-					<div class="plan-info-price" data-tier-price>$25 / mo</div>
-				</label>
-				<label class="plan-radio">
-					<input type="radio" name="plan" value="Signature" data-monthly="30" data-annual="288" checked />
-					<span class="radio-dot"></span>
-					<div class="plan-info">
-						<div class="plan-info-name">Signature <span style="color: var(--pink); font-size: 10px; font-family: var(--font-mono); margin-left: 6px;">MOST POPULAR</span></div>
-						<div class="plan-info-desc">Full club + recovery wing 8/mo + dietitian.</div>
-					</div>
-					<div class="plan-info-price" data-tier-price>$30 / mo</div>
-				</label>
-				<label class="plan-radio">
-					<input type="radio" name="plan" value="Elite" data-monthly="32" data-annual="308" />
-					<span class="radio-dot"></span>
-					<div class="plan-info">
-						<div class="plan-info-name">Elite</div>
-						<div class="plan-info-desc">Personal training + doctor + physio + weekly plan.</div>
-					</div>
-					<div class="plan-info-price" data-tier-price>$32 / mo</div>
-				</label>
+		<h3>Join APEX</h3>
+		<p class="hint">You've picked <strong id="join-tier-name" style="color: var(--pink);">Signature</strong>. Complete the details below — one of the team will confirm within 24 hours.</p>
+		<form id="join-form">
+			<div class="field">
+				<label for="j-name">Full name</label>
+				<input type="text" id="j-name" required placeholder="Alex Reyes" />
+			</div>
+			<div class="field">
+				<label for="j-email">Email</label>
+				<input type="email" id="j-email" required placeholder="you@example.com" />
+			</div>
+			<div class="field">
+				<label for="j-phone">Phone</label>
+				<input type="tel" id="j-phone" required placeholder="+1 305 555 0000" />
+			</div>
+			<div class="field">
+				<label for="j-start">Preferred start date</label>
+				<input type="date" id="j-start" required />
 			</div>
 			<div class="modal-actions">
-				<button type="button" class="btn btn-primary" style="flex: 1;" id="join-next">Continue to payment</button>
-			</div>
-		</div>
-
-		<!-- STEP 2 — Payment (fake credit card) -->
-		<div class="join-step" data-step="2" style="display: none;">
-			<h3>Payment</h3>
-			<p class="hint">Step 2 of 2 — <strong style="color: var(--pink);" id="join-summary">Signature · $30 / month</strong>. Any card number will be accepted (demo only, no real payment).</p>
-			<form id="join-form">
-				<div class="field">
-					<label for="cc-name">Name on card</label>
-					<input type="text" id="cc-name" required placeholder="Alex Reyes (any name)" />
-				</div>
-				<div class="field">
-					<label for="cc-number">Card number</label>
-					<input type="text" id="cc-number" required placeholder="4242 4242 4242 4242 (any number)" inputmode="numeric" maxlength="19" />
-				</div>
-				<div class="cc-row">
-					<div class="field">
-						<label for="cc-expiry">Expiry (MM / YY)</label>
-						<input type="text" id="cc-expiry" required placeholder="12 / 28" maxlength="7" />
-					</div>
-					<div class="field">
-						<label for="cc-cvc">CVC</label>
-						<input type="text" id="cc-cvc" required placeholder="123" maxlength="4" inputmode="numeric" />
-					</div>
-				</div>
-				<div class="modal-actions" style="gap: 10px;">
-					<button type="button" class="btn btn-ghost" id="join-back">Back</button>
-					<button type="submit" class="btn btn-primary" style="flex: 1;">Confirm &amp; join</button>
-				</div>
-			</form>
-		</div>
-	</div>
-</div>
-
-<!-- Contact form modal (used from bottom-of-page CTA row) -->
-<div class="overlay" id="contactform-overlay" role="dialog" aria-modal="true" aria-label="Contact APEX">
-	<div class="modal">
-		<button class="modal-close" data-close aria-label="Close">
-			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-				<path d="M6 6l12 12M18 6L6 18" />
-			</svg>
-		</button>
-		<h3>Contact us</h3>
-		<p class="hint">Question about membership, classes, or a corporate rate — we reply within one business day.</p>
-		<form id="contactform-form">
-			<div class="field">
-				<label for="cf-name">Full name</label>
-				<input type="text" id="cf-name" required placeholder="Alex Reyes" />
-			</div>
-			<div class="field">
-				<label for="cf-email">Email</label>
-				<input type="email" id="cf-email" required placeholder="you@example.com" />
-			</div>
-			<div class="field">
-				<label for="cf-subject">Subject</label>
-				<select id="cf-subject" required>
-					<option value="Membership">Membership</option>
-					<option value="Personal training">Personal training</option>
-					<option value="Corporate rate">Corporate rate</option>
-					<option value="Other">Other</option>
-				</select>
-			</div>
-			<div class="field">
-				<label for="cf-message">Message</label>
-				<textarea id="cf-message" required rows="4" placeholder="Tell us how we can help"></textarea>
-			</div>
-			<div class="modal-actions">
-				<button type="submit" class="btn btn-primary" style="flex: 1;">Send message</button>
+				<button type="submit" class="btn btn-primary" style="flex: 1;">Submit application</button>
 			</div>
 		</form>
 	</div>
@@ -2090,12 +1950,6 @@
 			el.classList.add("open");
 			document.body.style.overflow = "hidden";
 			lockScrollGutter(true);
-			// Reset Join modal back to step 1 whenever it opens.
-			if (id === "join") {
-				el.querySelectorAll(".join-step").forEach((s) => {
-					s.style.display = s.dataset.step === "1" ? "" : "none";
-				});
-			}
 		}
 		function closeOverlay(el) {
 			el.classList.remove("open");
@@ -2103,23 +1957,13 @@
 			lockScrollGutter(false);
 		}
 		document.addEventListener("click", (e) => {
-			// "Coming soon" links (Shop / Classes / Contact / My Space until pages exist)
-			const soon = e.target.closest("[data-soon]");
-			if (soon) {
-				e.preventDefault();
-				const label = soon.getAttribute("data-soon");
-				showToast(label + " page coming soon");
-				return;
-			}
 			const opener = e.target.closest("[data-open]");
 			if (opener) {
 				const id = opener.getAttribute("data-open");
 				if (id === "join") {
-					const tier = opener.getAttribute("data-tier");
-					if (tier) {
-						const radio = document.querySelector('input[name="plan"][value="' + tier + '"]');
-						if (radio) radio.checked = true;
-					}
+					const tier = opener.getAttribute("data-tier") || "Signature";
+					const label = document.getElementById("join-tier-name");
+					if (label) label.textContent = tier;
 				}
 				openOverlay(id);
 				return;
@@ -2140,37 +1984,10 @@
 			}
 		});
 
-		// --- Billing period toggle (monthly / annual on tiers cards) ---
-		let billingPeriod = "monthly";
-		function applyBilling(period) {
-			billingPeriod = period;
-			document.querySelectorAll(".billing-toggle button").forEach((b) => {
-				b.classList.toggle("active", b.dataset.billing === period);
-			});
-			document.querySelectorAll(".tier .amount").forEach((el) => {
-				const m = parseInt(el.dataset.monthly, 10);
-				const a = parseInt(el.dataset.annual, 10);
-				el.textContent = "$" + (period === "monthly" ? m : a);
-			});
-			document.querySelectorAll(".tier [data-per]").forEach((el) => {
-				el.textContent = period === "monthly" ? "/ month" : "/ year";
-			});
-			// Sync plan radios in Join modal too
-			document.querySelectorAll(".plan-radio [data-tier-price]").forEach((el) => {
-				const input = el.closest(".plan-radio").querySelector("input");
-				const m = parseInt(input.dataset.monthly, 10);
-				const a = parseInt(input.dataset.annual, 10);
-				el.textContent = "$" + (period === "monthly" ? m : a) + " / " + (period === "monthly" ? "mo" : "yr");
-			});
-		}
-		document.querySelectorAll(".billing-toggle button").forEach((b) => {
-			b.addEventListener("click", () => applyBilling(b.dataset.billing));
-		});
-
-		// --- Join flow: step 1 (plan) -> step 2 (fake credit card) -> save + swap nav ---
-		function saveAccount(name, tier) {
+		// --- Auth / Guest / Join form submissions (fake, localStorage-backed) ---
+		function saveAccount(email, name) {
 			try {
-				localStorage.setItem("apex_account", JSON.stringify({ name, tier, period: billingPeriod, joined: Date.now() }));
+				localStorage.setItem("apex_account", JSON.stringify({ email, name, tier: "Signature", joined: Date.now() }));
 			} catch (_) {}
 		}
 		function showToast(msg) {
@@ -2180,36 +1997,21 @@
 			setTimeout(() => t.classList.remove("show"), 2400);
 		}
 
-		document.getElementById("join-next")?.addEventListener("click", () => {
-			const selected = document.querySelector('input[name="plan"]:checked');
-			if (!selected) return;
-			const tier = selected.value;
-			const m = parseInt(selected.dataset.monthly, 10);
-			const a = parseInt(selected.dataset.annual, 10);
-			const price = billingPeriod === "monthly" ? m + " / month" : a + " / year";
-			const summary = document.getElementById("join-summary");
-			if (summary) summary.textContent = tier + " · $" + price;
-			const overlay = document.getElementById("join-overlay");
-			overlay.querySelectorAll(".join-step").forEach((s) => {
-				s.style.display = s.dataset.step === "2" ? "" : "none";
-			});
+		document.getElementById("google-signin")?.addEventListener("click", () => {
+			saveAccount("alex.reyes@gmail.com", "Alex Reyes");
+			closeOverlay(document.getElementById("auth-overlay"));
+			showToast("Signed in — welcome back, Alex");
+			setTimeout(() => (window.location.href = "user.html"), 900);
 		});
-		document.getElementById("join-back")?.addEventListener("click", () => {
-			const overlay = document.getElementById("join-overlay");
-			overlay.querySelectorAll(".join-step").forEach((s) => {
-				s.style.display = s.dataset.step === "1" ? "" : "none";
-			});
-		});
-		document.getElementById("join-form")?.addEventListener("submit", (e) => {
+		document.getElementById("auth-form")?.addEventListener("submit", (e) => {
 			e.preventDefault();
-			const name = document.getElementById("cc-name").value.trim() || "Alex Reyes";
-			const selected = document.querySelector('input[name="plan"]:checked');
-			const tier = selected ? selected.value : "Signature";
-			saveAccount(name, tier);
-			closeOverlay(document.getElementById("join-overlay"));
-			showToast("Welcome to APEX — " + tier + " member");
-			swapJoinToMySpace();
-			e.target.reset();
+			const email = document.getElementById("auth-email").value.trim();
+			const name = document.getElementById("auth-name").value.trim();
+			if (!email || !name) return;
+			saveAccount(email, name);
+			closeOverlay(document.getElementById("auth-overlay"));
+			showToast("Signed in — welcome, " + name.split(" ")[0]);
+			setTimeout(() => (window.location.href = "user.html"), 900);
 		});
 		document.getElementById("guestpass-form")?.addEventListener("submit", (e) => {
 			e.preventDefault();
@@ -2217,31 +2019,31 @@
 			showToast("Guest pass requested — check your email");
 			e.target.reset();
 		});
-		document.getElementById("contactform-form")?.addEventListener("submit", (e) => {
+		document.getElementById("join-form")?.addEventListener("submit", (e) => {
 			e.preventDefault();
-			closeOverlay(document.getElementById("contactform-overlay"));
-			showToast("Message sent — we'll reply within one business day");
+			closeOverlay(document.getElementById("join-overlay"));
+			showToast("Application received — we'll be in touch");
 			e.target.reset();
 		});
 
-		// --- Swap Join → My Space in nav after a successful join ---
-		function swapJoinToMySpace() {
-			[["nav-join-btn"], ["mobile-join-btn"]].forEach(([id]) => {
-				const btn = document.getElementById(id);
-				if (!btn) return;
-				btn.textContent = "My Space";
-				btn.removeAttribute("data-open");
-				// Replace click handler
-				const newBtn = btn.cloneNode(true);
-				btn.parentNode.replaceChild(newBtn, btn);
-				newBtn.addEventListener("click", () => {
-					showToast("My Space page coming soon");
-				});
-			});
-		}
-		// Auto-swap on load if the visitor already joined earlier.
+		// --- If already signed in, swap Sign in button for My Space ---
 		try {
-			if (localStorage.getItem("apex_account")) swapJoinToMySpace();
+			const raw = localStorage.getItem("apex_account");
+			if (raw) {
+				const acc = JSON.parse(raw);
+				const signIn = document.getElementById("nav-signin-btn");
+				const signInMobile = document.getElementById("mobile-signin-btn");
+				if (signIn) {
+					signIn.textContent = "My Space";
+					signIn.removeAttribute("data-open");
+					signIn.addEventListener("click", () => (window.location.href = "user.html"));
+				}
+				if (signInMobile) {
+					signInMobile.textContent = "My Space";
+					signInMobile.removeAttribute("data-open");
+					signInMobile.addEventListener("click", () => (window.location.href = "user.html"));
+				}
+			}
 		} catch (_) {}
 	})();
 </script>
