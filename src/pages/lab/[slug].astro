@@ -1,0 +1,161 @@
+---
+/**
+ * AI Lab case study — format allégé (no client/role/year, just intro paragraphs
+ * + gallery + live demo). Distinct from /work/[slug] which is the full
+ * 6-section case study for client work.
+ */
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import { aiLabProjects } from '../../data/aiLabProjects';
+
+export function getStaticPaths() {
+	return aiLabProjects.map((project) => ({
+		params: { slug: project.slug },
+		props: { project },
+	}));
+}
+
+const { project } = Astro.props;
+
+const seoDescription = project.shortDesc;
+const seoOgImage = project.thumbnail;
+
+// Paragraphs — split intro on blank lines, keep original spacing for readability.
+const paragraphs = project.intro.split(/\n\s*\n/).filter((p) => p.trim().length > 0);
+
+const projectJsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'CreativeWork',
+	name: project.title,
+	description: project.shortDesc,
+	creator: { '@type': 'Person', name: 'David Bitan' },
+	about: 'AI Lab experiment',
+	image: seoOgImage,
+	url: project.demoUrl,
+};
+---
+
+<Layout
+	title={`${project.title} — AI Lab · David Bitan`}
+	description={seoDescription}
+	ogImage={seoOgImage}
+	structuredData={projectJsonLd}
+>
+	<Nav />
+
+	<article class="mx-auto max-w-[1000px] px-6 pt-16 pb-8 sm:pt-20 lg:px-0" data-reveal>
+		<a href="/#ai-lab" class="text-sm font-semibold text-accent hover:underline"
+			>← Back to AI Lab</a
+		>
+
+		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">
+			{project.eyebrow}
+		</p>
+		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
+			{project.title}
+		</h1>
+		<p class="mt-4 max-w-2xl text-lg text-muted">{project.subtitle}</p>
+
+		<div class="mt-10 flex flex-wrap items-center gap-4">
+			<a
+				href={project.demoUrl}
+				target="_blank"
+				rel="noopener"
+				class="inline-flex items-center gap-2 rounded-md bg-accent px-6 py-3 text-sm font-semibold text-bg transition-transform duration-300 hover:-translate-y-[1px]"
+			>
+				View live demo
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="14"
+					height="14"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.4"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M7 17L17 7M8 7h9v9"></path>
+				</svg>
+			</a>
+			<span class="text-xs uppercase tracking-widest text-muted"
+				>Fictional experiment · self-brief</span
+			>
+		</div>
+	</article>
+
+	<section class="mx-auto max-w-[800px] px-6 py-12 sm:py-16 lg:px-0" data-reveal>
+		<div class="prose-lab">
+			{paragraphs.map((p) => <p>{p}</p>)}
+		</div>
+	</section>
+
+	<section
+		class="mx-auto max-w-[1200px] px-6 py-8 sm:py-12 lg:px-0"
+		data-reveal
+	>
+		<div class="grid grid-cols-1 gap-6">
+			{
+				project.gallery.map((src, i) => (
+					<a
+						href={src}
+						target="_blank"
+						rel="noopener"
+						class="ai-lab-shot block overflow-hidden rounded-md bg-card"
+					>
+						<img
+							src={src}
+							alt={`${project.title} — screenshot ${i + 1}`}
+							loading={i === 0 ? 'eager' : 'lazy'}
+							class="h-auto w-full object-cover"
+						/>
+					</a>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="mx-auto max-w-[1000px] px-6 py-12 text-center sm:py-16 lg:px-0" data-reveal>
+		<a
+			href={project.demoUrl}
+			target="_blank"
+			rel="noopener"
+			class="inline-flex items-center gap-2 rounded-md border border-ink/25 px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent"
+		>
+			Open the live demo
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="14"
+				height="14"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2.4"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path d="M7 17L17 7M8 7h9v9"></path>
+			</svg>
+		</a>
+	</section>
+
+	<Footer />
+</Layout>
+
+<style>
+	.prose-lab p {
+		font-size: 1.0625rem;
+		line-height: 1.7;
+		color: var(--color-ink);
+	}
+	.prose-lab p + p {
+		margin-top: 1.25rem;
+	}
+	.ai-lab-shot img {
+		transition: transform 0.7s ease;
+	}
+	.ai-lab-shot:hover img {
+		transform: scale(1.01);
+	}
+</style>
