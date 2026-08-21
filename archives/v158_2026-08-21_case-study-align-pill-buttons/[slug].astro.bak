@@ -61,8 +61,8 @@ const projectJsonLd = {
 			<a
 				href={project.demoUrl}
 				target="_blank"
-				rel="noopener noreferrer"
-				class="inline-flex items-center gap-2 rounded-pill bg-accent px-7 py-3.5 text-sm font-semibold text-accent-ink transition-colors hover:bg-ink"
+				rel="noopener"
+				class="inline-flex items-center gap-2 rounded-md bg-accent px-6 py-3 text-sm font-semibold text-bg transition-transform duration-300 hover:-translate-y-[1px]"
 			>
 				View live demo
 				<svg
@@ -85,14 +85,14 @@ const projectJsonLd = {
 		</div>
 	</article>
 
-	<section class="mx-auto max-w-[1000px] px-6 py-12 sm:py-16 lg:px-0" data-reveal>
-		<div class="prose-lab max-w-[68ch]">
+	<section class="mx-auto max-w-[800px] px-6 py-12 sm:py-16 lg:px-0" data-reveal>
+		<div class="prose-lab">
 			{paragraphs.map((p) => <p>{p}</p>)}
 		</div>
 	</section>
 
 	<section
-		class="mx-auto max-w-[1000px] px-6 py-8 sm:py-12 lg:px-0"
+		class="mx-auto max-w-[1200px] px-6 py-8 sm:py-12 lg:px-0"
 		data-reveal
 	>
 		<div class="grid grid-cols-1 gap-6">
@@ -101,7 +101,7 @@ const projectJsonLd = {
 					<a
 						href={src}
 						target="_blank"
-						rel="noopener noreferrer"
+						rel="noopener"
 						class="ai-lab-shot block overflow-hidden rounded-md bg-card"
 					>
 						<img
@@ -120,8 +120,8 @@ const projectJsonLd = {
 		<a
 			href={project.demoUrl}
 			target="_blank"
-			rel="noopener noreferrer"
-			class="inline-flex items-center gap-2 rounded-pill border border-ink/15 px-7 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-ink/40"
+			rel="noopener"
+			class="inline-flex items-center gap-2 rounded-md border border-ink/25 px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent"
 		>
 			Open the live demo
 			<svg
