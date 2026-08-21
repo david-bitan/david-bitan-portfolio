@@ -8,10 +8,6 @@
 import { aiLabProjects } from '../data/aiLabProjects';
 ---
 
-<div class="mx-auto max-w-[1200px] px-6 lg:px-0">
-	<hr class="border-t border-ink/10" />
-</div>
-
 <section
 	id="ai-lab"
 	class="mx-auto max-w-[1200px] scroll-mt-24 px-6 py-20 sm:py-28 lg:px-0"
