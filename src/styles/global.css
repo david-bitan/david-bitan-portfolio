@@ -147,8 +147,18 @@ select:not(:disabled) {
 
 /* Logos marquee */
 .marquee-mask {
-  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  /* Capped to the same 1200px the rest of the page uses. Left full-width, the
+     strip stretched to whatever the monitor was — 2560px and beyond — and read
+     as a separate, wider layer floating behind the site.
+     overflow:hidden does the actual clipping: the mask alone would not, since
+     mask-repeat defaults to `repeat` and would tile the gradient outward. */
+  max-width: 1200px;
+  margin-inline: auto;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
 }
 
 .marquee-track {
