@@ -101,7 +101,6 @@ Almost all of the work was in the parts that are usually faked. Booking a class 
 			'/lab-assets/apex-athletic-club/shop.jpg',
 			'/lab-assets/apex-athletic-club/my-space.jpg',
 			'/lab-assets/apex-athletic-club/contact.jpg',
-			'/lab-assets/apex-athletic-club/guest-pass.jpg',
 		],
 		demoUrl: '/demo/apex-athletic-club/',
 		thumbnail: '/lab-assets/apex-athletic-club/thumbnail.jpg',
