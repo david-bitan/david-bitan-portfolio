@@ -15,9 +15,12 @@ interface Props {
 	structuredData?: unknown;
 }
 
-// Deployed URL. Update when the custom domain lands so canonical + OG URLs
-// stop pointing to the .pages.dev preview address.
-const SITE_URL = 'https://davidbitan.pages.dev';
+// Deployed URL. This has to match the domain the site is actually served from:
+// it feeds rel=canonical, og:url and the absolute og:image. It used to read
+// davidbitan.pages.dev, which no longer resolves at all (NXDOMAIN) — so every
+// page declared a dead canonical, and link previews on LinkedIn / WhatsApp had
+// no image to fetch. Update again when a custom domain lands.
+const SITE_URL = 'https://david-bitan-portfolio.pages.dev';
 const SITE_NAME = 'David Bitan — Portfolio';
 const DEFAULT_TITLE = 'David Bitan — Senior Product Designer';
 const DEFAULT_DESCRIPTION =
