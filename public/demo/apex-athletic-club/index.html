@@ -309,7 +309,11 @@
 	   ============================================================ */
 	.hero {
 		position: relative;
+		/* svh = small viewport height: the height with the mobile address bar
+		   VISIBLE. Plain vh assumes it is hidden, so the hero overflows the
+		   screen on iOS until the user scrolls. vh first as the fallback. */
 		min-height: calc(100vh - var(--nav-h));
+		min-height: calc(100svh - var(--nav-h));
 		display: flex;
 		align-items: center;
 		overflow: hidden;
@@ -1387,7 +1391,7 @@
 		.footer-inner { grid-template-columns: repeat(2, 1fr); gap: 32px; }
 	}
 	@media (max-width: 640px) {
-		.hero { min-height: calc(100vh - var(--nav-h)); }
+		.hero { min-height: calc(100vh - var(--nav-h)); min-height: calc(100svh - var(--nav-h)); }
 		.hero-meta { grid-template-columns: 1fr 1fr; }
 		.facilities-grid { grid-template-columns: 1fr; grid-auto-rows: 180px; }
 		.f-1, .f-2, .f-3, .f-4, .f-5, .f-6 { grid-column: 1 / -1; grid-row: span 1; }

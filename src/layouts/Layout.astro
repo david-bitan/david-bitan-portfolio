@@ -62,7 +62,10 @@ const personJsonLd = {
 <html lang="fr">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
+		<!-- initial-scale=1 is not optional: without it iOS Safari picks its own
+		     scale and can render the page zoomed out, most visibly on rotation.
+		     viewport-fit=cover lets the layout reach under the notch. -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonicalUrl} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
