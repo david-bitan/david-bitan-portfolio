@@ -1,0 +1,2848 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0A0F" />
+<title>Contact — APEX Athletic Club Miami</title>
+<meta name="description" content="Visit APEX Athletic Club at 1201 Ocean Drive, Miami Beach. Hours, phone, and direct line to the front desk. Free guest pass for first-time visitors." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+	/* ============================================================
+	   APEX — Contact page
+	   Shares the same design system as the home page: ink canvas,
+	   pink accent, mint secondary, off-white type. Nav / footer /
+	   modals kept identical for continuity across the mini-site.
+	   ============================================================ */
+
+	:root {
+		--ink: #0A0A0F;
+		--ink-2: #14141C;
+		--ink-3: #1E1E28;
+		--line: rgba(245, 245, 247, 0.10);
+		--line-strong: rgba(245, 245, 247, 0.22);
+		--white: #F5F5F7;
+		--white-soft: rgba(245, 245, 247, 0.72);
+		--white-mute: rgba(245, 245, 247, 0.52);
+		--pink: #FF2E7E;
+		--pink-dim: #C9265E;
+		--mint: #00E5A0;
+		--mint-dim: #06B37D;
+
+		--font-display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+		--font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+		--font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+		--maxw: 1200px;
+		--pad-x: clamp(20px, 4vw, 48px);
+		--nav-h: 72px;
+
+		color-scheme: dark;
+	}
+
+	*, *::before, *::after { box-sizing: border-box; }
+	/* scrollbar-gutter reserves the scrollbar track at all times. Without it,
+	   `body { overflow: hidden }` on modal open removes the scrollbar, the
+	   viewport widens by ~15px, and the whole page lurches sideways for one
+	   frame — the visible "jump" when an overlay opened. */
+	html {
+		scroll-behavior: smooth;
+		-webkit-text-size-adjust: 100%;
+		scrollbar-gutter: stable;
+	}
+	body {
+		margin: 0;
+		background: var(--ink);
+		color: var(--white);
+		font-family: var(--font-body);
+		font-size: 16px;
+		line-height: 1.55;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	img, svg { max-width: 100%; height: auto; display: block; }
+	a { color: inherit; text-decoration: none; }
+	button { font: inherit; color: inherit; background: transparent; border: 0; cursor: pointer; }
+
+	/* Reveal pre-hide via html class flipped by JS. `:not(.is-in)` scopes it
+	   so the same selector releases when observer adds `.is-in`. */
+	html.js-reveal-ready [data-reveal]:not(.is-in) { opacity: 0; transform: translateY(18px); }
+	[data-reveal] {
+		transition: opacity 700ms cubic-bezier(0.22, 0.61, 0.36, 1),
+		            transform 700ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		html.js-reveal-ready [data-reveal]:not(.is-in) { opacity: 1; transform: none; }
+		[data-reveal] { transition: none; }
+	}
+
+	/* Typography */
+	.eyebrow {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 12px;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: var(--mint);
+	}
+	.eyebrow.pink { color: var(--pink); }
+	.h1 {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(40px, 6.4vw, 88px);
+		line-height: 0.96;
+		letter-spacing: -0.02em;
+		text-transform: uppercase;
+	}
+	.h2 {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(32px, 4.4vw, 56px);
+		line-height: 1.02;
+		letter-spacing: -0.015em;
+		text-transform: uppercase;
+	}
+	.h3 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: clamp(22px, 2.4vw, 30px);
+		line-height: 1.15;
+		letter-spacing: -0.01em;
+		text-transform: uppercase;
+	}
+	.h4 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 18px;
+		line-height: 1.2;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+	}
+	.lead {
+		font-size: clamp(16px, 1.6vw, 20px);
+		line-height: 1.55;
+		color: var(--white-soft);
+		max-width: 62ch;
+	}
+	.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+	.wrap {
+		max-width: var(--maxw);
+		margin: 0 auto;
+		padding-left: var(--pad-x);
+		padding-right: var(--pad-x);
+	}
+
+	/* Buttons */
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 14px 26px;
+		border-radius: 999px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 13px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease;
+		white-space: nowrap;
+	}
+	.btn-primary { background: var(--pink); color: var(--ink); }
+	.btn-primary:hover { background: var(--white); }
+	.btn-ghost { border: 1px solid var(--line-strong); color: var(--white); }
+	.btn-ghost:hover { border-color: var(--white); }
+	.btn-mint { background: var(--mint); color: var(--ink); }
+	.btn-mint:hover { background: var(--white); }
+
+	/* NAV */
+	.nav {
+		position: sticky;
+		top: 0;
+		z-index: 60;
+		background: rgba(10, 10, 15, 0.82);
+		backdrop-filter: saturate(140%) blur(14px);
+		-webkit-backdrop-filter: saturate(140%) blur(14px);
+		border-bottom: 1px solid var(--line);
+	}
+	/* Three columns, not space-between. With space-between the links sit
+	   wherever the brand and the right-hand controls leave them, so adding a
+	   cart icon on one page shifted the whole menu sideways on that page only.
+	   1fr auto 1fr pins the links to the centre of the bar on every page,
+	   whatever ends up on either side of them. */
+	.nav-inner {
+		max-width: var(--maxw);
+		margin: 0 auto;
+		padding: 0 var(--pad-x);
+		height: var(--nav-h);
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		align-items: center;
+		gap: 24px;
+	}
+	.nav-inner > .nav-brand { justify-self: start; }
+	.nav-actions {
+		justify-self: end;
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+	}
+	.nav-brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: 18px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+	.nav-brand .apex-mark {
+		width: 26px; height: 26px;
+		display: inline-block;
+		background:
+			conic-gradient(from 135deg at 50% 50%, var(--pink) 0deg 90deg, var(--mint) 90deg 180deg, var(--white) 180deg 270deg, var(--pink) 270deg 360deg);
+		clip-path: polygon(50% 0, 100% 100%, 0 100%);
+	}
+	.nav-links {
+		display: flex;
+		align-items: center;
+		gap: 28px;
+		list-style: none;
+		margin: 0; padding: 0;
+	}
+	.nav-links a, .nav-links span {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 12px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		position: relative;
+		padding: 6px 0;
+		transition: color 200ms ease;
+	}
+	.nav-links a:hover { color: var(--white); }
+	.nav-links .active {
+		color: var(--pink);
+		pointer-events: none;
+		cursor: default;
+	}
+	/* Anchor items marked active stay clickable (Home = scroll-top; other
+	   anchored nav items keep their link behavior). Only span-actives lock. */
+	.nav-links a.active,
+	.mobile-nav a.active {
+		pointer-events: auto;
+		cursor: pointer;
+	}
+	.nav-links .active::after {
+		content: "";
+		position: absolute;
+		left: 0; right: 0;
+		bottom: -2px;
+		height: 2px;
+		background: var(--pink);
+	}
+	.nav-cta { display: inline-flex; gap: 10px; }
+	.nav-toggle {
+		display: none;
+		width: 40px; height: 40px;
+		border: 1px solid var(--line-strong);
+		border-radius: 10px;
+	}
+	.nav-toggle svg { margin: 0 auto; }
+
+	.mobile-nav {
+		position: fixed; inset: 0;
+		z-index: 80;
+		background: var(--ink);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 24px;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 240ms ease;
+	}
+	.mobile-nav.open { opacity: 1; pointer-events: auto; }
+	.mobile-nav a, .mobile-nav span {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 24px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white);
+	}
+	.mobile-nav .active { color: var(--pink); pointer-events: none; }
+	.mobile-nav-close {
+		position: absolute;
+		top: 20px; right: 20px;
+		width: 44px; height: 44px;
+		border-radius: 12px;
+		border: 1px solid var(--line-strong);
+	}
+
+	/* ============================================================
+	   PAGE HERO (compact — not fullscreen like home)
+	   ============================================================ */
+	.page-hero {
+		position: relative;
+		padding: clamp(80px, 10vw, 140px) 0 clamp(60px, 7vw, 100px);
+		background:
+			radial-gradient(ellipse 900px 500px at 80% 10%, rgba(255,46,126,0.10) 0%, transparent 60%),
+			radial-gradient(ellipse 700px 400px at 10% 90%, rgba(0,229,160,0.08) 0%, transparent 60%),
+			linear-gradient(180deg, #0F0F18 0%, var(--ink) 100%);
+		overflow: hidden;
+	}
+	/* Page hero — same 2col × Nrow grid pattern as .section .head so the
+	   big H1 (left, row 2) top-aligns with the .lead paragraph (right,
+	   row 2). Eyebrow lives in row 1 above the H1 without shifting either.
+	   Meta row spans full width on row 3. */
+	.page-hero .inner {
+		max-width: var(--maxw);
+		margin: 0 auto;
+		padding: 0 var(--pad-x);
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: auto auto auto;
+		column-gap: 60px;
+		row-gap: 18px;
+	}
+	.page-hero .inner > .eyebrow { grid-column: 1; grid-row: 1; align-self: end; }
+	.page-hero .inner > .h1 {
+		grid-column: 1; grid-row: 2;
+		margin: 0;
+		max-width: 12ch;
+	}
+	.page-hero .inner > .h1 .pink { color: var(--pink); }
+	.page-hero .inner > .lead {
+		grid-column: 2; grid-row: 2;
+		margin: 0;
+		align-self: start;
+	}
+	.page-hero .inner > .meta-row {
+		grid-column: 1 / -1;
+		grid-row: 3;
+		display: flex;
+		gap: 40px;
+		margin-top: 22px;
+		padding-top: 28px;
+		border-top: 1px solid var(--line);
+	}
+	.page-hero .meta-item {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+	.page-hero .meta-item .k {
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.page-hero .meta-item .v {
+		font-family: var(--font-mono);
+		font-weight: 500;
+		font-size: 15px;
+		color: var(--white);
+	}
+	.page-hero .meta-item .v.mint { color: var(--mint); }
+	.page-hero .meta-item .v.pink { color: var(--pink); }
+
+	/* ============================================================
+	   SECTION SHELL
+	   ============================================================ */
+	.section {
+		padding: clamp(80px, 10vw, 140px) 0;
+		position: relative;
+	}
+	/* Section head — two-row grid so the big h2 (left, row 2) top-aligns
+	   with the p.lead (right, row 2). The eyebrow lives in row 1 above the
+	   h2 without shifting either. */
+	.section .head {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: auto auto;
+		column-gap: 60px;
+		row-gap: 14px;
+		margin-bottom: 60px;
+	}
+	.section .head > .eyebrow { grid-column: 1; grid-row: 1; align-self: end; }
+	.section .head > .h2 {
+		grid-column: 1;
+		grid-row: 2;
+		margin: 0;
+		font-size: clamp(28px, 3.6vw, 44px);
+	}
+	.section .head > p.lead { grid-column: 2; grid-row: 2; margin: 0; align-self: start; }
+
+	/* ============================================================
+	   CONTACT GRID — form + sidebar
+	   ============================================================ */
+	/* Equal 1fr / 1fr so the sidebar's left edge lines up with the p.lead
+	   above (also col 2 of a 1fr / 1fr .head grid). Cohérent avec toutes
+	   les autres 2-col grids du site. */
+	.contact-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 60px;
+		align-items: start;
+	}
+	.contact-form-block {
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: clamp(28px, 3vw, 44px);
+	}
+	.contact-form-block h3 {
+		font-family: var(--font-display);
+		font-size: 20px;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		margin: 0 0 8px;
+	}
+	.contact-form-block .hint {
+		font-size: 14px;
+		color: var(--white-mute);
+		margin: 0 0 28px;
+	}
+	.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+	.field {
+		display: flex; flex-direction: column;
+		gap: 8px;
+		margin-bottom: 16px;
+	}
+	.field label {
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.field input, .field select, .field textarea {
+		background: var(--ink);
+		border: 1px solid var(--line-strong);
+		color: var(--white);
+		padding: 12px 14px;
+		border-radius: 4px;
+		font: 14px/1.4 var(--font-body);
+		outline: none;
+		transition: border-color 200ms ease;
+	}
+	/* Native selects need extra right padding for the chevron and a custom
+	   pink-tinted arrow so the value never touches the right edge. */
+	.field select {
+		padding-right: 40px;
+		appearance: none;
+		-webkit-appearance: none;
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%23FF2E7E' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+		background-repeat: no-repeat;
+		background-position: right 14px center;
+	}
+	.field textarea { resize: vertical; min-height: 130px; }
+	.field input:focus, .field select:focus, .field textarea:focus {
+		border-color: var(--pink);
+	}
+	.form-note {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+		letter-spacing: 0.02em;
+		margin: 4px 0 20px;
+	}
+	.form-note .mint { color: var(--mint); }
+
+	/* Sidebar — direct info */
+	.contact-sidebar {
+		display: flex;
+		flex-direction: column;
+		gap: 36px;
+	}
+	.info-block h4 {
+		font-family: var(--font-display);
+		font-size: 12px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		margin: 0 0 14px;
+	}
+	.info-block .line {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 18px;
+		line-height: 1.35;
+		color: var(--white);
+	}
+	.info-block .sub {
+		font-family: var(--font-mono);
+		font-size: 12px;
+		color: var(--white-mute);
+		margin-top: 6px;
+		letter-spacing: 0.02em;
+	}
+	.info-block a.line:hover { color: var(--pink); transition: color 200ms ease; }
+	.info-divider {
+		height: 1px;
+		background: var(--line);
+	}
+	.social-row {
+		display: flex;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+	.social-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 10px 14px;
+		border: 1px solid var(--line-strong);
+		border-radius: 999px;
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white);
+		transition: border-color 200ms ease, color 200ms ease, background 200ms ease;
+	}
+	.social-chip:hover {
+		border-color: var(--pink);
+		color: var(--pink);
+	}
+	.social-chip svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+	/* ============================================================
+	   VISIT SECTION — SVG map + hours 7 days
+	   ============================================================ */
+	/* minmax(0,1fr) instead of 1fr: a plain 1fr track has min-width:auto, so the
+	   SVG's intrinsic 800px min-content width forces the track wider than half
+	   the container and the map bleeds past the hours panel. */
+	.visit-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: 40px;
+		align-items: stretch;
+	}
+	.visit-grid > * { min-width: 0; }
+	/* The hours panel next to this has a filled background, so a flat bordered
+	   rectangle read as unfinished beside it. Matching border weight plus a
+	   grounded shadow puts the two halves of the row on the same plane. */
+	.map-wrap {
+		position: relative;
+		min-width: 0;
+		max-width: 100%;
+		background: linear-gradient(180deg, #0B0B12 0%, #08080D 100%);
+		border: 1px solid var(--line-strong);
+		border-radius: 6px;
+		overflow: hidden;
+		aspect-ratio: 4 / 3;
+		box-shadow: 0 18px 40px rgba(0, 0, 0, 0.42);
+	}
+	.map-wrap svg { width: 100%; height: 100%; max-width: 100%; display: block; }
+	.map-legend {
+		position: absolute;
+		bottom: 16px; left: 16px;
+		display: flex;
+		gap: 18px;
+		background: rgba(10, 10, 15, 0.72);
+		backdrop-filter: blur(10px);
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		padding: 8px 14px;
+	}
+	.map-legend .li {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-family: var(--font-display);
+		font-size: 10px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.map-legend .li .sw {
+		width: 10px; height: 10px;
+		display: inline-block;
+	}
+	.map-legend .li .sw.ocean { background: rgba(0,229,160,0.18); border: 1px solid var(--mint); }
+	.map-legend .li .sw.pin {
+		background: var(--pink);
+		clip-path: polygon(50% 0, 100% 100%, 0 100%);
+	}
+	.map-pin-anim {
+		transform-origin: center;
+		animation: map-pulse 2.2s ease-in-out infinite;
+	}
+	@keyframes map-pulse {
+		0%, 100% { transform: scale(1); opacity: 0.9; }
+		50% { transform: scale(1.15); opacity: 1; }
+	}
+	.map-ring {
+		fill: none;
+		stroke: var(--pink);
+		stroke-width: 2;
+		opacity: 0.5;
+		animation: map-ring 2.2s ease-out infinite;
+	}
+	@keyframes map-ring {
+		0% { r: 12; opacity: 0.6; }
+		100% { r: 40; opacity: 0; }
+	}
+
+	.hours-panel {
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: clamp(24px, 2.6vw, 36px);
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+	.hours-panel h3 {
+		font-family: var(--font-display);
+		font-size: 14px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		margin: 0;
+	}
+	.hours-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.hours-list li {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		padding: 12px 0;
+		border-bottom: 1px solid var(--line);
+		font-size: 14px;
+	}
+	.hours-list li:last-child { border-bottom: 0; }
+	.hours-list li .day {
+		font-family: var(--font-display);
+		font-size: 13px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+	.hours-list li .time {
+		font-family: var(--font-mono);
+		color: var(--white-soft);
+		font-size: 13px;
+	}
+	.hours-list li.today .day { color: var(--pink); }
+	.hours-list li.today .time { color: var(--pink); }
+	.hours-list li.today::before {
+		content: "TODAY";
+		font-family: var(--font-mono);
+		font-size: 9px;
+		background: var(--pink);
+		color: var(--ink);
+		padding: 2px 6px;
+		border-radius: 4px;
+		letter-spacing: 0.08em;
+		margin-right: 10px;
+		align-self: center;
+	}
+	.hours-list li.today { padding-left: 0; }
+	.hours-note {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+		line-height: 1.5;
+		border-top: 1px solid var(--line);
+		padding-top: 16px;
+	}
+	.hours-note .mint { color: var(--mint); }
+
+	/* ============================================================
+	   FAQ mini
+	   ============================================================ */
+	.faq-list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 20px 40px;
+	}
+	.faq-item {
+		border-top: 1px solid var(--line);
+		padding-top: 20px;
+	}
+	.faq-item h4 {
+		font-family: var(--font-display);
+		font-size: 15px;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+		color: var(--white);
+		margin: 0 0 8px;
+	}
+	.faq-item p {
+		font-size: 14px;
+		color: var(--white-soft);
+		line-height: 1.6;
+		margin: 0;
+	}
+
+	/* ============================================================
+	   CTA final
+	   ============================================================ */
+	.cta-final {
+		background: linear-gradient(160deg, rgba(255,46,126,0.08) 0%, var(--ink-2) 100%);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: clamp(40px, 5vw, 72px);
+	}
+	/* One-line CTA layout — flex row so the title and the action buttons
+	   sit on the same visual line. Wraps naturally on narrow viewports. */
+	.cta-final .inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 40px;
+		flex-wrap: wrap;
+	}
+	/* Title shrinks, actions never do — that's what keeps them on one line.
+	   flex-shrink:0 + white-space:nowrap on the buttons stops the actions block
+	   from dropping under the title on mid-width viewports. */
+	.cta-final .h2 {
+		margin: 0;
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+	.cta-final .h2 .pink { color: var(--pink); }
+	.cta-final .actions {
+		display: inline-flex;
+		gap: 12px;
+		flex-wrap: nowrap;
+		flex-shrink: 0;
+	}
+	.cta-final .actions .btn { white-space: nowrap; }
+	@media (max-width: 860px) {
+		.cta-final .inner { flex-direction: column; align-items: flex-start; gap: 28px; }
+	}
+	@media (max-width: 640px) {
+		.cta-final .actions { flex-wrap: wrap; }
+	}
+
+	/* ============================================================
+	   MODAL / OVERLAY
+	   ============================================================ */
+	.overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 90;
+		background: rgba(6, 6, 10, 0.88);
+		-webkit-backdrop-filter: blur(6px);
+		backdrop-filter: blur(6px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 20px;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 240ms ease;
+	}
+	.overlay.open { opacity: 1; pointer-events: auto; }
+	.modal {
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		max-width: 480px;
+		width: 100%;
+		max-height: 92vh;
+		overflow: hidden auto;
+		overscroll-behavior: contain;
+		padding: 32px;
+		position: relative;
+		transform: translateY(12px);
+		transition: transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	.overlay.open .modal { transform: none; }
+
+
+	/* Stacked, not inline: at 460px the three items wrapped 2 + 1 and read as a
+	   ragged block. A short column is calmer and scans in one pass. */
+	/* Footer line inside the Join modal. Named for its role, not its container —
+	   it started life in a side drawer that no longer exists. Back in a centred
+	   modal it reads as a short reassurance footer under the actions. */
+	.modal-reassure {
+		margin: 22px 0 0;
+		padding: 20px 0 0;
+		border-top: 1px solid var(--line);
+		display: flex;
+		flex-direction: column;
+		gap: 9px;
+		padding-left: 0;
+		list-style: none;
+	}
+	.modal-reassure li {
+		display: inline-flex;
+		align-items: center;
+		gap: 7px;
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.04em;
+		color: var(--white-mute);
+		list-style: none;
+	}
+	.modal-reassure li::before {
+		content: "";
+		flex-shrink: 0;
+		width: 12px; height: 12px;
+		background: var(--mint);
+		clip-path: polygon(20% 55%, 40% 75%, 85% 25%, 90% 30%, 45% 82%, 15% 60%);
+	}
+
+	.modal-close {
+		position: absolute;
+		top: 12px; right: 12px;
+		width: 40px; height: 40px;
+		border-radius: 8px;
+	}
+	.modal-close:hover { background: var(--ink-3); }
+	.modal h3 {
+		font-family: var(--font-display);
+		font-size: 24px;
+		text-transform: uppercase;
+		margin: 0 0 6px;
+	}
+	.modal p.hint {
+		font-size: 14px;
+		color: var(--white-mute);
+		margin: 0 0 24px;
+	}
+	.modal-actions {
+		display: flex; gap: 10px;
+		margin-top: 8px;
+	}
+	.plan-radios { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+	.plan-radio {
+		display: flex; align-items: center; gap: 14px;
+		padding: 16px 18px;
+		border: 1px solid var(--line-strong);
+		border-radius: 8px;
+		cursor: pointer;
+		transition: border-color 200ms ease, background 200ms ease;
+	}
+	.plan-radio:hover { border-color: var(--white-mute); }
+	.plan-radio input { display: none; }
+	.plan-radio .radio-dot {
+		width: 18px; height: 18px;
+		border-radius: 50%;
+		border: 1.5px solid var(--line-strong);
+		flex-shrink: 0;
+		position: relative;
+		transition: border-color 200ms ease;
+	}
+	.plan-radio input:checked ~ .radio-dot { border-color: var(--pink); }
+	.plan-radio input:checked ~ .radio-dot::after {
+		content: ""; position: absolute;
+		inset: 3px; border-radius: 50%;
+		background: var(--pink);
+	}
+	.plan-radio:has(input:checked) {
+		border-color: var(--pink);
+		background: rgba(255,46,126,0.05);
+	}
+	.plan-radio .plan-info { flex: 1; }
+	.plan-radio .plan-info-name {
+		font-family: var(--font-display);
+		font-size: 14px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white);
+	}
+	.plan-radio .plan-info-desc {
+		font-size: 12px;
+		color: var(--white-mute);
+		margin-top: 2px;
+	}
+	.plan-radio .plan-info-price {
+		font-family: var(--font-mono);
+		font-weight: 700;
+		font-size: 16px;
+		color: var(--mint);
+	}
+	/* Same min-content trap as the visit-grid map: a bare `1fr` track keeps
+	   min-width:auto, and an <input> defaults to size=20 (~180px+) of intrinsic
+	   width, so the two fields pushed the row wider than the modal and CVC hung
+	   off the right edge. minmax(0,1fr) + width:100% pins them inside. */
+	.cc-row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: 12px;
+	}
+	.cc-row .field { min-width: 0; }
+	.cc-row input { width: 100%; min-width: 0; }
+	.modal .field input,
+	.modal .field select,
+	.modal .field textarea { width: 100%; min-width: 0; box-sizing: border-box; }
+
+	/* Floating scroll-to-top — pink circle, white up arrow, bottom-right.
+	   Same pattern as portfolio (orange there, pink here). */
+	.scroll-top-btn {
+		position: fixed;
+		bottom: 24px; right: 24px;
+		width: 52px; height: 52px;
+		border-radius: 50%;
+		background: var(--pink);
+		color: var(--white);
+		z-index: 70;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		transform: translateY(20px);
+		pointer-events: none;
+		transition: opacity 240ms ease, transform 240ms ease, background 200ms ease;
+		box-shadow: 0 10px 24px rgba(255, 46, 126, 0.32), 0 2px 6px rgba(10,10,15,0.6);
+	}
+	.scroll-top-btn.visible {
+		opacity: 1;
+		transform: translateY(0);
+		pointer-events: auto;
+	}
+	.scroll-top-btn:hover { background: var(--pink-dim); }
+	@media (max-width: 640px) {
+		.scroll-top-btn { width: 46px; height: 46px; bottom: 18px; right: 18px; }
+	}
+
+	/* Toast */
+	.toast {
+		position: fixed;
+		bottom: 30px;
+		left: 50%;
+		transform: translate(-50%, 20px);
+		background: var(--mint);
+		color: var(--ink);
+		padding: 14px 22px;
+		border-radius: 999px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 13px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		z-index: 100;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 240ms ease, transform 240ms ease;
+	}
+	.toast.show {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+
+	/* ============================================================
+	   FOOTER
+	   ============================================================ */
+	.footer {
+		background: #06060A;
+		border-top: 1px solid var(--line);
+		padding: 60px 0 40px;
+	}
+	.footer-inner {
+		display: grid;
+		grid-template-columns: 1.4fr repeat(3, 1fr);
+		gap: 40px;
+	}
+	.footer-brand-block p {
+		color: var(--white-mute);
+		font-size: 13px;
+		margin: 12px 0 0;
+		max-width: 34ch;
+	}
+	.footer-col h4 {
+		font-family: var(--font-display);
+		font-size: 12px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white);
+		margin: 0 0 16px;
+	}
+	.footer-col ul {
+		list-style: none;
+		margin: 0; padding: 0;
+		display: flex; flex-direction: column;
+		gap: 10px;
+	}
+	.footer-col a,
+	.footer-col span {
+		font-size: 13px;
+		color: var(--white-mute);
+		transition: color 200ms ease;
+		font-family: var(--font-body);
+		font-weight: 400;
+		letter-spacing: 0;
+	}
+	.footer-col a:hover { color: var(--pink); }
+	.footer-bottom {
+		max-width: var(--maxw);
+		margin: 40px auto 0;
+		padding: 20px var(--pad-x) 0;
+		border-top: 1px solid var(--line);
+		display: flex;
+		justify-content: space-between;
+		font-size: 12px;
+		color: var(--white-mute);
+	}
+
+	/* ============================================================
+	   RESPONSIVE
+	   ============================================================ */
+	@media (max-width: 1023px) {
+		.nav-links, .nav-cta { display: none; }
+		.nav-toggle { display: flex; align-items: center; justify-content: center; }
+		.section .head {
+			grid-template-columns: 1fr;
+			grid-template-rows: auto auto auto;
+			row-gap: 12px;
+			margin-bottom: 40px;
+		}
+		.section .head > .eyebrow { grid-column: 1; grid-row: 1; align-self: start; }
+		.section .head > .h2 { grid-column: 1; grid-row: 2; }
+		.section .head > p.lead { grid-column: 1; grid-row: 3; }
+		.page-hero .inner {
+			grid-template-columns: 1fr;
+			grid-template-rows: auto auto auto auto;
+			row-gap: 14px;
+		}
+		.page-hero .inner > .eyebrow { grid-column: 1; grid-row: 1; align-self: start; }
+		.page-hero .inner > .h1 { grid-column: 1; grid-row: 2; }
+		.page-hero .inner > .lead { grid-column: 1; grid-row: 3; }
+		.page-hero .inner > .meta-row { grid-column: 1; grid-row: 4; margin-top: 12px; }
+		.contact-grid { grid-template-columns: 1fr; gap: 40px; }
+		.visit-grid { grid-template-columns: 1fr; gap: 32px; }
+		.map-wrap { aspect-ratio: 16 / 10; }
+		.faq-list { grid-template-columns: 1fr; }
+		.cta-final .actions { justify-content: flex-start; width: 100%; }
+		.footer-inner { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+	}
+	@media (max-width: 640px) {
+		.page-hero .meta-row { flex-wrap: wrap; gap: 24px; }
+		.form-row { grid-template-columns: 1fr; }
+		.footer-inner { grid-template-columns: 1fr; }
+		.footer-bottom { flex-direction: column; gap: 8px; }
+	}
+
+	/* ============================================================
+	   FORM CONTROLS — universal overrides (see user.html for the rationale).
+	   `select` is the weakest selector there is, so !important is what makes it
+	   beat rules like `.modal .field select` whose `background:` shorthand
+	   blanks the custom chevron.
+	   ============================================================ */
+	select {
+		appearance: none;
+		-webkit-appearance: none;
+		padding-right: 36px !important;
+		background-color: var(--ink);
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%23FF2E7E' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") !important;
+		background-repeat: no-repeat !important;
+		background-position: right 12px center !important;
+	}
+	select option { background: var(--ink-2); color: var(--white); }
+
+
+	/* ============================================================
+	   DATE PICKER — custom, replaces the native one
+	   The browser-drawn calendar is chrome we don't control: it ignores the
+	   palette, the mono type and the radius, and it looked like a system dialog
+	   dropped onto the page. This one is built from the same tokens as every
+	   other control, so a date field now reads like the selects next to it.
+	   ============================================================ */
+	.dp { position: relative; }
+	.dp-input {
+		width: 100%;
+		min-width: 0;
+		box-sizing: border-box;
+		background: var(--ink);
+		border: 1px solid var(--line-strong);
+		color: var(--white);
+		padding: 10px 40px 10px 12px;
+		border-radius: 4px;
+		font: 14px/1.3 var(--font-mono);
+		outline: none;
+		cursor: pointer;
+		transition: border-color 200ms ease;
+	}
+	.dp-input::placeholder { color: var(--white-mute); }
+	.dp-input:focus,
+	.dp.open .dp-input { border-color: var(--pink); }
+	.dp-icon {
+		position: absolute;
+		right: 12px;
+		top: 50%;
+		transform: translateY(-50%);
+		pointer-events: none;
+		color: var(--pink);
+	}
+	/* Fixed, not absolute. The picker lives inside .modal, which needs
+	   overflow-y:auto for tall content — an absolutely positioned panel gets
+	   clipped by it. Fixed takes the panel out of every ancestor's overflow, and
+	   the JS places it against the input's viewport rect. */
+	.dp-panel {
+		position: fixed;
+		/* Pinned to 0,0 while closed. A `position: fixed` box with no insets
+		   falls back to its static position — out at the right edge of the
+		   modal — which pushed the viewport wider and flashed a horizontal
+		   scrollbar every time an overlay containing a date field opened.
+		   JS overwrites left/top with the real placement on open. */
+		left: 0;
+		top: 0;
+		visibility: hidden;
+		z-index: 120;
+		width: 292px;
+		background: var(--ink-2);
+		border: 1px solid var(--line-strong);
+		border-radius: 6px;
+		box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+		padding: 14px;
+		opacity: 0;
+		transform: translateY(-6px);
+		pointer-events: none;
+		transition: opacity 180ms ease, transform 180ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	/* Flipped above the field when there isn't room below. */
+	.dp-panel.up { transform: translateY(6px); }
+	.dp.open .dp-panel { opacity: 1; transform: none; pointer-events: auto; visibility: visible; }
+	.dp-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 12px;
+	}
+	.dp-month {
+		font-family: var(--font-display);
+		font-size: 12px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white);
+	}
+	.dp-nav {
+		width: 26px; height: 26px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid var(--line-strong);
+		border-radius: 4px;
+		background: transparent;
+		color: var(--white-soft);
+		cursor: pointer;
+		transition: border-color 180ms ease, color 180ms ease, background 180ms ease;
+	}
+	.dp-nav:hover { border-color: var(--pink); color: var(--pink); }
+	.dp-dow, .dp-grid {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		gap: 2px;
+	}
+	.dp-dow span {
+		text-align: center;
+		font-family: var(--font-display);
+		font-size: 9px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		padding-bottom: 6px;
+	}
+	.dp-day {
+		aspect-ratio: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 4px;
+		border: 1px solid transparent;
+		background: transparent;
+		font: 12px/1 var(--font-mono);
+		color: var(--white-soft);
+		cursor: pointer;
+		transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+	}
+	.dp-day:hover:not(:disabled) { border-color: var(--line-strong); color: var(--white); }
+	.dp-day.muted { color: rgba(245, 245, 247, 0.22); }
+	.dp-day.today { border-color: var(--mint); color: var(--mint); }
+	.dp-day.selected {
+		background: var(--pink);
+		border-color: var(--pink);
+		color: var(--ink);
+		font-weight: 700;
+	}
+	.dp-day:disabled { opacity: 0.25; cursor: not-allowed; }
+	.dp-foot {
+		display: flex;
+		justify-content: space-between;
+		margin-top: 12px;
+		padding-top: 10px;
+		border-top: 1px solid var(--line);
+	}
+	.dp-link {
+		background: transparent;
+		border: 0;
+		padding: 0;
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+		cursor: pointer;
+		transition: color 160ms ease;
+	}
+	.dp-link:hover { color: var(--pink); }
+
+	/* ============================================================
+	   GUEST PASS CARD — issued after the guest-pass form is submitted
+	   A ticket, not a receipt: fixed aspect, perforated notch down the middle,
+	   the club mark top-left, and a mono strip at the bottom that reads like
+	   something a front desk would scan.
+	   ============================================================ */
+	.pass-shell { text-align: center; }
+	.pass-shell h3 { margin-bottom: 6px; }
+	.pass-card {
+		position: relative;
+		margin: 22px auto 0;
+		max-width: 380px;
+		background: linear-gradient(155deg, #16161F 0%, #0C0C13 60%, #101018 100%);
+		border: 1px solid var(--line-strong);
+		border-radius: 10px;
+		overflow: hidden;
+		text-align: left;
+		box-shadow: 0 22px 48px rgba(0, 0, 0, 0.55);
+	}
+	/* Accent bar across the top — the club's two colours, in order. */
+	.pass-card::before {
+		content: "";
+		position: absolute;
+		top: 0; left: 0; right: 0;
+		height: 3px;
+		background: linear-gradient(90deg, var(--pink) 0%, var(--pink) 62%, var(--mint) 100%);
+	}
+	.pass-top { padding: 24px 24px 18px; }
+	.pass-brand {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 20px;
+	}
+	.pass-mark {
+		display: inline-flex;
+		align-items: center;
+		gap: 9px;
+		font-family: var(--font-display);
+		font-size: 15px;
+		letter-spacing: 0.22em;
+		color: var(--white);
+	}
+	.pass-kind {
+		font-family: var(--font-display);
+		font-size: 9px;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		color: var(--ink);
+		background: var(--pink);
+		border-radius: 999px;
+		padding: 4px 10px;
+	}
+	.pass-name {
+		font-family: var(--font-display);
+		font-size: clamp(22px, 4.4vw, 28px);
+		line-height: 1.05;
+		text-transform: uppercase;
+		color: var(--white);
+		margin: 0 0 4px;
+		word-break: break-word;
+	}
+	.pass-sub {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.04em;
+		color: var(--white-mute);
+	}
+	.pass-rows {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: 16px;
+		margin-top: 22px;
+	}
+	.pass-row .k {
+		display: block;
+		font-family: var(--font-display);
+		font-size: 9px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		margin-bottom: 5px;
+	}
+	.pass-row .v {
+		font-family: var(--font-mono);
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--white);
+	}
+	.pass-row .v.mint { color: var(--mint); }
+	/* Perforation: a dashed rule with a punched notch bitten out of each edge. */
+	.pass-perf {
+		position: relative;
+		height: 0;
+		border-top: 1px dashed var(--line-strong);
+		margin: 4px 0;
+	}
+	.pass-perf::before, .pass-perf::after {
+		content: "";
+		position: absolute;
+		top: -9px;
+		width: 18px; height: 18px;
+		border-radius: 50%;
+		background: var(--ink-2);
+		border: 1px solid var(--line-strong);
+	}
+	.pass-perf::before { left: -10px; }
+	.pass-perf::after { right: -10px; }
+	.pass-foot {
+		padding: 16px 24px 20px;
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 14px;
+	}
+	.pass-terms {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		line-height: 1.5;
+		color: var(--white-mute);
+		max-width: 190px;
+	}
+	.pass-code {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		letter-spacing: 0.1em;
+		color: var(--white-soft);
+		text-align: right;
+	}
+	/* Fake scan strip — pure CSS bars, no image, no font dependency. */
+	.pass-bars {
+		height: 26px;
+		margin-bottom: 6px;
+		background: repeating-linear-gradient(
+			90deg,
+			var(--white) 0 2px,
+			transparent 2px 4px,
+			var(--white) 4px 5px,
+			transparent 5px 9px,
+			var(--white) 9px 12px,
+			transparent 12px 14px
+		);
+		opacity: 0.82;
+	}
+	.pass-actions {
+		display: flex;
+		gap: 10px;
+		justify-content: center;
+		margin-top: 24px;
+		flex-wrap: wrap;
+	}
+	@media (max-width: 420px) {
+		.pass-rows { grid-template-columns: 1fr; gap: 14px; }
+		.pass-foot { flex-direction: column; align-items: flex-start; }
+		.pass-code { text-align: left; }
+	}
+
+	/* Reuse the nav's triangle mark on the pass. Same conic gradient, so the
+	   ticket carries the real club logo rather than a redrawn approximation. */
+	.pass-mark .apex-mark {
+		width: 22px; height: 22px;
+		display: inline-block;
+		background:
+			conic-gradient(from 135deg at 50% 50%, var(--pink) 0deg 90deg, var(--mint) 90deg 180deg, var(--white) 180deg 270deg, var(--pink) 270deg 360deg);
+		clip-path: polygon(50% 0, 100% 100%, 0 100%);
+	}
+
+
+	/* Two side-by-side actions with real labels ("Keep membership" / "Yes,
+	   cancel") can't share a 360px modal — they were being clipped. Stack them
+	   at the narrow end instead of shrinking the text. */
+	@media (max-width: 430px) {
+		.modal-actions { flex-direction: column; align-items: stretch; }
+		.modal-actions .btn { width: 100%; flex: 0 0 auto !important; }
+	}
+
+	/* QR tile. Deliberately dark-on-white even though the card is dark — scanners
+	   expect that polarity and the contrast is what makes it read at arm's length. */
+	.pass-qr {
+		width: 84px; height: 84px;
+		background: var(--white);
+		border-radius: 4px;
+		padding: 5px;
+		margin-bottom: 7px;
+		margin-left: auto;
+	}
+	.pass-qr svg { display: block; width: 100%; height: 100%; }
+	.pass-icon-btn {
+		width: 38px;
+		padding-left: 0;
+		padding-right: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	/* Print: the page collapses to the pass alone, on white. Printing the dark
+	   card would drain a cartridge and scan worse; the QR keeps its polarity. */
+	@media print {
+		body { background: #fff !important; }
+		body > *:not(#passcard-overlay) { display: none !important; }
+		#passcard-overlay {
+			position: static !important;
+			opacity: 1 !important;
+			pointer-events: auto !important;
+			background: none !important;
+			backdrop-filter: none !important;
+			display: block !important;
+			padding: 0 !important;
+		}
+		#passcard-overlay .modal {
+			background: #fff !important;
+			border: 0 !important;
+			box-shadow: none !important;
+			max-width: 100% !important;
+			max-height: none !important;
+			overflow: visible !important;
+			padding: 0 !important;
+		}
+		#passcard-overlay h3,
+		#passcard-overlay .hint,
+		.pass-actions,
+		.modal-close { display: none !important; }
+		.pass-card {
+			background: #fff !important;
+			border: 1px solid #111 !important;
+			box-shadow: none !important;
+			max-width: 420px !important;
+			margin: 0 !important;
+		}
+		.pass-name, .pass-row .v, .pass-mark { color: #111 !important; }
+		.pass-sub, .pass-row .k, .pass-terms, .pass-code { color: #444 !important; }
+		.pass-row .v.mint { color: #111 !important; }
+		.pass-perf::before, .pass-perf::after { background: #fff !important; border-color: #111 !important; }
+		.pass-qr { background: #fff !important; padding: 0 !important; }
+	}
+</style>
+
+<!-- Pre-hide reveal blocks BEFORE first paint. JS flips the class as soon as it runs. -->
+<script>document.documentElement.classList.add("js-reveal-ready");</script>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<header class="nav">
+	<div class="nav-inner">
+		<a href="/demo/apex-athletic-club/index.html" class="nav-brand" aria-label="APEX Athletic Club home">
+			<span class="apex-mark" aria-hidden="true"></span>
+			APEX
+		</a>
+
+		<nav>
+			<ul class="nav-links" id="desk-nav">
+				<li><a href="/demo/apex-athletic-club/index.html" data-nav="home">Home</a></li>
+				<li><a href="/demo/apex-athletic-club/shop.html" data-nav="shop">Shop</a></li>
+				<li><a href="/demo/apex-athletic-club/index.html#membership" data-nav="membership">Membership</a></li>
+				<li><a href="/demo/apex-athletic-club/classes.html" data-nav="classes">Classes</a></li>
+				<li><span class="active" data-nav="contact">Contact</span></li>
+			</ul>
+		</nav>
+
+		<div class="nav-actions">
+			<div class="nav-cta">
+				<button class="btn btn-primary" data-open="join" id="nav-join-btn">Join</button>
+			</div>
+
+			<button class="nav-toggle" id="nav-toggle" aria-label="Open menu">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+					<path d="M3 7h18M3 12h18M3 17h18" />
+				</svg>
+			</button>
+		</div>
+	</div>
+</header>
+
+<div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+	<button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">
+		<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+			<path d="M6 6l12 12M18 6L6 18" />
+		</svg>
+	</button>
+	<a href="/demo/apex-athletic-club/index.html" data-nav-m="home">Home</a>
+	<a href="/demo/apex-athletic-club/shop.html" data-nav-m="shop">Shop</a>
+	<a href="/demo/apex-athletic-club/index.html#membership" data-nav-m="membership">Membership</a>
+	<a href="/demo/apex-athletic-club/classes.html" data-nav-m="classes">Classes</a>
+	<span class="active" data-nav-m="contact">Contact</span>
+	<button class="btn btn-primary" data-open="join" id="mobile-join-btn" style="margin-top: 20px;">Join</button>
+</div>
+
+<!-- ============================================================
+     PAGE HERO
+     ============================================================ -->
+<section class="page-hero">
+	<div class="inner">
+		<span class="eyebrow pink" data-reveal>Contact · Miami Beach</span>
+		<h1 class="h1" data-reveal>
+			Come by.<br />
+			Or <span class="pink">write.</span>
+		</h1>
+		<p class="lead" data-reveal>
+			We answer every message within one business day. For a tour or a free
+			guest pass, walk in during club hours — the front desk is staffed from
+			open to close.
+		</p>
+		<div class="meta-row" data-reveal>
+			<div class="meta-item">
+				<div class="k">Address</div>
+				<div class="v">1201 Ocean Drive</div>
+			</div>
+			<div class="meta-item">
+				<div class="k">Front desk</div>
+				<div class="v mint">+1 305 555 0142</div>
+			</div>
+			<div class="meta-item">
+				<div class="k">General</div>
+				<div class="v">hello@apex-athletic.club</div>
+			</div>
+			<div class="meta-item">
+				<div class="k">Response</div>
+				<div class="v pink">&lt; 1 business day</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     CONTACT SECTION — form + sidebar
+     ============================================================ -->
+<section class="section" id="contact-body" style="padding-top: clamp(60px, 7vw, 100px);">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div class="eyebrow">Write to the club</div>
+			<h2 class="h2">Tell us what you need.</h2>
+			<p class="lead">
+				Membership questions, corporate rates, a coach match, or a press
+				inquiry — pick a subject and we route your note directly to the
+				right person on the team.
+			</p>
+		</div>
+
+		<div class="contact-grid">
+			<div class="contact-form-block" data-reveal>
+				<h3>Send a message</h3>
+				<p class="hint">All fields required. We only use your address to reply — no lists, no partners.</p>
+				<form id="contact-page-form">
+					<div class="form-row">
+						<div class="field">
+							<label for="c-name">Full name</label>
+							<input type="text" id="c-name" required placeholder="Alex Reyes" />
+						</div>
+						<div class="field">
+							<label for="c-email">Email</label>
+							<input type="email" id="c-email" required placeholder="you@example.com" />
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="field">
+							<label for="c-phone">Phone <span style="opacity: 0.6;">(optional)</span></label>
+							<input type="tel" id="c-phone" placeholder="+1 305 555 0000" />
+						</div>
+						<div class="field">
+							<label for="c-subject">Subject</label>
+							<select id="c-subject" required>
+								<option value="Membership">Membership</option>
+								<option value="Personal training">Personal training</option>
+								<option value="Class booking">Class booking</option>
+								<option value="Corporate rate">Corporate rate</option>
+								<option value="Press / partnership">Press / partnership</option>
+								<option value="Other">Other</option>
+							</select>
+						</div>
+					</div>
+					<div class="field">
+						<label for="c-message">Message</label>
+						<textarea id="c-message" required rows="6" placeholder="Tell us what you're looking for. Goals, schedule, anything relevant — the more we know, the better we match."></textarea>
+					</div>
+					<p class="form-note">
+						<span class="mint">Response time</span> — under one business day.
+						For anything urgent, call the front desk directly.
+					</p>
+					<div class="modal-actions">
+						<button type="submit" class="btn btn-primary" style="flex: 1;">Send message</button>
+					</div>
+				</form>
+			</div>
+
+			<aside class="contact-sidebar" data-reveal>
+				<div class="info-block">
+					<h4>Address</h4>
+					<div class="line">1201 Ocean Drive</div>
+					<div class="line">Miami Beach, FL 33139</div>
+					<div class="sub">Between 12th &amp; 13th Street · direct beach access · valet + bike racks in the back</div>
+				</div>
+				<div class="info-divider"></div>
+				<div class="info-block">
+					<h4>Front desk</h4>
+					<a href="tel:+13055550142" class="line">+1 305 555 0142</a>
+					<div class="sub">Staffed open to close · reservations, tours, guest passes</div>
+				</div>
+				<div class="info-block">
+					<h4>Email</h4>
+					<a href="mailto:hello@apex-athletic.club" class="line">hello@apex-athletic.club</a>
+					<div class="sub">General &middot; also press@apex-athletic.club for media</div>
+				</div>
+				<div class="info-divider"></div>
+				<div class="info-block">
+					<h4>Follow</h4>
+					<div class="social-row">
+						<a href="#" data-soon="Instagram" class="social-chip" aria-label="Instagram">
+							<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+							Instagram
+						</a>
+						<a href="#" data-soon="YouTube" class="social-chip" aria-label="YouTube">
+							<svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><polygon points="10,9 16,12 10,15" fill="currentColor" stroke="none"/></svg>
+							YouTube
+						</a>
+						<a href="#" data-soon="Strava" class="social-chip" aria-label="Strava">
+							<svg viewBox="0 0 24 24"><polyline points="4,18 10,4 14,12 18,4"/></svg>
+							Strava
+						</a>
+						<a href="#" data-soon="TikTok" class="social-chip" aria-label="TikTok">
+							<svg viewBox="0 0 24 24"><path d="M14 4v10a4 4 0 1 1-4-4"/><path d="M14 4c0 3 2 5 5 5"/></svg>
+							TikTok
+						</a>
+					</div>
+				</div>
+			</aside>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     VISIT SECTION — SVG map + hours 7 days
+     ============================================================ -->
+<section class="section" id="visit" style="padding-top: 0;">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div class="eyebrow">Visit</div>
+			<h2 class="h2">Ocean Drive, between 12th &amp; 13th.</h2>
+			<p class="lead">
+				Two blocks from Lincoln Road, direct dune walkway to the water, valet
+				and bike parking in the back. First-time visitors get a free guest pass
+				at the front desk — no appointment needed.
+			</p>
+		</div>
+
+		<div class="visit-grid">
+			<div class="map-wrap" data-reveal aria-label="Stylized map of Miami Beach with APEX location marked">
+				<!-- Custom SVG map — not a real map, a stylized diagram matching the design system.
+				     Left = land (ink), right = ocean (mint tint), coastline curve, subtle street grid,
+				     pin at APEX with pulsing ring. -->
+				<svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" role="img" aria-hidden="true">
+					<defs>
+						<linearGradient id="ocean" x1="0" y1="0" x2="0" y2="1">
+							<stop offset="0%" stop-color="#00E5A0" stop-opacity="0.20"/>
+							<stop offset="100%" stop-color="#00E5A0" stop-opacity="0.06"/>
+						</linearGradient>
+						<pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+							<path d="M60 0 L0 0 0 60" fill="none" stroke="rgba(245,245,247,0.05)" stroke-width="1"/>
+						</pattern>
+					</defs>
+
+					<!-- Land base + grid -->
+					<rect x="0" y="0" width="800" height="600" fill="#08080D"/>
+					<rect x="0" y="0" width="800" height="600" fill="url(#grid)"/>
+
+					<!-- Ocean shape (right side, coastline slightly wavy) -->
+					<path d="M 520 0 Q 500 100 530 200 T 510 400 Q 495 500 540 600 L 800 600 L 800 0 Z"
+					      fill="url(#ocean)" stroke="#00E5A0" stroke-width="1.5" stroke-opacity="0.5"/>
+
+					<!-- Wave lines in ocean -->
+					<g stroke="#00E5A0" stroke-opacity="0.22" stroke-width="1" fill="none">
+						<path d="M 600 80 q 20 -8 40 0 t 40 0 t 40 0" />
+						<path d="M 620 180 q 20 -8 40 0 t 40 0 t 40 0" />
+						<path d="M 640 300 q 20 -8 40 0 t 40 0 t 40 0" />
+						<path d="M 620 420 q 20 -8 40 0 t 40 0 t 40 0" />
+						<path d="M 640 520 q 20 -8 40 0 t 40 0 t 40 0" />
+					</g>
+
+					<!-- Main streets -->
+					<g stroke="rgba(245,245,247,0.15)" stroke-width="2.5" fill="none">
+						<!-- Ocean Drive (parallel to coast) -->
+						<path d="M 460 0 Q 440 100 470 200 T 450 400 Q 435 500 480 600" />
+						<!-- Collins Ave -->
+						<path d="M 380 0 L 380 600" />
+						<!-- Washington Ave -->
+						<path d="M 280 0 L 280 600" />
+						<!-- Alton Rd -->
+						<path d="M 140 0 L 140 600" />
+						<!-- 12th St -->
+						<path d="M 0 340 L 520 320" />
+						<!-- 13th St -->
+						<path d="M 0 260 L 520 245" />
+						<!-- Lincoln Rd (thicker) -->
+						<path d="M 0 180 L 480 170" stroke-width="3.2" />
+						<!-- 5th St -->
+						<path d="M 0 500 L 520 490" />
+					</g>
+
+					<!-- Street labels -->
+					<g font-family="JetBrains Mono, monospace" font-size="10" fill="rgba(245,245,247,0.35)" letter-spacing="0.05em">
+						<text x="466" y="80" transform="rotate(88 466 80)">OCEAN DR</text>
+						<text x="386" y="80" transform="rotate(90 386 80)">COLLINS AVE</text>
+						<text x="286" y="80" transform="rotate(90 286 80)">WASHINGTON AVE</text>
+						<text x="146" y="80" transform="rotate(90 146 80)">ALTON RD</text>
+						<text x="20" y="175" fill="rgba(245,245,247,0.5)">LINCOLN RD</text>
+						<text x="20" y="255">13TH ST</text>
+						<text x="20" y="335">12TH ST</text>
+						<text x="20" y="495">5TH ST</text>
+						<text x="700" y="60" fill="rgba(0,229,160,0.7)">ATLANTIC OCEAN</text>
+					</g>
+
+					<!-- Beach / dune band (thin strip east of Ocean Drive) -->
+					<path d="M 480 0 Q 460 100 490 200 T 470 400 Q 455 500 500 600 L 540 600 Q 495 500 510 400 T 530 200 Q 500 100 520 0 Z"
+					      fill="rgba(255,180,80,0.06)" stroke="none"/>
+
+					<!-- APEX pin location — between 12th & 13th, on Ocean Dr side -->
+					<g transform="translate(470, 290)">
+						<circle class="map-ring" cx="0" cy="0" r="12"/>
+						<circle class="map-ring" cx="0" cy="0" r="12" style="animation-delay: 1.1s"/>
+						<g class="map-pin-anim">
+							<circle cx="0" cy="0" r="18" fill="#0A0A0F" stroke="#FF2E7E" stroke-width="1.5"/>
+							<path d="M 0 -10 L 8 8 L -8 8 Z" fill="#FF2E7E"/>
+						</g>
+						<text x="24" y="6" font-family="Space Grotesk, sans-serif" font-size="13" font-weight="600" fill="#FF2E7E" letter-spacing="0.14em">APEX</text>
+						<text x="24" y="22" font-family="JetBrains Mono, monospace" font-size="10" fill="rgba(245,245,247,0.5)" letter-spacing="0.05em">1201 OCEAN DR</text>
+					</g>
+
+					<!-- Compass -->
+					<g transform="translate(60, 60)" font-family="JetBrains Mono, monospace" font-size="10">
+						<circle cx="0" cy="0" r="22" fill="none" stroke="rgba(245,245,247,0.2)" stroke-width="1"/>
+						<path d="M 0 -18 L 4 -2 L 0 -6 L -4 -2 Z" fill="#F5F5F7"/>
+						<text x="-3" y="-25" fill="rgba(245,245,247,0.7)">N</text>
+					</g>
+
+					<!-- Scale -->
+					<g transform="translate(680, 560)" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(245,245,247,0.5)">
+						<line x1="0" y1="0" x2="60" y2="0" stroke="rgba(245,245,247,0.4)" stroke-width="1.5"/>
+						<line x1="0" y1="-3" x2="0" y2="3" stroke="rgba(245,245,247,0.4)" stroke-width="1.5"/>
+						<line x1="60" y1="-3" x2="60" y2="3" stroke="rgba(245,245,247,0.4)" stroke-width="1.5"/>
+						<text x="15" y="16">200 FT</text>
+					</g>
+				</svg>
+
+				<div class="map-legend">
+					<span class="li"><span class="sw ocean"></span>Atlantic</span>
+					<span class="li"><span class="sw pin"></span>APEX</span>
+				</div>
+			</div>
+
+			<div class="hours-panel" data-reveal>
+				<h3>Club hours</h3>
+				<ul class="hours-list" id="hours-list">
+					<li data-day="1"><span class="day">Monday</span><span class="time">05:30 – 23:00</span></li>
+					<li data-day="2"><span class="day">Tuesday</span><span class="time">05:30 – 23:00</span></li>
+					<li data-day="3"><span class="day">Wednesday</span><span class="time">05:30 – 23:00</span></li>
+					<li data-day="4"><span class="day">Thursday</span><span class="time">05:30 – 23:00</span></li>
+					<li data-day="5"><span class="day">Friday</span><span class="time">05:30 – 22:00</span></li>
+					<li data-day="6"><span class="day">Saturday</span><span class="time">07:00 – 21:00</span></li>
+					<li data-day="0"><span class="day">Sunday</span><span class="time">07:00 – 20:00</span></li>
+				</ul>
+				<div class="hours-note">
+					<span class="mint">Recovery wing</span> stays open one hour past close for members.
+					<br /><br />
+					Holidays &amp; storm-day closures posted on Instagram the night before.
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     FAQ MINI
+     ============================================================ -->
+<section class="section" id="faq" style="padding-top: 0;">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div class="eyebrow">Quick answers</div>
+			<h2 class="h2">Before you reach out.</h2>
+			<p class="lead">
+				Most first-time questions land in one of five buckets. If yours isn't
+				here, the form is a two-line write-up — we'll take it from there.
+			</p>
+		</div>
+		<div class="faq-list" data-reveal>
+			<div class="faq-item">
+				<h4>Do you offer a free trial?</h4>
+				<p>Yes — one full day, no card. Floor, pool, sauna, jacuzzi and one group class. Request a guest pass from the hero button or walk in during club hours.</p>
+			</div>
+			<div class="faq-item">
+				<h4>Is there parking?</h4>
+				<p>Valet at the entrance (members: complimentary), a 40-space lot in the back, and a covered bike rack. Metered street parking on Collins if all else fails.</p>
+			</div>
+			<div class="faq-item">
+				<h4>Can I bring a guest?</h4>
+				<p>Signature and Elite members get four guest passes a month. Basic members get two. Guests sign in at the front desk with a photo ID.</p>
+			</div>
+			<div class="faq-item">
+				<h4>Do you take corporate accounts?</h4>
+				<p>Yes. We work with 40+ Miami-based teams — flat corporate rate, direct invoicing, wellness reporting on request. Pick the corporate subject in the form.</p>
+			</div>
+			<div class="faq-item">
+				<h4>How does cancellation work?</h4>
+				<p>30 days notice at any time, no fee. The current billing cycle finishes as paid — no partial refund, no auto-rebill after the notice period.</p>
+			</div>
+			<div class="faq-item">
+				<h4>Do you have showers &amp; day-use lockers?</h4>
+				<p>Full locker room with towels, hair products, and hair dryers included in every tier. Day-use lockers for guests, permanent lockers for Signature and Elite members.</p>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     CTA FINAL
+     ============================================================ -->
+<section class="section" id="cta" style="padding-top: 0;">
+	<div class="wrap">
+		<div class="cta-final" data-reveal>
+			<div class="inner">
+				<h2 class="h2">Rather <span class="pink">walk in</span>?</h2>
+				<div class="actions">
+					<button class="btn btn-primary" data-open="guestpass">Get a free guest pass</button>
+					<button class="btn btn-ghost" data-open="join">Join now</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer">
+	<div class="wrap footer-inner">
+		<div class="footer-brand-block">
+			<div class="nav-brand">
+				<span class="apex-mark" aria-hidden="true"></span>
+				APEX
+			</div>
+			<p>Miami's oceanfront strength and recovery club. Small membership, full team, direct beach access. Est. 2019.</p>
+		</div>
+		<div class="footer-col">
+			<h4>Club</h4>
+			<ul>
+				<li><a href="/demo/apex-athletic-club/index.html#facilities">Facilities</a></li>
+				<li><a href="/demo/apex-athletic-club/index.html#membership">Membership</a></li>
+				<li><a href="/demo/apex-athletic-club/classes.html">Classes</a></li>
+				<li><a href="/demo/apex-athletic-club/index.html#staff">Team</a></li>
+			</ul>
+		</div>
+		<div class="footer-col">
+			<h4>Shop</h4>
+			<ul>
+				<li><a href="/demo/apex-athletic-club/shop.html?cat=supplements#shop">Supplements</a></li>
+				<li><a href="/demo/apex-athletic-club/shop.html?cat=equipment#shop">Weights &amp; equipment</a></li>
+				<li><a href="/demo/apex-athletic-club/shop.html?cat=recovery#shop">Recovery</a></li>
+				<li><a href="/demo/apex-athletic-club/shop.html?cat=apparel#shop">Apparel</a></li>
+			</ul>
+		</div>
+		<div class="footer-col">
+			<h4>Info</h4>
+			<ul>
+				<li><span style="cursor: default;">Contact</span></li>
+				<li><a href="#visit">Hours &amp; address</a></li>
+				<li><a href="/demo/apex-athletic-club/user.html">My Space</a></li>
+				<li><a href="/demo/apex-athletic-club/index.html#membership">Cancel policy</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="footer-bottom">
+		<div>© 2026 APEX Athletic Club · Miami Beach</div>
+		<div>Fictional concept · Designed &amp; built as portfolio work</div>
+	</div>
+</footer>
+
+<!-- ============================================================
+     MODALS — Join (multi-step) + Guest pass
+     (No contact-form modal on this page — the page IS the form.)
+     ============================================================ -->
+<div class="overlay" id="guestpass-overlay" role="dialog" aria-modal="true" aria-label="Get a free guest pass">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+				<path d="M6 6l12 12M18 6L6 18" />
+			</svg>
+		</button>
+		<h3>Free guest pass</h3>
+		<p class="hint">One full day at the club — floor, pool, sauna, jacuzzi, one group class. On us.</p>
+		<form id="guestpass-form">
+			<div class="field">
+				<label for="gp-name">Full name</label>
+				<input type="text" id="gp-name" required placeholder="Alex Reyes" />
+			</div>
+			<div class="field">
+				<label for="gp-email">Email</label>
+				<input type="email" id="gp-email" required placeholder="you@example.com" />
+			</div>
+			<div class="field">
+				<label for="gp-phone">Phone</label>
+				<input type="tel" id="gp-phone" required placeholder="+1 305 555 0000" />
+			</div>
+			<div class="cc-row">
+				<div class="field">
+					<label for="gp-date">Preferred date</label>
+					<div class="dp" data-dp>
+						<input type="text" id="gp-date" class="dp-input" readonly required placeholder="Pick a date" autocomplete="off" />
+						<svg class="dp-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+						<div class="dp-panel">
+							<div class="dp-head">
+								<button type="button" class="dp-nav" data-dp-prev aria-label="Previous month">&#8249;</button>
+								<div class="dp-month" data-dp-label></div>
+								<button type="button" class="dp-nav" data-dp-next aria-label="Next month">&#8250;</button>
+							</div>
+							<div class="dp-dow"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+							<div class="dp-grid" data-dp-grid></div>
+							<div class="dp-foot">
+								<button type="button" class="dp-link" data-dp-clear>Clear</button>
+								<button type="button" class="dp-link" data-dp-today>Today</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="field">
+					<label for="gp-time">Arrival time</label>
+					<select id="gp-time" required><option>06:00</option><option>07:00</option><option>08:00</option><option>09:00</option><option>10:00</option><option>11:00</option><option>12:00</option><option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option><option>19:00</option><option>20:00</option></select>
+				</div>
+			</div>
+			<div class="modal-actions">
+				<button type="submit" class="btn btn-primary" style="flex: 1;">Request pass</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Guest pass, issued after the request form. Deliberately a ticket rather than
+     a confirmation message: it is the thing a visitor shows at the front desk. -->
+<div class="overlay" id="passcard-overlay" role="dialog" aria-modal="true" aria-label="Your guest pass">
+	<div class="modal pass-shell">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+		</button>
+		<h3>You're on the list.</h3>
+		<p class="hint">Show this at the front desk. We've emailed a copy too.</p>
+
+		<div class="pass-card" id="pass-card">
+			<div class="pass-top">
+				<div class="pass-brand">
+					<span class="pass-mark"><span class="apex-mark" aria-hidden="true"></span>APEX</span>
+					<span class="pass-kind">Guest pass</span>
+				</div>
+				<p class="pass-name" id="pass-name">Alex Reyes</p>
+				<div class="pass-sub">Miami Beach &middot; 1201 Ocean Drive</div>
+				<div class="pass-rows">
+					<div class="pass-row"><span class="k">Valid on</span><span class="v" id="pass-date">—</span></div>
+					<div class="pass-row"><span class="k">Arriving</span><span class="v mint" id="pass-time">—</span></div>
+					<div class="pass-row"><span class="k">Access</span><span class="v">Full club</span></div>
+					<div class="pass-row"><span class="k">Duration</span><span class="v">One day</span></div>
+				</div>
+			</div>
+			<div class="pass-perf"></div>
+			<div class="pass-foot">
+				<p class="pass-terms">Admits one. Photo ID required at check-in. Floor, pool, sauna, jacuzzi and one group class included.</p>
+				<div class="pass-code">
+					<div class="pass-qr" id="pass-qr" aria-label="Scan to save this pass to your phone"></div>
+					<span id="pass-ref">APX-000000</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="pass-actions">
+			<button type="button" class="btn btn-primary btn-sm" id="pass-download">Download</button>
+			<button type="button" class="btn btn-ghost btn-sm pass-icon-btn" id="pass-print" aria-label="Print pass" title="Print pass">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M8 17h8v4H8z"/>
+				</svg>
+			</button>
+		</div>
+	</div>
+</div>
+
+<div class="overlay" id="join-overlay" role="dialog" aria-modal="true" aria-label="Join APEX">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+				<path d="M6 6l12 12M18 6L6 18" />
+			</svg>
+		</button>
+
+		<!-- STEP 1 — Choose plan -->
+		<div class="join-step" data-step="1">
+			<h3>Join APEX</h3>
+			<p class="hint">Step 1 of 2 — Pick your plan. Cancel any time with 30 days notice.</p>
+			<div class="plan-radios">
+				<label class="plan-radio">
+					<input type="radio" name="plan" value="Basic" data-monthly="149" data-annual="1430" />
+					<span class="radio-dot"></span>
+					<div class="plan-info">
+						<div class="plan-info-name">Basic</div>
+						<div class="plan-info-desc">Strength floor, sauna, group studios.</div>
+					</div>
+					<div class="plan-info-price" data-tier-price>$149 / mo</div>
+				</label>
+				<label class="plan-radio">
+					<input type="radio" name="plan" value="Signature" data-monthly="259" data-annual="2486" checked />
+					<span class="radio-dot"></span>
+					<div class="plan-info">
+						<div class="plan-info-name">Signature <span style="color: var(--pink); font-size: 10px; font-family: var(--font-mono); margin-left: 6px;">MOST POPULAR</span></div>
+						<div class="plan-info-desc">Full club + recovery wing 8/mo + dietitian.</div>
+					</div>
+					<div class="plan-info-price" data-tier-price>$259 / mo</div>
+				</label>
+				<label class="plan-radio">
+					<input type="radio" name="plan" value="Elite" data-monthly="549" data-annual="5270" />
+					<span class="radio-dot"></span>
+					<div class="plan-info">
+						<div class="plan-info-name">Elite</div>
+						<div class="plan-info-desc">Personal training + doctor + physio + weekly plan.</div>
+					</div>
+					<div class="plan-info-price" data-tier-price>$549 / mo</div>
+				</label>
+			</div>
+			<div class="modal-actions">
+				<button type="button" class="btn btn-primary" style="flex: 1;" id="join-next">Continue to payment</button>
+			</div>
+		</div>
+
+		<!-- STEP 2 — Payment (fake credit card) -->
+		<div class="join-step" data-step="2" style="display: none;">
+			<h3>Payment</h3>
+			<p class="hint">Step 2 of 2 — <strong style="color: var(--pink);" id="join-summary">Signature · $259 / month</strong>. Any card number will be accepted (demo only, no real payment).</p>
+			<form id="join-form">
+				<div class="field">
+					<label for="cc-name">Name on card</label>
+					<input type="text" id="cc-name" required placeholder="Alex Reyes (any name)" />
+				</div>
+				<div class="field">
+					<label for="cc-number">Card number</label>
+					<input type="text" id="cc-number" required placeholder="4242 4242 4242 4242 (any number)" inputmode="numeric" maxlength="19" />
+				</div>
+				<div class="cc-row">
+					<div class="field">
+						<label for="cc-expiry">Expiry (MM / YY)</label>
+						<input type="text" id="cc-expiry" required placeholder="12 / 28" maxlength="7" />
+					</div>
+					<div class="field">
+						<label for="cc-cvc">CVC</label>
+						<input type="text" id="cc-cvc" required placeholder="123" maxlength="4" inputmode="numeric" />
+					</div>
+				</div>
+				<div class="modal-actions" style="gap: 10px;">
+					<button type="button" class="btn btn-ghost" id="join-back">Back</button>
+					<button type="submit" class="btn btn-primary" style="flex: 1;">Confirm &amp; join</button>
+				</div>
+			</form>
+		</div>
+		<ul class="modal-reassure">
+			<li>No joining fee</li>
+			<li>Cancel with 30 days notice</li>
+			<li>Guest pass included</li>
+		</ul>
+	</div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">Message sent</div>
+
+<!-- Floating scroll-to-top: pink circle, white up arrow, bottom-right. -->
+<button class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top" data-scroll-top>
+	<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+		<path d="M12 19V5M5 12l7-7 7 7" />
+	</svg>
+</button>
+
+<!-- ============================================================
+     JS
+     ============================================================ -->
+<script>
+	(function () {
+		// --- Reveal on scroll ---
+		const revealEls = document.querySelectorAll("[data-reveal]");
+		const io = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((e) => {
+					if (e.isIntersecting) {
+						e.target.classList.add("is-in");
+						io.unobserve(e.target);
+					}
+				});
+			},
+			{ rootMargin: "0px 0px -8% 0px", threshold: 0.06 }
+		);
+		revealEls.forEach((el) => io.observe(el));
+		setTimeout(() => revealEls.forEach((el) => el.classList.add("is-in")), 3000);
+
+		// --- Mobile nav ---
+		const mobileToggle = document.getElementById("nav-toggle");
+		const mobileNav = document.getElementById("mobile-nav");
+		const mobileClose = document.getElementById("mobile-nav-close");
+		function openMobile() {
+			mobileNav.classList.add("open");
+			mobileNav.setAttribute("aria-hidden", "false");
+			document.body.style.overflow = "hidden";
+			lockScrollGutter(true);
+		}
+		function closeMobile() {
+			mobileNav.classList.remove("open");
+			mobileNav.setAttribute("aria-hidden", "true");
+			document.body.style.overflow = "";
+			lockScrollGutter(false);
+		}
+		mobileToggle?.addEventListener("click", openMobile);
+		mobileClose?.addEventListener("click", closeMobile);
+		mobileNav?.querySelectorAll("a, span").forEach((el) =>
+			el.addEventListener("click", closeMobile)
+		);
+
+		// --- Scrollbar gutter lock (paint gutter same as body ink to hide the flash) ---
+		function lockScrollGutter(on) {
+			document.documentElement.style.scrollbarColor = on ? "#0A0A0F #0A0A0F" : "";
+		}
+
+		// --- Highlight today in hours list ---
+		const today = new Date().getDay(); // 0 = Sunday
+		document.querySelectorAll("#hours-list li").forEach((li) => {
+			if (parseInt(li.dataset.day, 10) === today) li.classList.add("today");
+		});
+
+		// --- Modal open/close (event delegation) ---
+		function openOverlay(id) {
+			const el = document.getElementById(id + "-overlay");
+			if (!el) return;
+			el.classList.add("open");
+			document.body.style.overflow = "hidden";
+			lockScrollGutter(true);
+			if (id === "join") {
+				el.querySelectorAll(".join-step").forEach((s) => {
+					s.style.display = s.dataset.step === "1" ? "" : "none";
+				});
+			}
+		}
+		function closeOverlay(el) {
+			el.classList.remove("open");
+			document.body.style.overflow = "";
+			lockScrollGutter(false);
+		}
+		// Floating scroll-to-top button visibility toggle.
+		const scrollBtn = document.getElementById("scroll-top-btn");
+		function updateScrollBtn() {
+			scrollBtn?.classList.toggle("visible", window.scrollY > 400);
+		}
+		let stTicking = false;
+		window.addEventListener("scroll", () => {
+			if (stTicking) return;
+			stTicking = true;
+			requestAnimationFrame(() => { updateScrollBtn(); stTicking = false; });
+		}, { passive: true });
+		updateScrollBtn();
+
+		document.addEventListener("click", (e) => {
+			// Scroll to top — Home in nav (when we return to it) + floating pink button.
+			const scrollTop = e.target.closest("[data-scroll-top]");
+			if (scrollTop) {
+				e.preventDefault();
+				window.scrollTo({ top: 0, behavior: "smooth" });
+				return;
+			}
+			// "Coming soon" (Shop / Classes / My Space / socials until real pages exist)
+			const soon = e.target.closest("[data-soon]");
+			if (soon) {
+				e.preventDefault();
+				showToast(soon.getAttribute("data-soon") + " coming soon");
+				return;
+			}
+			const opener = e.target.closest("[data-open]");
+			if (opener) {
+				// The tier CTAs are <a href="#"> — without this the browser follows
+				// the empty fragment and scrolls the document to the top behind the
+				// modal. THIS was the "page jumps to top" bug, not the modal itself.
+				e.preventDefault();
+				openOverlay(opener.getAttribute("data-open"));
+				return;
+			}
+			const closer = e.target.closest("[data-close]");
+			if (closer) {
+				e.preventDefault();
+				const overlay = closer.closest(".overlay");
+				if (overlay) closeOverlay(overlay);
+				return;
+			}
+			if (e.target.classList.contains("overlay")) closeOverlay(e.target);
+		});
+		document.addEventListener("keydown", (e) => {
+			if (e.key === "Escape") {
+				document.querySelectorAll(".overlay.open").forEach(closeOverlay);
+				if (mobileNav.classList.contains("open")) closeMobile();
+			}
+		});
+
+		// --- Toast ---
+		function showToast(msg) {
+			const t = document.getElementById("toast");
+			t.textContent = msg;
+			t.classList.add("show");
+			setTimeout(() => t.classList.remove("show"), 2400);
+		}
+
+		// --- Contact page form submit ---
+		document.getElementById("contact-page-form")?.addEventListener("submit", (e) => {
+			e.preventDefault();
+			showToast("Message sent — we'll reply within one business day");
+			e.target.reset();
+		});
+
+		// --- Guest pass form submit ---
+	// ------------------------------------------------------------
+	// Guest pass issuing. The form no longer just toasts — it fills and shows a
+	// pass card, which is the artefact the visitor actually needs.
+	// ------------------------------------------------------------
+	// Pass rendering helpers — QR drawing, PNG download, print.
+	// ------------------------------------------------------------
+	function qrToSvg(matrix, dark) {
+		const n = matrix.length;
+		let path = "";
+		for (let r = 0; r < n; r++) for (let c = 0; c < n; c++)
+			if (matrix[r][c]) path += `M${c} ${r}h1v1h-1z`;
+		return `<svg viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">`
+		     + `<path d="${path}" fill="${dark || "#0A0A0F"}"/></svg>`;
+	}
+
+	// Payload kept short on purpose: a compact URL stays at a low QR version,
+	// which is what survives a phone camera at arm's length.
+	function passUrl(ref) { return "https://apex-athletic.club/pass/" + ref; }
+
+	let lastPass = null;
+
+	function drawPassCanvas() {
+		if (!lastPass) return null;
+		const S = 3;                       // 3x for a crisp export
+		const W = 400, H = 322;
+		const cv = document.createElement("canvas");
+		cv.width = W * S; cv.height = H * S;
+		const x = cv.getContext("2d");
+		x.scale(S, S);
+
+		const INK = "#0C0C13", INK2 = "#16161F", PINK = "#FF2E7E", MINT = "#00E5A0";
+		const WHITE = "#F5F5F7", MUTE = "rgba(245,245,247,0.55)";
+
+		const g = x.createLinearGradient(0, 0, W, H);
+		g.addColorStop(0, INK2); g.addColorStop(0.6, INK); g.addColorStop(1, "#101018");
+		x.fillStyle = g; x.fillRect(0, 0, W, H);
+
+		const bar = x.createLinearGradient(0, 0, W, 0);
+		bar.addColorStop(0, PINK); bar.addColorStop(0.62, PINK); bar.addColorStop(1, MINT);
+		x.fillStyle = bar; x.fillRect(0, 0, W, 3);
+
+		// Logo triangle, drawn rather than rasterised so it stays sharp
+		x.fillStyle = PINK;
+		x.beginPath(); x.moveTo(35, 26); x.lineTo(46, 46); x.lineTo(24, 46); x.closePath(); x.fill();
+		x.fillStyle = MINT;
+		x.beginPath(); x.moveTo(35, 26); x.lineTo(46, 46); x.lineTo(35, 46); x.closePath(); x.fill();
+
+		x.fillStyle = WHITE;
+		x.font = "600 14px 'Barlow Condensed', Impact, sans-serif";
+		x.letterSpacing = "3px";
+		x.fillText("APEX", 54, 42);
+
+		// GUEST PASS pill
+		x.fillStyle = PINK;
+		const pw = 78, px = W - 24 - pw;
+		x.beginPath(); x.roundRect(px, 26, pw, 18, 9); x.fill();
+		x.fillStyle = INK;
+		x.font = "600 9px 'Barlow Condensed', Impact, sans-serif";
+		x.letterSpacing = "1.6px";
+		x.fillText("GUEST PASS", px + 10, 38);
+
+		x.letterSpacing = "0px";
+		x.fillStyle = WHITE;
+		x.font = "700 27px 'Barlow Condensed', Impact, sans-serif";
+		x.fillText(lastPass.name.toUpperCase(), 24, 84);
+
+		x.fillStyle = MUTE;
+		x.font = "11px 'JetBrains Mono', monospace";
+		x.fillText("Miami Beach · 1201 Ocean Drive", 24, 102);
+
+		const rows = [
+			["VALID ON", lastPass.date, WHITE, 24, 134],
+			["ARRIVING", lastPass.time, MINT, 214, 134],
+			["ACCESS", "Full club", WHITE, 24, 178],
+			["DURATION", "One day", WHITE, 214, 178]
+		];
+		for (const [k, v, col, cx, cy] of rows) {
+			x.fillStyle = MUTE;
+			x.font = "600 9px 'Barlow Condensed', Impact, sans-serif";
+			x.letterSpacing = "1.5px";
+			x.fillText(k, cx, cy);
+			x.letterSpacing = "0px";
+			x.fillStyle = col;
+			x.font = "700 13px 'JetBrains Mono', monospace";
+			x.fillText(v, cx, cy + 17);
+		}
+
+		// Perforation
+		x.strokeStyle = "rgba(245,245,247,0.22)";
+		x.setLineDash([4, 4]); x.lineWidth = 1;
+		x.beginPath(); x.moveTo(0, 208); x.lineTo(W, 208); x.stroke();
+		x.setLineDash([]);
+		x.fillStyle = "#0A0A0F";
+		x.beginPath(); x.arc(0, 208, 9, 0, Math.PI * 2); x.fill();
+		x.beginPath(); x.arc(W, 208, 9, 0, Math.PI * 2); x.fill();
+
+		// Terms
+		x.fillStyle = MUTE;
+		x.font = "10px 'JetBrains Mono', monospace";
+		const terms = ["Admits one. Photo ID required at", "check-in. Floor, pool, sauna,",
+		               "jacuzzi and one group class", "included."];
+		terms.forEach((line, i) => x.fillText(line, 24, 234 + i * 14));
+
+		// QR, dark-on-white for scan contrast
+		const qs = 76, qx = W - 24 - qs, qy = 224;
+		x.fillStyle = "#FFFFFF";
+		x.beginPath(); x.roundRect(qx, qy, qs, qs, 4); x.fill();
+		const mod = lastPass.matrix, n = mod.length, cell = (qs - 8) / n;
+		x.fillStyle = "#0A0A0F";
+		for (let r = 0; r < n; r++) for (let c = 0; c < n; c++)
+			if (mod[r][c]) x.fillRect(qx + 4 + c * cell, qy + 4 + r * cell, cell + 0.4, cell + 0.4);
+
+		x.fillStyle = "rgba(245,245,247,0.78)";
+		x.font = "10px 'JetBrains Mono', monospace";
+		const tw = x.measureText(lastPass.ref).width;
+		x.fillText(lastPass.ref, W - 24 - tw, 314);
+
+		return cv;
+	}
+
+	// ------------------------------------------------------------
+	function issueGuestPass(form) {
+		const name  = (document.getElementById("gp-name").value || "").trim() || "Guest";
+		const dateEl = document.getElementById("gp-date");
+		const timeEl = document.getElementById("gp-time");
+		const isoDate = dateEl ? dateEl.dataset.value : "";
+		const shown = isoDate
+			? new Date(isoDate + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long" })
+			: (dateEl ? dateEl.value : "—");
+		const time = timeEl ? timeEl.value : "—";
+
+		// Reference derived from the date + a short random tail, so two passes on
+		// the same day still differ. Cosmetic only — nothing validates it.
+		const tail = Math.floor(1000 + Math.random() * 9000);
+		const dpart = (isoDate || "").replace(/-/g, "").slice(2) || "000000";
+		const ref = "APX-" + dpart + "-" + tail;
+
+		document.getElementById("pass-name").textContent = name;
+		document.getElementById("pass-date").textContent = shown;
+		document.getElementById("pass-time").textContent = time;
+		document.getElementById("pass-ref").textContent = ref;
+
+		let matrix = null;
+		try { matrix = qrEncode(passUrl(ref), "M"); } catch (_) {}
+		const qrBox = document.getElementById("pass-qr");
+		if (qrBox) qrBox.innerHTML = matrix ? qrToSvg(matrix) : "";
+		lastPass = { name, date: shown, time, ref, matrix };
+
+		closeOverlay(document.getElementById("guestpass-overlay"));
+		openOverlay("passcard");
+		form.reset();
+		if (dateEl) { dateEl.value = ""; delete dateEl.dataset.value; }
+	}
+
+	document.getElementById("pass-download")?.addEventListener("click", () => {
+		const cv = drawPassCanvas();
+		if (!cv) return;
+		cv.toBlob((blob) => {
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = "apex-guest-pass-" + (lastPass ? lastPass.ref : "pass") + ".png";
+			document.body.appendChild(a); a.click(); a.remove();
+			setTimeout(() => URL.revokeObjectURL(url), 2000);
+		}, "image/png");
+		showToast("Pass downloaded");
+	});
+	document.getElementById("pass-print")?.addEventListener("click", () => window.print());
+
+		document.getElementById("guestpass-form")?.addEventListener("submit", (e) => {
+			e.preventDefault();
+			issueGuestPass(e.target);
+		});
+
+		// --- Join flow: step 1 -> step 2 -> save + swap nav ---
+		function saveAccount(name, tier) {
+			try {
+				localStorage.setItem("apex_account", JSON.stringify({ name, tier, joined: Date.now() }));
+			} catch (_) {}
+		}
+		document.getElementById("join-next")?.addEventListener("click", () => {
+			const selected = document.querySelector('input[name="plan"]:checked');
+			if (!selected) return;
+			const tier = selected.value;
+			const m = parseInt(selected.dataset.monthly, 10);
+			const summary = document.getElementById("join-summary");
+			if (summary) summary.textContent = tier + " · $" + m + " / month";
+			const overlay = document.getElementById("join-overlay");
+			overlay.querySelectorAll(".join-step").forEach((s) => {
+				s.style.display = s.dataset.step === "2" ? "" : "none";
+			});
+		});
+		document.getElementById("join-back")?.addEventListener("click", () => {
+			const overlay = document.getElementById("join-overlay");
+			overlay.querySelectorAll(".join-step").forEach((s) => {
+				s.style.display = s.dataset.step === "1" ? "" : "none";
+			});
+		});
+		document.getElementById("join-form")?.addEventListener("submit", (e) => {
+			e.preventDefault();
+			const name = document.getElementById("cc-name").value.trim() || "Alex Reyes";
+			const selected = document.querySelector('input[name="plan"]:checked');
+			const tier = selected ? selected.value : "Signature";
+			saveAccount(name, tier);
+			closeOverlay(document.getElementById("join-overlay"));
+			showToast("Welcome to APEX — " + tier + " member");
+			swapJoinToMySpace();
+			e.target.reset();
+		});
+
+		// --- Swap Join → My Space in nav after a successful join ---
+		// Replace the <button> with an <a> pointing at the dashboard so the
+		// browser handles navigation natively (right-click, cmd-click, etc).
+		function swapJoinToMySpace() {
+			[["nav-join-btn"], ["mobile-join-btn"]].forEach(([id]) => {
+				const btn = document.getElementById(id);
+				if (!btn || btn.tagName === "A") return;
+				const link = document.createElement("a");
+				link.id = btn.id;
+				link.href = "/demo/apex-athletic-club/user.html";
+				link.className = btn.className;
+				link.setAttribute("aria-label", "Open your member dashboard");
+				link.textContent = "My Space";
+				btn.parentNode.replaceChild(link, btn);
+			});
+		}
+		try {
+			if (localStorage.getItem("apex_account")) swapJoinToMySpace();
+		} catch (_) {}
+	})();
+	// ------------------------------------------------------------
+	// Custom date picker. Replaces <input type="date"> so the calendar matches
+	// the design system instead of rendering the OS widget. The visible field is
+	// a readonly text input (so it still participates in `required` validation)
+	// and the ISO value lives in dataset.value for anything that needs to parse it.
+	// ------------------------------------------------------------
+	function initDatePickers(root) {
+		const MONTHS = ["January","February","March","April","May","June",
+		                "July","August","September","October","November","December"];
+		const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+		const iso = (d) => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+		const pretty = (d) => d.toLocaleDateString("en-US", { weekday:"short", day:"numeric", month:"short", year:"numeric" });
+
+		(root || document).querySelectorAll("[data-dp]").forEach((dp) => {
+			if (dp.dataset.dpReady) return;
+			dp.dataset.dpReady = "1";
+
+			const input = dp.querySelector(".dp-input");
+			const panel = dp.querySelector(".dp-panel");
+			const label = dp.querySelector("[data-dp-label]");
+			const grid  = dp.querySelector("[data-dp-grid]");
+			const today = startOfDay(new Date());
+			// Past dates can't be booked, so they're rendered but disabled.
+			const min   = today;
+			let view = new Date(today.getFullYear(), today.getMonth(), 1);
+			let selected = null;
+
+			function render() {
+				label.textContent = MONTHS[view.getMonth()] + " " + view.getFullYear();
+				grid.innerHTML = "";
+				const first = new Date(view.getFullYear(), view.getMonth(), 1);
+				// Monday-first week, matching the club's schedule elsewhere on the site.
+				const lead = (first.getDay() + 6) % 7;
+				const start = new Date(first);
+				start.setDate(1 - lead);
+				for (let i = 0; i < 42; i++) {
+					const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+					const b = document.createElement("button");
+					b.type = "button";
+					b.className = "dp-day";
+					b.textContent = d.getDate();
+					if (d.getMonth() !== view.getMonth()) b.classList.add("muted");
+					if (d.getTime() === today.getTime()) b.classList.add("today");
+					if (selected && d.getTime() === selected.getTime()) b.classList.add("selected");
+					if (d < min) b.disabled = true;
+					b.addEventListener("click", () => {
+						selected = d;
+						input.value = pretty(d);
+						input.dataset.value = iso(d);
+						input.dispatchEvent(new Event("change", { bubbles: true }));
+						close();
+					});
+					grid.appendChild(b);
+				}
+			}
+			// Panel is position:fixed, so it is placed against the input's viewport
+			// rect. Flips above the field when there isn't 330px of room below, and
+			// is nudged back inside the right edge on narrow screens.
+			function place() {
+				const r = input.getBoundingClientRect();
+				const H = 330, W = panel.offsetWidth || 292;
+				const up = r.bottom + H > window.innerHeight && r.top > H;
+				panel.classList.toggle("up", up);
+				panel.style.top = up ? (r.top - H - 8) + "px" : (r.bottom + 8) + "px";
+				panel.style.left = Math.max(8, Math.min(r.left, window.innerWidth - W - 8)) + "px";
+			}
+			function open() {
+				document.querySelectorAll(".dp.open").forEach((o) => { if (o !== dp) o.classList.remove("open"); });
+				dp.classList.add("open");
+				render();
+				place();
+			}
+			function close() { dp.classList.remove("open"); }
+			// A fixed panel doesn't travel with its field, so any scroll or resize
+			// while it's open re-places it rather than leaving it stranded.
+			window.addEventListener("resize", () => { if (dp.classList.contains("open")) place(); });
+			window.addEventListener("scroll", () => { if (dp.classList.contains("open")) place(); }, true);
+
+			input.addEventListener("click", (e) => { e.stopPropagation(); dp.classList.contains("open") ? close() : open(); });
+			input.addEventListener("keydown", (e) => {
+				if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+				if (e.key === "Escape") close();
+			});
+			dp.querySelector("[data-dp-prev]").addEventListener("click", (e) => {
+				e.stopPropagation(); view = new Date(view.getFullYear(), view.getMonth() - 1, 1); render();
+			});
+			dp.querySelector("[data-dp-next]").addEventListener("click", (e) => {
+				e.stopPropagation(); view = new Date(view.getFullYear(), view.getMonth() + 1, 1); render();
+			});
+			dp.querySelector("[data-dp-today]").addEventListener("click", (e) => {
+				e.stopPropagation();
+				selected = today; view = new Date(today.getFullYear(), today.getMonth(), 1);
+				input.value = pretty(today); input.dataset.value = iso(today);
+				input.dispatchEvent(new Event("change", { bubbles: true }));
+				close();
+			});
+			dp.querySelector("[data-dp-clear]").addEventListener("click", (e) => {
+				e.stopPropagation();
+				selected = null; input.value = ""; delete input.dataset.value;
+				input.dispatchEvent(new Event("change", { bubbles: true }));
+				render();
+			});
+			panel.addEventListener("click", (e) => e.stopPropagation());
+			document.addEventListener("click", close);
+			document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+			render();
+		});
+	}
+	initDatePickers();
+
+// ---------------------------------------------------------------------------
+// Minimal QR encoder — byte mode, ECC level M, versions 1..10.
+// Written inline because the page must stay a single self-contained file: no
+// CDN, no build step. Scope is deliberately narrow (one mode, one ECC level,
+// small versions) since the only payload is a short pass URL.
+// ---------------------------------------------------------------------------
+function qrEncode(text, eccLevel) {
+	const ECC = eccLevel || "M";
+
+	// --- GF(256) tables for Reed-Solomon, generator polynomial x^8+x^4+x^3+x^2+1
+	const EXP = new Uint8Array(512), LOG = new Uint8Array(256);
+	(function () {
+		let x = 1;
+		for (let i = 0; i < 255; i++) {
+			EXP[i] = x; LOG[x] = i;
+			x <<= 1; if (x & 0x100) x ^= 0x11d;
+		}
+		for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+	})();
+	const gmul = (a, b) => (a === 0 || b === 0) ? 0 : EXP[LOG[a] + LOG[b]];
+
+	function rsGenerator(deg) {
+		let poly = [1];
+		for (let i = 0; i < deg; i++) {
+			const next = new Array(poly.length + 1).fill(0);
+			for (let j = 0; j < poly.length; j++) {
+				next[j] ^= gmul(poly[j], 1);           // multiply by x
+				next[j + 1] ^= gmul(poly[j], EXP[i]);  // multiply by alpha^i
+			}
+			poly = next;
+		}
+		return poly;
+	}
+	function rsEncode(data, ecLen) {
+		const gen = rsGenerator(ecLen);
+		const res = new Array(ecLen).fill(0);
+		for (const b of data) {
+			const factor = b ^ res[0];
+			res.shift(); res.push(0);
+			for (let i = 0; i < ecLen; i++) res[i] ^= gmul(gen[i + 1], factor);
+		}
+		return res;
+	}
+
+	// --- Capacity / block tables, versions 1..10, byte mode.
+	// [totalCodewords, ecPerBlock, group1Blocks, group1Data, group2Blocks, group2Data]
+	const TABLE = {
+		L: [[26,7,1,19,0,0],[44,10,1,34,0,0],[70,15,1,55,0,0],[100,20,1,80,0,0],[134,26,1,108,0,0],
+		    [172,18,2,68,0,0],[196,20,2,78,0,0],[242,24,2,97,0,0],[292,30,2,116,0,0],[346,18,2,68,2,69]],
+		M: [[26,10,1,16,0,0],[44,16,1,28,0,0],[70,26,1,44,0,0],[100,18,2,32,0,0],[134,24,2,43,0,0],
+		    [172,16,4,27,0,0],[196,18,4,31,0,0],[242,22,2,38,2,39],[292,22,3,36,2,37],[346,26,4,43,1,44]],
+		Q: [[26,13,1,13,0,0],[44,22,1,22,0,0],[70,18,2,17,0,0],[100,26,2,24,0,0],[134,18,2,15,2,16],
+		    [172,24,4,19,0,0],[196,18,2,14,4,15],[242,22,4,18,2,19],[292,20,4,16,4,17],[346,24,6,19,2,20]],
+		H: [[26,17,1,9,0,0],[44,28,1,16,0,0],[70,22,2,13,0,0],[100,16,4,9,0,0],[134,22,2,11,2,12],
+		    [172,28,4,15,0,0],[196,26,4,13,1,14],[242,26,4,14,2,15],[292,24,4,12,4,13],[346,28,6,15,2,16]]
+	};
+	const ALIGN = {
+		1: [], 2: [6,18], 3: [6,22], 4: [6,26], 5: [6,30],
+		6: [6,34], 7: [6,22,38], 8: [6,24,42], 9: [6,26,46], 10: [6,28,50]
+	};
+
+	// --- UTF-8 bytes
+	const bytes = [];
+	for (const ch of unescape(encodeURIComponent(text))) bytes.push(ch.charCodeAt(0));
+
+	// --- Pick the smallest version that fits
+	let version = 0, spec = null;
+	for (let v = 1; v <= 10; v++) {
+		const t = TABLE[ECC][v - 1];
+		const dataCw = t[2] * t[3] + t[4] * t[5];
+		const lenBits = v < 10 ? 8 : 16;
+		if (4 + lenBits + bytes.length * 8 <= dataCw * 8) { version = v; spec = t; break; }
+	}
+	if (!version) throw new Error("payload too long for version 10");
+
+	const [totalCw, ecPerBlock, g1, g1d, g2, g2d] = spec;
+	const dataCw = g1 * g1d + g2 * g2d;
+
+	// --- Bit stream: mode(4) + length + data + terminator + pad
+	const bits = [];
+	const push = (val, len) => { for (let i = len - 1; i >= 0; i--) bits.push((val >> i) & 1); };
+	push(4, 4);                                     // byte mode
+	push(bytes.length, version < 10 ? 8 : 16);
+	for (const b of bytes) push(b, 8);
+	for (let i = 0; i < 4 && bits.length < dataCw * 8; i++) bits.push(0);
+	while (bits.length % 8) bits.push(0);
+	const cw = [];
+	for (let i = 0; i < bits.length; i += 8) {
+		let b = 0; for (let j = 0; j < 8; j++) b = (b << 1) | bits[i + j];
+		cw.push(b);
+	}
+	const PAD = [0xEC, 0x11];
+	for (let i = 0; cw.length < dataCw; i++) cw.push(PAD[i % 2]);
+
+	// --- Split into blocks, compute EC, interleave
+	const blocks = [], ecBlocks = [];
+	let p = 0;
+	for (let i = 0; i < g1; i++) { blocks.push(cw.slice(p, p + g1d)); p += g1d; }
+	for (let i = 0; i < g2; i++) { blocks.push(cw.slice(p, p + g2d)); p += g2d; }
+	for (const b of blocks) ecBlocks.push(rsEncode(b, ecPerBlock));
+
+	const finalCw = [];
+	const maxData = Math.max(...blocks.map(b => b.length));
+	for (let i = 0; i < maxData; i++) for (const b of blocks) if (i < b.length) finalCw.push(b[i]);
+	for (let i = 0; i < ecPerBlock; i++) for (const b of ecBlocks) finalCw.push(b[i]);
+
+	// --- Build the module matrix
+	const size = version * 4 + 17;
+	const m = Array.from({ length: size }, () => new Array(size).fill(null)); // null = free
+	const reserved = Array.from({ length: size }, () => new Array(size).fill(false));
+
+	function setF(r, c, v) { if (r >= 0 && r < size && c >= 0 && c < size) { m[r][c] = v; reserved[r][c] = true; } }
+
+	function finder(r, c) {
+		for (let i = -1; i <= 7; i++) for (let j = -1; j <= 7; j++) {
+			const rr = r + i, cc = c + j;
+			if (rr < 0 || rr >= size || cc < 0 || cc >= size) continue;
+			const inRing = (i >= 0 && i <= 6 && (j === 0 || j === 6)) || (j >= 0 && j <= 6 && (i === 0 || i === 6));
+			const inCore = i >= 2 && i <= 4 && j >= 2 && j <= 4;
+			setF(rr, cc, (inRing || inCore) ? 1 : 0);
+		}
+	}
+	finder(0, 0); finder(0, size - 7); finder(size - 7, 0);
+
+	// Timing patterns
+	for (let i = 8; i < size - 8; i++) { setF(6, i, i % 2 === 0 ? 1 : 0); setF(i, 6, i % 2 === 0 ? 1 : 0); }
+
+	// Alignment patterns (skipped where they would collide with a finder)
+	const centers = ALIGN[version];
+	for (const r of centers) for (const c of centers) {
+		if ((r === 6 && c === 6) || (r === 6 && c === size - 7) || (r === size - 7 && c === 6)) continue;
+		for (let i = -2; i <= 2; i++) for (let j = -2; j <= 2; j++) {
+			const on = Math.max(Math.abs(i), Math.abs(j)) !== 1;
+			setF(r + i, c + j, on ? 1 : 0);
+		}
+	}
+
+	// Dark module + reserved format areas
+	setF(size - 8, 8, 1);
+	for (let i = 0; i <= 8; i++) { if (!reserved[8][i]) setF(8, i, 0); if (!reserved[i][8]) setF(i, 8, 0); }
+	for (let i = size - 8; i < size; i++) { if (!reserved[8][i]) setF(8, i, 0); if (!reserved[i][8]) setF(i, 8, 0); }
+
+	// Version information blocks (version >= 7)
+	if (version >= 7) {
+		let d = version;
+		for (let i = 0; i < 12; i++) d = (d << 1) ^ ((d >>> 11) * 0x1f25);
+		const vBits = (version << 12) | d;
+		for (let i = 0; i < 18; i++) {
+			const bit = (vBits >> i) & 1;
+			const a = Math.floor(i / 3), b = i % 3;
+			setF(size - 11 + b, a, bit);
+			setF(a, size - 11 + b, bit);
+		}
+	}
+
+	// --- Place data in the zig-zag pattern
+	let bi = 0;
+	const dataBits = [];
+	for (const b of finalCw) for (let i = 7; i >= 0; i--) dataBits.push((b >> i) & 1);
+	let up = true;
+	for (let col = size - 1; col > 0; col -= 2) {
+		if (col === 6) col--; // skip the vertical timing column
+		for (let k = 0; k < size; k++) {
+			const row = up ? size - 1 - k : k;
+			for (let c = 0; c < 2; c++) {
+				const cc = col - c;
+				if (reserved[row][cc]) continue;
+				m[row][cc] = bi < dataBits.length ? dataBits[bi] : 0;
+				bi++;
+			}
+		}
+		up = !up;
+	}
+
+	// --- Masking: apply each of the 8 patterns, score, keep the best
+	const MASKS = [
+		(r, c) => (r + c) % 2 === 0,
+		(r, c) => r % 2 === 0,
+		(r, c) => c % 3 === 0,
+		(r, c) => (r + c) % 3 === 0,
+		(r, c) => (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0,
+		(r, c) => ((r * c) % 2) + ((r * c) % 3) === 0,
+		(r, c) => (((r * c) % 2) + ((r * c) % 3)) % 2 === 0,
+		(r, c) => (((r + c) % 2) + ((r * c) % 3)) % 2 === 0
+	];
+	const ECC_BITS = { L: 1, M: 0, Q: 3, H: 2 };
+
+	function applyFormat(grid, maskIdx) {
+		const data = (ECC_BITS[ECC] << 3) | maskIdx;
+		let d = data;
+		for (let i = 0; i < 10; i++) d = (d << 1) ^ ((d >>> 9) * 0x537);
+		const fmt = ((data << 10) | d) ^ 0x5412;
+		// The 15 format modules are written MSB-first along each of these two
+		// paths. Order and split point were both verified by decoding the result
+		// with a real scanner rather than assumed — an off-by-one here produces a
+		// QR that looks perfect and refuses to scan.
+		const copy1 = [[8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8],
+		               [7,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8]];
+		const copy2 = [[size-1,8],[size-2,8],[size-3,8],[size-4,8],[size-5,8],[size-6,8],[size-7,8],
+		               [8,size-8],[8,size-7],[8,size-6],[8,size-5],[8,size-4],[8,size-3],[8,size-2],[8,size-1]];
+		for (let i = 0; i < 15; i++) {
+			const bit = (fmt >> (14 - i)) & 1;
+			grid[copy1[i][0]][copy1[i][1]] = bit;
+			grid[copy2[i][0]][copy2[i][1]] = bit;
+		}
+		grid[size - 8][8] = 1; // dark module, always set
+	}
+
+	function penalty(g) {
+		let score = 0;
+		// Rule 1 — runs of 5+ same-colour modules
+		for (let i = 0; i < size; i++) {
+			for (const line of [g[i], g.map(row => row[i])]) {
+				let run = 1;
+				for (let j = 1; j < size; j++) {
+					if (line[j] === line[j - 1]) { run++; if (run === 5) score += 3; else if (run > 5) score++; }
+					else run = 1;
+				}
+			}
+		}
+		// Rule 2 — 2x2 blocks of one colour
+		for (let r = 0; r < size - 1; r++) for (let c = 0; c < size - 1; c++)
+			if (g[r][c] === g[r][c + 1] && g[r][c] === g[r + 1][c] && g[r][c] === g[r + 1][c + 1]) score += 3;
+		// Rule 3 — finder-like 1:1:3:1:1 sequences
+		const P1 = [1,0,1,1,1,0,1,0,0,0,0], P2 = [0,0,0,0,1,0,1,1,1,0,1];
+		for (let r = 0; r < size; r++) for (let c = 0; c <= size - 11; c++) {
+			let a = true, b = true;
+			for (let k = 0; k < 11; k++) { if (g[r][c + k] !== P1[k]) a = false; if (g[r][c + k] !== P2[k]) b = false; }
+			if (a || b) score += 40;
+		}
+		for (let c = 0; c < size; c++) for (let r = 0; r <= size - 11; r++) {
+			let a = true, b = true;
+			for (let k = 0; k < 11; k++) { if (g[r + k][c] !== P1[k]) a = false; if (g[r + k][c] !== P2[k]) b = false; }
+			if (a || b) score += 40;
+		}
+		// Rule 4 — deviation from a 50/50 dark ratio
+		let dark = 0;
+		for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) dark += g[r][c];
+		const pct = dark * 100 / (size * size);
+		score += Math.floor(Math.abs(pct - 50) / 5) * 10;
+		return score;
+	}
+
+	let best = null, bestScore = Infinity;
+	for (let mi = 0; mi < 8; mi++) {
+		const g = m.map(row => row.slice());
+		for (let r = 0; r < size; r++) for (let c = 0; c < size; c++)
+			if (!reserved[r][c] && MASKS[mi](r, c)) g[r][c] ^= 1;
+		applyFormat(g, mi);
+		const s = penalty(g);
+		if (s < bestScore) { bestScore = s; best = g; }
+	}
+	return best;
+}
+
+
+</script>
+
+<script>
+	// ------------------------------------------------------------
+	// Deep-link landing fix.
+	// Every image on these pages is unsized, so at the moment the browser
+	// performs its hash jump the document is still short and it lands well
+	// above the target — or, as here, doesn't move at all. The visitor clicks
+	// "Membership" on another page and arrives at the top of the home page
+	// with Membership highlighted, which reads as a broken menu.
+	// Re-apply the jump once the page has actually finished growing, and back
+	// off the moment the visitor takes over the scroll themselves.
+	// ------------------------------------------------------------
+	(function () {
+		var id = (location.hash || "").replace("#", "");
+		var target = id && document.getElementById(id);
+		if (!target) return;
+
+		var surrendered = false;
+		function surrender() { surrendered = true; }
+		["wheel", "touchstart", "keydown"].forEach(function (evt) {
+			window.addEventListener(evt, surrender, { passive: true, once: true });
+		});
+
+		var navH = parseInt(getComputedStyle(document.documentElement)
+			.getPropertyValue("--nav-h"), 10) || 72;
+
+		function jump() {
+			if (surrendered) return;
+			var root = document.documentElement;
+			var prev = root.style.scrollBehavior;
+			// html carries scroll-behavior:smooth, and passing behavior:"auto"
+			// to scrollTo is not enough to beat it here: the smooth animation
+			// restarts every time another unsized image lands and finishes its
+			// layout, so it never actually arrives. Turn the CSS off for the
+			// duration of the jump, then hand it back.
+			root.style.scrollBehavior = "auto";
+			var y = target.getBoundingClientRect().top + window.scrollY - navH;
+			window.scrollTo(0, Math.max(0, y));
+			root.style.scrollBehavior = prev;
+		}
+
+		jump();
+		window.addEventListener("load", function () { jump(); setTimeout(jump, 300); });
+		if (document.fonts && document.fonts.ready) document.fonts.ready.then(jump);
+	})();
+</script>

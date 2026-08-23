@@ -1,0 +1,2729 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0A0F" />
+<title>My Space — APEX Athletic Club</title>
+<meta name="description" content="APEX member dashboard — membership status, upcoming classes, personal training, calorie calculator, weekly meal plan." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+	/* ============================================================
+	   APEX — My Space (member dashboard)
+	   Same design system as home + contact: ink canvas, pink primary,
+	   mint secondary. Dashboard-only additions: membership card,
+	   personal class list, PT sessions, live calorie calculator,
+	   meal-plan tabs, cancel flow.
+	   ============================================================ */
+
+	:root {
+		--ink: #0A0A0F;
+		--ink-2: #14141C;
+		--ink-3: #1E1E28;
+		--line: rgba(245, 245, 247, 0.10);
+		--line-strong: rgba(245, 245, 247, 0.22);
+		--white: #F5F5F7;
+		--white-soft: rgba(245, 245, 247, 0.72);
+		--white-mute: rgba(245, 245, 247, 0.52);
+		--pink: #FF2E7E;
+		--pink-dim: #C9265E;
+		--mint: #00E5A0;
+		--mint-dim: #06B37D;
+		--warn: #FFB020;
+
+		--font-display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+		--font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+		--font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+		--maxw: 1200px;
+		--pad-x: clamp(20px, 4vw, 48px);
+		--nav-h: 72px;
+
+		color-scheme: dark;
+	}
+
+	*, *::before, *::after { box-sizing: border-box; }
+	/* scrollbar-gutter reserves the scrollbar track at all times. Without it,
+	   `body { overflow: hidden }` on modal open removes the scrollbar, the
+	   viewport widens by ~15px, and the whole page lurches sideways for one
+	   frame — the visible "jump" when an overlay opened. */
+	html {
+		scroll-behavior: smooth;
+		-webkit-text-size-adjust: 100%;
+		scrollbar-gutter: stable;
+	}
+	body {
+		margin: 0;
+		background: var(--ink);
+		color: var(--white);
+		font-family: var(--font-body);
+		font-size: 16px;
+		line-height: 1.55;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	img, svg { max-width: 100%; height: auto; display: block; }
+	a { color: inherit; text-decoration: none; }
+	button { font: inherit; color: inherit; background: transparent; border: 0; cursor: pointer; }
+
+	html.js-reveal-ready [data-reveal]:not(.is-in) { opacity: 0; transform: translateY(18px); }
+	[data-reveal] {
+		transition: opacity 700ms cubic-bezier(0.22, 0.61, 0.36, 1),
+		            transform 700ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		html.js-reveal-ready [data-reveal]:not(.is-in) { opacity: 1; transform: none; }
+		[data-reveal] { transition: none; }
+	}
+
+	/* Typography */
+	.eyebrow {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 12px;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: var(--mint);
+	}
+	.eyebrow.pink { color: var(--pink); }
+	.h1 {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(36px, 5.6vw, 72px);
+		line-height: 0.98;
+		letter-spacing: -0.02em;
+		text-transform: uppercase;
+	}
+	.h2 {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(32px, 4.4vw, 56px);
+		line-height: 1.02;
+		letter-spacing: -0.015em;
+		text-transform: uppercase;
+	}
+	.h3 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: clamp(22px, 2.4vw, 30px);
+		line-height: 1.15;
+		letter-spacing: -0.01em;
+		text-transform: uppercase;
+	}
+	.h4 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 18px;
+		line-height: 1.2;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+	}
+	.lead {
+		font-size: clamp(16px, 1.6vw, 20px);
+		line-height: 1.55;
+		color: var(--white-soft);
+		max-width: 62ch;
+	}
+	.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+	.wrap {
+		max-width: var(--maxw);
+		margin: 0 auto;
+		padding-left: var(--pad-x);
+		padding-right: var(--pad-x);
+	}
+
+	/* Buttons */
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 14px 26px;
+		border-radius: 999px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 13px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease;
+		white-space: nowrap;
+	}
+	.btn-primary { background: var(--pink); color: var(--ink); }
+	.btn-primary:hover { background: var(--white); }
+	.btn-ghost { border: 1px solid var(--line-strong); color: var(--white); }
+	.btn-ghost:hover { border-color: var(--white); }
+	.btn-mint { background: var(--mint); color: var(--ink); }
+	.btn-mint:hover { background: var(--white); }
+	.btn-danger { background: transparent; border: 1px solid var(--pink-dim); color: var(--pink); }
+	.btn-danger:hover { background: var(--pink-dim); color: var(--white); }
+	.btn-sm { padding: 10px 18px; font-size: 11px; letter-spacing: 0.12em; }
+
+	/* NAV */
+	.nav {
+		position: sticky;
+		top: 0;
+		z-index: 60;
+		background: rgba(10, 10, 15, 0.82);
+		backdrop-filter: saturate(140%) blur(14px);
+		-webkit-backdrop-filter: saturate(140%) blur(14px);
+		border-bottom: 1px solid var(--line);
+	}
+	/* Three columns, not space-between. With space-between the links sit
+	   wherever the brand and the right-hand controls leave them, so adding a
+	   cart icon on one page shifted the whole menu sideways on that page only.
+	   1fr auto 1fr pins the links to the centre of the bar on every page,
+	   whatever ends up on either side of them. */
+	.nav-inner {
+		max-width: var(--maxw);
+		margin: 0 auto;
+		padding: 0 var(--pad-x);
+		height: var(--nav-h);
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		align-items: center;
+		gap: 24px;
+	}
+	.nav-inner > .nav-brand { justify-self: start; }
+	.nav-actions {
+		justify-self: end;
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+	}
+	.nav-brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: 18px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+	.nav-brand .apex-mark {
+		width: 26px; height: 26px;
+		display: inline-block;
+		background:
+			conic-gradient(from 135deg at 50% 50%, var(--pink) 0deg 90deg, var(--mint) 90deg 180deg, var(--white) 180deg 270deg, var(--pink) 270deg 360deg);
+		clip-path: polygon(50% 0, 100% 100%, 0 100%);
+	}
+	.nav-links {
+		display: flex;
+		align-items: center;
+		gap: 28px;
+		list-style: none;
+		margin: 0; padding: 0;
+	}
+	.nav-links a, .nav-links span {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 12px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		position: relative;
+		padding: 6px 0;
+		transition: color 200ms ease;
+	}
+	.nav-links a:hover { color: var(--white); }
+	.nav-links .active { color: var(--pink); pointer-events: none; cursor: default; }
+	.nav-links a.active, .mobile-nav a.active { pointer-events: auto; cursor: pointer; }
+	.nav-links .active::after {
+		content: "";
+		position: absolute;
+		left: 0; right: 0;
+		bottom: -2px;
+		height: 2px;
+		background: var(--pink);
+	}
+	.nav-cta { display: inline-flex; gap: 10px; align-items: center; }
+	/* MY SPACE indicator on user.html — pink ring, no leading dot (dot
+	   was pushing the whole nav menu left). Discreet + still readable. */
+	.nav-cta .on-page {
+		background: transparent;
+		color: var(--pink);
+		border: 1px solid var(--pink);
+		cursor: default;
+		pointer-events: none;
+	}
+	/* Log out link next to MY SPACE — small ghost pill. */
+	.nav-cta .logout-link {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		padding: 8px 12px;
+		border-radius: 999px;
+		transition: color 200ms ease, background 200ms ease;
+	}
+	.nav-cta .logout-link:hover { color: var(--white); background: var(--ink-2); }
+	.nav-toggle {
+		display: none;
+		width: 40px; height: 40px;
+		border: 1px solid var(--line-strong);
+		border-radius: 10px;
+	}
+	.nav-toggle svg { margin: 0 auto; }
+
+	.mobile-nav {
+		position: fixed; inset: 0;
+		z-index: 80;
+		background: var(--ink);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 24px;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 240ms ease;
+	}
+	.mobile-nav.open { opacity: 1; pointer-events: auto; }
+	.mobile-nav a, .mobile-nav span {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 24px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white);
+	}
+	.mobile-nav .active { color: var(--pink); pointer-events: none; }
+	.mobile-nav-close {
+		position: absolute;
+		top: 20px; right: 20px;
+		width: 44px; height: 44px;
+		border-radius: 12px;
+		border: 1px solid var(--line-strong);
+	}
+
+	/* ============================================================
+	   PAGE HERO — greeting + membership badge inline
+	   ============================================================ */
+	.page-hero {
+		position: relative;
+		padding: clamp(60px, 8vw, 100px) 0 clamp(40px, 5vw, 60px);
+		background:
+			radial-gradient(ellipse 900px 500px at 10% 20%, rgba(255,46,126,0.08) 0%, transparent 60%),
+			radial-gradient(ellipse 700px 400px at 90% 80%, rgba(0,229,160,0.06) 0%, transparent 60%),
+			linear-gradient(180deg, #0F0F18 0%, var(--ink) 100%);
+		overflow: hidden;
+	}
+	.page-hero .inner {
+		max-width: var(--maxw);
+		margin: 0 auto;
+		padding: 0 var(--pad-x);
+	}
+	.page-hero .greet-row {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 40px;
+		flex-wrap: wrap;
+	}
+	.page-hero h1 { margin: 12px 0 0; max-width: 18ch; }
+	.page-hero h1 .pink { color: var(--pink); }
+	.page-hero .membership-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 12px;
+		padding: 14px 20px;
+		border: 1px solid var(--pink);
+		border-radius: 999px;
+		background: rgba(255,46,126,0.06);
+	}
+	.page-hero .membership-badge .tier-name {
+		font-family: var(--font-display);
+		font-size: 14px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--pink);
+	}
+	.page-hero .membership-badge .sep {
+		width: 4px; height: 4px; border-radius: 50%;
+		background: var(--white-mute);
+	}
+	.page-hero .membership-badge .since {
+		font-family: var(--font-mono);
+		font-size: 12px;
+		color: var(--white-mute);
+	}
+
+	/* ============================================================
+	   SECTION SHELL + .head grid (same pattern as index/contact)
+	   ============================================================ */
+	.section {
+		padding: clamp(60px, 7vw, 100px) 0;
+		position: relative;
+	}
+	.section.tight { padding: clamp(40px, 5vw, 60px) 0; }
+	.section .head {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: auto auto;
+		column-gap: 60px;
+		row-gap: 14px;
+		margin-bottom: 40px;
+	}
+	.section .head > .eyebrow { grid-column: 1; grid-row: 1; align-self: end; }
+	.section .head > .h2 {
+		grid-column: 1; grid-row: 2; margin: 0;
+		font-size: clamp(28px, 3.6vw, 44px);
+	}
+	.section .head > p.lead { grid-column: 2; grid-row: 2; margin: 0; align-self: start; }
+	.section .head > .head-actions {
+		grid-column: 2; grid-row: 1; align-self: end; justify-self: end;
+		display: inline-flex; gap: 10px;
+	}
+
+	/* ============================================================
+	   MEMBERSHIP STATUS CARD
+	   ============================================================ */
+	.membership-card {
+		background: linear-gradient(160deg, rgba(255,46,126,0.06) 0%, var(--ink-2) 100%);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: clamp(28px, 3vw, 40px);
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: 40px;
+		align-items: center;
+	}
+	.mc-stats {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 24px;
+	}
+	.mc-stat .k {
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		margin-bottom: 6px;
+	}
+	/* Values are short, self-contained figures ("$259 / mo", "Aug 2026") — they
+	   must never break mid-value. The clamp floor drops a little so a 4-digit
+	   price still fits its column at laptop widths instead of wrapping. */
+	.mc-stat .v {
+		font-family: var(--font-mono);
+		font-weight: 700;
+		font-size: clamp(17px, 1.9vw, 26px);
+		line-height: 1.15;
+		white-space: nowrap;
+		color: var(--white);
+	}
+	.mc-stat { min-width: 0; }
+	.mc-stat .v.mint { color: var(--mint); }
+	.mc-stat .v.pink { color: var(--pink); }
+	.mc-stat .sub {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+		margin-top: 4px;
+	}
+	.mc-actions {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		align-items: flex-end;
+	}
+
+	/* ============================================================
+	   CLASSES — filters + list
+	   ============================================================ */
+	.filters {
+		display: flex;
+		gap: 8px;
+		flex-wrap: wrap;
+		margin-bottom: 20px;
+		padding: 6px;
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		align-self: flex-start;
+	}
+	.filters button {
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		padding: 8px 16px;
+		border-radius: 999px;
+		transition: color 200ms ease, background 200ms ease;
+	}
+	.filters button:hover { color: var(--white); }
+	.filters button.active {
+		background: var(--pink);
+		color: var(--ink);
+	}
+	.filter-groups {
+		display: flex;
+		gap: 12px;
+		flex-wrap: wrap;
+		margin-bottom: 24px;
+	}
+	.class-list {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.class-item {
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-left: 3px solid var(--white-mute);
+		border-radius: 4px;
+		padding: 18px 24px;
+		display: grid;
+		grid-template-columns: 100px 1fr 1fr auto;
+		gap: 20px;
+		align-items: center;
+		transition: border-color 200ms ease, background 200ms ease;
+	}
+	.class-item:hover { border-color: var(--line-strong); background: var(--ink-3); }
+	.class-item.type-mint { border-left-color: var(--mint); }
+	.class-item.type-pink { border-left-color: var(--pink); }
+	.class-item.type-white { border-left-color: var(--white); }
+	.class-item.type-warn { border-left-color: var(--warn); }
+	.class-item .ci-time .day {
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.class-item .ci-time .hour {
+		font-family: var(--font-mono);
+		font-size: 15px;
+		font-weight: 500;
+		color: var(--white);
+		margin-top: 2px;
+	}
+	.class-item .ci-name {
+		font-family: var(--font-display);
+		font-size: 16px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+	}
+	.class-item .ci-name .lvl {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		color: var(--white-mute);
+		margin-left: 8px;
+		letter-spacing: 0.05em;
+	}
+	.class-item .ci-coach {
+		font-size: 13px;
+		color: var(--white-soft);
+	}
+	.class-item .ci-coach .studio {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+		display: block;
+		margin-top: 2px;
+	}
+	.class-item .ci-actions {
+		display: flex;
+		gap: 8px;
+	}
+	.class-empty {
+		background: var(--ink-2);
+		border: 1px dashed var(--line);
+		border-radius: 4px;
+		padding: 40px;
+		text-align: center;
+		color: var(--white-mute);
+		font-family: var(--font-mono);
+		font-size: 13px;
+	}
+	/* Book-new card at the end of the class list — dashed, centered,
+	   opens the class-picker modal. Same design intent as .pt-card.book-new. */
+	.class-item.book-new {
+		background: transparent;
+		border: 1px dashed var(--line-strong);
+		border-left: 1px dashed var(--line-strong);
+		border-radius: 4px;
+		padding: 22px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 16px;
+		color: var(--white-soft);
+		transition: border-color 200ms ease, color 200ms ease;
+		cursor: pointer;
+	}
+	.class-item.book-new:hover {
+		border-color: var(--pink);
+		color: var(--pink);
+	}
+	.class-item.book-new .plus {
+		width: 36px; height: 36px;
+		border-radius: 50%;
+		border: 1px solid currentColor;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-family: var(--font-mono);
+		font-size: 20px;
+		line-height: 1;
+	}
+	.class-item.book-new .book-new-copy { display: inline-flex; flex-direction: column; gap: 2px; text-align: left; }
+	.class-item.book-new .lbl {
+		font-family: var(--font-display);
+		font-size: 14px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+	.class-item.book-new .sub {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+	}
+
+	/* ============================================================
+	   PERSONAL TRAINING
+	   ============================================================ */
+	.pt-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 16px;
+	}
+	.pt-card {
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: 24px;
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
+	.pt-card.book-new {
+		background: transparent;
+		border: 1px dashed var(--line-strong);
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+	}
+	.pt-card.book-new .plus {
+		width: 48px; height: 48px;
+		border-radius: 50%;
+		border: 1px solid var(--pink);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--pink);
+		font-size: 24px;
+		font-family: var(--font-mono);
+		line-height: 1;
+	}
+	.pt-card .pt-date {
+		font-family: var(--font-mono);
+		font-size: 12px;
+		color: var(--mint);
+		letter-spacing: 0.06em;
+	}
+	.pt-card .pt-coach {
+		font-family: var(--font-display);
+		font-size: 18px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+	}
+	.pt-card .pt-focus {
+		font-size: 13px;
+		color: var(--white-soft);
+	}
+	.pt-card .pt-actions {
+		display: flex;
+		gap: 8px;
+		margin-top: auto;
+	}
+
+	/* ============================================================
+	   CALORIE CALCULATOR
+	   ============================================================ */
+	.calc-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 30px;
+		align-items: stretch;
+	}
+	.calc-form {
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: clamp(24px, 2.8vw, 36px);
+	}
+	.calc-form h4 {
+		margin: 0 0 6px;
+		font-family: var(--font-display);
+		font-size: 14px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.calc-form .hint {
+		font-size: 12px;
+		color: var(--white-mute);
+		margin: 0 0 20px;
+		font-family: var(--font-mono);
+	}
+	.calc-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+	/* A <select>'s min-content width is its LONGEST option ("Moderate — 3-5
+	   workouts / week"), which pushed the calculator card past a 390px viewport
+	   and gave the whole page a horizontal scrollbar. Pinning the controls to
+	   100% of their column with min-width:0 lets them shrink and ellipsise. */
+	.calc-field { min-width: 0; }
+	.calc-field input,
+	.calc-field select {
+		width: 100%;
+		min-width: 0;
+		box-sizing: border-box;
+		text-overflow: ellipsis;
+	}
+	.calc-field {
+		display: flex; flex-direction: column;
+		gap: 6px;
+		margin-bottom: 14px;
+	}
+	.calc-field label {
+		font-family: var(--font-display);
+		font-size: 10px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.calc-field input, .calc-field select {
+		background: var(--ink);
+		border: 1px solid var(--line-strong);
+		color: var(--white);
+		padding: 10px 12px;
+		border-radius: 4px;
+		font: 14px/1.3 var(--font-mono);
+		outline: none;
+		transition: border-color 200ms ease;
+	}
+	.calc-field input:focus, .calc-field select:focus { border-color: var(--pink); }
+	/* Native selects — custom chevron + extra right padding so the value
+	   never sits under the arrow (also applied to modal .field selects). */
+	.calc-field select,
+	.modal .field select {
+		padding-right: 36px;
+		appearance: none;
+		-webkit-appearance: none;
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%23FF2E7E' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+		background-repeat: no-repeat;
+		background-position: right 12px center;
+	}
+	.calc-radios {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 6px;
+		margin-bottom: 14px;
+	}
+	.calc-radios label {
+		display: block;
+		padding: 10px 8px;
+		border: 1px solid var(--line-strong);
+		border-radius: 4px;
+		cursor: pointer;
+		text-align: center;
+		font-family: var(--font-display);
+		font-size: 10px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		transition: border-color 200ms ease, color 200ms ease, background 200ms ease;
+	}
+	.calc-radios input { display: none; }
+	.calc-radios label:has(input:checked) {
+		border-color: var(--pink);
+		color: var(--pink);
+		background: rgba(255,46,126,0.06);
+	}
+	.calc-results {
+		background: linear-gradient(180deg, var(--ink-2) 0%, var(--ink) 100%);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: clamp(24px, 2.8vw, 36px);
+		display: flex;
+		flex-direction: column;
+	}
+	.calc-results h4 {
+		margin: 0 0 6px;
+		font-family: var(--font-display);
+		font-size: 14px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--mint);
+	}
+	.calc-results .rhint {
+		font-size: 12px;
+		color: var(--white-mute);
+		margin: 0 0 24px;
+		font-family: var(--font-mono);
+	}
+	.calc-tdee {
+		border: 1px solid var(--pink);
+		border-radius: 4px;
+		padding: 20px;
+		margin-bottom: 20px;
+		background: rgba(255,46,126,0.04);
+	}
+	.calc-tdee .lbl {
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.calc-tdee .val {
+		font-family: var(--font-mono);
+		font-weight: 700;
+		font-size: 44px;
+		line-height: 1;
+		color: var(--pink);
+		margin-top: 8px;
+	}
+	.calc-tdee .val .unit {
+		font-size: 14px;
+		color: var(--white-mute);
+		margin-left: 6px;
+	}
+	.calc-tdee .breakdown {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+		margin-top: 10px;
+	}
+	.calc-macros {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 10px;
+	}
+	.macro {
+		border: 1px solid var(--line);
+		border-radius: 4px;
+		padding: 14px;
+		background: var(--ink-2);
+	}
+	.macro .name {
+		font-family: var(--font-display);
+		font-size: 10px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.macro .grams {
+		font-family: var(--font-mono);
+		font-weight: 700;
+		font-size: 22px;
+		margin-top: 4px;
+	}
+	.macro.protein .grams { color: var(--mint); }
+	.macro.carbs .grams { color: var(--white); }
+	.macro.fat .grams { color: var(--warn); }
+	.macro .cals {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		color: var(--white-mute);
+		margin-top: 4px;
+	}
+
+	/* ============================================================
+	   MEAL PLAN — 7 day tabs + display
+	   ============================================================ */
+	/* ------------------------------------------------------------
+	   Day tabs — the pink block is a single shared element that slides between
+	   tabs, rather than a background that blinks off one tab and on to another.
+	   The tabs themselves stay transparent and only animate their text colour,
+	   so the eye follows one moving object instead of two flashing ones.
+	   ------------------------------------------------------------ */
+	.day-tabs {
+		position: relative;
+		display: flex;
+		gap: 6px;
+		padding: 6px;
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		margin-bottom: 24px;
+		overflow-x: auto;
+	}
+	.day-tab-indicator {
+		position: absolute;
+		top: 6px;
+		bottom: 6px;
+		left: 0;
+		width: 0;
+		border-radius: 4px;
+		background: var(--pink);
+		box-shadow: 0 6px 18px rgba(255, 46, 126, 0.28);
+		/* Slight overshoot on the way in — the block arrives with a bit of weight
+		   instead of easing to a dead stop. */
+		transition: transform 440ms cubic-bezier(0.34, 1.32, 0.5, 1),
+		            width 440ms cubic-bezier(0.34, 1.32, 0.5, 1);
+		pointer-events: none;
+		z-index: 0;
+	}
+	/* Before the first measurement the indicator has no width; the active tab
+	   keeps its own background so the control never renders unpainted. */
+	.day-tabs:not([data-indicator-ready]) .day-tab.active {
+		background: var(--pink);
+		color: var(--ink);
+	}
+	.day-tab {
+		position: relative;
+		z-index: 1;
+		flex: 1;
+		padding: 12px 8px;
+		border-radius: 4px;
+		text-align: center;
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		background: transparent;
+		transition: color 260ms ease, transform 260ms cubic-bezier(0.34, 1.32, 0.5, 1);
+		white-space: nowrap;
+	}
+	.day-tab.active { color: var(--ink); }
+	.day-tab:hover:not(.active) { color: var(--white); transform: translateY(-2px); }
+	.day-tab:active { transform: scale(0.96); }
+	.day-tab .num {
+		display: block;
+		font-family: var(--font-mono);
+		font-size: 16px;
+		font-weight: 700;
+		margin-top: 4px;
+	}
+	.meal-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 16px;
+	}
+	.meal-card {
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: 22px;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		transition: transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
+		            border-color 320ms ease,
+		            box-shadow 320ms ease;
+	}
+	.meal-card:hover {
+		transform: translateY(-4px);
+		border-color: var(--line-strong);
+		box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4);
+	}
+	/* Day change: cards re-enter staggered rather than swapping instantly, so the
+	   switch reads as new content arriving. The delay is set inline per card. */
+	@keyframes meal-card-in {
+		from { opacity: 0; transform: translateY(14px) scale(0.985); }
+		to   { opacity: 1; transform: none; }
+	}
+	.meal-card.is-entering {
+		opacity: 0;
+		animation: meal-card-in 420ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+	}
+
+	/* Anyone who has asked their OS for less motion gets the state change
+	   without the travel. */
+	@media (prefers-reduced-motion: reduce) {
+		.day-tab-indicator { transition: none; }
+		.meal-card.is-entering { animation-duration: 1ms; }
+		.meal-card:hover { transform: none; }
+		.day-tab:hover:not(.active) { transform: none; }
+	}
+	.meal-card .slot {
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--mint);
+	}
+	.meal-card .time {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+	}
+	.meal-card .food {
+		font-size: 14px;
+		color: var(--white);
+		line-height: 1.5;
+	}
+	.meal-card .kcal {
+		font-family: var(--font-mono);
+		font-size: 12px;
+		color: var(--white-mute);
+		margin-top: auto;
+		padding-top: 10px;
+		border-top: 1px solid var(--line);
+	}
+
+	/* ============================================================
+	   CANCEL SPLASH (shown after successful cancel)
+	   ============================================================ */
+	.cancel-splash {
+		display: none;
+		padding: clamp(80px, 10vw, 120px) 0;
+		text-align: center;
+	}
+	.cancel-splash.visible { display: block; }
+	body.canceled .dashboard-body { display: none; }
+	.cancel-splash h2 {
+		font-family: var(--font-display);
+		font-size: clamp(28px, 4vw, 44px);
+		text-transform: uppercase;
+		margin: 0 0 16px;
+	}
+	.cancel-splash p {
+		color: var(--white-soft);
+		max-width: 52ch;
+		margin: 0 auto 32px;
+	}
+	.cancel-splash .actions {
+		display: inline-flex; gap: 12px;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	/* ============================================================
+	   MODAL / OVERLAY
+	   ============================================================ */
+	.overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 90;
+		background: rgba(6, 6, 10, 0.88);
+		-webkit-backdrop-filter: blur(6px);
+		backdrop-filter: blur(6px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 20px;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 240ms ease;
+	}
+	.overlay.open { opacity: 1; pointer-events: auto; }
+	.modal {
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		max-width: 480px;
+		width: 100%;
+		max-height: 92vh;
+		overflow: hidden auto;
+		overscroll-behavior: contain;
+		padding: 32px;
+		position: relative;
+		transform: translateY(12px);
+		transition: transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	.overlay.open .modal { transform: none; }
+
+	.modal-close {
+		position: absolute;
+		top: 12px; right: 12px;
+		width: 40px; height: 40px;
+		border-radius: 8px;
+	}
+	.modal-close:hover { background: var(--ink-3); }
+	.modal h3 {
+		font-family: var(--font-display);
+		font-size: 22px;
+		text-transform: uppercase;
+		margin: 0 0 6px;
+	}
+	.modal p.hint {
+		font-size: 14px;
+		color: var(--white-mute);
+		margin: 0 0 20px;
+	}
+	.modal ul.notice {
+		list-style: none;
+		margin: 0 0 24px;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	.modal ul.notice li {
+		display: flex;
+		align-items: flex-start;
+		gap: 12px;
+		font-size: 13px;
+		color: var(--white-soft);
+		padding: 12px;
+		background: var(--ink);
+		border: 1px solid var(--line);
+		border-radius: 4px;
+	}
+	.modal ul.notice li::before {
+		content: "!";
+		flex-shrink: 0;
+		width: 22px; height: 22px;
+		border-radius: 50%;
+		background: var(--warn);
+		color: var(--ink);
+		font-family: var(--font-mono);
+		font-weight: 700;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 13px;
+	}
+	.modal .field {
+		display: flex; flex-direction: column;
+		gap: 6px;
+		margin-bottom: 14px;
+	}
+	.modal .field label {
+		font-family: var(--font-display);
+		font-size: 10px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.modal .field input,
+	.modal .field select,
+	.modal .field textarea {
+		background: var(--ink);
+		border: 1px solid var(--line-strong);
+		color: var(--white);
+		padding: 10px 12px;
+		border-radius: 4px;
+		font: 14px/1.3 var(--font-body);
+		outline: none;
+	}
+	.modal .field input:focus, .modal .field select:focus, .modal .field textarea:focus {
+		border-color: var(--pink);
+	}
+	.modal-actions {
+		display: flex;
+		gap: 10px;
+		margin-top: 8px;
+	}
+
+	/* Floating scroll-to-top button */
+	.scroll-top-btn {
+		position: fixed;
+		bottom: 24px; right: 24px;
+		width: 52px; height: 52px;
+		border-radius: 50%;
+		background: var(--pink);
+		color: var(--white);
+		z-index: 70;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		transform: translateY(20px);
+		pointer-events: none;
+		transition: opacity 240ms ease, transform 240ms ease, background 200ms ease;
+		box-shadow: 0 10px 24px rgba(255, 46, 126, 0.32), 0 2px 6px rgba(10,10,15,0.6);
+	}
+	.scroll-top-btn.visible {
+		opacity: 1;
+		transform: translateY(0);
+		pointer-events: auto;
+	}
+	.scroll-top-btn:hover { background: var(--pink-dim); }
+	@media (max-width: 640px) {
+		.scroll-top-btn { width: 46px; height: 46px; bottom: 18px; right: 18px; }
+	}
+
+	/* Toast */
+	.toast {
+		position: fixed;
+		bottom: 30px;
+		left: 50%;
+		transform: translate(-50%, 20px);
+		background: var(--mint);
+		color: var(--ink);
+		padding: 14px 22px;
+		border-radius: 999px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 13px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		z-index: 100;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 240ms ease, transform 240ms ease;
+	}
+	.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+	/* FOOTER */
+	.footer {
+		background: #06060A;
+		border-top: 1px solid var(--line);
+		padding: 60px 0 40px;
+	}
+	.footer-inner {
+		display: grid;
+		grid-template-columns: 1.4fr repeat(3, 1fr);
+		gap: 40px;
+	}
+	.footer-brand-block p {
+		color: var(--white-mute);
+		font-size: 13px;
+		margin: 12px 0 0;
+		max-width: 34ch;
+	}
+	.footer-col h4 {
+		font-family: var(--font-display);
+		font-size: 12px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white);
+		margin: 0 0 16px;
+	}
+	.footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+	.footer-col a,
+	.footer-col span {
+		font-size: 13px;
+		color: var(--white-mute);
+		transition: color 200ms ease;
+		font-family: var(--font-body);
+		font-weight: 400;
+		letter-spacing: 0;
+	}
+	.footer-col a:hover { color: var(--pink); }
+	.footer-bottom {
+		max-width: var(--maxw);
+		margin: 40px auto 0;
+		padding: 20px var(--pad-x) 0;
+		border-top: 1px solid var(--line);
+		display: flex;
+		justify-content: space-between;
+		font-size: 12px;
+		color: var(--white-mute);
+	}
+
+	/* RESPONSIVE */
+	@media (max-width: 1023px) {
+		.nav-links, .nav-cta { display: none; }
+		.nav-toggle { display: flex; align-items: center; justify-content: center; }
+		.section .head {
+			grid-template-columns: 1fr;
+			grid-template-rows: auto auto auto;
+			row-gap: 12px;
+			margin-bottom: 32px;
+		}
+		.section .head > .eyebrow { grid-column: 1; grid-row: 1; align-self: start; }
+		.section .head > .h2 { grid-column: 1; grid-row: 2; }
+		.section .head > p.lead { grid-column: 1; grid-row: 3; }
+		.section .head > .head-actions { grid-column: 1; grid-row: 4; justify-self: start; }
+		.membership-card { grid-template-columns: 1fr; gap: 24px; }
+		.mc-actions { align-items: flex-start; flex-direction: row; }
+		.calc-grid { grid-template-columns: 1fr; }
+		.meal-grid { grid-template-columns: repeat(2, 1fr); }
+		.pt-grid { grid-template-columns: 1fr; }
+		.class-item { grid-template-columns: 1fr; gap: 8px; }
+		.class-item .ci-actions { justify-content: flex-start; }
+		.footer-inner { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+	}
+	@media (max-width: 640px) {
+		.mc-stats { grid-template-columns: repeat(2, 1fr); }
+		.calc-row { grid-template-columns: 1fr; }
+		.calc-radios { grid-template-columns: repeat(2, 1fr); }
+		.meal-grid { grid-template-columns: 1fr; }
+		.day-tabs { padding: 4px; }
+		.day-tab { padding: 8px 6px; font-size: 10px; }
+		.footer-inner { grid-template-columns: 1fr; }
+		.footer-bottom { flex-direction: column; gap: 8px; }
+	}
+
+	/* ============================================================
+	   FORM CONTROLS — universal overrides
+	   Placed last on purpose. Earlier rules (.modal .field select) use the
+	   `background:` SHORTHAND, which resets background-image and wiped the
+	   custom chevron on some selects. A single late universal rule wins for
+	   every <select> on the page regardless of where it sits in the markup.
+	   ============================================================ */
+	/* !important is deliberate. `select` is the weakest possible selector
+	   (0,0,0,1), so being last in the file is not enough — .modal .field select
+	   (0,0,2,1) still wins, and its `background:` SHORTHAND blanks the chevron
+	   image. Forcing these three is cheaper and less brittle than mirroring
+	   every future selector that happens to touch a select's background. */
+	select {
+		appearance: none;
+		-webkit-appearance: none;
+		padding-right: 36px !important;
+		background-color: var(--ink);
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%23FF2E7E' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") !important;
+		background-repeat: no-repeat !important;
+		background-position: right 12px center !important;
+	}
+	select option {
+		background: var(--ink-2);
+		color: var(--white);
+	}
+
+
+	/* ============================================================
+	   DATE PICKER — custom, replaces the native one
+	   The browser-drawn calendar is chrome we don't control: it ignores the
+	   palette, the mono type and the radius, and it looked like a system dialog
+	   dropped onto the page. This one is built from the same tokens as every
+	   other control, so a date field now reads like the selects next to it.
+	   ============================================================ */
+	.dp { position: relative; }
+	.dp-input {
+		width: 100%;
+		min-width: 0;
+		box-sizing: border-box;
+		background: var(--ink);
+		border: 1px solid var(--line-strong);
+		color: var(--white);
+		padding: 10px 40px 10px 12px;
+		border-radius: 4px;
+		font: 14px/1.3 var(--font-mono);
+		outline: none;
+		cursor: pointer;
+		transition: border-color 200ms ease;
+	}
+	.dp-input::placeholder { color: var(--white-mute); }
+	.dp-input:focus,
+	.dp.open .dp-input { border-color: var(--pink); }
+	.dp-icon {
+		position: absolute;
+		right: 12px;
+		top: 50%;
+		transform: translateY(-50%);
+		pointer-events: none;
+		color: var(--pink);
+	}
+	/* Fixed, not absolute. The picker lives inside .modal, which needs
+	   overflow-y:auto for tall content — an absolutely positioned panel gets
+	   clipped by it. Fixed takes the panel out of every ancestor's overflow, and
+	   the JS places it against the input's viewport rect. */
+	.dp-panel {
+		position: fixed;
+		/* Pinned to 0,0 while closed. A `position: fixed` box with no insets
+		   falls back to its static position — out at the right edge of the
+		   modal — which pushed the viewport wider and flashed a horizontal
+		   scrollbar every time an overlay containing a date field opened.
+		   JS overwrites left/top with the real placement on open. */
+		left: 0;
+		top: 0;
+		visibility: hidden;
+		z-index: 120;
+		width: 292px;
+		background: var(--ink-2);
+		border: 1px solid var(--line-strong);
+		border-radius: 6px;
+		box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+		padding: 14px;
+		opacity: 0;
+		transform: translateY(-6px);
+		pointer-events: none;
+		transition: opacity 180ms ease, transform 180ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	/* Flipped above the field when there isn't room below. */
+	.dp-panel.up { transform: translateY(6px); }
+	.dp.open .dp-panel { opacity: 1; transform: none; pointer-events: auto; visibility: visible; }
+	.dp-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 12px;
+	}
+	.dp-month {
+		font-family: var(--font-display);
+		font-size: 12px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white);
+	}
+	.dp-nav {
+		width: 26px; height: 26px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid var(--line-strong);
+		border-radius: 4px;
+		background: transparent;
+		color: var(--white-soft);
+		cursor: pointer;
+		transition: border-color 180ms ease, color 180ms ease, background 180ms ease;
+	}
+	.dp-nav:hover { border-color: var(--pink); color: var(--pink); }
+	.dp-dow, .dp-grid {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		gap: 2px;
+	}
+	.dp-dow span {
+		text-align: center;
+		font-family: var(--font-display);
+		font-size: 9px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		padding-bottom: 6px;
+	}
+	.dp-day {
+		aspect-ratio: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 4px;
+		border: 1px solid transparent;
+		background: transparent;
+		font: 12px/1 var(--font-mono);
+		color: var(--white-soft);
+		cursor: pointer;
+		transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+	}
+	.dp-day:hover:not(:disabled) { border-color: var(--line-strong); color: var(--white); }
+	.dp-day.muted { color: rgba(245, 245, 247, 0.22); }
+	.dp-day.today { border-color: var(--mint); color: var(--mint); }
+	.dp-day.selected {
+		background: var(--pink);
+		border-color: var(--pink);
+		color: var(--ink);
+		font-weight: 700;
+	}
+	.dp-day:disabled { opacity: 0.25; cursor: not-allowed; }
+	.dp-foot {
+		display: flex;
+		justify-content: space-between;
+		margin-top: 12px;
+		padding-top: 10px;
+		border-top: 1px solid var(--line);
+	}
+	.dp-link {
+		background: transparent;
+		border: 0;
+		padding: 0;
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+		cursor: pointer;
+		transition: color 160ms ease;
+	}
+	.dp-link:hover { color: var(--pink); }
+
+
+	/* Two side-by-side actions with real labels ("Keep membership" / "Yes,
+	   cancel") can't share a 360px modal — they were being clipped. Stack them
+	   at the narrow end instead of shrinking the text. */
+	@media (max-width: 430px) {
+		.modal-actions { flex-direction: column; align-items: stretch; }
+		.modal-actions .btn { width: 100%; flex: 0 0 auto !important; }
+	}
+</style>
+
+<script>document.documentElement.classList.add("js-reveal-ready");</script>
+
+<!-- ============================================================ NAV ============================================================ -->
+<header class="nav">
+	<div class="nav-inner">
+		<a href="/demo/apex-athletic-club/index.html" class="nav-brand" aria-label="APEX Athletic Club home">
+			<span class="apex-mark" aria-hidden="true"></span>
+			APEX
+		</a>
+		<nav>
+			<ul class="nav-links">
+				<li><a href="/demo/apex-athletic-club/index.html" data-nav="home">Home</a></li>
+				<li><a href="/demo/apex-athletic-club/shop.html" data-nav="shop">Shop</a></li>
+				<li><a href="/demo/apex-athletic-club/index.html#membership" data-nav="membership">Membership</a></li>
+				<li><a href="/demo/apex-athletic-club/classes.html" data-nav="classes">Classes</a></li>
+				<li><a href="/demo/apex-athletic-club/contact.html" data-nav="contact">Contact</a></li>
+			</ul>
+		</nav>
+
+		<div class="nav-actions">
+			<div class="nav-cta">
+				<span class="btn on-page" aria-current="page">My Space</span>
+				<button type="button" class="logout-link" id="nav-logout-link">Log out</button>
+			</div>
+
+			<button class="nav-toggle" id="nav-toggle" aria-label="Open menu">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7h18M3 12h18M3 17h18" /></svg>
+			</button>
+		</div>
+	</div>
+</header>
+
+<div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+	<button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">
+		<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+	</button>
+	<a href="/demo/apex-athletic-club/index.html" data-nav-m="home">Home</a>
+	<a href="/demo/apex-athletic-club/shop.html" data-nav-m="shop">Shop</a>
+	<a href="/demo/apex-athletic-club/index.html#membership" data-nav-m="membership">Membership</a>
+	<a href="/demo/apex-athletic-club/classes.html" data-nav-m="classes">Classes</a>
+	<a href="/demo/apex-athletic-club/contact.html" data-nav-m="contact">Contact</a>
+	<span class="active">My Space</span>
+</div>
+
+<!-- ============================================================ PAGE HERO ============================================================ -->
+<section class="page-hero">
+	<div class="inner">
+		<div class="greet-row" data-reveal>
+			<div>
+				<span class="eyebrow pink">Member dashboard</span>
+				<h1 class="h1">
+					Welcome back,<br />
+					<span class="pink" id="hero-name">Alex</span>.
+				</h1>
+			</div>
+			<div class="membership-badge">
+				<span class="tier-name" id="hero-tier">Signature</span>
+				<span class="sep"></span>
+				<span class="since" id="hero-since">Member since May 2026</span>
+			</div>
+		</div>
+	</div>
+</section>
+
+<div class="dashboard-body">
+
+<!-- ============================================================ MEMBERSHIP STATUS ============================================================ -->
+<section class="section" id="membership-status">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div class="eyebrow">Membership</div>
+			<h2 class="h2">Your plan.</h2>
+			<p class="lead">
+				Month-to-month, no contracts. Cancel any time with 30 days notice — no cancellation fee, but the current billing cycle finishes as paid.
+			</p>
+		</div>
+		<div class="membership-card" data-reveal>
+			<div class="mc-stats">
+				<div class="mc-stat">
+					<div class="k">Tier</div>
+					<div class="v pink" id="ms-tier">Signature</div>
+					<div class="sub" id="ms-tier-sub">Full club + recovery wing 8/mo + dietitian</div>
+				</div>
+				<div class="mc-stat">
+					<div class="k">Billing</div>
+					<div class="v" id="ms-price">$259 / mo</div>
+					<div class="sub">Next charge <span id="ms-next">Sep 12, 2026</span></div>
+				</div>
+				<div class="mc-stat">
+					<div class="k">Member since</div>
+					<div class="v mint" id="ms-since">May 2026</div>
+					<div class="sub" id="ms-days">4 months</div>
+				</div>
+				<div class="mc-stat">
+					<div class="k">Guest passes</div>
+					<div class="v">3 <span class="unit" style="font-size:14px; color:var(--white-mute)">/ 4</span></div>
+					<div class="sub">This month · resets Sep 1</div>
+				</div>
+			</div>
+			<div class="mc-actions">
+				<button class="btn btn-ghost btn-sm" data-open="upgrade">Change plan</button>
+				<button class="btn btn-danger btn-sm" data-open="cancel">Cancel membership</button>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================ CLASSES ============================================================ -->
+<section class="section tight" id="my-classes">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div class="eyebrow">This week</div>
+			<h2 class="h2">Your classes.</h2>
+			<p class="lead">
+				Filter by type, day, or level. Booked classes appear here 30 days ahead — cancel up to 4 hours before start with no penalty.
+			</p>
+		</div>
+
+		<div class="filter-groups" data-reveal>
+			<div class="filters" data-filter-group="type">
+				<button class="active" data-filter="all">All types</button>
+				<button data-filter="strength">Strength</button>
+				<button data-filter="cardio">Cardio</button>
+				<button data-filter="mobility">Mobility</button>
+				<button data-filter="combat">Combat</button>
+			</div>
+			<div class="filters" data-filter-group="level">
+				<button class="active" data-filter="all">All levels</button>
+				<button data-filter="beginner">Beginner</button>
+				<button data-filter="intermediate">Intermediate</button>
+				<button data-filter="advanced">Advanced</button>
+			</div>
+		</div>
+
+		<div class="class-list" id="class-list">
+			<article class="class-item type-mint" data-type="mobility" data-level="beginner">
+				<div class="ci-time"><div class="day">Mon</div><div class="hour">06:30</div></div>
+				<div class="ci-name">Yoga · Sunrise <span class="lvl">Beginner</span></div>
+				<div class="ci-coach">with Priya Menon<span class="studio">Studio 2 · 60 min</span></div>
+				<div class="ci-actions"><button class="btn btn-ghost btn-sm" data-cancel-class>Cancel</button></div>
+			</article>
+			<article class="class-item type-pink" data-type="combat" data-level="intermediate">
+				<div class="ci-time"><div class="day">Tue</div><div class="hour">18:00</div></div>
+				<div class="ci-name">Kickboxing 60 <span class="lvl">Intermediate</span></div>
+				<div class="ci-coach">with Diego Vasquez<span class="studio">Combat Room · 60 min</span></div>
+				<div class="ci-actions"><button class="btn btn-ghost btn-sm" data-cancel-class>Cancel</button></div>
+			</article>
+			<article class="class-item type-warn" data-type="cardio" data-level="advanced">
+				<div class="ci-time"><div class="day">Wed</div><div class="hour">07:00</div></div>
+				<div class="ci-name">HIIT 45 <span class="lvl">Advanced</span></div>
+				<div class="ci-coach">with Marcus Reyes<span class="studio">Strength Floor · 45 min</span></div>
+				<div class="ci-actions"><button class="btn btn-ghost btn-sm" data-cancel-class>Cancel</button></div>
+			</article>
+			<article class="class-item type-white" data-type="strength" data-level="intermediate">
+				<div class="ci-time"><div class="day">Thu</div><div class="hour">12:30</div></div>
+				<div class="ci-name">Barbell 101 <span class="lvl">Intermediate</span></div>
+				<div class="ci-coach">with Marcus Reyes<span class="studio">Strength Floor · 60 min</span></div>
+				<div class="ci-actions"><button class="btn btn-ghost btn-sm" data-cancel-class>Cancel</button></div>
+			</article>
+			<article class="class-item type-mint" data-type="mobility" data-level="intermediate">
+				<div class="ci-time"><div class="day">Fri</div><div class="hour">17:30</div></div>
+				<div class="ci-name">Mobility Flow <span class="lvl">Intermediate</span></div>
+				<div class="ci-coach">with Kai Nakamura<span class="studio">Studio 1 · 45 min</span></div>
+				<div class="ci-actions"><button class="btn btn-ghost btn-sm" data-cancel-class>Cancel</button></div>
+			</article>
+			<article class="class-item type-pink" data-type="combat" data-level="beginner">
+				<div class="ci-time"><div class="day">Sat</div><div class="hour">10:00</div></div>
+				<div class="ci-name">Boxing Basics <span class="lvl">Beginner</span></div>
+				<div class="ci-coach">with Diego Vasquez<span class="studio">Combat Room · 60 min</span></div>
+				<div class="ci-actions"><button class="btn btn-ghost btn-sm" data-cancel-class>Cancel</button></div>
+			</article>
+			<div class="class-empty" id="class-empty" style="display:none;">No classes match this filter.</div>
+
+			<!-- Book-a-class card — always at the end of the list, opens
+			     the picker modal. Mirrors the PT section's book-new pattern. -->
+			<button type="button" class="class-item book-new" data-open="book-class">
+				<span class="plus" aria-hidden="true">+</span>
+				<span class="book-new-copy">
+					<span class="lbl">Book a class</span>
+					<span class="sub">Full schedule + coach picker inside</span>
+				</span>
+			</button>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================ PERSONAL TRAINING ============================================================ -->
+<section class="section tight" id="pt">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div class="eyebrow pink">One-on-one</div>
+			<h2 class="h2">Personal training.</h2>
+			<p class="lead">
+				Signature and Elite members get sessions credited monthly. Book a new one from any coach — 24-hour cancellation window.
+			</p>
+		</div>
+		<div class="pt-grid" data-reveal>
+			<div class="pt-card">
+				<div class="pt-date">Mon Aug 25 · 07:00</div>
+				<div class="pt-coach">Marcus Reyes</div>
+				<div class="pt-focus">Focus — deadlift form check + hip mobility. Bring your lifting shoes.</div>
+				<div class="pt-actions">
+					<button class="btn btn-ghost btn-sm" data-pt-reschedule>Reschedule</button>
+					<button class="btn btn-danger btn-sm" data-pt-cancel>Cancel</button>
+				</div>
+			</div>
+			<div class="pt-card">
+				<div class="pt-date">Thu Aug 28 · 12:30</div>
+				<div class="pt-coach">Kai Nakamura</div>
+				<div class="pt-focus">Focus — shoulder rehab progression, week 4 of 8. Assessment + programming update.</div>
+				<div class="pt-actions">
+					<button class="btn btn-ghost btn-sm" data-pt-reschedule>Reschedule</button>
+					<button class="btn btn-danger btn-sm" data-pt-cancel>Cancel</button>
+				</div>
+			</div>
+			<button class="pt-card book-new" data-open="book-pt">
+				<span class="plus" aria-hidden="true">+</span>
+				<div class="pt-coach" style="font-size:14px; color:var(--white);">Book a session</div>
+				<div class="pt-focus">Pick a coach, date, and focus area — we'll confirm within one business day.</div>
+			</button>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================ CALORIE CALCULATOR ============================================================ -->
+<section class="section tight" id="calc">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div class="eyebrow">Nutrition</div>
+			<h2 class="h2">Calorie &amp; macro calculator.</h2>
+			<p class="lead">
+				Live TDEE using the Mifflin-St Jeor formula, plus a macro split tuned to your goal. Values update as you type.
+			</p>
+		</div>
+		<div class="calc-grid" data-reveal>
+			<div class="calc-form">
+				<h4>Your inputs</h4>
+				<p class="hint">Units — kg &amp; cm. All fields required.</p>
+				<div class="calc-row">
+					<div class="calc-field">
+						<label for="c-age">Age</label>
+						<input type="number" id="c-age" min="14" max="90" value="32" />
+					</div>
+					<div class="calc-field">
+						<label for="c-gender">Gender (biological)</label>
+						<select id="c-gender">
+							<option value="male" selected>Male</option>
+							<option value="female">Female</option>
+						</select>
+					</div>
+				</div>
+				<div class="calc-row">
+					<div class="calc-field">
+						<label for="c-weight">Weight (kg)</label>
+						<input type="number" id="c-weight" min="35" max="200" step="0.1" value="78" />
+					</div>
+					<div class="calc-field">
+						<label for="c-height">Height (cm)</label>
+						<input type="number" id="c-height" min="130" max="220" value="182" />
+					</div>
+				</div>
+				<div class="calc-field">
+					<label for="c-activity">Activity level</label>
+					<select id="c-activity">
+						<option value="1.2">Sedentary — desk job, little exercise</option>
+						<option value="1.375">Light — 1–3 workouts / week</option>
+						<option value="1.55" selected>Moderate — 3–5 workouts / week</option>
+						<option value="1.725">Active — 6–7 workouts / week</option>
+						<option value="1.9">Athlete — 2× / day or physical job</option>
+					</select>
+				</div>
+				<div class="calc-field">
+					<label>Goal</label>
+					<div class="calc-radios">
+						<label><input type="radio" name="goal" value="cut" />Cut · −20%</label>
+						<label><input type="radio" name="goal" value="maintain" checked />Maintain</label>
+						<label><input type="radio" name="goal" value="bulk" />Bulk · +15%</label>
+					</div>
+				</div>
+			</div>
+
+			<div class="calc-results">
+				<h4>Daily targets</h4>
+				<p class="rhint">Round to the nearest 10 in practice. Track a 7-day average, not one day.</p>
+				<div class="calc-tdee">
+					<div class="lbl">Target calories</div>
+					<div class="val"><span id="r-tdee">2,720</span><span class="unit">kcal / day</span></div>
+					<div class="breakdown">BMR <span id="r-bmr">1,754</span> · TDEE <span id="r-tdee-raw">2,720</span> · <span id="r-goal-label">maintain</span></div>
+				</div>
+				<div class="calc-macros">
+					<div class="macro protein">
+						<div class="name">Protein · <span id="r-p-pct">30</span>%</div>
+						<div class="grams"><span id="r-p-g">204</span><span style="font-size:12px; color:var(--white-mute);"> g</span></div>
+						<div class="cals"><span id="r-p-c">816</span> kcal</div>
+					</div>
+					<div class="macro carbs">
+						<div class="name">Carbs · <span id="r-c-pct">45</span>%</div>
+						<div class="grams"><span id="r-c-g">306</span><span style="font-size:12px; color:var(--white-mute);"> g</span></div>
+						<div class="cals"><span id="r-c-c">1,224</span> kcal</div>
+					</div>
+					<div class="macro fat">
+						<div class="name">Fat · <span id="r-f-pct">25</span>%</div>
+						<div class="grams"><span id="r-f-g">76</span><span style="font-size:12px; color:var(--white-mute);"> g</span></div>
+						<div class="cals"><span id="r-f-c">680</span> kcal</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================ MEAL PLAN ============================================================ -->
+<section class="section tight" id="meal-plan">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div class="eyebrow pink">Sample week</div>
+			<h2 class="h2">This week's meals.</h2>
+			<p class="lead">
+				A representative day from our dietitian's rotation. Not a prescription — a starting point aligned with your targets above.
+			</p>
+		</div>
+
+		<div class="day-tabs" data-reveal>
+			<span class="day-tab-indicator" aria-hidden="true"></span>
+			<button class="day-tab active" data-day="mon">Mon<span class="num">25</span></button>
+			<button class="day-tab" data-day="tue">Tue<span class="num">26</span></button>
+			<button class="day-tab" data-day="wed">Wed<span class="num">27</span></button>
+			<button class="day-tab" data-day="thu">Thu<span class="num">28</span></button>
+			<button class="day-tab" data-day="fri">Fri<span class="num">29</span></button>
+			<button class="day-tab" data-day="sat">Sat<span class="num">30</span></button>
+			<button class="day-tab" data-day="sun">Sun<span class="num">31</span></button>
+		</div>
+
+		<div class="meal-grid" id="meal-grid" data-reveal>
+			<!-- Filled by JS on tab change -->
+		</div>
+
+		<!-- Sub-action after the meal grid — discreet, right-aligned request. -->
+		<div style="display:flex; justify-content:flex-end; margin-top: 20px;" data-reveal>
+			<button type="button" class="btn btn-sm btn-ghost" data-soon="Full meal plan">Request full week plan →</button>
+		</div>
+	</div>
+</section>
+
+
+</div>
+<!-- end dashboard-body -->
+
+<!-- ============================================================ CANCEL SPLASH (hidden by default, shown after confirm) ============================================================ -->
+<section class="cancel-splash" id="cancel-splash">
+	<div class="wrap">
+		<div class="eyebrow" style="color: var(--warn);">Membership canceled</div>
+		<h2 style="margin-top: 14px;">See you around.</h2>
+		<p>
+			Your access ends on <strong id="access-until" style="color: var(--white);">September 12, 2026</strong> — no more charges. Come back any time; your history stays on file for a year.
+		</p>
+		<div class="actions">
+			<a href="/demo/apex-athletic-club/index.html" class="btn btn-primary">Back to home</a>
+			<button class="btn btn-ghost" id="rejoin-btn">Rejoin</button>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================ FOOTER ============================================================ -->
+<footer class="footer">
+	<div class="wrap footer-inner">
+		<div class="footer-brand-block">
+			<div class="nav-brand"><span class="apex-mark" aria-hidden="true"></span>APEX</div>
+			<p>Miami's oceanfront strength and recovery club. Small membership, full team, direct beach access. Est. 2019.</p>
+		</div>
+		<div class="footer-col">
+			<h4>Club</h4>
+			<ul>
+				<li><a href="/demo/apex-athletic-club/index.html#facilities">Facilities</a></li>
+				<li><a href="/demo/apex-athletic-club/index.html#membership">Membership</a></li>
+				<li><a href="/demo/apex-athletic-club/classes.html">Classes</a></li>
+				<li><a href="/demo/apex-athletic-club/index.html#staff">Team</a></li>
+			</ul>
+		</div>
+		<div class="footer-col">
+			<h4>Shop</h4>
+			<ul>
+				<li><a href="/demo/apex-athletic-club/shop.html?cat=supplements#shop">Supplements</a></li>
+				<li><a href="/demo/apex-athletic-club/shop.html?cat=equipment#shop">Weights &amp; equipment</a></li>
+				<li><a href="/demo/apex-athletic-club/shop.html?cat=recovery#shop">Recovery</a></li>
+				<li><a href="/demo/apex-athletic-club/shop.html?cat=apparel#shop">Apparel</a></li>
+			</ul>
+		</div>
+		<div class="footer-col">
+			<h4>Info</h4>
+			<ul>
+				<li><a href="/demo/apex-athletic-club/contact.html">Contact</a></li>
+				<li><a href="/demo/apex-athletic-club/contact.html#visit">Hours &amp; address</a></li>
+				<li><span style="color: var(--pink); cursor: default;">My Space</span></li>
+				<li><a href="/demo/apex-athletic-club/index.html#membership">Cancel policy</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="footer-bottom">
+		<div>© 2026 APEX Athletic Club · Miami Beach</div>
+		<div>Fictional concept · Designed &amp; built as portfolio work</div>
+	</div>
+</footer>
+
+<!-- ============================================================ MODALS ============================================================ -->
+<div class="overlay" id="cancel-overlay" role="dialog" aria-modal="true" aria-label="Cancel membership">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+		</button>
+		<h3>Cancel membership?</h3>
+		<p class="hint">Before you confirm, please read the cancellation terms below.</p>
+		<ul class="notice">
+			<li><span><strong>30 days notice.</strong> Your membership stays active for 30 days after today. Access ends on <span id="cancel-until-date" style="color: var(--pink);">September 12, 2026</span>.</span></li>
+			<li><span><strong>No refund on the current cycle.</strong> The last charged month runs its full course. You keep full access until the end.</span></li>
+			<li><span><strong>Personal training credits</strong> not used before the access-end date are forfeited (no rollover, no refund).</span></li>
+		</ul>
+		<div class="modal-actions">
+			<button type="button" class="btn btn-ghost" data-close style="flex: 1;">Keep membership</button>
+			<button type="button" class="btn btn-danger" id="confirm-cancel-btn" style="flex: 1;">Yes, cancel</button>
+		</div>
+	</div>
+</div>
+
+<!-- Generic confirm dialog. Reused for class cancellations and PT cancellations:
+     the JS fills the title/body and stashes the pending action, so we don't need
+     one overlay per destructive button. -->
+<div class="overlay" id="confirm-overlay" role="dialog" aria-modal="true" aria-label="Confirm">
+	<div class="modal" style="max-width: 420px;">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+		</button>
+		<h3 id="confirm-title">Are you sure?</h3>
+		<p class="hint" id="confirm-body">This can't be undone.</p>
+		<div class="modal-actions">
+			<button type="button" class="btn btn-ghost" data-close style="flex: 1;">No, keep it</button>
+			<button type="button" class="btn btn-danger" id="confirm-yes-btn" style="flex: 1;">Yes, cancel</button>
+		</div>
+	</div>
+</div>
+
+<div class="overlay" id="book-pt-overlay" role="dialog" aria-modal="true" aria-label="Book a personal training session">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+		</button>
+		<h3>Book a PT session</h3>
+		<p class="hint">Pick a coach, a date, and what you want to focus on. We'll confirm within one business day.</p>
+		<form id="book-pt-form">
+			<div class="field">
+				<label for="pt-coach">Coach</label>
+				<select id="pt-coach" required>
+					<option value="Marcus Reyes">Marcus Reyes — Head strength</option>
+					<option value="Diego Vasquez">Diego Vasquez — Boxing / conditioning</option>
+					<option value="Kai Nakamura">Kai Nakamura — DPT / mobility</option>
+					<option value="Sofia Rossi">Sofia Rossi — Pilates reformer</option>
+					<option value="Priya Menon">Priya Menon — Dietitian</option>
+				</select>
+			</div>
+			<div class="calc-row">
+				<div class="field">
+					<label for="pt-date">Date</label>
+					<div class="dp" data-dp>
+						<input type="text" id="pt-date" class="dp-input" readonly required placeholder="Pick a date" autocomplete="off" />
+						<svg class="dp-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+						<div class="dp-panel">
+							<div class="dp-head">
+								<button type="button" class="dp-nav" data-dp-prev aria-label="Previous month">&#8249;</button>
+								<div class="dp-month" data-dp-label></div>
+								<button type="button" class="dp-nav" data-dp-next aria-label="Next month">&#8250;</button>
+							</div>
+							<div class="dp-dow"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+							<div class="dp-grid" data-dp-grid></div>
+							<div class="dp-foot">
+								<button type="button" class="dp-link" data-dp-clear>Clear</button>
+								<button type="button" class="dp-link" data-dp-today>Today</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="field">
+					<label for="pt-time">Time</label>
+					<select id="pt-time" required>
+						<option>07:00</option><option>08:00</option><option>09:00</option>
+						<option>12:00</option><option>12:30</option><option>17:00</option>
+						<option>18:00</option><option>19:00</option>
+					</select>
+				</div>
+			</div>
+			<div class="field">
+				<label for="pt-focus">Focus (optional)</label>
+				<textarea id="pt-focus" rows="3" placeholder="Deadlift form, hip mobility, shoulder rehab..."></textarea>
+			</div>
+			<div class="modal-actions">
+				<button type="submit" class="btn btn-primary" style="flex: 1;">Request session</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div class="overlay" id="upgrade-overlay" role="dialog" aria-modal="true" aria-label="Change plan">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+		</button>
+		<h3>Change your plan</h3>
+		<p class="hint">Upgrades take effect today (prorated). Downgrades take effect at the next billing cycle.</p>
+		<div class="field">
+			<label for="up-tier">New tier</label>
+			<select id="up-tier">
+				<option value="Basic">Basic — $149 / mo</option>
+				<option value="Signature">Signature — $259 / mo</option>
+				<option value="Elite">Elite — $549 / mo</option>
+			</select>
+		</div>
+		<div class="modal-actions">
+			<button type="button" class="btn btn-ghost" data-close style="flex: 1;">Cancel</button>
+			<button type="button" class="btn btn-primary" id="confirm-upgrade-btn" style="flex: 1;">Confirm change</button>
+		</div>
+	</div>
+</div>
+
+<!-- Book a class modal — picker with type / level / day / time / coach.
+     Submits into #class-list. Also links out to the full weekly schedule. -->
+<div class="overlay" id="book-class-overlay" role="dialog" aria-modal="true" aria-label="Book a class">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+		</button>
+		<h3>Book a class</h3>
+		<p class="hint">Pick a slot — it lands in your list. Cancel any time up to 4 hours before start.</p>
+		<form id="book-class-form">
+			<div class="calc-row">
+				<div class="field">
+					<label for="bc-type">Type</label>
+					<select id="bc-type" required>
+						<option value="strength" data-color="white">Strength</option>
+						<option value="cardio" data-color="warn">Cardio</option>
+						<option value="mobility" data-color="mint" selected>Mobility</option>
+						<option value="combat" data-color="pink">Combat</option>
+					</select>
+				</div>
+				<div class="field">
+					<label for="bc-level">Level</label>
+					<select id="bc-level" required>
+						<option value="beginner">Beginner</option>
+						<option value="intermediate" selected>Intermediate</option>
+						<option value="advanced">Advanced</option>
+					</select>
+				</div>
+			</div>
+			<div class="field">
+				<label for="bc-name">Class</label>
+				<select id="bc-name" required>
+					<option>Yoga · Sunrise</option>
+					<option>Mobility Flow</option>
+					<option>HIIT 45</option>
+					<option>Spinning</option>
+					<option>Kickboxing 60</option>
+					<option>Boxing Basics</option>
+					<option>Barbell 101</option>
+					<option>Pilates Reformer</option>
+				</select>
+			</div>
+			<div class="calc-row">
+				<div class="field">
+					<label for="bc-day">Day</label>
+					<select id="bc-day" required>
+						<option>Mon</option><option>Tue</option><option>Wed</option>
+						<option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option>
+					</select>
+				</div>
+				<div class="field">
+					<label for="bc-time">Time</label>
+					<select id="bc-time" required>
+						<option>06:30</option><option>07:00</option><option>09:00</option>
+						<option>12:30</option><option>17:30</option><option>18:00</option><option>19:00</option>
+					</select>
+				</div>
+			</div>
+			<div class="modal-actions">
+				<button type="submit" class="btn btn-primary" style="flex: 1;">Book slot</button>
+			</div>
+		</form>
+		<p style="font-family: var(--font-mono); font-size: 11px; color: var(--white-mute); margin: 18px 0 0; text-align: center;">
+			Need the full grid? <a href="/demo/apex-athletic-club/classes.html" style="color: var(--pink);">See the weekly schedule →</a>
+		</p>
+	</div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">Saved</div>
+
+<button class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top" data-scroll-top>
+	<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
+</button>
+
+<!-- ============================================================ JS ============================================================ -->
+<script>
+(function () {
+	// ------------------------------------------------------------
+	// Account bootstrap — if the visitor arrives without an account
+	// (e.g. via a direct link, or the marketing site), seed a demo
+	// one so the dashboard is populated. Real joiners keep theirs.
+	// ------------------------------------------------------------
+	const TIER_META = {
+		Basic:     { price: 149, sub: "Strength floor, sauna, group studios." },
+		Signature: { price: 259, sub: "Full club + recovery wing 8/mo + dietitian." },
+		Elite:     { price: 549, sub: "Personal training + doctor + physio + weekly plan." }
+	};
+
+	let account;
+	try {
+		account = JSON.parse(localStorage.getItem("apex_account"));
+	} catch (_) { account = null; }
+	if (!account || !account.tier || !TIER_META[account.tier]) {
+		// Seed demo account joined ~90 days ago
+		account = {
+			name: "Alex Reyes",
+			tier: "Signature",
+			period: "monthly",
+			joined: Date.now() - 90 * 24 * 60 * 60 * 1000
+		};
+		try { localStorage.setItem("apex_account", JSON.stringify(account)); } catch (_) {}
+	}
+
+	// Compute a display "next billing" date from joined date + N months.
+	const joinedDate = new Date(account.joined);
+	const nextBilling = new Date(joinedDate);
+	// Next charge = joined-day of the current or next month
+	const now = new Date();
+	nextBilling.setFullYear(now.getFullYear());
+	nextBilling.setMonth(now.getMonth());
+	if (nextBilling <= now) nextBilling.setMonth(nextBilling.getMonth() + 1);
+
+	function fmtDate(d) {
+		return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+	}
+	function fmtMonthYear(d) {
+		return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+	}
+
+	// Populate top hero + membership card + account actions
+	const firstName = (account.name || "Alex Reyes").split(" ")[0];
+	document.getElementById("hero-name").textContent = firstName;
+	document.getElementById("hero-tier").textContent = account.tier;
+	document.getElementById("hero-since").textContent = "Member since " + fmtMonthYear(joinedDate);
+
+	document.getElementById("ms-tier").textContent = account.tier;
+	document.getElementById("ms-tier-sub").textContent = TIER_META[account.tier].sub;
+	document.getElementById("ms-price").textContent = "$" + TIER_META[account.tier].price.toLocaleString("en-US") + " / mo";
+	document.getElementById("ms-next").textContent = fmtDate(nextBilling);
+	document.getElementById("ms-since").textContent = fmtMonthYear(joinedDate);
+	const daysMember = Math.round((now - joinedDate) / (24 * 60 * 60 * 1000));
+	document.getElementById("ms-days").textContent = daysMember < 60 ? daysMember + " days" : Math.round(daysMember / 30) + " months";
+
+	const acctName = document.getElementById("acct-name");
+	if (acctName) acctName.textContent = account.name;
+	const acctTier = document.getElementById("acct-tier");
+	if (acctTier) acctTier.textContent = account.tier;
+
+	// Prefill the "access until" text in the cancel modal + splash (today + 30d)
+	const accessUntil = new Date(); accessUntil.setDate(accessUntil.getDate() + 30);
+	document.getElementById("cancel-until-date").textContent = fmtDate(accessUntil);
+	document.getElementById("access-until").textContent = fmtDate(accessUntil);
+
+	// ------------------------------------------------------------
+	// Reveal on scroll
+	// ------------------------------------------------------------
+	const revealEls = document.querySelectorAll("[data-reveal]");
+	const io = new IntersectionObserver(
+		(entries) => {
+			entries.forEach((e) => {
+				if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); }
+			});
+		},
+		{ rootMargin: "0px 0px -8% 0px", threshold: 0.06 }
+	);
+	revealEls.forEach((el) => io.observe(el));
+	setTimeout(() => revealEls.forEach((el) => el.classList.add("is-in")), 3000);
+
+	// ------------------------------------------------------------
+	// Mobile nav
+	// ------------------------------------------------------------
+	const mobileToggle = document.getElementById("nav-toggle");
+	const mobileNav = document.getElementById("mobile-nav");
+	const mobileClose = document.getElementById("mobile-nav-close");
+	function openMobile() {
+		mobileNav.classList.add("open");
+		mobileNav.setAttribute("aria-hidden", "false");
+		document.body.style.overflow = "hidden";
+		lockScrollGutter(true);
+	}
+	function closeMobile() {
+		mobileNav.classList.remove("open");
+		mobileNav.setAttribute("aria-hidden", "true");
+		document.body.style.overflow = "";
+		lockScrollGutter(false);
+	}
+	mobileToggle?.addEventListener("click", openMobile);
+	mobileClose?.addEventListener("click", closeMobile);
+	mobileNav?.querySelectorAll("a, span").forEach((el) => el.addEventListener("click", closeMobile));
+
+	function lockScrollGutter(on) {
+		document.documentElement.style.scrollbarColor = on ? "#0A0A0F #0A0A0F" : "";
+	}
+
+	// ------------------------------------------------------------
+	// Floating scroll-to-top button
+	// ------------------------------------------------------------
+	const scrollBtn = document.getElementById("scroll-top-btn");
+	function updateScrollBtn() { scrollBtn?.classList.toggle("visible", window.scrollY > 400); }
+	let stTicking = false;
+	window.addEventListener("scroll", () => {
+		if (stTicking) return;
+		stTicking = true;
+		requestAnimationFrame(() => { updateScrollBtn(); stTicking = false; });
+	}, { passive: true });
+	updateScrollBtn();
+
+	// ------------------------------------------------------------
+	// Toast helper
+	// ------------------------------------------------------------
+	function showToast(msg) {
+		const t = document.getElementById("toast");
+		t.textContent = msg;
+		t.classList.add("show");
+		setTimeout(() => t.classList.remove("show"), 2400);
+	}
+
+	// ------------------------------------------------------------
+	// Modal open/close (delegated) + coming-soon toasts + scroll-top + class cancel
+	// ------------------------------------------------------------
+	function openOverlay(id) {
+		const el = document.getElementById(id + "-overlay");
+		if (!el) return;
+		el.classList.add("open");
+		document.body.style.overflow = "hidden";
+		lockScrollGutter(true);
+	}
+	function closeOverlay(el) {
+		el.classList.remove("open");
+		document.body.style.overflow = "";
+		lockScrollGutter(false);
+	}
+
+	// Generic yes/no confirm. Holds the pending callback in a closure variable so
+	// the same overlay serves every destructive action on the page.
+	let pendingConfirm = null;
+	function askConfirm({ title, body, confirmLabel, onYes }) {
+		pendingConfirm = onYes;
+		document.getElementById("confirm-title").textContent = title || "Are you sure?";
+		document.getElementById("confirm-body").textContent = body || "";
+		document.getElementById("confirm-yes-btn").textContent = confirmLabel || "Yes";
+		openOverlay("confirm");
+	}
+	document.getElementById("confirm-yes-btn").addEventListener("click", () => {
+		const fn = pendingConfirm;
+		pendingConfirm = null;
+		closeOverlay(document.getElementById("confirm-overlay"));
+		if (typeof fn === "function") fn();
+	});
+	document.addEventListener("click", (e) => {
+		const scrollTop = e.target.closest("[data-scroll-top]");
+		if (scrollTop) {
+			e.preventDefault();
+			window.scrollTo({ top: 0, behavior: "smooth" });
+			return;
+		}
+		const soon = e.target.closest("[data-soon]");
+		if (soon) {
+			e.preventDefault();
+			showToast(soon.getAttribute("data-soon") + " coming soon");
+			return;
+		}
+		// Individual class row cancel — goes through the confirm dialog first
+		const cancelClass = e.target.closest("[data-cancel-class]");
+		if (cancelClass) {
+			e.preventDefault();
+			const row = cancelClass.closest(".class-item");
+			if (row) {
+				const nameEl = row.querySelector(".ci-name");
+				const label = nameEl ? nameEl.textContent.trim() : "this class";
+				askConfirm({
+					title: "Cancel this booking?",
+					body: "You're about to release your spot in " + label + ". Popular classes fill fast — you may not get it back.",
+					confirmLabel: "Yes, cancel",
+					onYes: () => {
+						row.style.transition = "opacity 240ms ease, transform 240ms ease";
+						row.style.opacity = "0";
+						row.style.transform = "translateX(-10px)";
+						setTimeout(() => { row.remove(); refreshClassEmpty(); }, 260);
+						showToast("Class canceled — spot released");
+					}
+				});
+			}
+			return;
+		}
+		const ptReschedule = e.target.closest("[data-pt-reschedule]");
+		if (ptReschedule) {
+			openOverlay("book-pt");
+			showToast("Pick a new slot to reschedule");
+			return;
+		}
+		const ptCancel = e.target.closest("[data-pt-cancel]");
+		if (ptCancel) {
+			const card = ptCancel.closest(".pt-card");
+			if (card) {
+				askConfirm({
+					title: "Cancel this PT session?",
+					body: "Sessions canceled less than 12 hours before the slot still use one credit.",
+					confirmLabel: "Yes, cancel",
+					onYes: () => {
+						card.style.transition = "opacity 240ms ease";
+						card.style.opacity = "0";
+						setTimeout(() => card.remove(), 260);
+						showToast("PT session canceled");
+					}
+				});
+			}
+			return;
+		}
+		const opener = e.target.closest("[data-open]");
+		if (opener) {
+			// The tier CTAs are <a href="#"> — without this the browser follows
+			// the empty fragment and scrolls the document to the top behind the
+			// modal. THIS was the "page jumps to top" bug, not the modal itself.
+			e.preventDefault(); openOverlay(opener.getAttribute("data-open")); return; }
+		const closer = e.target.closest("[data-close]");
+		if (closer) {
+			e.preventDefault();
+			const overlay = closer.closest(".overlay");
+			if (overlay) closeOverlay(overlay);
+			return;
+		}
+		if (e.target.classList.contains("overlay")) closeOverlay(e.target);
+	});
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape") {
+			document.querySelectorAll(".overlay.open").forEach(closeOverlay);
+			if (mobileNav.classList.contains("open")) closeMobile();
+		}
+	});
+
+	// ------------------------------------------------------------
+	// Class filters — two independent filter groups (type + level)
+	// ------------------------------------------------------------
+	const filterGroups = document.querySelectorAll(".filters");
+	const state = { type: "all", level: "all" };
+	filterGroups.forEach((group) => {
+		const key = group.dataset.filterGroup;
+		group.querySelectorAll("button").forEach((btn) => {
+			btn.addEventListener("click", () => {
+				group.querySelectorAll("button").forEach((b) => b.classList.remove("active"));
+				btn.classList.add("active");
+				state[key] = btn.dataset.filter;
+				applyClassFilters();
+			});
+		});
+	});
+	function applyClassFilters() {
+		document.querySelectorAll(".class-item").forEach((row) => {
+			const t = row.dataset.type;
+			const l = row.dataset.level;
+			const okT = state.type === "all" || t === state.type;
+			const okL = state.level === "all" || l === state.level;
+			row.style.display = (okT && okL) ? "" : "none";
+		});
+		refreshClassEmpty();
+	}
+	function refreshClassEmpty() {
+		const visible = [...document.querySelectorAll(".class-item")].filter((r) => r.style.display !== "none").length;
+		const empty = document.getElementById("class-empty");
+		if (empty) empty.style.display = visible === 0 ? "" : "none";
+	}
+
+	// ------------------------------------------------------------
+	// Calorie calculator — Mifflin-St Jeor + goal-based macros
+	// BMR:  male   10w + 6.25h - 5a + 5
+	//       female 10w + 6.25h - 5a - 161
+	// TDEE = BMR × activity multiplier
+	// Goal split (P/C/F):
+	//   cut      -20%   40/40/20
+	//   maintain   0%   30/45/25
+	//   bulk     +15%   30/50/20
+	// ------------------------------------------------------------
+	const GOAL_META = {
+		cut:      { mult: 0.80, split: [40, 40, 20], label: "cut (−20%)" },
+		maintain: { mult: 1.00, split: [30, 45, 25], label: "maintain" },
+		bulk:     { mult: 1.15, split: [30, 50, 20], label: "bulk (+15%)" }
+	};
+	const fmt = (n) => Math.round(n).toLocaleString("en-US");
+	function calc() {
+		const age = +document.getElementById("c-age").value || 0;
+		const gender = document.getElementById("c-gender").value;
+		const w = +document.getElementById("c-weight").value || 0;
+		const h = +document.getElementById("c-height").value || 0;
+		const act = +document.getElementById("c-activity").value || 1.2;
+		const goal = document.querySelector('input[name="goal"]:checked')?.value || "maintain";
+		if (!age || !w || !h) return;
+		const bmr = gender === "male"
+			? 10 * w + 6.25 * h - 5 * age + 5
+			: 10 * w + 6.25 * h - 5 * age - 161;
+		const tdee = bmr * act;
+		const meta = GOAL_META[goal];
+		const target = tdee * meta.mult;
+		const [pP, pC, pF] = meta.split;
+		const pG = (target * pP / 100) / 4;   // 4 kcal/g protein
+		const cG = (target * pC / 100) / 4;   // 4 kcal/g carbs
+		const fG = (target * pF / 100) / 9;   // 9 kcal/g fat
+
+		document.getElementById("r-tdee").textContent = fmt(target);
+		document.getElementById("r-bmr").textContent = fmt(bmr);
+		document.getElementById("r-tdee-raw").textContent = fmt(tdee);
+		document.getElementById("r-goal-label").textContent = meta.label;
+		document.getElementById("r-p-pct").textContent = pP;
+		document.getElementById("r-c-pct").textContent = pC;
+		document.getElementById("r-f-pct").textContent = pF;
+		document.getElementById("r-p-g").textContent = fmt(pG);
+		document.getElementById("r-c-g").textContent = fmt(cG);
+		document.getElementById("r-f-g").textContent = fmt(fG);
+		document.getElementById("r-p-c").textContent = fmt(pG * 4);
+		document.getElementById("r-c-c").textContent = fmt(cG * 4);
+		document.getElementById("r-f-c").textContent = fmt(fG * 9);
+	}
+	document.querySelectorAll("#calc input, #calc select").forEach((el) => {
+		el.addEventListener("input", calc);
+		el.addEventListener("change", calc);
+	});
+	calc();
+
+	// ------------------------------------------------------------
+	// Meal plan — 7 days × 4 meals. Placeholder content aligned
+	// with the athletic Miami vibe. Filled into #meal-grid on tab click.
+	// ------------------------------------------------------------
+	const meals = {
+		mon: [
+			{ slot: "Breakfast", time: "07:00", food: "3-egg omelet · avocado · sourdough toast · black coffee", kcal: 620 },
+			{ slot: "Lunch",     time: "12:30", food: "Grilled chicken bowl · brown rice · roasted veg · lemon-tahini", kcal: 720 },
+			{ slot: "Snack",     time: "16:00", food: "Greek yogurt · berries · honey · almonds", kcal: 340 },
+			{ slot: "Dinner",    time: "19:30", food: "Wild salmon · sweet potato · asparagus · greens", kcal: 780 }
+		],
+		tue: [
+			{ slot: "Breakfast", time: "07:00", food: "Steel-cut oats · banana · peanut butter · whey scoop", kcal: 640 },
+			{ slot: "Lunch",     time: "12:30", food: "Turkey wrap · hummus · pickled veg · side salad", kcal: 690 },
+			{ slot: "Snack",     time: "16:00", food: "Cottage cheese · pineapple · walnuts", kcal: 320 },
+			{ slot: "Dinner",    time: "19:30", food: "Beef stir-fry · jasmine rice · bok choy · ginger", kcal: 810 }
+		],
+		wed: [
+			{ slot: "Breakfast", time: "07:00", food: "Protein smoothie · spinach · frozen berries · oats · flax", kcal: 550 },
+			{ slot: "Lunch",     time: "12:30", food: "Poke bowl · tuna · brown rice · edamame · sesame", kcal: 700 },
+			{ slot: "Snack",     time: "16:00", food: "Hard-boiled eggs · cucumber · everything seasoning", kcal: 260 },
+			{ slot: "Dinner",    time: "19:30", food: "Grilled shrimp · quinoa · charred zucchini · chimichurri", kcal: 740 }
+		],
+		thu: [
+			{ slot: "Breakfast", time: "07:00", food: "Greek yogurt bowl · granola · kiwi · chia · pumpkin seeds", kcal: 580 },
+			{ slot: "Lunch",     time: "12:30", food: "Chicken shawarma · pita · tzatziki · tomato-cucumber salad", kcal: 730 },
+			{ slot: "Snack",     time: "16:00", food: "Rice cakes · almond butter · sliced apple", kcal: 300 },
+			{ slot: "Dinner",    time: "19:30", food: "Bison burger · sweet potato wedges · slaw", kcal: 820 }
+		],
+		fri: [
+			{ slot: "Breakfast", time: "07:00", food: "Egg-white scramble · smoked salmon · avocado · rye", kcal: 610 },
+			{ slot: "Lunch",     time: "12:30", food: "Lentil soup · sourdough · goat cheese salad", kcal: 660 },
+			{ slot: "Snack",     time: "16:00", food: "Whey shake · banana · dark chocolate square", kcal: 340 },
+			{ slot: "Dinner",    time: "19:30", food: "Cioppino · crusty bread · arugula-fennel salad", kcal: 780 }
+		],
+		sat: [
+			{ slot: "Breakfast", time: "08:30", food: "Sourdough french toast · Greek yogurt · berry compote · espresso", kcal: 680 },
+			{ slot: "Lunch",     time: "13:00", food: "Steak salad · blue cheese · pickled onion · balsamic", kcal: 720 },
+			{ slot: "Snack",     time: "17:00", food: "Trail mix · dried mango · dark chocolate", kcal: 350 },
+			{ slot: "Dinner",    time: "20:00", food: "Grilled sea bass · lemon risotto · grilled asparagus", kcal: 820 }
+		],
+		sun: [
+			{ slot: "Breakfast", time: "09:00", food: "Shakshuka · feta · warm pita · orange juice", kcal: 620 },
+			{ slot: "Lunch",     time: "13:00", food: "Herb-roasted chicken · farro · roasted carrots · lemon dressing", kcal: 730 },
+			{ slot: "Snack",     time: "17:00", food: "Sliced pear · aged cheddar · almonds", kcal: 320 },
+			{ slot: "Dinner",    time: "20:00", food: "Vegetable curry · basmati · grilled halloumi · naan", kcal: 760 }
+		]
+	};
+	const mealGrid = document.getElementById("meal-grid");
+	const dayTabsEl = document.querySelector(".day-tabs");
+	const dayIndicator = document.querySelector(".day-tab-indicator");
+
+	// Move the shared pink block onto whichever tab is active. offsetLeft is
+	// measured against .day-tabs (position:relative), so this stays correct even
+	// when the strip is horizontally scrolled on narrow screens.
+	function moveDayIndicator(instant) {
+		const active = document.querySelector(".day-tab.active");
+		if (!active || !dayIndicator || !dayTabsEl) return;
+		if (instant) dayIndicator.style.transition = "none";
+		dayIndicator.style.width = active.offsetWidth + "px";
+		dayIndicator.style.transform = "translateX(" + active.offsetLeft + "px)";
+		if (instant) {
+			// Force a reflow so the transition-less write lands before we restore it.
+			void dayIndicator.offsetWidth;
+			dayIndicator.style.transition = "";
+		}
+		dayTabsEl.setAttribute("data-indicator-ready", "");
+	}
+
+	// firstPaint skips the stagger on initial load — the reveal-on-scroll
+	// animation already covers the section's entrance.
+	function renderMeals(day, firstPaint) {
+		const items = meals[day] || [];
+		mealGrid.innerHTML = items.map((m, i) => `
+			<article class="meal-card${firstPaint ? "" : " is-entering"}"${firstPaint ? "" : ` style="animation-delay:${i * 70}ms"`}>
+				<div class="slot">${m.slot}</div>
+				<div class="time">${m.time}</div>
+				<div class="food">${m.food}</div>
+				<div class="kcal">${m.kcal} kcal</div>
+			</article>
+		`).join("");
+	}
+	document.querySelectorAll(".day-tab").forEach((tab) => {
+		tab.addEventListener("click", () => {
+			if (tab.classList.contains("active")) return;
+			document.querySelectorAll(".day-tab").forEach((t) => t.classList.remove("active"));
+			tab.classList.add("active");
+			moveDayIndicator(false);
+			renderMeals(tab.dataset.day, false);
+		});
+	});
+	renderMeals("mon", true);
+	moveDayIndicator(true);
+	// Tab widths are flex-derived, so they change with the viewport.
+	window.addEventListener("resize", () => moveDayIndicator(true));
+	// Webfonts landing late can shift the tab metrics after first measurement.
+	if (document.fonts && document.fonts.ready) {
+		document.fonts.ready.then(() => moveDayIndicator(true));
+	}
+
+	// ------------------------------------------------------------
+	// Cancel membership — confirm modal → wipe account + show splash
+	// ------------------------------------------------------------
+	document.getElementById("confirm-cancel-btn")?.addEventListener("click", () => {
+		try { localStorage.removeItem("apex_account"); } catch (_) {}
+		closeOverlay(document.getElementById("cancel-overlay"));
+		document.body.classList.add("canceled");
+		document.getElementById("cancel-splash").classList.add("visible");
+		showToast("Membership canceled");
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	});
+	document.getElementById("rejoin-btn")?.addEventListener("click", () => {
+		// Redirect to home so they hit Join from the marketing hero.
+		location.href = "/demo/apex-athletic-club/index.html#membership";
+	});
+
+	// ------------------------------------------------------------
+	// Upgrade / downgrade — save new tier + update UI in place
+	// ------------------------------------------------------------
+	document.getElementById("confirm-upgrade-btn")?.addEventListener("click", () => {
+		const newTier = document.getElementById("up-tier").value;
+		if (!TIER_META[newTier]) return;
+		account.tier = newTier;
+		try { localStorage.setItem("apex_account", JSON.stringify(account)); } catch (_) {}
+		document.getElementById("hero-tier").textContent = newTier;
+		document.getElementById("ms-tier").textContent = newTier;
+		document.getElementById("ms-tier-sub").textContent = TIER_META[newTier].sub;
+		document.getElementById("ms-price").textContent = "$" + TIER_META[newTier].price.toLocaleString("en-US") + " / mo";
+		const acctTierEl = document.getElementById("acct-tier");
+		if (acctTierEl) acctTierEl.textContent = newTier;
+		closeOverlay(document.getElementById("upgrade-overlay"));
+		showToast("Plan updated to " + newTier);
+	});
+
+	// ------------------------------------------------------------
+	// Book PT — form submit adds a new card into the PT grid
+	// ------------------------------------------------------------
+	document.getElementById("book-pt-form")?.addEventListener("submit", (e) => {
+		e.preventDefault();
+		const coach = document.getElementById("pt-coach").value;
+		const date = document.getElementById("pt-date").value;
+		const time = document.getElementById("pt-time").value;
+		const focus = document.getElementById("pt-focus").value.trim();
+		if (!coach || !date || !time) return;
+		const d = new Date(date + "T" + time);
+		const label = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) + " · " + time;
+		const card = document.createElement("div");
+		card.className = "pt-card";
+		card.innerHTML = `
+			<div class="pt-date">${label}</div>
+			<div class="pt-coach">${coach}</div>
+			<div class="pt-focus">${focus || "Focus TBD — coach will reach out to confirm."}</div>
+			<div class="pt-actions">
+				<button class="btn btn-ghost btn-sm" data-pt-reschedule>Reschedule</button>
+				<button class="btn btn-danger btn-sm" data-pt-cancel>Cancel</button>
+			</div>
+		`;
+		const grid = document.querySelector(".pt-grid");
+		grid.insertBefore(card, grid.querySelector(".book-new"));
+		closeOverlay(document.getElementById("book-pt-overlay"));
+		showToast("PT session requested — we'll confirm within 1 business day");
+		e.target.reset();
+	});
+
+	// ------------------------------------------------------------
+	// Book a class — form submit inserts a new .class-item row into
+	// #class-list, right before the dashed "book-new" card. Colors the
+	// left border to match the type, and honours current filters.
+	// ------------------------------------------------------------
+	document.getElementById("book-class-form")?.addEventListener("submit", (e) => {
+		e.preventDefault();
+		const typeSel = document.getElementById("bc-type");
+		const type = typeSel.value;
+		const color = typeSel.options[typeSel.selectedIndex].dataset.color;
+		const level = document.getElementById("bc-level").value;
+		const name = document.getElementById("bc-name").value;
+		const day = document.getElementById("bc-day").value;
+		const time = document.getElementById("bc-time").value;
+		const article = document.createElement("article");
+		article.className = "class-item type-" + color;
+		article.setAttribute("data-type", type);
+		article.setAttribute("data-level", level);
+		article.innerHTML = `
+			<div class="ci-time"><div class="day">${day}</div><div class="hour">${time}</div></div>
+			<div class="ci-name">${name} <span class="lvl">${level.charAt(0).toUpperCase() + level.slice(1)}</span></div>
+			<div class="ci-coach">with the on-duty coach<span class="studio">Studio TBC · 60 min</span></div>
+			<div class="ci-actions"><button class="btn btn-ghost btn-sm" data-cancel-class>Cancel</button></div>
+		`;
+		const list = document.getElementById("class-list");
+		const bookNew = list.querySelector(".book-new");
+		list.insertBefore(article, bookNew);
+		// Respect current filters
+		const okT = state.type === "all" || type === state.type;
+		const okL = state.level === "all" || level === state.level;
+		if (!(okT && okL)) article.style.display = "none";
+		refreshClassEmpty();
+		closeOverlay(document.getElementById("book-class-overlay"));
+		showToast("Class booked — " + name + " " + day + " " + time);
+		e.target.reset();
+	});
+
+	// ------------------------------------------------------------
+	// Log out — wipe account + go home. Single trigger now: the nav pill,
+	// top-right and always visible. The duplicate bottom strip was removed.
+	// ------------------------------------------------------------
+	function doLogout() {
+		try { localStorage.removeItem("apex_account"); } catch (_) {}
+		showToast("Logged out");
+		setTimeout(() => { location.href = "/demo/apex-athletic-club/index.html"; }, 600);
+	}
+	document.getElementById("nav-logout-link")?.addEventListener("click", doLogout);
+})();
+	// ------------------------------------------------------------
+	// Custom date picker. Replaces <input type="date"> so the calendar matches
+	// the design system instead of rendering the OS widget. The visible field is
+	// a readonly text input (so it still participates in `required` validation)
+	// and the ISO value lives in dataset.value for anything that needs to parse it.
+	// ------------------------------------------------------------
+	function initDatePickers(root) {
+		const MONTHS = ["January","February","March","April","May","June",
+		                "July","August","September","October","November","December"];
+		const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+		const iso = (d) => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+		const pretty = (d) => d.toLocaleDateString("en-US", { weekday:"short", day:"numeric", month:"short", year:"numeric" });
+
+		(root || document).querySelectorAll("[data-dp]").forEach((dp) => {
+			if (dp.dataset.dpReady) return;
+			dp.dataset.dpReady = "1";
+
+			const input = dp.querySelector(".dp-input");
+			const panel = dp.querySelector(".dp-panel");
+			const label = dp.querySelector("[data-dp-label]");
+			const grid  = dp.querySelector("[data-dp-grid]");
+			const today = startOfDay(new Date());
+			// Past dates can't be booked, so they're rendered but disabled.
+			const min   = today;
+			let view = new Date(today.getFullYear(), today.getMonth(), 1);
+			let selected = null;
+
+			function render() {
+				label.textContent = MONTHS[view.getMonth()] + " " + view.getFullYear();
+				grid.innerHTML = "";
+				const first = new Date(view.getFullYear(), view.getMonth(), 1);
+				// Monday-first week, matching the club's schedule elsewhere on the site.
+				const lead = (first.getDay() + 6) % 7;
+				const start = new Date(first);
+				start.setDate(1 - lead);
+				for (let i = 0; i < 42; i++) {
+					const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+					const b = document.createElement("button");
+					b.type = "button";
+					b.className = "dp-day";
+					b.textContent = d.getDate();
+					if (d.getMonth() !== view.getMonth()) b.classList.add("muted");
+					if (d.getTime() === today.getTime()) b.classList.add("today");
+					if (selected && d.getTime() === selected.getTime()) b.classList.add("selected");
+					if (d < min) b.disabled = true;
+					b.addEventListener("click", () => {
+						selected = d;
+						input.value = pretty(d);
+						input.dataset.value = iso(d);
+						input.dispatchEvent(new Event("change", { bubbles: true }));
+						close();
+					});
+					grid.appendChild(b);
+				}
+			}
+			// Panel is position:fixed, so it is placed against the input's viewport
+			// rect. Flips above the field when there isn't 330px of room below, and
+			// is nudged back inside the right edge on narrow screens.
+			function place() {
+				const r = input.getBoundingClientRect();
+				const H = 330, W = panel.offsetWidth || 292;
+				const up = r.bottom + H > window.innerHeight && r.top > H;
+				panel.classList.toggle("up", up);
+				panel.style.top = up ? (r.top - H - 8) + "px" : (r.bottom + 8) + "px";
+				panel.style.left = Math.max(8, Math.min(r.left, window.innerWidth - W - 8)) + "px";
+			}
+			function open() {
+				document.querySelectorAll(".dp.open").forEach((o) => { if (o !== dp) o.classList.remove("open"); });
+				dp.classList.add("open");
+				render();
+				place();
+			}
+			function close() { dp.classList.remove("open"); }
+			// A fixed panel doesn't travel with its field, so any scroll or resize
+			// while it's open re-places it rather than leaving it stranded.
+			window.addEventListener("resize", () => { if (dp.classList.contains("open")) place(); });
+			window.addEventListener("scroll", () => { if (dp.classList.contains("open")) place(); }, true);
+
+			input.addEventListener("click", (e) => { e.stopPropagation(); dp.classList.contains("open") ? close() : open(); });
+			input.addEventListener("keydown", (e) => {
+				if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+				if (e.key === "Escape") close();
+			});
+			dp.querySelector("[data-dp-prev]").addEventListener("click", (e) => {
+				e.stopPropagation(); view = new Date(view.getFullYear(), view.getMonth() - 1, 1); render();
+			});
+			dp.querySelector("[data-dp-next]").addEventListener("click", (e) => {
+				e.stopPropagation(); view = new Date(view.getFullYear(), view.getMonth() + 1, 1); render();
+			});
+			dp.querySelector("[data-dp-today]").addEventListener("click", (e) => {
+				e.stopPropagation();
+				selected = today; view = new Date(today.getFullYear(), today.getMonth(), 1);
+				input.value = pretty(today); input.dataset.value = iso(today);
+				input.dispatchEvent(new Event("change", { bubbles: true }));
+				close();
+			});
+			dp.querySelector("[data-dp-clear]").addEventListener("click", (e) => {
+				e.stopPropagation();
+				selected = null; input.value = ""; delete input.dataset.value;
+				input.dispatchEvent(new Event("change", { bubbles: true }));
+				render();
+			});
+			panel.addEventListener("click", (e) => e.stopPropagation());
+			document.addEventListener("click", close);
+			document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+			render();
+		});
+	}
+	initDatePickers();
+
+</script>
+
+<script>
+	// ------------------------------------------------------------
+	// Deep-link landing fix.
+	// Every image on these pages is unsized, so at the moment the browser
+	// performs its hash jump the document is still short and it lands well
+	// above the target — or, as here, doesn't move at all. The visitor clicks
+	// "Membership" on another page and arrives at the top of the home page
+	// with Membership highlighted, which reads as a broken menu.
+	// Re-apply the jump once the page has actually finished growing, and back
+	// off the moment the visitor takes over the scroll themselves.
+	// ------------------------------------------------------------
+	(function () {
+		var id = (location.hash || "").replace("#", "");
+		var target = id && document.getElementById(id);
+		if (!target) return;
+
+		var surrendered = false;
+		function surrender() { surrendered = true; }
+		["wheel", "touchstart", "keydown"].forEach(function (evt) {
+			window.addEventListener(evt, surrender, { passive: true, once: true });
+		});
+
+		var navH = parseInt(getComputedStyle(document.documentElement)
+			.getPropertyValue("--nav-h"), 10) || 72;
+
+		function jump() {
+			if (surrendered) return;
+			var root = document.documentElement;
+			var prev = root.style.scrollBehavior;
+			// html carries scroll-behavior:smooth, and passing behavior:"auto"
+			// to scrollTo is not enough to beat it here: the smooth animation
+			// restarts every time another unsized image lands and finishes its
+			// layout, so it never actually arrives. Turn the CSS off for the
+			// duration of the jump, then hand it back.
+			root.style.scrollBehavior = "auto";
+			var y = target.getBoundingClientRect().top + window.scrollY - navH;
+			window.scrollTo(0, Math.max(0, y));
+			root.style.scrollBehavior = prev;
+		}
+
+		jump();
+		window.addEventListener("load", function () { jump(); setTimeout(jump, 300); });
+		if (document.fonts && document.fonts.ready) document.fonts.ready.then(jump);
+	})();
+</script>

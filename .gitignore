@@ -25,3 +25,9 @@ pnpm-debug.log*
 
 # Claude Code local settings
 .claude/
+
+# local snapshot archive — versioned history lives in git, not in folders
+archives/
+
+# staging area for files device_bash cannot delete; never ship this
+_to_delete/

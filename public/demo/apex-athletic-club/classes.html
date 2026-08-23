@@ -1,0 +1,3589 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0A0F" />
+<title>Classes — APEX Athletic Club Miami</title>
+<meta name="description" content="The full APEX class timetable — strength, conditioning, boxing, yoga and recovery, seven days out. Every class capped, booking opens 30 days ahead." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+	/* ============================================================
+	   APEX — Classes page
+	   Shares the same design system as the home page: ink canvas,
+	   pink accent, mint secondary, off-white type. Nav / footer /
+	   modals kept identical for continuity across the mini-site.
+	   ============================================================ */
+
+	:root {
+		--ink: #0A0A0F;
+		--ink-2: #14141C;
+		--ink-3: #1E1E28;
+		--line: rgba(245, 245, 247, 0.10);
+		--line-strong: rgba(245, 245, 247, 0.22);
+		--white: #F5F5F7;
+		--white-soft: rgba(245, 245, 247, 0.72);
+		--white-mute: rgba(245, 245, 247, 0.52);
+		--pink: #FF2E7E;
+		--pink-dim: #C9265E;
+		--mint: #00E5A0;
+		--mint-dim: #06B37D;
+
+		--font-display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+		--font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+		--font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+		--maxw: 1200px;
+		--pad-x: clamp(20px, 4vw, 48px);
+		--nav-h: 72px;
+
+		color-scheme: dark;
+	}
+
+	*, *::before, *::after { box-sizing: border-box; }
+	/* scrollbar-gutter reserves the scrollbar track at all times. Without it,
+	   `body { overflow: hidden }` on modal open removes the scrollbar, the
+	   viewport widens by ~15px, and the whole page lurches sideways for one
+	   frame — the visible "jump" when an overlay opened. */
+	html {
+		scroll-behavior: smooth;
+		-webkit-text-size-adjust: 100%;
+		scrollbar-gutter: stable;
+	}
+	body {
+		margin: 0;
+		background: var(--ink);
+		color: var(--white);
+		font-family: var(--font-body);
+		font-size: 16px;
+		line-height: 1.55;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	img, svg { max-width: 100%; height: auto; display: block; }
+	a { color: inherit; text-decoration: none; }
+	button { font: inherit; color: inherit; background: transparent; border: 0; cursor: pointer; }
+
+	/* Reveal pre-hide via html class flipped by JS. `:not(.is-in)` scopes it
+	   so the same selector releases when observer adds `.is-in`. */
+	html.js-reveal-ready [data-reveal]:not(.is-in) { opacity: 0; transform: translateY(18px); }
+	[data-reveal] {
+		transition: opacity 700ms cubic-bezier(0.22, 0.61, 0.36, 1),
+		            transform 700ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		html.js-reveal-ready [data-reveal]:not(.is-in) { opacity: 1; transform: none; }
+		[data-reveal] { transition: none; }
+	}
+
+	/* Typography */
+	.eyebrow {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 12px;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: var(--mint);
+	}
+	.eyebrow.pink { color: var(--pink); }
+	.h1 {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(40px, 6.4vw, 88px);
+		line-height: 0.96;
+		letter-spacing: -0.02em;
+		text-transform: uppercase;
+	}
+	.h2 {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(32px, 4.4vw, 56px);
+		line-height: 1.02;
+		letter-spacing: -0.015em;
+		text-transform: uppercase;
+	}
+	.h3 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: clamp(22px, 2.4vw, 30px);
+		line-height: 1.15;
+		letter-spacing: -0.01em;
+		text-transform: uppercase;
+	}
+	.h4 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 18px;
+		line-height: 1.2;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+	}
+	.lead {
+		font-size: clamp(16px, 1.6vw, 20px);
+		line-height: 1.55;
+		color: var(--white-soft);
+		max-width: 62ch;
+	}
+	.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+	.wrap {
+		max-width: var(--maxw);
+		margin: 0 auto;
+		padding-left: var(--pad-x);
+		padding-right: var(--pad-x);
+	}
+
+	/* Buttons */
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 14px 26px;
+		border-radius: 999px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 13px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease;
+		white-space: nowrap;
+	}
+	.btn-primary { background: var(--pink); color: var(--ink); }
+	.btn-primary:hover { background: var(--white); }
+	.btn-ghost { border: 1px solid var(--line-strong); color: var(--white); }
+	.btn-ghost:hover { border-color: var(--white); }
+	.btn-mint { background: var(--mint); color: var(--ink); }
+	.btn-mint:hover { background: var(--white); }
+
+	/* NAV */
+	.nav {
+		position: sticky;
+		top: 0;
+		z-index: 60;
+		background: rgba(10, 10, 15, 0.82);
+		backdrop-filter: saturate(140%) blur(14px);
+		-webkit-backdrop-filter: saturate(140%) blur(14px);
+		border-bottom: 1px solid var(--line);
+	}
+	/* Three columns, not space-between. With space-between the links sit
+	   wherever the brand and the right-hand controls leave them, so adding a
+	   cart icon on one page shifted the whole menu sideways on that page only.
+	   1fr auto 1fr pins the links to the centre of the bar on every page,
+	   whatever ends up on either side of them. */
+	.nav-inner {
+		max-width: var(--maxw);
+		margin: 0 auto;
+		padding: 0 var(--pad-x);
+		height: var(--nav-h);
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		align-items: center;
+		gap: 24px;
+	}
+	.nav-inner > .nav-brand { justify-self: start; }
+	.nav-actions {
+		justify-self: end;
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+	}
+	.nav-brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: 18px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+	.nav-brand .apex-mark {
+		width: 26px; height: 26px;
+		display: inline-block;
+		background:
+			conic-gradient(from 135deg at 50% 50%, var(--pink) 0deg 90deg, var(--mint) 90deg 180deg, var(--white) 180deg 270deg, var(--pink) 270deg 360deg);
+		clip-path: polygon(50% 0, 100% 100%, 0 100%);
+	}
+	.nav-links {
+		display: flex;
+		align-items: center;
+		gap: 28px;
+		list-style: none;
+		margin: 0; padding: 0;
+	}
+	.nav-links a, .nav-links span {
+		font-family: var(--font-display);
+		font-weight: 500;
+		font-size: 12px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		position: relative;
+		padding: 6px 0;
+		transition: color 200ms ease;
+	}
+	.nav-links a:hover { color: var(--white); }
+	.nav-links .active {
+		color: var(--pink);
+		pointer-events: none;
+		cursor: default;
+	}
+	/* Anchor items marked active stay clickable (Home = scroll-top; other
+	   anchored nav items keep their link behavior). Only span-actives lock. */
+	.nav-links a.active,
+	.mobile-nav a.active {
+		pointer-events: auto;
+		cursor: pointer;
+	}
+	.nav-links .active::after {
+		content: "";
+		position: absolute;
+		left: 0; right: 0;
+		bottom: -2px;
+		height: 2px;
+		background: var(--pink);
+	}
+	.nav-cta { display: inline-flex; gap: 10px; }
+	.nav-toggle {
+		display: none;
+		width: 40px; height: 40px;
+		border: 1px solid var(--line-strong);
+		border-radius: 10px;
+	}
+	.nav-toggle svg { margin: 0 auto; }
+
+	.mobile-nav {
+		position: fixed; inset: 0;
+		z-index: 80;
+		background: var(--ink);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 24px;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 240ms ease;
+	}
+	.mobile-nav.open { opacity: 1; pointer-events: auto; }
+	.mobile-nav a, .mobile-nav span {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 24px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white);
+	}
+	.mobile-nav .active { color: var(--pink); pointer-events: none; }
+	.mobile-nav-close {
+		position: absolute;
+		top: 20px; right: 20px;
+		width: 44px; height: 44px;
+		border-radius: 12px;
+		border: 1px solid var(--line-strong);
+	}
+
+	/* ============================================================
+	   PAGE HERO (compact — not fullscreen like home)
+	   ============================================================ */
+	.page-hero {
+		position: relative;
+		padding: clamp(80px, 10vw, 140px) 0 clamp(60px, 7vw, 100px);
+		background:
+			radial-gradient(ellipse 900px 500px at 80% 10%, rgba(255,46,126,0.10) 0%, transparent 60%),
+			radial-gradient(ellipse 700px 400px at 10% 90%, rgba(0,229,160,0.08) 0%, transparent 60%),
+			linear-gradient(180deg, #0F0F18 0%, var(--ink) 100%);
+		overflow: hidden;
+	}
+	/* Page hero — same 2col × Nrow grid pattern as .section .head so the
+	   big H1 (left, row 2) top-aligns with the .lead paragraph (right,
+	   row 2). Eyebrow lives in row 1 above the H1 without shifting either.
+	   Meta row spans full width on row 3. */
+	.page-hero .inner {
+		max-width: var(--maxw);
+		margin: 0 auto;
+		padding: 0 var(--pad-x);
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: auto auto auto;
+		column-gap: 60px;
+		row-gap: 18px;
+	}
+	.page-hero .inner > .eyebrow { grid-column: 1; grid-row: 1; align-self: end; }
+	.page-hero .inner > .h1 {
+		grid-column: 1; grid-row: 2;
+		margin: 0;
+		max-width: 12ch;
+	}
+	.page-hero .inner > .h1 .pink { color: var(--pink); }
+	.page-hero .inner > .lead {
+		grid-column: 2; grid-row: 2;
+		margin: 0;
+		align-self: start;
+	}
+	.page-hero .inner > .meta-row {
+		grid-column: 1 / -1;
+		grid-row: 3;
+		display: flex;
+		gap: 40px;
+		margin-top: 22px;
+		padding-top: 28px;
+		border-top: 1px solid var(--line);
+	}
+	.page-hero .meta-item {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+	.page-hero .meta-item .k {
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.page-hero .meta-item .v {
+		font-family: var(--font-mono);
+		font-weight: 500;
+		font-size: 15px;
+		color: var(--white);
+	}
+	.page-hero .meta-item .v.mint { color: var(--mint); }
+	.page-hero .meta-item .v.pink { color: var(--pink); }
+
+	/* ============================================================
+	   SECTION SHELL
+	   ============================================================ */
+	.section {
+		padding: clamp(80px, 10vw, 140px) 0;
+		position: relative;
+	}
+	/* Section head — two-row grid so the big h2 (left, row 2) top-aligns
+	   with the p.lead (right, row 2). The eyebrow lives in row 1 above the
+	   h2 without shifting either. */
+	.section .head {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: auto auto;
+		column-gap: 60px;
+		row-gap: 14px;
+		margin-bottom: 60px;
+	}
+	.section .head > .eyebrow { grid-column: 1; grid-row: 1; align-self: end; }
+	.section .head > .h2 {
+		grid-column: 1;
+		grid-row: 2;
+		margin: 0;
+		font-size: clamp(28px, 3.6vw, 44px);
+	}
+	.section .head > p.lead { grid-column: 2; grid-row: 2; margin: 0; align-self: start; }
+
+	/* ============================================================
+	   FORM FIELDS (modals)
+	   ============================================================ */
+	/* Equal 1fr / 1fr so the sidebar's left edge lines up with the p.lead
+	   above (also col 2 of a 1fr / 1fr .head grid). Cohérent avec toutes
+	   les autres 2-col grids du site. */
+	.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+	.field {
+		display: flex; flex-direction: column;
+		gap: 8px;
+		margin-bottom: 16px;
+	}
+	.field label {
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.field input, .field select, .field textarea {
+		background: var(--ink);
+		border: 1px solid var(--line-strong);
+		color: var(--white);
+		padding: 12px 14px;
+		border-radius: 4px;
+		font: 14px/1.4 var(--font-body);
+		outline: none;
+		transition: border-color 200ms ease;
+	}
+	/* Native selects need extra right padding for the chevron and a custom
+	   pink-tinted arrow so the value never touches the right edge. */
+	.field select {
+		padding-right: 40px;
+		appearance: none;
+		-webkit-appearance: none;
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%23FF2E7E' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+		background-repeat: no-repeat;
+		background-position: right 14px center;
+	}
+	.field textarea { resize: vertical; min-height: 130px; }
+	.field input:focus, .field select:focus, .field textarea:focus {
+		border-color: var(--pink);
+	}
+
+	/* Sidebar — direct info */
+
+	/* ============================================================
+	   VISIT SECTION — SVG map + hours 7 days
+	   ============================================================ */
+	/* minmax(0,1fr) instead of 1fr: a plain 1fr track has min-width:auto, so the
+	   SVG's intrinsic 800px min-content width forces the track wider than half
+	   the container and the map bleeds past the hours panel. */
+	/* The hours panel next to this has a filled background, so a flat bordered
+	   rectangle read as unfinished beside it. Matching border weight plus a
+	   grounded shadow puts the two halves of the row on the same plane. */
+	@keyframes map-pulse {
+		0%, 100% { transform: scale(1); opacity: 0.9; }
+		50% { transform: scale(1.15); opacity: 1; }
+	}
+	@keyframes map-ring {
+		0% { r: 12; opacity: 0.6; }
+		100% { r: 40; opacity: 0; }
+	}
+
+
+	/* ============================================================
+	   FAQ mini
+	   ============================================================ */
+
+	/* ============================================================
+	   CTA final
+	   ============================================================ */
+	.cta-final {
+		background: linear-gradient(160deg, rgba(255,46,126,0.08) 0%, var(--ink-2) 100%);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: clamp(40px, 5vw, 72px);
+	}
+	/* One-line CTA layout — flex row so the title and the action buttons
+	   sit on the same visual line. Wraps naturally on narrow viewports. */
+	.cta-final .inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 40px;
+		flex-wrap: wrap;
+	}
+	/* Title shrinks, actions never do — that's what keeps them on one line.
+	   flex-shrink:0 + white-space:nowrap on the buttons stops the actions block
+	   from dropping under the title on mid-width viewports. */
+	.cta-final .h2 {
+		margin: 0;
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+	.cta-final .h2 .pink { color: var(--pink); }
+	.cta-final .actions {
+		display: inline-flex;
+		gap: 12px;
+		flex-wrap: nowrap;
+		flex-shrink: 0;
+	}
+	.cta-final .actions .btn { white-space: nowrap; }
+	@media (max-width: 860px) {
+		.cta-final .inner { flex-direction: column; align-items: flex-start; gap: 28px; }
+	}
+	@media (max-width: 640px) {
+		.cta-final .actions { flex-wrap: wrap; }
+	}
+
+	/* ============================================================
+	   MODAL / OVERLAY
+	   ============================================================ */
+	.overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 90;
+		background: rgba(6, 6, 10, 0.88);
+		-webkit-backdrop-filter: blur(6px);
+		backdrop-filter: blur(6px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 20px;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 240ms ease;
+	}
+	.overlay.open { opacity: 1; pointer-events: auto; }
+	.modal {
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		max-width: 480px;
+		width: 100%;
+		max-height: 92vh;
+		overflow: hidden auto;
+		overscroll-behavior: contain;
+		padding: 32px;
+		position: relative;
+		transform: translateY(12px);
+		transition: transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	.overlay.open .modal { transform: none; }
+
+
+	/* Stacked, not inline: at 460px the three items wrapped 2 + 1 and read as a
+	   ragged block. A short column is calmer and scans in one pass. */
+	/* Footer line inside the Join modal. Named for its role, not its container —
+	   it started life in a side drawer that no longer exists. Back in a centred
+	   modal it reads as a short reassurance footer under the actions. */
+	.modal-reassure {
+		margin: 22px 0 0;
+		padding: 20px 0 0;
+		border-top: 1px solid var(--line);
+		display: flex;
+		flex-direction: column;
+		gap: 9px;
+		padding-left: 0;
+		list-style: none;
+	}
+	.modal-reassure li {
+		display: inline-flex;
+		align-items: center;
+		gap: 7px;
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.04em;
+		color: var(--white-mute);
+		list-style: none;
+	}
+	.modal-reassure li::before {
+		content: "";
+		flex-shrink: 0;
+		width: 12px; height: 12px;
+		background: var(--mint);
+		clip-path: polygon(20% 55%, 40% 75%, 85% 25%, 90% 30%, 45% 82%, 15% 60%);
+	}
+
+	.modal-close {
+		position: absolute;
+		top: 12px; right: 12px;
+		width: 40px; height: 40px;
+		border-radius: 8px;
+	}
+	.modal-close:hover { background: var(--ink-3); }
+	.modal h3 {
+		font-family: var(--font-display);
+		font-size: 24px;
+		text-transform: uppercase;
+		margin: 0 0 6px;
+	}
+	.modal p.hint {
+		font-size: 14px;
+		color: var(--white-mute);
+		margin: 0 0 24px;
+	}
+	.modal-actions {
+		display: flex; gap: 10px;
+		margin-top: 8px;
+	}
+	.plan-radios { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+	.plan-radio {
+		display: flex; align-items: center; gap: 14px;
+		padding: 16px 18px;
+		border: 1px solid var(--line-strong);
+		border-radius: 8px;
+		cursor: pointer;
+		transition: border-color 200ms ease, background 200ms ease;
+	}
+	.plan-radio:hover { border-color: var(--white-mute); }
+	.plan-radio input { display: none; }
+	.plan-radio .radio-dot {
+		width: 18px; height: 18px;
+		border-radius: 50%;
+		border: 1.5px solid var(--line-strong);
+		flex-shrink: 0;
+		position: relative;
+		transition: border-color 200ms ease;
+	}
+	.plan-radio input:checked ~ .radio-dot { border-color: var(--pink); }
+	.plan-radio input:checked ~ .radio-dot::after {
+		content: ""; position: absolute;
+		inset: 3px; border-radius: 50%;
+		background: var(--pink);
+	}
+	.plan-radio:has(input:checked) {
+		border-color: var(--pink);
+		background: rgba(255,46,126,0.05);
+	}
+	.plan-radio .plan-info { flex: 1; }
+	.plan-radio .plan-info-name {
+		font-family: var(--font-display);
+		font-size: 14px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white);
+	}
+	.plan-radio .plan-info-desc {
+		font-size: 12px;
+		color: var(--white-mute);
+		margin-top: 2px;
+	}
+	.plan-radio .plan-info-price {
+		font-family: var(--font-mono);
+		font-weight: 700;
+		font-size: 16px;
+		color: var(--mint);
+	}
+	/* Same min-content trap as the visit-grid map: a bare `1fr` track keeps
+	   min-width:auto, and an <input> defaults to size=20 (~180px+) of intrinsic
+	   width, so the two fields pushed the row wider than the modal and CVC hung
+	   off the right edge. minmax(0,1fr) + width:100% pins them inside. */
+	.cc-row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: 12px;
+	}
+	.cc-row .field { min-width: 0; }
+	.cc-row input { width: 100%; min-width: 0; }
+	.modal .field input,
+	.modal .field select,
+	.modal .field textarea { width: 100%; min-width: 0; box-sizing: border-box; }
+
+	/* Floating scroll-to-top — pink circle, white up arrow, bottom-right.
+	   Same pattern as portfolio (orange there, pink here). */
+	.scroll-top-btn {
+		position: fixed;
+		bottom: 24px; right: 24px;
+		width: 52px; height: 52px;
+		border-radius: 50%;
+		background: var(--pink);
+		color: var(--white);
+		z-index: 70;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		transform: translateY(20px);
+		pointer-events: none;
+		transition: opacity 240ms ease, transform 240ms ease, background 200ms ease;
+		box-shadow: 0 10px 24px rgba(255, 46, 126, 0.32), 0 2px 6px rgba(10,10,15,0.6);
+	}
+	.scroll-top-btn.visible {
+		opacity: 1;
+		transform: translateY(0);
+		pointer-events: auto;
+	}
+	.scroll-top-btn:hover { background: var(--pink-dim); }
+	@media (max-width: 640px) {
+		.scroll-top-btn { width: 46px; height: 46px; bottom: 18px; right: 18px; }
+	}
+
+	/* Toast */
+	.toast {
+		position: fixed;
+		bottom: 30px;
+		left: 50%;
+		transform: translate(-50%, 20px);
+		background: var(--mint);
+		color: var(--ink);
+		padding: 14px 22px;
+		border-radius: 999px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 13px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		z-index: 100;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 240ms ease, transform 240ms ease;
+	}
+	.toast.show {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+
+	/* ============================================================
+	   FOOTER
+	   ============================================================ */
+	.footer {
+		background: #06060A;
+		border-top: 1px solid var(--line);
+		padding: 60px 0 40px;
+	}
+	.footer-inner {
+		display: grid;
+		grid-template-columns: 1.4fr repeat(3, 1fr);
+		gap: 40px;
+	}
+	.footer-brand-block p {
+		color: var(--white-mute);
+		font-size: 13px;
+		margin: 12px 0 0;
+		max-width: 34ch;
+	}
+	.footer-col h4 {
+		font-family: var(--font-display);
+		font-size: 12px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white);
+		margin: 0 0 16px;
+	}
+	.footer-col ul {
+		list-style: none;
+		margin: 0; padding: 0;
+		display: flex; flex-direction: column;
+		gap: 10px;
+	}
+	.footer-col a,
+	.footer-col span {
+		font-size: 13px;
+		color: var(--white-mute);
+		transition: color 200ms ease;
+		font-family: var(--font-body);
+		font-weight: 400;
+		letter-spacing: 0;
+	}
+	.footer-col a:hover { color: var(--pink); }
+	.footer-bottom {
+		max-width: var(--maxw);
+		margin: 40px auto 0;
+		padding: 20px var(--pad-x) 0;
+		border-top: 1px solid var(--line);
+		display: flex;
+		justify-content: space-between;
+		font-size: 12px;
+		color: var(--white-mute);
+	}
+
+	/* ============================================================
+	   RESPONSIVE
+	   ============================================================ */
+	@media (max-width: 1023px) {
+		.nav-links, .nav-cta { display: none; }
+		.nav-toggle { display: flex; align-items: center; justify-content: center; }
+		.section .head {
+			grid-template-columns: 1fr;
+			grid-template-rows: auto auto auto;
+			row-gap: 12px;
+			margin-bottom: 40px;
+		}
+		.section .head > .eyebrow { grid-column: 1; grid-row: 1; align-self: start; }
+		.section .head > .h2 { grid-column: 1; grid-row: 2; }
+		.section .head > p.lead { grid-column: 1; grid-row: 3; }
+		.page-hero .inner {
+			grid-template-columns: 1fr;
+			grid-template-rows: auto auto auto auto;
+			row-gap: 14px;
+		}
+		.page-hero .inner > .eyebrow { grid-column: 1; grid-row: 1; align-self: start; }
+		.page-hero .inner > .h1 { grid-column: 1; grid-row: 2; }
+		.page-hero .inner > .lead { grid-column: 1; grid-row: 3; }
+		.page-hero .inner > .meta-row { grid-column: 1; grid-row: 4; margin-top: 12px; }
+		.cta-final .actions { justify-content: flex-start; width: 100%; }
+		.footer-inner { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+	}
+	@media (max-width: 640px) {
+		.page-hero .meta-row { flex-wrap: wrap; gap: 24px; }
+		.form-row { grid-template-columns: 1fr; }
+		.footer-inner { grid-template-columns: 1fr; }
+		.footer-bottom { flex-direction: column; gap: 8px; }
+	}
+
+	/* ============================================================
+	   FORM CONTROLS — universal overrides (see user.html for the rationale).
+	   `select` is the weakest selector there is, so !important is what makes it
+	   beat rules like `.modal .field select` whose `background:` shorthand
+	   blanks the custom chevron.
+	   ============================================================ */
+	select {
+		appearance: none;
+		-webkit-appearance: none;
+		padding-right: 36px !important;
+		background-color: var(--ink);
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%23FF2E7E' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") !important;
+		background-repeat: no-repeat !important;
+		background-position: right 12px center !important;
+	}
+	select option { background: var(--ink-2); color: var(--white); }
+
+
+	/* ============================================================
+	   DATE PICKER — custom, replaces the native one
+	   The browser-drawn calendar is chrome we don't control: it ignores the
+	   palette, the mono type and the radius, and it looked like a system dialog
+	   dropped onto the page. This one is built from the same tokens as every
+	   other control, so a date field now reads like the selects next to it.
+	   ============================================================ */
+	.dp { position: relative; }
+	.dp-input {
+		width: 100%;
+		min-width: 0;
+		box-sizing: border-box;
+		background: var(--ink);
+		border: 1px solid var(--line-strong);
+		color: var(--white);
+		padding: 10px 40px 10px 12px;
+		border-radius: 4px;
+		font: 14px/1.3 var(--font-mono);
+		outline: none;
+		cursor: pointer;
+		transition: border-color 200ms ease;
+	}
+	.dp-input::placeholder { color: var(--white-mute); }
+	.dp-input:focus,
+	.dp.open .dp-input { border-color: var(--pink); }
+	.dp-icon {
+		position: absolute;
+		right: 12px;
+		top: 50%;
+		transform: translateY(-50%);
+		pointer-events: none;
+		color: var(--pink);
+	}
+	/* Fixed, not absolute. The picker lives inside .modal, which needs
+	   overflow-y:auto for tall content — an absolutely positioned panel gets
+	   clipped by it. Fixed takes the panel out of every ancestor's overflow, and
+	   the JS places it against the input's viewport rect. */
+	.dp-panel {
+		position: fixed;
+		/* Pinned to 0,0 while closed. A `position: fixed` box with no insets
+		   falls back to its static position — out at the right edge of the
+		   modal — which pushed the viewport wider and flashed a horizontal
+		   scrollbar every time an overlay containing a date field opened.
+		   JS overwrites left/top with the real placement on open. */
+		left: 0;
+		top: 0;
+		visibility: hidden;
+		z-index: 120;
+		width: 292px;
+		background: var(--ink-2);
+		border: 1px solid var(--line-strong);
+		border-radius: 6px;
+		box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+		padding: 14px;
+		opacity: 0;
+		transform: translateY(-6px);
+		pointer-events: none;
+		transition: opacity 180ms ease, transform 180ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	/* Flipped above the field when there isn't room below. */
+	.dp-panel.up { transform: translateY(6px); }
+	.dp.open .dp-panel { opacity: 1; transform: none; pointer-events: auto; visibility: visible; }
+	.dp-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 12px;
+	}
+	.dp-month {
+		font-family: var(--font-display);
+		font-size: 12px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white);
+	}
+	.dp-nav {
+		width: 26px; height: 26px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid var(--line-strong);
+		border-radius: 4px;
+		background: transparent;
+		color: var(--white-soft);
+		cursor: pointer;
+		transition: border-color 180ms ease, color 180ms ease, background 180ms ease;
+	}
+	.dp-nav:hover { border-color: var(--pink); color: var(--pink); }
+	.dp-dow, .dp-grid {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		gap: 2px;
+	}
+	.dp-dow span {
+		text-align: center;
+		font-family: var(--font-display);
+		font-size: 9px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		padding-bottom: 6px;
+	}
+	.dp-day {
+		aspect-ratio: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 4px;
+		border: 1px solid transparent;
+		background: transparent;
+		font: 12px/1 var(--font-mono);
+		color: var(--white-soft);
+		cursor: pointer;
+		transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+	}
+	.dp-day:hover:not(:disabled) { border-color: var(--line-strong); color: var(--white); }
+	.dp-day.muted { color: rgba(245, 245, 247, 0.22); }
+	.dp-day.today { border-color: var(--mint); color: var(--mint); }
+	.dp-day.selected {
+		background: var(--pink);
+		border-color: var(--pink);
+		color: var(--ink);
+		font-weight: 700;
+	}
+	.dp-day:disabled { opacity: 0.25; cursor: not-allowed; }
+	.dp-foot {
+		display: flex;
+		justify-content: space-between;
+		margin-top: 12px;
+		padding-top: 10px;
+		border-top: 1px solid var(--line);
+	}
+	.dp-link {
+		background: transparent;
+		border: 0;
+		padding: 0;
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+		cursor: pointer;
+		transition: color 160ms ease;
+	}
+	.dp-link:hover { color: var(--pink); }
+
+	/* ============================================================
+	   GUEST PASS CARD — issued after the guest-pass form is submitted
+	   A ticket, not a receipt: fixed aspect, perforated notch down the middle,
+	   the club mark top-left, and a mono strip at the bottom that reads like
+	   something a front desk would scan.
+	   ============================================================ */
+	.pass-shell { text-align: center; }
+	.pass-shell h3 { margin-bottom: 6px; }
+	.pass-card {
+		position: relative;
+		margin: 22px auto 0;
+		max-width: 380px;
+		background: linear-gradient(155deg, #16161F 0%, #0C0C13 60%, #101018 100%);
+		border: 1px solid var(--line-strong);
+		border-radius: 10px;
+		overflow: hidden;
+		text-align: left;
+		box-shadow: 0 22px 48px rgba(0, 0, 0, 0.55);
+	}
+	/* Accent bar across the top — the club's two colours, in order. */
+	.pass-card::before {
+		content: "";
+		position: absolute;
+		top: 0; left: 0; right: 0;
+		height: 3px;
+		background: linear-gradient(90deg, var(--pink) 0%, var(--pink) 62%, var(--mint) 100%);
+	}
+	.pass-top { padding: 24px 24px 18px; }
+	.pass-brand {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 20px;
+	}
+	.pass-mark {
+		display: inline-flex;
+		align-items: center;
+		gap: 9px;
+		font-family: var(--font-display);
+		font-size: 15px;
+		letter-spacing: 0.22em;
+		color: var(--white);
+	}
+	.pass-kind {
+		font-family: var(--font-display);
+		font-size: 9px;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		color: var(--ink);
+		background: var(--pink);
+		border-radius: 999px;
+		padding: 4px 10px;
+	}
+	.pass-name {
+		font-family: var(--font-display);
+		font-size: clamp(22px, 4.4vw, 28px);
+		line-height: 1.05;
+		text-transform: uppercase;
+		color: var(--white);
+		margin: 0 0 4px;
+		word-break: break-word;
+	}
+	.pass-sub {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.04em;
+		color: var(--white-mute);
+	}
+	.pass-rows {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: 16px;
+		margin-top: 22px;
+	}
+	.pass-row .k {
+		display: block;
+		font-family: var(--font-display);
+		font-size: 9px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		margin-bottom: 5px;
+	}
+	.pass-row .v {
+		font-family: var(--font-mono);
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--white);
+	}
+	.pass-row .v.mint { color: var(--mint); }
+	/* Perforation: a dashed rule with a punched notch bitten out of each edge. */
+	.pass-perf {
+		position: relative;
+		height: 0;
+		border-top: 1px dashed var(--line-strong);
+		margin: 4px 0;
+	}
+	.pass-perf::before, .pass-perf::after {
+		content: "";
+		position: absolute;
+		top: -9px;
+		width: 18px; height: 18px;
+		border-radius: 50%;
+		background: var(--ink-2);
+		border: 1px solid var(--line-strong);
+	}
+	.pass-perf::before { left: -10px; }
+	.pass-perf::after { right: -10px; }
+	.pass-foot {
+		padding: 16px 24px 20px;
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 14px;
+	}
+	.pass-terms {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		line-height: 1.5;
+		color: var(--white-mute);
+		max-width: 190px;
+	}
+	.pass-code {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		letter-spacing: 0.1em;
+		color: var(--white-soft);
+		text-align: right;
+	}
+	/* Fake scan strip — pure CSS bars, no image, no font dependency. */
+	.pass-bars {
+		height: 26px;
+		margin-bottom: 6px;
+		background: repeating-linear-gradient(
+			90deg,
+			var(--white) 0 2px,
+			transparent 2px 4px,
+			var(--white) 4px 5px,
+			transparent 5px 9px,
+			var(--white) 9px 12px,
+			transparent 12px 14px
+		);
+		opacity: 0.82;
+	}
+	.pass-actions {
+		display: flex;
+		gap: 10px;
+		justify-content: center;
+		margin-top: 24px;
+		flex-wrap: wrap;
+	}
+	@media (max-width: 420px) {
+		.pass-rows { grid-template-columns: 1fr; gap: 14px; }
+		.pass-foot { flex-direction: column; align-items: flex-start; }
+		.pass-code { text-align: left; }
+	}
+
+	/* Reuse the nav's triangle mark on the pass. Same conic gradient, so the
+	   ticket carries the real club logo rather than a redrawn approximation. */
+	.pass-mark .apex-mark {
+		width: 22px; height: 22px;
+		display: inline-block;
+		background:
+			conic-gradient(from 135deg at 50% 50%, var(--pink) 0deg 90deg, var(--mint) 90deg 180deg, var(--white) 180deg 270deg, var(--pink) 270deg 360deg);
+		clip-path: polygon(50% 0, 100% 100%, 0 100%);
+	}
+
+
+	/* Two side-by-side actions with real labels ("Keep membership" / "Yes,
+	   cancel") can't share a 360px modal — they were being clipped. Stack them
+	   at the narrow end instead of shrinking the text. */
+	@media (max-width: 430px) {
+		.modal-actions { flex-direction: column; align-items: stretch; }
+		.modal-actions .btn { width: 100%; flex: 0 0 auto !important; }
+	}
+
+	/* QR tile. Deliberately dark-on-white even though the card is dark — scanners
+	   expect that polarity and the contrast is what makes it read at arm's length. */
+	.pass-qr {
+		width: 84px; height: 84px;
+		background: var(--white);
+		border-radius: 4px;
+		padding: 5px;
+		margin-bottom: 7px;
+		margin-left: auto;
+	}
+	.pass-qr svg { display: block; width: 100%; height: 100%; }
+	.pass-icon-btn {
+		width: 38px;
+		padding-left: 0;
+		padding-right: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	/* Print: the page collapses to the pass alone, on white. Printing the dark
+	   card would drain a cartridge and scan worse; the QR keeps its polarity. */
+	@media print {
+		body { background: #fff !important; }
+		body > *:not(#passcard-overlay) { display: none !important; }
+		#passcard-overlay {
+			position: static !important;
+			opacity: 1 !important;
+			pointer-events: auto !important;
+			background: none !important;
+			backdrop-filter: none !important;
+			display: block !important;
+			padding: 0 !important;
+		}
+		#passcard-overlay .modal {
+			background: #fff !important;
+			border: 0 !important;
+			box-shadow: none !important;
+			max-width: 100% !important;
+			max-height: none !important;
+			overflow: visible !important;
+			padding: 0 !important;
+		}
+		#passcard-overlay h3,
+		#passcard-overlay .hint,
+		.pass-actions,
+		.modal-close { display: none !important; }
+		.pass-card {
+			background: #fff !important;
+			border: 1px solid #111 !important;
+			box-shadow: none !important;
+			max-width: 420px !important;
+			margin: 0 !important;
+		}
+		.pass-name, .pass-row .v, .pass-mark { color: #111 !important; }
+		.pass-sub, .pass-row .k, .pass-terms, .pass-code { color: #444 !important; }
+		.pass-row .v.mint { color: #111 !important; }
+		.pass-perf::before, .pass-perf::after { background: #fff !important; border-color: #111 !important; }
+		.pass-qr { background: #fff !important; padding: 0 !important; }
+	}
+
+	/* ============================================================
+	   BOOKING GATE
+	   Ported verbatim from the home page so the gate looks and behaves
+	   identically wherever a booking CTA lives.
+	   ============================================================ */
+	.auth-paths {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: 12px;
+		margin: 22px 0 18px;
+	}
+	.auth-path {
+		text-align: left;
+		background: var(--ink);
+		border: 1px solid var(--line-strong);
+		border-radius: 6px;
+		padding: 18px 16px;
+		cursor: pointer;
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+		transition: border-color 220ms ease, transform 220ms cubic-bezier(0.22, 0.61, 0.36, 1), background 220ms ease;
+	}
+	.auth-path:hover { border-color: var(--pink); transform: translateY(-3px); }
+	.auth-path.featured { border-color: var(--pink); background: linear-gradient(180deg, rgba(255,46,126,0.08) 0%, var(--ink) 100%); }
+	.auth-path .ap-k {
+		font-family: var(--font-display);
+		font-size: 9px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.auth-path .ap-v {
+		font-family: var(--font-display);
+		font-size: 17px;
+		color: var(--white);
+	}
+	.auth-path .ap-s {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		color: var(--white-mute);
+		line-height: 1.4;
+	}
+	.auth-alt {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+		margin: 0;
+	}
+	.link-btn {
+		background: none;
+		border: 0;
+		padding: 0;
+		font: inherit;
+		color: var(--pink);
+		cursor: pointer;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
+	/* ============================================================
+	   SCHEDULE — day tabs
+	   Same sliding-indicator component as the meal planner in My Space:
+	   one shared pink block that travels, rather than a background that
+	   blinks from tab to tab.
+	   ============================================================ */
+	.day-tabs {
+		position: relative;
+		display: flex;
+		gap: 6px;
+		padding: 6px;
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		overflow-x: auto;
+		scrollbar-width: thin;
+	}
+	.day-tab-indicator {
+		position: absolute;
+		top: 6px;
+		bottom: 6px;
+		left: 0;
+		width: 0;
+		border-radius: 4px;
+		background: var(--pink);
+		box-shadow: 0 6px 18px rgba(255, 46, 126, 0.28);
+		/* Slight overshoot on the way in — the block arrives with a bit of
+		   weight instead of easing to a dead stop. */
+		transition: transform 440ms cubic-bezier(0.34, 1.32, 0.5, 1),
+		            width 440ms cubic-bezier(0.34, 1.32, 0.5, 1);
+		pointer-events: none;
+		z-index: 0;
+	}
+	/* Before the first measurement the indicator has no width; the active tab
+	   keeps its own background so the control never renders unpainted. */
+	.day-tabs:not([data-indicator-ready]) .day-tab.active {
+		background: var(--pink);
+		color: var(--ink);
+	}
+	.day-tab {
+		position: relative;
+		z-index: 1;
+		flex: 1;
+		min-width: 0;
+		padding: 12px 8px;
+		border-radius: 4px;
+		text-align: center;
+		font-family: var(--font-display);
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		background: transparent;
+		transition: color 260ms ease, transform 260ms cubic-bezier(0.34, 1.32, 0.5, 1);
+		white-space: nowrap;
+	}
+	.day-tab.active { color: var(--ink); }
+	.day-tab:hover:not(.active) { color: var(--white); transform: translateY(-2px); }
+	.day-tab:active { transform: scale(0.96); }
+	.day-tab .num {
+		display: block;
+		font-family: var(--font-mono);
+		font-size: 16px;
+		font-weight: 700;
+		margin-top: 4px;
+	}
+	.day-tab .today-dot {
+		display: block;
+		width: 4px;
+		height: 4px;
+		border-radius: 50%;
+		background: var(--mint);
+		margin: 4px auto 0;
+	}
+	.day-tab.active .today-dot { background: var(--ink); }
+
+	/* ============================================================
+	   SCHEDULE — filters
+	   ============================================================ */
+	.filter-bar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 22px;
+		margin: 20px 0 6px;
+	}
+	.filter-group {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 8px;
+		min-width: 0;
+	}
+	.filter-group > .fg-label {
+		font-family: var(--font-display);
+		font-size: 10px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		margin-right: 2px;
+	}
+	.pill {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.04em;
+		padding: 7px 13px;
+		border-radius: 999px;
+		border: 1px solid var(--line-strong);
+		color: var(--white-soft);
+		background: transparent;
+		white-space: nowrap;
+		transition: border-color 200ms ease, color 200ms ease, background 200ms ease, transform 200ms cubic-bezier(0.34, 1.32, 0.5, 1);
+	}
+	.pill:hover { color: var(--white); border-color: var(--white-mute); transform: translateY(-2px); }
+	.pill.active {
+		background: var(--pink);
+		border-color: var(--pink);
+		color: #fff;
+	}
+	.pill.active:hover { transform: translateY(-2px); }
+	.filter-reset {
+		margin-left: auto;
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+	}
+	.filter-reset:hover { color: var(--pink); }
+
+	/* ============================================================
+	   SCHEDULE — class rows
+	   A row is a grid, not a flex line: the columns have to stay aligned
+	   down the list or the eye can't scan times. Every track is
+	   minmax(0, …) because the coach chip carries a photo.
+	   ============================================================ */
+	.class-list {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		margin-top: 22px;
+	}
+	@keyframes class-row-in {
+		from { opacity: 0; transform: translateY(14px) scale(0.99); }
+		to   { opacity: 1; transform: none; }
+	}
+	.class-row {
+		display: grid;
+		grid-template-columns: 96px minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 0.9fr) 108px 132px;
+		align-items: center;
+		gap: 18px;
+		padding: 16px 20px;
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		transition: transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
+		            border-color 320ms ease,
+		            box-shadow 320ms ease;
+	}
+	.class-row > * { min-width: 0; }
+	.class-row:hover {
+		transform: translateY(-3px);
+		border-color: var(--line-strong);
+		box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4);
+	}
+	.class-row.is-entering {
+		opacity: 0;
+		animation: class-row-in 420ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+	}
+	.class-row.is-full { opacity: 0.62; }
+	.class-row.is-full:hover { transform: none; box-shadow: none; }
+
+	.cr-time {
+		font-family: var(--font-mono);
+		font-size: 19px;
+		font-weight: 700;
+		color: var(--white);
+		letter-spacing: -0.01em;
+	}
+	.cr-time .dur {
+		display: block;
+		font-size: 10px;
+		font-weight: 400;
+		color: var(--white-mute);
+		margin-top: 3px;
+		letter-spacing: 0.08em;
+	}
+	.cr-name {
+		font-family: var(--font-display);
+		font-size: 17px;
+		font-weight: 600;
+		color: var(--white);
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 9px;
+	}
+	.cr-type {
+		display: block;
+		font-family: var(--font-mono);
+		font-size: 10px;
+		font-weight: 400;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		margin-top: 5px;
+		flex-basis: 100%;
+	}
+	.level-badge {
+		font-family: var(--font-mono);
+		font-size: 9px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		padding: 3px 8px;
+		border-radius: 999px;
+		border: 1px solid currentColor;
+		white-space: nowrap;
+	}
+	.level-badge.all     { color: var(--mint); }
+	.level-badge.open    { color: var(--mint); }
+	.level-badge.inter   { color: #E8C15A; }
+	.level-badge.advanced{ color: var(--pink); }
+
+	.cr-coach {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-width: 0;
+	}
+	.cr-coach img {
+		width: 38px;
+		height: 38px;
+		border-radius: 50%;
+		object-fit: cover;
+		flex-shrink: 0;
+		filter: grayscale(1) contrast(1.05) brightness(0.9);
+		transition: filter 320ms ease;
+	}
+	.class-row:hover .cr-coach img { filter: none; }
+	.cr-coach .cc-text { min-width: 0; }
+	.cr-coach .cc-name {
+		display: block;
+		font-family: var(--font-display);
+		font-size: 13px;
+		color: var(--white);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.cr-coach .cc-role {
+		display: block;
+		font-family: var(--font-mono);
+		font-size: 9px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.cr-studio {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-soft);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.cr-spots {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+		text-align: right;
+	}
+	.cr-spots .n {
+		display: block;
+		font-size: 17px;
+		font-weight: 700;
+		color: var(--mint);
+		line-height: 1.2;
+	}
+	.cr-spots.low .n { color: #E8C15A; }
+	.cr-spots.none .n { color: var(--pink); }
+	.cr-action { justify-self: end; }
+	.cr-action .btn { width: 132px; justify-content: center; }
+
+	.class-empty {
+		padding: 48px 24px;
+		text-align: center;
+		border: 1px dashed var(--line-strong);
+		border-radius: 6px;
+		color: var(--white-mute);
+		font-family: var(--font-mono);
+		font-size: 12px;
+	}
+	.class-count {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+		margin-top: 16px;
+	}
+
+	/* ============================================================
+	   STUDIOS
+	   ============================================================ */
+	.studios-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 18px;
+	}
+	.studios-grid > * { min-width: 0; }
+	.studio-card {
+		position: relative;
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		overflow: hidden;
+		background: var(--ink-2);
+		transition: transform 380ms cubic-bezier(0.22, 0.61, 0.36, 1), border-color 380ms ease;
+	}
+	.studio-card:hover { transform: translateY(-5px); border-color: var(--line-strong); }
+	.studio-media {
+		position: relative;
+		aspect-ratio: 4 / 3;
+		overflow: hidden;
+	}
+	.studio-media img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		/* Same unified treatment as the facilities grid on the home page:
+		   the grid imposes its own look rather than hoping three different
+		   shoots agree. Colour comes back on hover. */
+		filter: grayscale(1) contrast(1.12) brightness(0.72);
+		transition: filter 520ms ease, transform 720ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	.studio-card:hover .studio-media img {
+		filter: grayscale(0.55) contrast(1.08) brightness(0.85);
+		transform: scale(1.04);
+	}
+	.studio-media::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: rgba(255, 46, 126, 0.06);
+		mix-blend-mode: overlay;
+		pointer-events: none;
+		z-index: 1;
+	}
+	.studio-cap {
+		position: absolute;
+		top: 12px;
+		left: 12px;
+		z-index: 2;
+		font-family: var(--font-mono);
+		font-size: 10px;
+		letter-spacing: 0.1em;
+		padding: 5px 10px;
+		border-radius: 999px;
+		background: rgba(6, 6, 10, 0.78);
+		border: 1px solid var(--line-strong);
+		color: var(--white-soft);
+	}
+	.studio-body { padding: 20px 22px 24px; }
+	.studio-body h3 {
+		font-family: var(--font-display);
+		font-size: 19px;
+		margin: 0 0 8px;
+	}
+	.studio-body p {
+		margin: 0 0 14px;
+		font-size: 14px;
+		line-height: 1.6;
+		color: var(--white-soft);
+	}
+	.studio-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+	.studio-tags span {
+		font-family: var(--font-mono);
+		font-size: 9px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		padding: 4px 9px;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		color: var(--white-mute);
+	}
+
+	/* ============================================================
+	   COACH STRIP
+	   ============================================================ */
+	.coach-strip {
+		display: grid;
+		grid-template-columns: repeat(6, minmax(0, 1fr));
+		gap: 14px;
+	}
+	.coach-strip > * { min-width: 0; }
+	.coach-chip {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 10px;
+		padding: 20px 12px;
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		text-align: center;
+		transition: transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1), border-color 320ms ease;
+	}
+	.coach-chip:hover { transform: translateY(-4px); border-color: var(--pink); }
+	.coach-chip img {
+		width: 68px;
+		height: 68px;
+		border-radius: 50%;
+		object-fit: cover;
+		filter: grayscale(1) contrast(1.08) brightness(0.85);
+		transition: filter 380ms ease;
+	}
+	.coach-chip:hover img { filter: none; }
+	.coach-chip .cn {
+		font-family: var(--font-display);
+		font-size: 14px;
+		color: var(--white);
+		line-height: 1.3;
+	}
+	.coach-chip .cd {
+		font-family: var(--font-mono);
+		font-size: 9px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+		line-height: 1.4;
+	}
+
+	/* ============================================================
+	   HOW BOOKING WORKS
+	   ============================================================ */
+	.steps-grid {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 18px;
+		counter-reset: step;
+	}
+	.steps-grid > * { min-width: 0; }
+	.step-card {
+		position: relative;
+		padding: 26px 22px 24px;
+		background: var(--ink-2);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		transition: border-color 320ms ease, transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	.step-card:hover { border-color: var(--line-strong); transform: translateY(-4px); }
+	.step-card::before {
+		counter-increment: step;
+		content: "0" counter(step);
+		display: block;
+		font-family: var(--font-mono);
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		color: var(--pink);
+		margin-bottom: 12px;
+	}
+	.step-card h3 {
+		font-family: var(--font-display);
+		font-size: 17px;
+		margin: 0 0 8px;
+	}
+	.step-card p {
+		margin: 0;
+		font-size: 14px;
+		line-height: 1.6;
+		color: var(--white-soft);
+	}
+	.policy-note {
+		margin-top: 22px;
+		padding: 18px 22px;
+		border: 1px solid var(--line-strong);
+		border-radius: 6px;
+		background: var(--ink-2);
+		font-family: var(--font-mono);
+		font-size: 11.5px;
+		line-height: 1.75;
+		color: var(--white-soft);
+	}
+	.policy-note strong { color: var(--pink); font-weight: 500; }
+
+	/* ============================================================
+	   BOOKING CONFIRMATION MODAL
+	   ============================================================ */
+	.book-summary {
+		margin: 20px 0 4px;
+		border: 1px solid var(--line-strong);
+		border-radius: 6px;
+		overflow: hidden;
+	}
+	.book-summary .bs-head {
+		padding: 16px 18px;
+		background: linear-gradient(180deg, rgba(255, 46, 126, 0.10) 0%, var(--ink) 100%);
+		border-bottom: 1px solid var(--line);
+	}
+	.book-summary .bs-title {
+		font-family: var(--font-display);
+		font-size: 20px;
+		color: var(--white);
+		margin: 0 0 4px;
+	}
+	.book-summary .bs-sub {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--white-mute);
+	}
+	.book-summary .bs-rows { padding: 6px 18px 14px; }
+	.book-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 16px;
+		padding: 9px 0;
+		border-bottom: 1px dashed var(--line);
+	}
+	.book-row:last-child { border-bottom: 0; }
+	.book-row .k {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--white-mute);
+	}
+	.book-row .v {
+		font-family: var(--font-mono);
+		font-size: 13px;
+		color: var(--white);
+		text-align: right;
+	}
+	.book-row .v.mint { color: var(--mint); }
+
+	/* ============================================================
+	   RESPONSIVE — classes page
+	   Breakpoints follow the content, not device names: the class row
+	   loses columns in the order they can be folded into the name cell.
+	   ============================================================ */
+	@media (max-width: 1080px) {
+		.class-row { grid-template-columns: 84px minmax(0, 1.5fr) minmax(0, 1fr) 92px 120px; }
+		.cr-studio { display: none; }
+		.cr-action .btn { width: 120px; }
+		.coach-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	}
+	@media (max-width: 900px) {
+		.studios-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+		.steps-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	}
+	@media (max-width: 760px) {
+		/* Below this the row can't hold five columns without shredding the
+		   class name, so it becomes two stacked lines. */
+		.class-row {
+			grid-template-columns: 72px minmax(0, 1fr);
+			grid-template-areas:
+				"time name"
+				"time coach"
+				"spots action";
+			row-gap: 12px;
+			column-gap: 14px;
+			align-items: start;
+		}
+		.cr-time   { grid-area: time; }
+		.cr-name   { grid-area: name; font-size: 16px; }
+		.cr-coach  { grid-area: coach; }
+		.cr-spots  { grid-area: spots; text-align: left; align-self: center; white-space: nowrap; }
+		.cr-spots .n { display: inline; font-size: 13px; }
+		.cr-action { grid-area: action; justify-self: end; align-self: center; }
+		.filter-reset { margin-left: 0; }
+	}
+	@media (max-width: 560px) {
+		.studios-grid { grid-template-columns: minmax(0, 1fr); }
+		.day-tab { padding: 9px 6px; font-size: 10px; letter-spacing: 0.1em; }
+		.day-tab .num { font-size: 14px; }
+		.filter-bar { gap: 14px; }
+	}
+	@media (max-width: 480px) {
+		.auth-paths { grid-template-columns: 1fr; }
+		.steps-grid { grid-template-columns: minmax(0, 1fr); }
+		.coach-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	}
+
+	/* Anyone who has asked their OS for less motion gets the state change
+	   without the travel. */
+	@media (prefers-reduced-motion: reduce) {
+		.day-tab-indicator { transition: none; }
+		.class-row.is-entering { animation-duration: 1ms; }
+		.class-row:hover, .studio-card:hover, .coach-chip:hover,
+		.step-card:hover, .pill:hover, .day-tab:hover:not(.active) { transform: none; }
+		.studio-card:hover .studio-media img { transform: none; }
+	}
+</style>
+
+<!-- Pre-hide reveal blocks BEFORE first paint. JS flips the class as soon as it runs. -->
+<script>document.documentElement.classList.add("js-reveal-ready");</script>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<header class="nav">
+	<div class="nav-inner">
+		<a href="/demo/apex-athletic-club/index.html" class="nav-brand" aria-label="APEX Athletic Club home">
+			<span class="apex-mark" aria-hidden="true"></span>
+			APEX
+		</a>
+
+		<nav>
+			<ul class="nav-links" id="desk-nav">
+				<li><a href="/demo/apex-athletic-club/index.html" data-nav="home">Home</a></li>
+				<li><a href="/demo/apex-athletic-club/shop.html" data-nav="shop">Shop</a></li>
+				<li><a href="/demo/apex-athletic-club/index.html#membership" data-nav="membership">Membership</a></li>
+				<li><span class="active" data-nav="classes">Classes</span></li>
+				<li><a href="/demo/apex-athletic-club/contact.html" data-nav="contact">Contact</a></li>
+			</ul>
+		</nav>
+
+		<div class="nav-actions">
+			<div class="nav-cta">
+				<button class="btn btn-primary" data-open="join" id="nav-join-btn">Join</button>
+			</div>
+
+			<button class="nav-toggle" id="nav-toggle" aria-label="Open menu">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+					<path d="M3 7h18M3 12h18M3 17h18" />
+				</svg>
+			</button>
+		</div>
+	</div>
+</header>
+
+<div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+	<button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">
+		<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+			<path d="M6 6l12 12M18 6L6 18" />
+		</svg>
+	</button>
+	<a href="/demo/apex-athletic-club/index.html" data-nav-m="home">Home</a>
+	<a href="/demo/apex-athletic-club/shop.html" data-nav-m="shop">Shop</a>
+	<a href="/demo/apex-athletic-club/index.html#membership" data-nav-m="membership">Membership</a>
+	<span class="active" data-nav-m="classes">Classes</span>
+	<a href="/demo/apex-athletic-club/contact.html" data-nav-m="contact">Contact</a>
+	<button class="btn btn-primary" data-open="join" id="mobile-join-btn" style="margin-top: 20px;">Join</button>
+</div>
+
+<!-- ============================================================
+     PAGE HERO
+     ============================================================ -->
+<section class="page-hero">
+	<div class="inner">
+		<span class="eyebrow pink" data-reveal>Classes · 42 a week</span>
+		<h1 class="h1" data-reveal>
+			Every class,<br />
+			<span class="pink">capped.</span>
+		</h1>
+		<p class="lead" data-reveal>
+			Nothing here runs at fifty people. Strength caps at twelve, reformer at
+			eight, boxing at fourteen — small enough that the coach corrects your
+			third rep, not your thirtieth. Booking opens 30 days ahead.
+		</p>
+		<div class="meta-row" data-reveal>
+			<div class="meta-item">
+				<div class="k">Weekly classes</div>
+				<div class="v">42</div>
+			</div>
+			<div class="meta-item">
+				<div class="k">Largest cap</div>
+				<div class="v mint">18 people</div>
+			</div>
+			<div class="meta-item">
+				<div class="k">Studios</div>
+				<div class="v">3</div>
+			</div>
+			<div class="meta-item">
+				<div class="k">Booking window</div>
+				<div class="v pink">30 days</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     SCHEDULE — day tabs, filters, class list
+     ============================================================ -->
+<section class="section" id="schedule" style="padding-top: clamp(60px, 7vw, 100px);">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div class="eyebrow">This week</div>
+			<h2 class="h2">Pick a day.</h2>
+			<p class="lead">
+				The full timetable, seven days out. Filter by what you want to train
+				and how hard you want it — the list updates as you go.
+			</p>
+		</div>
+
+		<div data-reveal>
+			<!-- Day labels are written by JS from the real date, so the schedule
+			     never reads as stale. -->
+			<div class="day-tabs" id="day-tabs">
+				<span class="day-tab-indicator" aria-hidden="true"></span>
+				<button class="day-tab active" data-day="0" type="button"><span class="dow">Mon</span><span class="num">—</span></button>
+				<button class="day-tab" data-day="1" type="button"><span class="dow">Tue</span><span class="num">—</span></button>
+				<button class="day-tab" data-day="2" type="button"><span class="dow">Wed</span><span class="num">—</span></button>
+				<button class="day-tab" data-day="3" type="button"><span class="dow">Thu</span><span class="num">—</span></button>
+				<button class="day-tab" data-day="4" type="button"><span class="dow">Fri</span><span class="num">—</span></button>
+				<button class="day-tab" data-day="5" type="button"><span class="dow">Sat</span><span class="num">—</span></button>
+				<button class="day-tab" data-day="6" type="button"><span class="dow">Sun</span><span class="num">—</span></button>
+			</div>
+
+			<div class="filter-bar">
+				<div class="filter-group" data-filter="type">
+					<span class="fg-label">Type</span>
+					<button class="pill active" type="button" data-value="all">All</button>
+					<button class="pill" type="button" data-value="strength">Strength</button>
+					<button class="pill" type="button" data-value="conditioning">Conditioning</button>
+					<button class="pill" type="button" data-value="boxing">Boxing</button>
+					<button class="pill" type="button" data-value="mind">Yoga &amp; Pilates</button>
+					<button class="pill" type="button" data-value="recovery">Recovery</button>
+				</div>
+				<div class="filter-group" data-filter="level">
+					<span class="fg-label">Level</span>
+					<button class="pill active" type="button" data-value="all">All</button>
+					<button class="pill" type="button" data-value="open">Open</button>
+					<button class="pill" type="button" data-value="inter">Intermediate</button>
+					<button class="pill" type="button" data-value="advanced">Advanced</button>
+				</div>
+				<button class="filter-reset link-btn" type="button" id="filter-reset">Reset filters</button>
+			</div>
+
+			<div class="class-list" id="class-list"></div>
+			<p class="class-count" id="class-count"></p>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     STUDIOS
+     ============================================================ -->
+<section class="section" id="studios" style="padding-top: 0;">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div class="eyebrow">Where they run</div>
+			<h2 class="h2">Three rooms. No overlap.</h2>
+			<p class="lead">
+				Each studio is built for one job. Nothing gets rolled away between
+				sessions, so a class never starts ten minutes late waiting for the
+				floor to be reset.
+			</p>
+		</div>
+
+		<div class="studios-grid" data-reveal>
+			<article class="studio-card">
+				<div class="studio-media">
+					<span class="studio-cap">Caps at 18</span>
+					<img src="https://images.unsplash.com/photo-1554284126-aa88f22d8b74?auto=format&fit=crop&w=1200&q=80" alt="Studio One group floor" loading="lazy" />
+				</div>
+				<div class="studio-body">
+					<h3>Studio One</h3>
+					<p>
+						Sprung oak floor, full mirror wall, tunable house system. Home to
+						barre, salsa fit, and every conditioning class that needs room to
+						move sideways.
+					</p>
+					<div class="studio-tags">
+						<span>Sprung floor</span>
+						<span>Mirror wall</span>
+						<span>Ocean side</span>
+					</div>
+				</div>
+			</article>
+
+			<article class="studio-card">
+				<div class="studio-media">
+					<span class="studio-cap">Caps at 12</span>
+					<img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80" alt="The Cage strength studio" loading="lazy" />
+				</div>
+				<div class="studio-body">
+					<h3>The Cage</h3>
+					<p>
+						Six platforms, calibrated plates, two competition bars per rack.
+						Barbell 101, Olympic technique and every heavy session lives here,
+						away from the main floor.
+					</p>
+					<div class="studio-tags">
+						<span>6 platforms</span>
+						<span>Calibrated plates</span>
+						<span>Chalk allowed</span>
+					</div>
+				</div>
+			</article>
+
+			<article class="studio-card">
+				<div class="studio-media">
+					<span class="studio-cap">Caps at 8</span>
+					<img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1200&q=80" alt="The Loft reformer and yoga studio" loading="lazy" />
+				</div>
+				<div class="studio-body">
+					<h3>The Loft</h3>
+					<p>
+						Eight reformers, underfloor heating, blackout blinds for restore
+						sessions. Shared with physio for one-to-one mobility work in the
+						late afternoon.
+					</p>
+					<div class="studio-tags">
+						<span>8 reformers</span>
+						<span>Heated floor</span>
+						<span>Blackout</span>
+					</div>
+				</div>
+			</article>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     COACHES
+     ============================================================ -->
+<section class="section" id="coaches" style="padding-top: 0;">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div class="eyebrow">Who's teaching</div>
+			<h2 class="h2">The same faces, every week.</h2>
+			<p class="lead">
+				No rotating pool of contractors. Six coaches carry the timetable, and
+				they all take one-to-one clients too — so the person on the floor
+				knows what you did on Tuesday.
+			</p>
+		</div>
+
+		<div class="coach-strip" data-reveal>
+			<a class="coach-chip" href="/demo/apex-athletic-club/index.html#staff">
+				<img src="https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&crop=faces&w=400&h=400&q=80" alt="Marcus Reyes" loading="lazy" />
+				<span class="cn">Marcus Reyes</span>
+				<span class="cd">Strength</span>
+			</a>
+			<a class="coach-chip" href="/demo/apex-athletic-club/index.html#staff">
+				<img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&crop=faces&w=400&h=400&q=80" alt="Dr. Lena Okafor" loading="lazy" />
+				<span class="cn">Dr. Lena Okafor</span>
+				<span class="cd">Conditioning</span>
+			</a>
+			<a class="coach-chip" href="/demo/apex-athletic-club/index.html#staff">
+				<img src="https://images.unsplash.com/photo-1642267284519-f137c5efc3c3?auto=format&fit=crop&crop=faces&w=400&h=400&q=80" alt="Priya Menon" loading="lazy" />
+				<span class="cn">Priya Menon</span>
+				<span class="cd">Yoga</span>
+			</a>
+			<a class="coach-chip" href="/demo/apex-athletic-club/index.html#staff">
+				<img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&crop=faces&w=400&h=400&q=80" alt="Diego Vasquez" loading="lazy" />
+				<span class="cn">Diego Vasquez</span>
+				<span class="cd">Boxing</span>
+			</a>
+			<a class="coach-chip" href="/demo/apex-athletic-club/index.html#staff">
+				<img src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&crop=faces&w=400&h=400&q=80" alt="Kai Nakamura" loading="lazy" />
+				<span class="cn">Kai Nakamura</span>
+				<span class="cd">Mobility</span>
+			</a>
+			<a class="coach-chip" href="/demo/apex-athletic-club/index.html#staff">
+				<img src="https://images.unsplash.com/photo-1548690312-e3b507d8c110?auto=format&fit=crop&crop=faces&w=400&h=400&q=80" alt="Sofia Rossi" loading="lazy" />
+				<span class="cn">Sofia Rossi</span>
+				<span class="cd">Pilates</span>
+			</a>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     HOW BOOKING WORKS
+     ============================================================ -->
+<section class="section" id="how" style="padding-top: 0;">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div class="eyebrow">How booking works</div>
+			<h2 class="h2">Four steps, no phone call.</h2>
+			<p class="lead">
+				Classes are included in every membership tier. You book them yourself,
+				and the only thing we ask is that you cancel in time if plans change.
+			</p>
+		</div>
+
+		<div class="steps-grid" data-reveal>
+			<article class="step-card">
+				<h3>Sign in</h3>
+				<p>Booking is a member action. Log in first — new to the club, start with a tier or a free guest pass.</p>
+			</article>
+			<article class="step-card">
+				<h3>Pick your slot</h3>
+				<p>Seven days on this page, thirty in My Space. Spots left are live; a full class opens a waitlist instead.</p>
+			</article>
+			<article class="step-card">
+				<h3>Get the confirmation</h3>
+				<p>It lands in My Space and in your calendar. Bring nothing but shoes — mats, gloves and towels are on site.</p>
+			</article>
+			<article class="step-card">
+				<h3>Show up</h3>
+				<p>Tap in at the front desk. Doors close on the hour, so arrive five minutes early for the warm-up.</p>
+			</article>
+		</div>
+
+		<p class="policy-note" data-reveal>
+			<strong>Cancellation.</strong> Free up to 6 hours before the class starts.
+			Inside 6 hours, or a no-show, and the slot counts against your monthly
+			allowance — it is the only way a capped class stays fair to the person on
+			the waitlist. &nbsp;·&nbsp; <strong>Waitlist.</strong> Automatic. If a spot
+			frees up you are notified, and you have 30 minutes to take it.
+		</p>
+	</div>
+</section>
+
+<!-- ============================================================
+     CTA FINAL
+     ============================================================ -->
+<section class="section" id="cta" style="padding-top: 0;">
+	<div class="wrap">
+		<div class="cta-final" data-reveal>
+			<div class="inner">
+				<h2 class="h2">Ready to <span class="pink">book</span>?</h2>
+				<div class="actions">
+					<button class="btn btn-primary" data-book-gate>Book a class</button>
+					<button class="btn btn-ghost" data-open="guestpass">Free guest pass</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer">
+	<div class="wrap footer-inner">
+		<div class="footer-brand-block">
+			<div class="nav-brand">
+				<span class="apex-mark" aria-hidden="true"></span>
+				APEX
+			</div>
+			<p>Miami's oceanfront strength and recovery club. Small membership, full team, direct beach access. Est. 2019.</p>
+		</div>
+		<div class="footer-col">
+			<h4>Club</h4>
+			<ul>
+				<li><a href="/demo/apex-athletic-club/index.html#facilities">Facilities</a></li>
+				<li><a href="/demo/apex-athletic-club/index.html#membership">Membership</a></li>
+				<li><span style="cursor: default;">Classes</span></li>
+				<li><a href="/demo/apex-athletic-club/index.html#staff">Team</a></li>
+			</ul>
+		</div>
+		<div class="footer-col">
+			<h4>Shop</h4>
+			<ul>
+				<li><a href="/demo/apex-athletic-club/shop.html?cat=supplements#shop">Supplements</a></li>
+				<li><a href="/demo/apex-athletic-club/shop.html?cat=equipment#shop">Weights &amp; equipment</a></li>
+				<li><a href="/demo/apex-athletic-club/shop.html?cat=recovery#shop">Recovery</a></li>
+				<li><a href="/demo/apex-athletic-club/shop.html?cat=apparel#shop">Apparel</a></li>
+			</ul>
+		</div>
+		<div class="footer-col">
+			<h4>Info</h4>
+			<ul>
+				<li><a href="/demo/apex-athletic-club/contact.html">Contact</a></li>
+				<li><a href="/demo/apex-athletic-club/contact.html#visit">Hours &amp; address</a></li>
+				<li><a href="/demo/apex-athletic-club/user.html">My Space</a></li>
+				<li><a href="/demo/apex-athletic-club/index.html#membership">Cancel policy</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="footer-bottom">
+		<div>© 2026 APEX Athletic Club · Miami Beach</div>
+		<div>Fictional concept · Designed &amp; built as portfolio work</div>
+	</div>
+</footer>
+
+<!-- ============================================================
+     MODALS — Guest pass + Join (multi-step) + booking gate + booking confirm
+     ============================================================ -->
+<div class="overlay" id="guestpass-overlay" role="dialog" aria-modal="true" aria-label="Get a free guest pass">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+				<path d="M6 6l12 12M18 6L6 18" />
+			</svg>
+		</button>
+		<h3>Free guest pass</h3>
+		<p class="hint">One full day at the club — floor, pool, sauna, jacuzzi, one group class. On us.</p>
+		<form id="guestpass-form">
+			<div class="field">
+				<label for="gp-name">Full name</label>
+				<input type="text" id="gp-name" required placeholder="Alex Reyes" />
+			</div>
+			<div class="field">
+				<label for="gp-email">Email</label>
+				<input type="email" id="gp-email" required placeholder="you@example.com" />
+			</div>
+			<div class="field">
+				<label for="gp-phone">Phone</label>
+				<input type="tel" id="gp-phone" required placeholder="+1 305 555 0000" />
+			</div>
+			<div class="cc-row">
+				<div class="field">
+					<label for="gp-date">Preferred date</label>
+					<div class="dp" data-dp>
+						<input type="text" id="gp-date" class="dp-input" readonly required placeholder="Pick a date" autocomplete="off" />
+						<svg class="dp-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+						<div class="dp-panel">
+							<div class="dp-head">
+								<button type="button" class="dp-nav" data-dp-prev aria-label="Previous month">&#8249;</button>
+								<div class="dp-month" data-dp-label></div>
+								<button type="button" class="dp-nav" data-dp-next aria-label="Next month">&#8250;</button>
+							</div>
+							<div class="dp-dow"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+							<div class="dp-grid" data-dp-grid></div>
+							<div class="dp-foot">
+								<button type="button" class="dp-link" data-dp-clear>Clear</button>
+								<button type="button" class="dp-link" data-dp-today>Today</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="field">
+					<label for="gp-time">Arrival time</label>
+					<select id="gp-time" required><option>06:00</option><option>07:00</option><option>08:00</option><option>09:00</option><option>10:00</option><option>11:00</option><option>12:00</option><option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option><option>19:00</option><option>20:00</option></select>
+				</div>
+			</div>
+			<div class="modal-actions">
+				<button type="submit" class="btn btn-primary" style="flex: 1;">Request pass</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Guest pass, issued after the request form. Deliberately a ticket rather than
+     a confirmation message: it is the thing a visitor shows at the front desk. -->
+<div class="overlay" id="passcard-overlay" role="dialog" aria-modal="true" aria-label="Your guest pass">
+	<div class="modal pass-shell">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+		</button>
+		<h3>You're on the list.</h3>
+		<p class="hint">Show this at the front desk. We've emailed a copy too.</p>
+
+		<div class="pass-card" id="pass-card">
+			<div class="pass-top">
+				<div class="pass-brand">
+					<span class="pass-mark"><span class="apex-mark" aria-hidden="true"></span>APEX</span>
+					<span class="pass-kind">Guest pass</span>
+				</div>
+				<p class="pass-name" id="pass-name">Alex Reyes</p>
+				<div class="pass-sub">Miami Beach &middot; 1201 Ocean Drive</div>
+				<div class="pass-rows">
+					<div class="pass-row"><span class="k">Valid on</span><span class="v" id="pass-date">—</span></div>
+					<div class="pass-row"><span class="k">Arriving</span><span class="v mint" id="pass-time">—</span></div>
+					<div class="pass-row"><span class="k">Access</span><span class="v">Full club</span></div>
+					<div class="pass-row"><span class="k">Duration</span><span class="v">One day</span></div>
+				</div>
+			</div>
+			<div class="pass-perf"></div>
+			<div class="pass-foot">
+				<p class="pass-terms">Admits one. Photo ID required at check-in. Floor, pool, sauna, jacuzzi and one group class included.</p>
+				<div class="pass-code">
+					<div class="pass-qr" id="pass-qr" aria-label="Scan to save this pass to your phone"></div>
+					<span id="pass-ref">APX-000000</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="pass-actions">
+			<button type="button" class="btn btn-primary btn-sm" id="pass-download">Download</button>
+			<button type="button" class="btn btn-ghost btn-sm pass-icon-btn" id="pass-print" aria-label="Print pass" title="Print pass">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M8 17h8v4H8z"/>
+				</svg>
+			</button>
+		</div>
+	</div>
+</div>
+
+<div class="overlay" id="join-overlay" role="dialog" aria-modal="true" aria-label="Join APEX">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+				<path d="M6 6l12 12M18 6L6 18" />
+			</svg>
+		</button>
+
+		<!-- STEP 1 — Choose plan -->
+		<div class="join-step" data-step="1">
+			<h3>Join APEX</h3>
+			<p class="hint">Step 1 of 2 — Pick your plan. Cancel any time with 30 days notice.</p>
+			<div class="plan-radios">
+				<label class="plan-radio">
+					<input type="radio" name="plan" value="Basic" data-monthly="149" data-annual="1430" />
+					<span class="radio-dot"></span>
+					<div class="plan-info">
+						<div class="plan-info-name">Basic</div>
+						<div class="plan-info-desc">Strength floor, sauna, group studios.</div>
+					</div>
+					<div class="plan-info-price" data-tier-price>$149 / mo</div>
+				</label>
+				<label class="plan-radio">
+					<input type="radio" name="plan" value="Signature" data-monthly="259" data-annual="2486" checked />
+					<span class="radio-dot"></span>
+					<div class="plan-info">
+						<div class="plan-info-name">Signature <span style="color: var(--pink); font-size: 10px; font-family: var(--font-mono); margin-left: 6px;">MOST POPULAR</span></div>
+						<div class="plan-info-desc">Full club + recovery wing 8/mo + dietitian.</div>
+					</div>
+					<div class="plan-info-price" data-tier-price>$259 / mo</div>
+				</label>
+				<label class="plan-radio">
+					<input type="radio" name="plan" value="Elite" data-monthly="549" data-annual="5270" />
+					<span class="radio-dot"></span>
+					<div class="plan-info">
+						<div class="plan-info-name">Elite</div>
+						<div class="plan-info-desc">Personal training + doctor + physio + weekly plan.</div>
+					</div>
+					<div class="plan-info-price" data-tier-price>$549 / mo</div>
+				</label>
+			</div>
+			<div class="modal-actions">
+				<button type="button" class="btn btn-primary" style="flex: 1;" id="join-next">Continue to payment</button>
+			</div>
+		</div>
+
+		<!-- STEP 2 — Payment (fake credit card) -->
+		<div class="join-step" data-step="2" style="display: none;">
+			<h3>Payment</h3>
+			<p class="hint">Step 2 of 2 — <strong style="color: var(--pink);" id="join-summary">Signature · $259 / month</strong>. Any card number will be accepted (demo only, no real payment).</p>
+			<form id="join-form">
+				<div class="field">
+					<label for="cc-name">Name on card</label>
+					<input type="text" id="cc-name" required placeholder="Alex Reyes (any name)" />
+				</div>
+				<div class="field">
+					<label for="cc-number">Card number</label>
+					<input type="text" id="cc-number" required placeholder="4242 4242 4242 4242 (any number)" inputmode="numeric" maxlength="19" />
+				</div>
+				<div class="cc-row">
+					<div class="field">
+						<label for="cc-expiry">Expiry (MM / YY)</label>
+						<input type="text" id="cc-expiry" required placeholder="12 / 28" maxlength="7" />
+					</div>
+					<div class="field">
+						<label for="cc-cvc">CVC</label>
+						<input type="text" id="cc-cvc" required placeholder="123" maxlength="4" inputmode="numeric" />
+					</div>
+				</div>
+				<div class="modal-actions" style="gap: 10px;">
+					<button type="button" class="btn btn-ghost" id="join-back">Back</button>
+					<button type="submit" class="btn btn-primary" style="flex: 1;">Confirm &amp; join</button>
+				</div>
+			</form>
+		</div>
+		<ul class="modal-reassure">
+			<li>No joining fee</li>
+			<li>Cancel with 30 days notice</li>
+			<li>Guest pass included</li>
+		</ul>
+	</div>
+</div>
+
+<!-- Booking gate. A booking is a member action, so identity comes first —
+     the payment flow is never the first screen someone sees. -->
+<div class="overlay" id="authgate-overlay" role="dialog" aria-modal="true" aria-label="Sign in or join">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+		</button>
+
+		<div class="auth-step" data-auth-step="choose">
+			<h3>Booking is for members.</h3>
+			<p class="hint">Classes open 30 days ahead and fill fast. Which are you?</p>
+			<div class="auth-paths">
+				<button type="button" class="auth-path" data-auth-go="login">
+					<span class="ap-k">Already a member</span>
+					<span class="ap-v">Log in</span>
+					<span class="ap-s">Straight to your schedule.</span>
+				</button>
+				<button type="button" class="auth-path featured" data-auth-go="join">
+					<span class="ap-k">New to APEX</span>
+					<span class="ap-v">See membership</span>
+					<span class="ap-s">Three tiers, no contracts.</span>
+				</button>
+			</div>
+			<p class="auth-alt">Just visiting? <button type="button" class="link-btn" data-auth-go="guestpass">Get a free guest pass</button></p>
+		</div>
+
+		<div class="auth-step" data-auth-step="login" style="display: none;">
+			<h3>Welcome back.</h3>
+			<p class="hint">Demo only — any email signs you in. No password, nothing stored off your device.</p>
+			<form id="auth-login-form">
+				<div class="field">
+					<label for="auth-email">Email</label>
+					<input type="email" id="auth-email" required placeholder="you@example.com" autocomplete="off" />
+				</div>
+				<div class="modal-actions">
+					<button type="button" class="btn btn-ghost" data-auth-go="choose">Back</button>
+					<button type="submit" class="btn btn-primary" style="flex: 1;">Log in</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Booking confirmation. A member who is already signed in still gets a
+     review screen: what, when, where, and what cancelling costs. -->
+<div class="overlay" id="book-overlay" role="dialog" aria-modal="true" aria-label="Confirm your booking">
+	<div class="modal">
+		<button class="modal-close" data-close aria-label="Close">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+		</button>
+		<h3 id="book-heading">Confirm your spot.</h3>
+		<p class="hint" id="book-hint">Included in your membership — nothing to pay now.</p>
+
+		<div class="book-summary">
+			<div class="bs-head">
+				<p class="bs-title" id="book-title">—</p>
+				<span class="bs-sub" id="book-sub">—</span>
+			</div>
+			<div class="bs-rows">
+				<div class="book-row"><span class="k">When</span><span class="v" id="book-when">—</span></div>
+				<div class="book-row"><span class="k">Studio</span><span class="v" id="book-studio">—</span></div>
+				<div class="book-row"><span class="k">Coach</span><span class="v" id="book-coach">—</span></div>
+				<div class="book-row"><span class="k">Level</span><span class="v" id="book-level">—</span></div>
+				<div class="book-row"><span class="k">Spots left</span><span class="v mint" id="book-spots">—</span></div>
+			</div>
+		</div>
+
+		<div class="modal-actions" style="margin-top: 20px;">
+			<button type="button" class="btn btn-ghost" data-close>Not now</button>
+			<button type="button" class="btn btn-primary" style="flex: 1;" id="book-confirm">Confirm booking</button>
+		</div>
+		<ul class="modal-reassure">
+			<li>Free cancellation up to 6h before</li>
+			<li>Mats and gloves provided</li>
+			<li>Waitlist is automatic</li>
+		</ul>
+	</div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">Message sent</div>
+
+<!-- Floating scroll-to-top: pink circle, white up arrow, bottom-right. -->
+<button class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top" data-scroll-top>
+	<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+		<path d="M12 19V5M5 12l7-7 7 7" />
+	</svg>
+</button>
+
+<!-- ============================================================
+     JS
+     ============================================================ -->
+<script>
+	(function () {
+		// --- Reveal on scroll ---
+		const revealEls = document.querySelectorAll("[data-reveal]");
+		const io = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((e) => {
+					if (e.isIntersecting) {
+						e.target.classList.add("is-in");
+						io.unobserve(e.target);
+					}
+				});
+			},
+			{ rootMargin: "0px 0px -8% 0px", threshold: 0.06 }
+		);
+		revealEls.forEach((el) => io.observe(el));
+		setTimeout(() => revealEls.forEach((el) => el.classList.add("is-in")), 3000);
+
+		// --- Mobile nav ---
+		const mobileToggle = document.getElementById("nav-toggle");
+		const mobileNav = document.getElementById("mobile-nav");
+		const mobileClose = document.getElementById("mobile-nav-close");
+		function openMobile() {
+			mobileNav.classList.add("open");
+			mobileNav.setAttribute("aria-hidden", "false");
+			document.body.style.overflow = "hidden";
+			lockScrollGutter(true);
+		}
+		function closeMobile() {
+			mobileNav.classList.remove("open");
+			mobileNav.setAttribute("aria-hidden", "true");
+			document.body.style.overflow = "";
+			lockScrollGutter(false);
+		}
+		mobileToggle?.addEventListener("click", openMobile);
+		mobileClose?.addEventListener("click", closeMobile);
+		mobileNav?.querySelectorAll("a, span").forEach((el) =>
+			el.addEventListener("click", closeMobile)
+		);
+
+		// --- Scrollbar gutter lock (paint gutter same as body ink to hide the flash) ---
+		function lockScrollGutter(on) {
+			document.documentElement.style.scrollbarColor = on ? "#0A0A0F #0A0A0F" : "";
+		}
+
+		// --- Modal open/close (event delegation) ---
+		function openOverlay(id) {
+			const el = document.getElementById(id + "-overlay");
+			if (!el) return;
+			el.classList.add("open");
+			document.body.style.overflow = "hidden";
+			lockScrollGutter(true);
+			if (id === "join") {
+				el.querySelectorAll(".join-step").forEach((s) => {
+					s.style.display = s.dataset.step === "1" ? "" : "none";
+				});
+			}
+		}
+		function closeOverlay(el) {
+			el.classList.remove("open");
+			document.body.style.overflow = "";
+			lockScrollGutter(false);
+		}
+		// Floating scroll-to-top button visibility toggle.
+		const scrollBtn = document.getElementById("scroll-top-btn");
+		function updateScrollBtn() {
+			scrollBtn?.classList.toggle("visible", window.scrollY > 400);
+		}
+		let stTicking = false;
+		window.addEventListener("scroll", () => {
+			if (stTicking) return;
+			stTicking = true;
+			requestAnimationFrame(() => { updateScrollBtn(); stTicking = false; });
+		}, { passive: true });
+		updateScrollBtn();
+
+		document.addEventListener("click", (e) => {
+			// Scroll to top — Home in nav (when we return to it) + floating pink button.
+			const scrollTop = e.target.closest("[data-scroll-top]");
+			if (scrollTop) {
+				e.preventDefault();
+				window.scrollTo({ top: 0, behavior: "smooth" });
+				return;
+			}
+			// "Coming soon" (Shop / Classes / My Space / socials until real pages exist)
+			const soon = e.target.closest("[data-soon]");
+			if (soon) {
+				e.preventDefault();
+				showToast(soon.getAttribute("data-soon") + " coming soon");
+				return;
+			}
+			const opener = e.target.closest("[data-open]");
+			if (opener) {
+				// The tier CTAs are <a href="#"> — without this the browser follows
+				// the empty fragment and scrolls the document to the top behind the
+				// modal. THIS was the "page jumps to top" bug, not the modal itself.
+				e.preventDefault();
+				openOverlay(opener.getAttribute("data-open"));
+				return;
+			}
+			const closer = e.target.closest("[data-close]");
+			if (closer) {
+				e.preventDefault();
+				const overlay = closer.closest(".overlay");
+				if (overlay) closeOverlay(overlay);
+				return;
+			}
+			if (e.target.classList.contains("overlay")) closeOverlay(e.target);
+		});
+		document.addEventListener("keydown", (e) => {
+			if (e.key === "Escape") {
+				document.querySelectorAll(".overlay.open").forEach(closeOverlay);
+				if (mobileNav.classList.contains("open")) closeMobile();
+			}
+		});
+
+		// --- Toast ---
+		function showToast(msg) {
+			const t = document.getElementById("toast");
+			t.textContent = msg;
+			t.classList.add("show");
+			setTimeout(() => t.classList.remove("show"), 2400);
+		}
+
+		// --- Guest pass form submit ---
+	// ------------------------------------------------------------
+	// Guest pass issuing. The form no longer just toasts — it fills and shows a
+	// pass card, which is the artefact the visitor actually needs.
+	// ------------------------------------------------------------
+	// Pass rendering helpers — QR drawing, PNG download, print.
+	// ------------------------------------------------------------
+	function qrToSvg(matrix, dark) {
+		const n = matrix.length;
+		let path = "";
+		for (let r = 0; r < n; r++) for (let c = 0; c < n; c++)
+			if (matrix[r][c]) path += `M${c} ${r}h1v1h-1z`;
+		return `<svg viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">`
+		     + `<path d="${path}" fill="${dark || "#0A0A0F"}"/></svg>`;
+	}
+
+	// Payload kept short on purpose: a compact URL stays at a low QR version,
+	// which is what survives a phone camera at arm's length.
+	function passUrl(ref) { return "https://apex-athletic.club/pass/" + ref; }
+
+	let lastPass = null;
+
+	function drawPassCanvas() {
+		if (!lastPass) return null;
+		const S = 3;                       // 3x for a crisp export
+		const W = 400, H = 322;
+		const cv = document.createElement("canvas");
+		cv.width = W * S; cv.height = H * S;
+		const x = cv.getContext("2d");
+		x.scale(S, S);
+
+		const INK = "#0C0C13", INK2 = "#16161F", PINK = "#FF2E7E", MINT = "#00E5A0";
+		const WHITE = "#F5F5F7", MUTE = "rgba(245,245,247,0.55)";
+
+		const g = x.createLinearGradient(0, 0, W, H);
+		g.addColorStop(0, INK2); g.addColorStop(0.6, INK); g.addColorStop(1, "#101018");
+		x.fillStyle = g; x.fillRect(0, 0, W, H);
+
+		const bar = x.createLinearGradient(0, 0, W, 0);
+		bar.addColorStop(0, PINK); bar.addColorStop(0.62, PINK); bar.addColorStop(1, MINT);
+		x.fillStyle = bar; x.fillRect(0, 0, W, 3);
+
+		// Logo triangle, drawn rather than rasterised so it stays sharp
+		x.fillStyle = PINK;
+		x.beginPath(); x.moveTo(35, 26); x.lineTo(46, 46); x.lineTo(24, 46); x.closePath(); x.fill();
+		x.fillStyle = MINT;
+		x.beginPath(); x.moveTo(35, 26); x.lineTo(46, 46); x.lineTo(35, 46); x.closePath(); x.fill();
+
+		x.fillStyle = WHITE;
+		x.font = "600 14px 'Barlow Condensed', Impact, sans-serif";
+		x.letterSpacing = "3px";
+		x.fillText("APEX", 54, 42);
+
+		// GUEST PASS pill
+		x.fillStyle = PINK;
+		const pw = 78, px = W - 24 - pw;
+		x.beginPath(); x.roundRect(px, 26, pw, 18, 9); x.fill();
+		x.fillStyle = INK;
+		x.font = "600 9px 'Barlow Condensed', Impact, sans-serif";
+		x.letterSpacing = "1.6px";
+		x.fillText("GUEST PASS", px + 10, 38);
+
+		x.letterSpacing = "0px";
+		x.fillStyle = WHITE;
+		x.font = "700 27px 'Barlow Condensed', Impact, sans-serif";
+		x.fillText(lastPass.name.toUpperCase(), 24, 84);
+
+		x.fillStyle = MUTE;
+		x.font = "11px 'JetBrains Mono', monospace";
+		x.fillText("Miami Beach · 1201 Ocean Drive", 24, 102);
+
+		const rows = [
+			["VALID ON", lastPass.date, WHITE, 24, 134],
+			["ARRIVING", lastPass.time, MINT, 214, 134],
+			["ACCESS", "Full club", WHITE, 24, 178],
+			["DURATION", "One day", WHITE, 214, 178]
+		];
+		for (const [k, v, col, cx, cy] of rows) {
+			x.fillStyle = MUTE;
+			x.font = "600 9px 'Barlow Condensed', Impact, sans-serif";
+			x.letterSpacing = "1.5px";
+			x.fillText(k, cx, cy);
+			x.letterSpacing = "0px";
+			x.fillStyle = col;
+			x.font = "700 13px 'JetBrains Mono', monospace";
+			x.fillText(v, cx, cy + 17);
+		}
+
+		// Perforation
+		x.strokeStyle = "rgba(245,245,247,0.22)";
+		x.setLineDash([4, 4]); x.lineWidth = 1;
+		x.beginPath(); x.moveTo(0, 208); x.lineTo(W, 208); x.stroke();
+		x.setLineDash([]);
+		x.fillStyle = "#0A0A0F";
+		x.beginPath(); x.arc(0, 208, 9, 0, Math.PI * 2); x.fill();
+		x.beginPath(); x.arc(W, 208, 9, 0, Math.PI * 2); x.fill();
+
+		// Terms
+		x.fillStyle = MUTE;
+		x.font = "10px 'JetBrains Mono', monospace";
+		const terms = ["Admits one. Photo ID required at", "check-in. Floor, pool, sauna,",
+		               "jacuzzi and one group class", "included."];
+		terms.forEach((line, i) => x.fillText(line, 24, 234 + i * 14));
+
+		// QR, dark-on-white for scan contrast
+		const qs = 76, qx = W - 24 - qs, qy = 224;
+		x.fillStyle = "#FFFFFF";
+		x.beginPath(); x.roundRect(qx, qy, qs, qs, 4); x.fill();
+		const mod = lastPass.matrix, n = mod.length, cell = (qs - 8) / n;
+		x.fillStyle = "#0A0A0F";
+		for (let r = 0; r < n; r++) for (let c = 0; c < n; c++)
+			if (mod[r][c]) x.fillRect(qx + 4 + c * cell, qy + 4 + r * cell, cell + 0.4, cell + 0.4);
+
+		x.fillStyle = "rgba(245,245,247,0.78)";
+		x.font = "10px 'JetBrains Mono', monospace";
+		const tw = x.measureText(lastPass.ref).width;
+		x.fillText(lastPass.ref, W - 24 - tw, 314);
+
+		return cv;
+	}
+
+	// ------------------------------------------------------------
+	function issueGuestPass(form) {
+		const name  = (document.getElementById("gp-name").value || "").trim() || "Guest";
+		const dateEl = document.getElementById("gp-date");
+		const timeEl = document.getElementById("gp-time");
+		const isoDate = dateEl ? dateEl.dataset.value : "";
+		const shown = isoDate
+			? new Date(isoDate + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long" })
+			: (dateEl ? dateEl.value : "—");
+		const time = timeEl ? timeEl.value : "—";
+
+		// Reference derived from the date + a short random tail, so two passes on
+		// the same day still differ. Cosmetic only — nothing validates it.
+		const tail = Math.floor(1000 + Math.random() * 9000);
+		const dpart = (isoDate || "").replace(/-/g, "").slice(2) || "000000";
+		const ref = "APX-" + dpart + "-" + tail;
+
+		document.getElementById("pass-name").textContent = name;
+		document.getElementById("pass-date").textContent = shown;
+		document.getElementById("pass-time").textContent = time;
+		document.getElementById("pass-ref").textContent = ref;
+
+		let matrix = null;
+		try { matrix = qrEncode(passUrl(ref), "M"); } catch (_) {}
+		const qrBox = document.getElementById("pass-qr");
+		if (qrBox) qrBox.innerHTML = matrix ? qrToSvg(matrix) : "";
+		lastPass = { name, date: shown, time, ref, matrix };
+
+		closeOverlay(document.getElementById("guestpass-overlay"));
+		openOverlay("passcard");
+		form.reset();
+		if (dateEl) { dateEl.value = ""; delete dateEl.dataset.value; }
+	}
+
+	document.getElementById("pass-download")?.addEventListener("click", () => {
+		const cv = drawPassCanvas();
+		if (!cv) return;
+		cv.toBlob((blob) => {
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = "apex-guest-pass-" + (lastPass ? lastPass.ref : "pass") + ".png";
+			document.body.appendChild(a); a.click(); a.remove();
+			setTimeout(() => URL.revokeObjectURL(url), 2000);
+		}, "image/png");
+		showToast("Pass downloaded");
+	});
+	document.getElementById("pass-print")?.addEventListener("click", () => window.print());
+
+		document.getElementById("guestpass-form")?.addEventListener("submit", (e) => {
+			e.preventDefault();
+			issueGuestPass(e.target);
+		});
+
+		// --- Join flow: step 1 -> step 2 -> save + swap nav ---
+		function saveAccount(name, tier) {
+			try {
+				localStorage.setItem("apex_account", JSON.stringify({ name, tier, joined: Date.now() }));
+			} catch (_) {}
+		}
+		document.getElementById("join-next")?.addEventListener("click", () => {
+			const selected = document.querySelector('input[name="plan"]:checked');
+			if (!selected) return;
+			const tier = selected.value;
+			const m = parseInt(selected.dataset.monthly, 10);
+			const summary = document.getElementById("join-summary");
+			if (summary) summary.textContent = tier + " · $" + m + " / month";
+			const overlay = document.getElementById("join-overlay");
+			overlay.querySelectorAll(".join-step").forEach((s) => {
+				s.style.display = s.dataset.step === "2" ? "" : "none";
+			});
+		});
+		document.getElementById("join-back")?.addEventListener("click", () => {
+			const overlay = document.getElementById("join-overlay");
+			overlay.querySelectorAll(".join-step").forEach((s) => {
+				s.style.display = s.dataset.step === "1" ? "" : "none";
+			});
+		});
+		document.getElementById("join-form")?.addEventListener("submit", (e) => {
+			e.preventDefault();
+			const name = document.getElementById("cc-name").value.trim() || "Alex Reyes";
+			const selected = document.querySelector('input[name="plan"]:checked');
+			const tier = selected ? selected.value : "Signature";
+			saveAccount(name, tier);
+			closeOverlay(document.getElementById("join-overlay"));
+			showToast("Welcome to APEX — " + tier + " member");
+			swapJoinToMySpace();
+			e.target.reset();
+		});
+
+		// --- Swap Join → My Space in nav after a successful join ---
+		// Replace the <button> with an <a> pointing at the dashboard so the
+		// browser handles navigation natively (right-click, cmd-click, etc).
+		function swapJoinToMySpace() {
+			[["nav-join-btn"], ["mobile-join-btn"]].forEach(([id]) => {
+				const btn = document.getElementById(id);
+				if (!btn || btn.tagName === "A") return;
+				const link = document.createElement("a");
+				link.id = btn.id;
+				link.href = "/demo/apex-athletic-club/user.html";
+				link.className = btn.className;
+				link.setAttribute("aria-label", "Open your member dashboard");
+				link.textContent = "My Space";
+				btn.parentNode.replaceChild(link, btn);
+			});
+		}
+
+		// ------------------------------------------------------------
+		// Booking gate. Members go straight to their dashboard; everyone else
+		// picks a path. The Join modal is never the first thing a visitor sees
+		// when they click a booking CTA.
+		// ------------------------------------------------------------
+		function hasAccount() {
+			try { return !!localStorage.getItem("apex_account"); } catch (_) { return false; }
+		}
+		function showAuthStep(name) {
+			document.querySelectorAll("#authgate-overlay .auth-step").forEach((el) => {
+				el.style.display = el.dataset.authStep === name ? "" : "none";
+			});
+		}
+		function openBookingGate() {
+			showAuthStep("choose");
+			openOverlay("authgate");
+		}
+		document.addEventListener("click", (e) => {
+			const go = e.target.closest("[data-auth-go]");
+			if (!go) return;
+			e.preventDefault();
+			const target = go.getAttribute("data-auth-go");
+			if (target === "choose" || target === "login") { showAuthStep(target); return; }
+			closeOverlay(document.getElementById("authgate-overlay"));
+			openOverlay(target === "join" ? "join" : "guestpass");
+		});
+		document.getElementById("auth-login-form")?.addEventListener("submit", (e) => {
+			e.preventDefault();
+			const email = document.getElementById("auth-email").value.trim();
+			// Name derived from the local part so the dashboard greeting isn't empty.
+			const local = email.split("@")[0].replace(/[._-]+/g, " ").trim() || "Member";
+			const name = local.replace(/\b\w/g, (m) => m.toUpperCase());
+			saveAccount(name, "Signature");
+			closeOverlay(document.getElementById("authgate-overlay"));
+			swapJoinToMySpace();
+			showToast("Signed in — pick a class");
+			// Staying on this page is the point: they came here to book, and the
+			// list is already in front of them.
+			if (pendingBooking) { const p = pendingBooking; pendingBooking = null; setTimeout(() => openBookingFor(p), 420); }
+		});
+
+		// ------------------------------------------------------------
+		// SCHEDULE
+		// Timetable keyed by weekday so the page never shows a stale date:
+		// the seven tabs are built from today forward at load time.
+		// ------------------------------------------------------------
+		const COACHES = {
+			marcus: { name: "Marcus Reyes",    role: "Strength",     img: "1567013127542-490d757e51fc" },
+			lena:   { name: "Dr. Lena Okafor", role: "Conditioning", img: "1594381898411-846e7d193883" },
+			priya:  { name: "Priya Menon",     role: "Yoga",         img: "1642267284519-f137c5efc3c3" },
+			diego:  { name: "Diego Vasquez",   role: "Boxing",       img: "1583454110551-21f2fa2afe61" },
+			kai:    { name: "Kai Nakamura",    role: "Mobility",     img: "1541534741688-6078c6bfb5c5" },
+			sofia:  { name: "Sofia Rossi",     role: "Pilates",      img: "1548690312-e3b507d8c110" }
+		};
+		const LEVEL_LABEL = { open: "Open", inter: "Intermediate", advanced: "Advanced" };
+		const TYPE_LABEL = {
+			strength: "Strength", conditioning: "Conditioning", boxing: "Boxing",
+			mind: "Yoga & Pilates", recovery: "Recovery"
+		};
+
+		// c(): compact constructor so the timetable below stays readable.
+		const c = (time, dur, name, type, level, coach, studio, spots, cap) =>
+			({ time, dur, name, type, level, coach, studio, spots, cap });
+
+		const SCHEDULE = {
+			0: [ // Monday
+				c("06:30", 45, "Sunrise Yoga",      "mind",         "open",     "priya",  "The Loft",   3, 8),
+				c("07:15", 45, "HIIT 45",           "conditioning", "inter",    "lena",   "Studio One", 6, 18),
+				c("09:00", 60, "Barbell 101",       "strength",     "open",     "marcus", "The Cage",   4, 12),
+				c("12:30", 50, "Reformer Flow",     "mind",         "inter",    "sofia",  "The Loft",   0, 8),
+				c("17:30", 60, "Boxing Fundamentals","boxing",      "open",     "diego",  "Studio One", 9, 14),
+				c("18:45", 75, "Olympic Technique", "strength",     "advanced", "marcus", "The Cage",   2, 12),
+				c("20:00", 45, "Restore & Breathe", "recovery",     "open",     "priya",  "The Loft",   5, 8)
+			],
+			1: [ // Tuesday
+				c("06:30", 50, "Mobility Reset",    "recovery",     "open",     "kai",    "The Loft",   4, 8),
+				c("07:30", 45, "Spinning",          "conditioning", "inter",    "lena",   "Studio One", 11, 18),
+				c("10:00", 60, "Strength Circuit",  "strength",     "inter",    "marcus", "The Cage",   5, 12),
+				c("12:30", 45, "Reformer Advanced", "mind",         "advanced", "sofia",  "The Loft",   1, 8),
+				c("17:00", 60, "Boxing Sparring",   "boxing",       "advanced", "diego",  "Studio One", 3, 14),
+				c("19:00", 60, "Barbell 101",       "strength",     "open",     "marcus", "The Cage",   7, 12)
+			],
+			2: [ // Wednesday
+				c("06:30", 45, "Sunrise Yoga",      "mind",         "open",     "priya",  "The Loft",   2, 8),
+				c("07:15", 45, "HIIT 45",           "conditioning", "inter",    "lena",   "Studio One", 8, 18),
+				c("09:30", 75, "Heavy Squat Club",  "strength",     "advanced", "marcus", "The Cage",   0, 12),
+				c("12:30", 50, "Mobility Flow",     "recovery",     "open",     "kai",    "The Loft",   6, 8),
+				c("17:30", 60, "Boxing Fundamentals","boxing",      "open",     "diego",  "Studio One", 12, 14),
+				c("20:00", 45, "Restore & Breathe", "recovery",     "open",     "priya",  "The Loft",   4, 8)
+			],
+			3: [ // Thursday
+				c("06:30", 50, "Reformer Flow",     "mind",         "inter",    "sofia",  "The Loft",   3, 8),
+				c("07:30", 45, "Spinning",          "conditioning", "inter",    "lena",   "Studio One", 14, 18),
+				c("10:00", 60, "Barbell 101",       "strength",     "open",     "marcus", "The Cage",   6, 12),
+				c("13:00", 45, "Slow Yoga",         "mind",         "open",     "priya",  "The Loft",   5, 8),
+				c("18:00", 60, "Pad Work",          "boxing",       "inter",    "diego",  "Studio One", 4, 14),
+				c("19:15", 75, "Olympic Technique", "strength",     "advanced", "marcus", "The Cage",   1, 12)
+			],
+			4: [ // Friday
+				c("06:30", 45, "Sunrise Yoga",      "mind",         "open",     "priya",  "The Loft",   4, 8),
+				c("07:15", 45, "HIIT 45",           "conditioning", "inter",    "lena",   "Studio One", 10, 18),
+				c("09:00", 60, "Strength Circuit",  "strength",     "inter",    "marcus", "The Cage",   8, 12),
+				c("12:30", 50, "Mobility Reset",    "recovery",     "open",     "kai",    "The Loft",   7, 8),
+				c("17:30", 60, "Boxing Sparring",   "boxing",       "advanced", "diego",  "Studio One", 6, 14),
+				c("19:00", 50, "Reformer Advanced", "mind",         "advanced", "sofia",  "The Loft",   0, 8)
+			],
+			5: [ // Saturday
+				c("08:00", 60, "Weekend Barbell",   "strength",     "open",     "marcus", "The Cage",   9, 12),
+				c("09:15", 45, "Salsa Fit",         "conditioning", "open",     "lena",   "Studio One", 15, 18),
+				c("10:30", 60, "Boxing Fundamentals","boxing",      "open",     "diego",  "Studio One", 8, 14),
+				c("11:45", 50, "Reformer Flow",     "mind",         "inter",    "sofia",  "The Loft",   2, 8),
+				c("17:00", 45, "Restore & Breathe", "recovery",     "open",     "priya",  "The Loft",   6, 8)
+			],
+			6: [ // Sunday
+				c("09:00", 60, "Slow Yoga",         "mind",         "open",     "priya",  "The Loft",   5, 8),
+				c("10:15", 50, "Mobility Flow",     "recovery",     "open",     "kai",    "The Loft",   4, 8),
+				c("11:30", 45, "Spinning",          "conditioning", "inter",    "lena",   "Studio One", 13, 18),
+				c("17:00", 60, "Strength Circuit",  "strength",     "inter",    "marcus", "The Cage",   7, 12)
+			]
+		};
+
+		const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+		const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+		const tabsEl      = document.getElementById("day-tabs");
+		const indicatorEl = tabsEl ? tabsEl.querySelector(".day-tab-indicator") : null;
+		const listEl      = document.getElementById("class-list");
+		const countEl     = document.getElementById("class-count");
+		const booked      = new Set();       // keys of classes booked this session
+		let pendingBooking = null;           // class the visitor wanted before signing in
+		let activeDay = 0;
+		let filters = { type: "all", level: "all" };
+
+		// The seven tabs start at today, so "Mon" is not hard-coded to column one.
+		const todayReal = new Date();
+		const dayDates = [];
+		for (let i = 0; i < 7; i++) {
+			const d = new Date(todayReal.getFullYear(), todayReal.getMonth(), todayReal.getDate() + i);
+			dayDates.push(d);
+		}
+		function weekdayIndex(d) { return (d.getDay() + 6) % 7; }   // Monday-first
+
+		function labelTabs() {
+			if (!tabsEl) return;
+			tabsEl.querySelectorAll(".day-tab").forEach((tab, i) => {
+				const d = dayDates[i];
+				tab.querySelector(".dow").textContent = i === 0 ? "Today" : DOW[weekdayIndex(d)];
+				tab.querySelector(".num").textContent = d.getDate();
+				tab.setAttribute("aria-label", DOW[weekdayIndex(d)] + " " + d.getDate() + " " + MON[d.getMonth()]);
+			});
+		}
+
+		// Move the shared pink block onto whichever tab is active. offsetLeft is
+		// measured against .day-tabs (position:relative), so this stays correct
+		// even when the strip is horizontally scrolled on narrow screens.
+		function moveIndicator(instant) {
+			const active = tabsEl ? tabsEl.querySelector(".day-tab.active") : null;
+			if (!active || !indicatorEl) return;
+			if (instant) indicatorEl.style.transition = "none";
+			indicatorEl.style.width = active.offsetWidth + "px";
+			indicatorEl.style.transform = "translateX(" + active.offsetLeft + "px)";
+			if (instant) {
+				void indicatorEl.offsetWidth;   // force reflow before restoring
+				indicatorEl.style.transition = "";
+			}
+			tabsEl.setAttribute("data-indicator-ready", "");
+		}
+
+		function visibleClasses() {
+			const list = SCHEDULE[weekdayIndex(dayDates[activeDay])] || [];
+			return list
+				.map((cl, i) => ({ cl, key: weekdayIndex(dayDates[activeDay]) + ":" + i }))
+				.filter(({ cl }) =>
+					(filters.type === "all" || cl.type === filters.type) &&
+					(filters.level === "all" || cl.level === filters.level));
+		}
+
+		function spotsClass(n) { return n === 0 ? "none" : (n <= 3 ? "low" : ""); }
+
+		function renderList(firstPaint) {
+			if (!listEl) return;
+			const rows = visibleClasses();
+			if (!rows.length) {
+				listEl.innerHTML = '<div class="class-empty">No classes match those filters on this day. Try widening the level, or check tomorrow.</div>';
+				countEl.textContent = "";
+				return;
+			}
+			listEl.innerHTML = rows.map(({ cl, key }, i) => {
+				const co = COACHES[cl.coach];
+				const isBooked = booked.has(key);
+				const full = cl.spots === 0 && !isBooked;
+				const btn = isBooked
+					? '<button class="btn btn-mint btn-sm" type="button" disabled>Booked</button>'
+					: (full
+						? '<button class="btn btn-ghost btn-sm" type="button" data-waitlist="' + key + '">Join waitlist</button>'
+						: '<button class="btn btn-primary btn-sm" type="button" data-book="' + key + '">Book</button>');
+				return `
+				<article class="class-row${full ? " is-full" : ""}${firstPaint ? "" : " is-entering"}"${firstPaint ? "" : ` style="animation-delay:${i * 55}ms"`}>
+					<div class="cr-time">${cl.time}<span class="dur">${cl.dur} MIN</span></div>
+					<div class="cr-name">
+						${cl.name}
+						<span class="level-badge ${cl.level}">${LEVEL_LABEL[cl.level]}</span>
+						<span class="cr-type">${TYPE_LABEL[cl.type]}</span>
+					</div>
+					<div class="cr-coach">
+						<img src="https://images.unsplash.com/photo-${co.img}?auto=format&fit=crop&crop=faces&w=200&h=200&q=80" alt="${co.name}" loading="lazy" />
+						<span class="cc-text">
+							<span class="cc-name">${co.name}</span>
+							<span class="cc-role">${co.role}</span>
+						</span>
+					</div>
+					<div class="cr-studio">${cl.studio}</div>
+					<div class="cr-spots ${spotsClass(cl.spots)}"><span class="n">${cl.spots}</span> of ${cl.cap} left</div>
+					<div class="cr-action">${btn}</div>
+				</article>`;
+			}).join("");
+			const total = (SCHEDULE[weekdayIndex(dayDates[activeDay])] || []).length;
+			countEl.textContent = rows.length === total
+				? rows.length + " classes on this day"
+				: rows.length + " of " + total + " classes match";
+		}
+
+		function findClass(key) {
+			const [d, i] = key.split(":").map(Number);
+			return (SCHEDULE[d] || [])[i] || null;
+		}
+
+		function openBookingFor(key) {
+			const cl = findClass(key);
+			if (!cl) return;
+			const co = COACHES[cl.coach];
+			const d = dayDates[activeDay];
+			const when = (activeDay === 0 ? "Today" : DOW[weekdayIndex(d)]) + " " + d.getDate() + " " +
+			             MON[d.getMonth()] + " · " + cl.time + "–" + endTime(cl.time, cl.dur);
+			document.getElementById("book-title").textContent = cl.name;
+			document.getElementById("book-sub").textContent = TYPE_LABEL[cl.type] + " · " + cl.dur + " minutes";
+			document.getElementById("book-when").textContent = when;
+			document.getElementById("book-studio").textContent = cl.studio;
+			document.getElementById("book-coach").textContent = co.name;
+			document.getElementById("book-level").textContent = LEVEL_LABEL[cl.level];
+			const spotsEl = document.getElementById("book-spots");
+			spotsEl.textContent = cl.spots + " of " + cl.cap;
+			spotsEl.className = "v" + (cl.spots <= 3 ? "" : " mint");
+			document.getElementById("book-confirm").dataset.key = key;
+			openOverlay("book");
+		}
+
+		function endTime(hhmm, mins) {
+			const [h, m] = hhmm.split(":").map(Number);
+			const t = h * 60 + m + mins;
+			return String(Math.floor(t / 60) % 24).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0");
+		}
+
+		// A Book click is a member action: identity first, tunnel never.
+		document.addEventListener("click", (e) => {
+			const bookBtn = e.target.closest("[data-book]");
+			if (bookBtn) {
+				const key = bookBtn.getAttribute("data-book");
+				if (!hasAccount()) { pendingBooking = key; openBookingGate(); return; }
+				openBookingFor(key);
+				return;
+			}
+			const wait = e.target.closest("[data-waitlist]");
+			if (wait) {
+				if (!hasAccount()) { pendingBooking = wait.getAttribute("data-waitlist"); openBookingGate(); return; }
+				showToast("You're on the waitlist — we'll notify you if a spot frees up");
+				return;
+			}
+		});
+
+		document.getElementById("book-confirm")?.addEventListener("click", (e) => {
+			const key = e.currentTarget.dataset.key;
+			const cl = findClass(key);
+			if (!cl) return;
+			if (cl.spots > 0) cl.spots -= 1;
+			booked.add(key);
+			closeOverlay(document.getElementById("book-overlay"));
+			showToast("Booked — " + cl.name + " at " + cl.time);
+			renderList(true);
+		});
+
+		// Day tabs
+		tabsEl?.querySelectorAll(".day-tab").forEach((tab) => {
+			tab.addEventListener("click", () => {
+				if (tab.classList.contains("active")) return;
+				tabsEl.querySelectorAll(".day-tab").forEach((t) => t.classList.remove("active"));
+				tab.classList.add("active");
+				activeDay = Number(tab.dataset.day);
+				moveIndicator(false);
+				renderList(false);
+			});
+		});
+
+		// Filter pills. One group is one dimension, so selecting inside a group
+		// replaces rather than accumulates.
+		document.querySelectorAll(".filter-group[data-filter]").forEach((group) => {
+			const dim = group.dataset.filter;
+			group.querySelectorAll(".pill").forEach((pill) => {
+				pill.addEventListener("click", () => {
+					if (pill.classList.contains("active")) return;
+					group.querySelectorAll(".pill").forEach((p) => p.classList.remove("active"));
+					pill.classList.add("active");
+					filters[dim] = pill.dataset.value;
+					renderList(false);
+				});
+			});
+		});
+		document.getElementById("filter-reset")?.addEventListener("click", () => {
+			filters = { type: "all", level: "all" };
+			document.querySelectorAll(".filter-group[data-filter]").forEach((group) => {
+				group.querySelectorAll(".pill").forEach((p) => {
+					p.classList.toggle("active", p.dataset.value === "all");
+				});
+			});
+			renderList(false);
+		});
+
+		labelTabs();
+		renderList(true);
+		moveIndicator(true);
+		// Tab widths are flex-derived, so they change with the viewport.
+		window.addEventListener("resize", () => moveIndicator(true));
+		// Webfonts landing late can shift the tab metrics after first measurement.
+		if (document.fonts && document.fonts.ready) {
+			document.fonts.ready.then(() => moveIndicator(true));
+		}
+
+		try {
+			if (localStorage.getItem("apex_account")) swapJoinToMySpace();
+		} catch (_) {}
+	})();
+	// ------------------------------------------------------------
+	// Custom date picker. Replaces <input type="date"> so the calendar matches
+	// the design system instead of rendering the OS widget. The visible field is
+	// a readonly text input (so it still participates in `required` validation)
+	// and the ISO value lives in dataset.value for anything that needs to parse it.
+	// ------------------------------------------------------------
+	function initDatePickers(root) {
+		const MONTHS = ["January","February","March","April","May","June",
+		                "July","August","September","October","November","December"];
+		const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+		const iso = (d) => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+		const pretty = (d) => d.toLocaleDateString("en-US", { weekday:"short", day:"numeric", month:"short", year:"numeric" });
+
+		(root || document).querySelectorAll("[data-dp]").forEach((dp) => {
+			if (dp.dataset.dpReady) return;
+			dp.dataset.dpReady = "1";
+
+			const input = dp.querySelector(".dp-input");
+			const panel = dp.querySelector(".dp-panel");
+			const label = dp.querySelector("[data-dp-label]");
+			const grid  = dp.querySelector("[data-dp-grid]");
+			const today = startOfDay(new Date());
+			// Past dates can't be booked, so they're rendered but disabled.
+			const min   = today;
+			let view = new Date(today.getFullYear(), today.getMonth(), 1);
+			let selected = null;
+
+			function render() {
+				label.textContent = MONTHS[view.getMonth()] + " " + view.getFullYear();
+				grid.innerHTML = "";
+				const first = new Date(view.getFullYear(), view.getMonth(), 1);
+				// Monday-first week, matching the club's schedule elsewhere on the site.
+				const lead = (first.getDay() + 6) % 7;
+				const start = new Date(first);
+				start.setDate(1 - lead);
+				for (let i = 0; i < 42; i++) {
+					const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+					const b = document.createElement("button");
+					b.type = "button";
+					b.className = "dp-day";
+					b.textContent = d.getDate();
+					if (d.getMonth() !== view.getMonth()) b.classList.add("muted");
+					if (d.getTime() === today.getTime()) b.classList.add("today");
+					if (selected && d.getTime() === selected.getTime()) b.classList.add("selected");
+					if (d < min) b.disabled = true;
+					b.addEventListener("click", () => {
+						selected = d;
+						input.value = pretty(d);
+						input.dataset.value = iso(d);
+						input.dispatchEvent(new Event("change", { bubbles: true }));
+						close();
+					});
+					grid.appendChild(b);
+				}
+			}
+			// Panel is position:fixed, so it is placed against the input's viewport
+			// rect. Flips above the field when there isn't 330px of room below, and
+			// is nudged back inside the right edge on narrow screens.
+			function place() {
+				const r = input.getBoundingClientRect();
+				const H = 330, W = panel.offsetWidth || 292;
+				const up = r.bottom + H > window.innerHeight && r.top > H;
+				panel.classList.toggle("up", up);
+				panel.style.top = up ? (r.top - H - 8) + "px" : (r.bottom + 8) + "px";
+				panel.style.left = Math.max(8, Math.min(r.left, window.innerWidth - W - 8)) + "px";
+			}
+			function open() {
+				document.querySelectorAll(".dp.open").forEach((o) => { if (o !== dp) o.classList.remove("open"); });
+				dp.classList.add("open");
+				render();
+				place();
+			}
+			function close() { dp.classList.remove("open"); }
+			// A fixed panel doesn't travel with its field, so any scroll or resize
+			// while it's open re-places it rather than leaving it stranded.
+			window.addEventListener("resize", () => { if (dp.classList.contains("open")) place(); });
+			window.addEventListener("scroll", () => { if (dp.classList.contains("open")) place(); }, true);
+
+			input.addEventListener("click", (e) => { e.stopPropagation(); dp.classList.contains("open") ? close() : open(); });
+			input.addEventListener("keydown", (e) => {
+				if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+				if (e.key === "Escape") close();
+			});
+			dp.querySelector("[data-dp-prev]").addEventListener("click", (e) => {
+				e.stopPropagation(); view = new Date(view.getFullYear(), view.getMonth() - 1, 1); render();
+			});
+			dp.querySelector("[data-dp-next]").addEventListener("click", (e) => {
+				e.stopPropagation(); view = new Date(view.getFullYear(), view.getMonth() + 1, 1); render();
+			});
+			dp.querySelector("[data-dp-today]").addEventListener("click", (e) => {
+				e.stopPropagation();
+				selected = today; view = new Date(today.getFullYear(), today.getMonth(), 1);
+				input.value = pretty(today); input.dataset.value = iso(today);
+				input.dispatchEvent(new Event("change", { bubbles: true }));
+				close();
+			});
+			dp.querySelector("[data-dp-clear]").addEventListener("click", (e) => {
+				e.stopPropagation();
+				selected = null; input.value = ""; delete input.dataset.value;
+				input.dispatchEvent(new Event("change", { bubbles: true }));
+				render();
+			});
+			panel.addEventListener("click", (e) => e.stopPropagation());
+			document.addEventListener("click", close);
+			document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+			render();
+		});
+	}
+	initDatePickers();
+
+// ---------------------------------------------------------------------------
+// Minimal QR encoder — byte mode, ECC level M, versions 1..10.
+// Written inline because the page must stay a single self-contained file: no
+// CDN, no build step. Scope is deliberately narrow (one mode, one ECC level,
+// small versions) since the only payload is a short pass URL.
+// ---------------------------------------------------------------------------
+function qrEncode(text, eccLevel) {
+	const ECC = eccLevel || "M";
+
+	// --- GF(256) tables for Reed-Solomon, generator polynomial x^8+x^4+x^3+x^2+1
+	const EXP = new Uint8Array(512), LOG = new Uint8Array(256);
+	(function () {
+		let x = 1;
+		for (let i = 0; i < 255; i++) {
+			EXP[i] = x; LOG[x] = i;
+			x <<= 1; if (x & 0x100) x ^= 0x11d;
+		}
+		for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+	})();
+	const gmul = (a, b) => (a === 0 || b === 0) ? 0 : EXP[LOG[a] + LOG[b]];
+
+	function rsGenerator(deg) {
+		let poly = [1];
+		for (let i = 0; i < deg; i++) {
+			const next = new Array(poly.length + 1).fill(0);
+			for (let j = 0; j < poly.length; j++) {
+				next[j] ^= gmul(poly[j], 1);           // multiply by x
+				next[j + 1] ^= gmul(poly[j], EXP[i]);  // multiply by alpha^i
+			}
+			poly = next;
+		}
+		return poly;
+	}
+	function rsEncode(data, ecLen) {
+		const gen = rsGenerator(ecLen);
+		const res = new Array(ecLen).fill(0);
+		for (const b of data) {
+			const factor = b ^ res[0];
+			res.shift(); res.push(0);
+			for (let i = 0; i < ecLen; i++) res[i] ^= gmul(gen[i + 1], factor);
+		}
+		return res;
+	}
+
+	// --- Capacity / block tables, versions 1..10, byte mode.
+	// [totalCodewords, ecPerBlock, group1Blocks, group1Data, group2Blocks, group2Data]
+	const TABLE = {
+		L: [[26,7,1,19,0,0],[44,10,1,34,0,0],[70,15,1,55,0,0],[100,20,1,80,0,0],[134,26,1,108,0,0],
+		    [172,18,2,68,0,0],[196,20,2,78,0,0],[242,24,2,97,0,0],[292,30,2,116,0,0],[346,18,2,68,2,69]],
+		M: [[26,10,1,16,0,0],[44,16,1,28,0,0],[70,26,1,44,0,0],[100,18,2,32,0,0],[134,24,2,43,0,0],
+		    [172,16,4,27,0,0],[196,18,4,31,0,0],[242,22,2,38,2,39],[292,22,3,36,2,37],[346,26,4,43,1,44]],
+		Q: [[26,13,1,13,0,0],[44,22,1,22,0,0],[70,18,2,17,0,0],[100,26,2,24,0,0],[134,18,2,15,2,16],
+		    [172,24,4,19,0,0],[196,18,2,14,4,15],[242,22,4,18,2,19],[292,20,4,16,4,17],[346,24,6,19,2,20]],
+		H: [[26,17,1,9,0,0],[44,28,1,16,0,0],[70,22,2,13,0,0],[100,16,4,9,0,0],[134,22,2,11,2,12],
+		    [172,28,4,15,0,0],[196,26,4,13,1,14],[242,26,4,14,2,15],[292,24,4,12,4,13],[346,28,6,15,2,16]]
+	};
+	const ALIGN = {
+		1: [], 2: [6,18], 3: [6,22], 4: [6,26], 5: [6,30],
+		6: [6,34], 7: [6,22,38], 8: [6,24,42], 9: [6,26,46], 10: [6,28,50]
+	};
+
+	// --- UTF-8 bytes
+	const bytes = [];
+	for (const ch of unescape(encodeURIComponent(text))) bytes.push(ch.charCodeAt(0));
+
+	// --- Pick the smallest version that fits
+	let version = 0, spec = null;
+	for (let v = 1; v <= 10; v++) {
+		const t = TABLE[ECC][v - 1];
+		const dataCw = t[2] * t[3] + t[4] * t[5];
+		const lenBits = v < 10 ? 8 : 16;
+		if (4 + lenBits + bytes.length * 8 <= dataCw * 8) { version = v; spec = t; break; }
+	}
+	if (!version) throw new Error("payload too long for version 10");
+
+	const [totalCw, ecPerBlock, g1, g1d, g2, g2d] = spec;
+	const dataCw = g1 * g1d + g2 * g2d;
+
+	// --- Bit stream: mode(4) + length + data + terminator + pad
+	const bits = [];
+	const push = (val, len) => { for (let i = len - 1; i >= 0; i--) bits.push((val >> i) & 1); };
+	push(4, 4);                                     // byte mode
+	push(bytes.length, version < 10 ? 8 : 16);
+	for (const b of bytes) push(b, 8);
+	for (let i = 0; i < 4 && bits.length < dataCw * 8; i++) bits.push(0);
+	while (bits.length % 8) bits.push(0);
+	const cw = [];
+	for (let i = 0; i < bits.length; i += 8) {
+		let b = 0; for (let j = 0; j < 8; j++) b = (b << 1) | bits[i + j];
+		cw.push(b);
+	}
+	const PAD = [0xEC, 0x11];
+	for (let i = 0; cw.length < dataCw; i++) cw.push(PAD[i % 2]);
+
+	// --- Split into blocks, compute EC, interleave
+	const blocks = [], ecBlocks = [];
+	let p = 0;
+	for (let i = 0; i < g1; i++) { blocks.push(cw.slice(p, p + g1d)); p += g1d; }
+	for (let i = 0; i < g2; i++) { blocks.push(cw.slice(p, p + g2d)); p += g2d; }
+	for (const b of blocks) ecBlocks.push(rsEncode(b, ecPerBlock));
+
+	const finalCw = [];
+	const maxData = Math.max(...blocks.map(b => b.length));
+	for (let i = 0; i < maxData; i++) for (const b of blocks) if (i < b.length) finalCw.push(b[i]);
+	for (let i = 0; i < ecPerBlock; i++) for (const b of ecBlocks) finalCw.push(b[i]);
+
+	// --- Build the module matrix
+	const size = version * 4 + 17;
+	const m = Array.from({ length: size }, () => new Array(size).fill(null)); // null = free
+	const reserved = Array.from({ length: size }, () => new Array(size).fill(false));
+
+	function setF(r, c, v) { if (r >= 0 && r < size && c >= 0 && c < size) { m[r][c] = v; reserved[r][c] = true; } }
+
+	function finder(r, c) {
+		for (let i = -1; i <= 7; i++) for (let j = -1; j <= 7; j++) {
+			const rr = r + i, cc = c + j;
+			if (rr < 0 || rr >= size || cc < 0 || cc >= size) continue;
+			const inRing = (i >= 0 && i <= 6 && (j === 0 || j === 6)) || (j >= 0 && j <= 6 && (i === 0 || i === 6));
+			const inCore = i >= 2 && i <= 4 && j >= 2 && j <= 4;
+			setF(rr, cc, (inRing || inCore) ? 1 : 0);
+		}
+	}
+	finder(0, 0); finder(0, size - 7); finder(size - 7, 0);
+
+	// Timing patterns
+	for (let i = 8; i < size - 8; i++) { setF(6, i, i % 2 === 0 ? 1 : 0); setF(i, 6, i % 2 === 0 ? 1 : 0); }
+
+	// Alignment patterns (skipped where they would collide with a finder)
+	const centers = ALIGN[version];
+	for (const r of centers) for (const c of centers) {
+		if ((r === 6 && c === 6) || (r === 6 && c === size - 7) || (r === size - 7 && c === 6)) continue;
+		for (let i = -2; i <= 2; i++) for (let j = -2; j <= 2; j++) {
+			const on = Math.max(Math.abs(i), Math.abs(j)) !== 1;
+			setF(r + i, c + j, on ? 1 : 0);
+		}
+	}
+
+	// Dark module + reserved format areas
+	setF(size - 8, 8, 1);
+	for (let i = 0; i <= 8; i++) { if (!reserved[8][i]) setF(8, i, 0); if (!reserved[i][8]) setF(i, 8, 0); }
+	for (let i = size - 8; i < size; i++) { if (!reserved[8][i]) setF(8, i, 0); if (!reserved[i][8]) setF(i, 8, 0); }
+
+	// Version information blocks (version >= 7)
+	if (version >= 7) {
+		let d = version;
+		for (let i = 0; i < 12; i++) d = (d << 1) ^ ((d >>> 11) * 0x1f25);
+		const vBits = (version << 12) | d;
+		for (let i = 0; i < 18; i++) {
+			const bit = (vBits >> i) & 1;
+			const a = Math.floor(i / 3), b = i % 3;
+			setF(size - 11 + b, a, bit);
+			setF(a, size - 11 + b, bit);
+		}
+	}
+
+	// --- Place data in the zig-zag pattern
+	let bi = 0;
+	const dataBits = [];
+	for (const b of finalCw) for (let i = 7; i >= 0; i--) dataBits.push((b >> i) & 1);
+	let up = true;
+	for (let col = size - 1; col > 0; col -= 2) {
+		if (col === 6) col--; // skip the vertical timing column
+		for (let k = 0; k < size; k++) {
+			const row = up ? size - 1 - k : k;
+			for (let c = 0; c < 2; c++) {
+				const cc = col - c;
+				if (reserved[row][cc]) continue;
+				m[row][cc] = bi < dataBits.length ? dataBits[bi] : 0;
+				bi++;
+			}
+		}
+		up = !up;
+	}
+
+	// --- Masking: apply each of the 8 patterns, score, keep the best
+	const MASKS = [
+		(r, c) => (r + c) % 2 === 0,
+		(r, c) => r % 2 === 0,
+		(r, c) => c % 3 === 0,
+		(r, c) => (r + c) % 3 === 0,
+		(r, c) => (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0,
+		(r, c) => ((r * c) % 2) + ((r * c) % 3) === 0,
+		(r, c) => (((r * c) % 2) + ((r * c) % 3)) % 2 === 0,
+		(r, c) => (((r + c) % 2) + ((r * c) % 3)) % 2 === 0
+	];
+	const ECC_BITS = { L: 1, M: 0, Q: 3, H: 2 };
+
+	function applyFormat(grid, maskIdx) {
+		const data = (ECC_BITS[ECC] << 3) | maskIdx;
+		let d = data;
+		for (let i = 0; i < 10; i++) d = (d << 1) ^ ((d >>> 9) * 0x537);
+		const fmt = ((data << 10) | d) ^ 0x5412;
+		// The 15 format modules are written MSB-first along each of these two
+		// paths. Order and split point were both verified by decoding the result
+		// with a real scanner rather than assumed — an off-by-one here produces a
+		// QR that looks perfect and refuses to scan.
+		const copy1 = [[8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8],
+		               [7,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8]];
+		const copy2 = [[size-1,8],[size-2,8],[size-3,8],[size-4,8],[size-5,8],[size-6,8],[size-7,8],
+		               [8,size-8],[8,size-7],[8,size-6],[8,size-5],[8,size-4],[8,size-3],[8,size-2],[8,size-1]];
+		for (let i = 0; i < 15; i++) {
+			const bit = (fmt >> (14 - i)) & 1;
+			grid[copy1[i][0]][copy1[i][1]] = bit;
+			grid[copy2[i][0]][copy2[i][1]] = bit;
+		}
+		grid[size - 8][8] = 1; // dark module, always set
+	}
+
+	function penalty(g) {
+		let score = 0;
+		// Rule 1 — runs of 5+ same-colour modules
+		for (let i = 0; i < size; i++) {
+			for (const line of [g[i], g.map(row => row[i])]) {
+				let run = 1;
+				for (let j = 1; j < size; j++) {
+					if (line[j] === line[j - 1]) { run++; if (run === 5) score += 3; else if (run > 5) score++; }
+					else run = 1;
+				}
+			}
+		}
+		// Rule 2 — 2x2 blocks of one colour
+		for (let r = 0; r < size - 1; r++) for (let c = 0; c < size - 1; c++)
+			if (g[r][c] === g[r][c + 1] && g[r][c] === g[r + 1][c] && g[r][c] === g[r + 1][c + 1]) score += 3;
+		// Rule 3 — finder-like 1:1:3:1:1 sequences
+		const P1 = [1,0,1,1,1,0,1,0,0,0,0], P2 = [0,0,0,0,1,0,1,1,1,0,1];
+		for (let r = 0; r < size; r++) for (let c = 0; c <= size - 11; c++) {
+			let a = true, b = true;
+			for (let k = 0; k < 11; k++) { if (g[r][c + k] !== P1[k]) a = false; if (g[r][c + k] !== P2[k]) b = false; }
+			if (a || b) score += 40;
+		}
+		for (let c = 0; c < size; c++) for (let r = 0; r <= size - 11; r++) {
+			let a = true, b = true;
+			for (let k = 0; k < 11; k++) { if (g[r + k][c] !== P1[k]) a = false; if (g[r + k][c] !== P2[k]) b = false; }
+			if (a || b) score += 40;
+		}
+		// Rule 4 — deviation from a 50/50 dark ratio
+		let dark = 0;
+		for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) dark += g[r][c];
+		const pct = dark * 100 / (size * size);
+		score += Math.floor(Math.abs(pct - 50) / 5) * 10;
+		return score;
+	}
+
+	let best = null, bestScore = Infinity;
+	for (let mi = 0; mi < 8; mi++) {
+		const g = m.map(row => row.slice());
+		for (let r = 0; r < size; r++) for (let c = 0; c < size; c++)
+			if (!reserved[r][c] && MASKS[mi](r, c)) g[r][c] ^= 1;
+		applyFormat(g, mi);
+		const s = penalty(g);
+		if (s < bestScore) { bestScore = s; best = g; }
+	}
+	return best;
+}
+
+
+</script>
+
+<script>
+	// ------------------------------------------------------------
+	// Deep-link landing fix.
+	// Every image on these pages is unsized, so at the moment the browser
+	// performs its hash jump the document is still short and it lands well
+	// above the target — or, as here, doesn't move at all. The visitor clicks
+	// "Membership" on another page and arrives at the top of the home page
+	// with Membership highlighted, which reads as a broken menu.
+	// Re-apply the jump once the page has actually finished growing, and back
+	// off the moment the visitor takes over the scroll themselves.
+	// ------------------------------------------------------------
+	(function () {
+		var id = (location.hash || "").replace("#", "");
+		var target = id && document.getElementById(id);
+		if (!target) return;
+
+		var surrendered = false;
+		function surrender() { surrendered = true; }
+		["wheel", "touchstart", "keydown"].forEach(function (evt) {
+			window.addEventListener(evt, surrender, { passive: true, once: true });
+		});
+
+		var navH = parseInt(getComputedStyle(document.documentElement)
+			.getPropertyValue("--nav-h"), 10) || 72;
+
+		function jump() {
+			if (surrendered) return;
+			var root = document.documentElement;
+			var prev = root.style.scrollBehavior;
+			// html carries scroll-behavior:smooth, and passing behavior:"auto"
+			// to scrollTo is not enough to beat it here: the smooth animation
+			// restarts every time another unsized image lands and finishes its
+			// layout, so it never actually arrives. Turn the CSS off for the
+			// duration of the jump, then hand it back.
+			root.style.scrollBehavior = "auto";
+			var y = target.getBoundingClientRect().top + window.scrollY - navH;
+			window.scrollTo(0, Math.max(0, y));
+			root.style.scrollBehavior = prev;
+		}
+
+		jump();
+		window.addEventListener("load", function () { jump(); setTimeout(jump, 300); });
+		if (document.fonts && document.fonts.ready) document.fonts.ready.then(jump);
+	})();
+</script>
