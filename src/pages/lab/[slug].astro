@@ -223,19 +223,14 @@ const ds = project.designSystem;
 		<div class="grid grid-cols-1 gap-6">
 			{
 				project.gallery.map((src, i) => (
-					<a
-						href={src}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="ai-lab-shot block overflow-hidden rounded-md bg-card"
-					>
+					<div class="ai-lab-shot block overflow-hidden rounded-md bg-card">
 						<img
 							src={src}
 							alt={`${project.title} — screenshot ${i + 1}`}
 							loading={i === 0 ? 'eager' : 'lazy'}
 							class="h-auto w-full object-cover"
 						/>
-					</a>
+					</div>
 				))
 			}
 		</div>
@@ -312,7 +307,11 @@ const ds = project.designSystem;
 		display: block;
 	}
 	.ds-swatch-chip {
-		aspect-ratio: 1 / 1;
+		/* A palette entry only has to show the colour — a full square gave it
+		   the visual weight of an image and pushed the rest of the system
+		   below the fold. A band reads the same and costs a third of the
+		   height. */
+		aspect-ratio: 3 / 1;
 		width: 100%;
 		border-radius: 12px;
 		border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
