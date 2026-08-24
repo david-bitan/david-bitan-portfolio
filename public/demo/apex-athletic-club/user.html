@@ -150,8 +150,9 @@
 		transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease;
 		white-space: nowrap;
 	}
-	.btn-primary { background: var(--pink); color: var(--ink); }
-	.btn-primary:hover { background: var(--white); }
+	.btn-primary { background: var(--pink); color: #fff; }
+	/* Hover inverts to white-on-ink, so the text colour has to flip back. */
+	.btn-primary:hover { background: var(--white); color: var(--ink); }
 	.btn-ghost { border: 1px solid var(--line-strong); color: var(--white); }
 	.btn-ghost:hover { border-color: var(--white); }
 	.btn-mint { background: var(--mint); color: var(--ink); }
@@ -298,6 +299,11 @@
 		width: 44px; height: 44px;
 		border-radius: 12px;
 		border: 1px solid var(--line-strong);
+		/* The global `svg { display: block }` turns the icon into a block box,
+		   which parks it top-left and leaves baseline space underneath. */
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	/* ============================================================
@@ -1154,6 +1160,8 @@
 		color: var(--ink);
 		padding: 14px 22px;
 		border-radius: 999px;
+		text-align: center;
+		max-width: calc(100vw - 40px);
 		font-family: var(--font-display);
 		font-weight: 600;
 		font-size: 13px;
@@ -1237,6 +1245,18 @@
 		.footer-inner { grid-template-columns: repeat(2, 1fr); gap: 32px; }
 	}
 	@media (max-width: 640px) {
+		/* A fully rounded track around a wrapping row of pills reads as a
+		   lozenge with the buttons falling out of it. Squared off, the
+		   container follows the rows instead of fighting them. */
+		.filters { border-radius: 10px; padding: 6px; gap: 6px; }
+		.filters button { border-radius: 6px; padding: 8px 12px; }
+		/* Right-aligned auto-width buttons put the longest label flush against
+		   the card edge. Stretched, both share the full width and one edge. */
+		/* The 1023px rule above flips this back to a row, so `stretch` was
+		   working on the cross axis and left the widths content-sized.
+		   Column first, then stretch actually means full width. */
+		.mc-actions { flex-direction: column; align-items: stretch; }
+		.mc-actions .btn { width: 100%; justify-content: center; }
 		.mc-stats { grid-template-columns: repeat(2, 1fr); }
 		.calc-row { grid-template-columns: 1fr; }
 		.calc-radios { grid-template-columns: repeat(2, 1fr); }
@@ -1470,6 +1490,9 @@
 	<a href="/demo/apex-athletic-club/classes.html" data-nav-m="classes">Classes</a>
 	<a href="/demo/apex-athletic-club/contact.html" data-nav-m="contact">Contact</a>
 	<span class="active">My Space</span>
+	<!-- The desktop nav's Log out pill lives in .nav-cta, which is display:none
+	     below 1023px — so on a phone there was no way to sign out at all. -->
+	<button type="button" class="btn btn-ghost" id="mobile-logout-link" style="margin-top: 20px;">Log out</button>
 </div>
 
 <!-- ============================================================ PAGE HERO ============================================================ -->
@@ -2569,6 +2592,7 @@
 		setTimeout(() => { location.href = "/demo/apex-athletic-club/index.html"; }, 600);
 	}
 	document.getElementById("nav-logout-link")?.addEventListener("click", doLogout);
+	document.getElementById("mobile-logout-link")?.addEventListener("click", doLogout);
 })();
 	// ------------------------------------------------------------
 	// Custom date picker. Replaces <input type="date"> so the calendar matches

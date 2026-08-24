@@ -31,7 +31,7 @@ import { aiLabProjects } from '../data/aiLabProjects';
 		{
 			aiLabProjects.map((project) => (
 				<a
-					href={`/lab/${project.slug}`}
+					href={project.cardHref ?? `/lab/${project.slug}`}
 					class="ai-lab-card group block overflow-hidden rounded-md bg-card"
 				>
 					<div class="aspect-[4/3] overflow-hidden">

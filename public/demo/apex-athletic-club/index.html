@@ -160,8 +160,9 @@
 		transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease;
 		white-space: nowrap;
 	}
-	.btn-primary { background: var(--pink); color: var(--ink); }
-	.btn-primary:hover { background: var(--white); }
+	.btn-primary { background: var(--pink); color: #fff; }
+	/* Hover inverts to white-on-ink, so the text colour has to flip back. */
+	.btn-primary:hover { background: var(--white); color: var(--ink); }
 	.btn-ghost { border: 1px solid var(--line-strong); color: var(--white); }
 	.btn-ghost:hover { border-color: var(--white); }
 	.btn-mint { background: var(--mint); color: var(--ink); }
@@ -302,6 +303,11 @@
 		width: 44px; height: 44px;
 		border-radius: 12px;
 		border: 1px solid var(--line-strong);
+		/* The global `svg { display: block }` turns the icon into a block box,
+		   which parks it top-left and leaves baseline space underneath. */
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	/* ============================================================
@@ -322,8 +328,11 @@
 	.hero-media {
 		position: absolute;
 		inset: 0;
+		/* The shot has white walls and daylit windows behind the headline, so a
+		   light veil left the type fighting the photo. Darkened across the
+		   whole ramp, most at the top where the eyebrow and h1 sit. */
 		background-image:
-			linear-gradient(180deg, rgba(10,10,15,0.20) 0%, rgba(10,10,15,0.55) 55%, rgba(10,10,15,0.95) 100%),
+			linear-gradient(180deg, rgba(10,10,15,0.42) 0%, rgba(10,10,15,0.68) 55%, rgba(10,10,15,0.96) 100%),
 			url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=2000&q=80");
 		background-size: cover;
 		background-position: center;
@@ -404,6 +413,13 @@
 	.section {
 		padding: clamp(80px, 10vw, 140px) 0;
 		position: relative;
+	}
+	/* `class="wrap section"` on the same element: .section uses the padding
+	   SHORTHAND, which resets .wrap's padding-left/right to 0 — so the copy
+	   ran into the screen edge on phones. Restore it for that combination. */
+	.wrap.section {
+		padding-left: var(--pad-x);
+		padding-right: var(--pad-x);
 	}
 	/* Section head — two-row grid so the big h2 (left, row 2) top-aligns
 	   with the p.lead (right, row 2). The eyebrow sits in row 1, above the
@@ -1347,6 +1363,8 @@
 		color: var(--ink);
 		padding: 14px 22px;
 		border-radius: 999px;
+		text-align: center;
+		max-width: calc(100vw - 40px);
 		font-family: var(--font-display);
 		font-weight: 600;
 		font-size: 13px;
@@ -1392,6 +1410,11 @@
 	}
 	@media (max-width: 640px) {
 		.hero { min-height: calc(100vh - var(--nav-h)); min-height: calc(100svh - var(--nav-h)); }
+		.hero-media {
+			background-image:
+				linear-gradient(180deg, rgba(10,10,15,0.60) 0%, rgba(10,10,15,0.80) 50%, rgba(10,10,15,0.97) 100%),
+				url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80");
+		}
 		.hero-meta { grid-template-columns: 1fr 1fr; }
 		.facilities-grid { grid-template-columns: 1fr; grid-auto-rows: 180px; }
 		.f-1, .f-2, .f-3, .f-4, .f-5, .f-6 { grid-column: 1 / -1; grid-row: span 1; }

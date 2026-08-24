@@ -150,8 +150,9 @@
 		transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease;
 		white-space: nowrap;
 	}
-	.btn-primary { background: var(--pink); color: var(--ink); }
-	.btn-primary:hover { background: var(--white); }
+	.btn-primary { background: var(--pink); color: #fff; }
+	/* Hover inverts to white-on-ink, so the text colour has to flip back. */
+	.btn-primary:hover { background: var(--white); color: var(--ink); }
 	.btn-ghost { border: 1px solid var(--line-strong); color: var(--white); }
 	.btn-ghost:hover { border-color: var(--white); }
 	.btn-mint { background: var(--mint); color: var(--ink); }
@@ -283,6 +284,11 @@
 		width: 44px; height: 44px;
 		border-radius: 12px;
 		border: 1px solid var(--line-strong);
+		/* The global `svg { display: block }` turns the icon into a block box,
+		   which parks it top-left and leaves baseline space underneath. */
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	/* ============================================================
@@ -484,10 +490,21 @@
 	}
 	.cta-final .actions .btn { white-space: nowrap; }
 	@media (max-width: 860px) {
-		.cta-final .inner { flex-direction: column; align-items: flex-start; gap: 28px; }
+		/* Stacked, the title and the buttons read as one centred block rather
+		   than two left-aligned things that happen to sit above each other. */
+		.cta-final .inner { flex-direction: column; align-items: center; text-align: center; gap: 28px; }
+		.cta-final .actions { justify-content: center; }
 	}
 	@media (max-width: 640px) {
-		.cta-final .actions { flex-wrap: wrap; }
+		.cta-final .actions { flex-wrap: wrap; justify-content: center; }
+	}
+	@media (max-width: 520px) {
+		/* Tighter padding and a smaller title so the headline still lands on
+		   one line at 360px instead of breaking mid-phrase. */
+		.cta-final { padding: 32px 22px; }
+		.cta-final .h2 { font-size: clamp(24px, 7.4vw, 32px); }
+		.cta-final .actions { flex-direction: column; width: 100%; }
+		.cta-final .actions .btn { width: 100%; justify-content: center; }
 	}
 
 	/* ============================================================
@@ -683,6 +700,8 @@
 		color: var(--ink);
 		padding: 14px 22px;
 		border-radius: 999px;
+		text-align: center;
+		max-width: calc(100vw - 40px);
 		font-family: var(--font-display);
 		font-weight: 600;
 		font-size: 13px;
@@ -776,7 +795,7 @@
 		.page-hero .inner > .h1 { grid-column: 1; grid-row: 2; }
 		.page-hero .inner > .lead { grid-column: 1; grid-row: 3; }
 		.page-hero .inner > .meta-row { grid-column: 1; grid-row: 4; margin-top: 12px; }
-		.cta-final .actions { justify-content: flex-start; width: 100%; }
+		.cta-final .actions { justify-content: center; width: 100%; }
 		.footer-inner { grid-template-columns: repeat(2, 1fr); gap: 32px; }
 	}
 	@media (max-width: 640px) {

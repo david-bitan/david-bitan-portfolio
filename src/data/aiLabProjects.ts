@@ -30,9 +30,27 @@ export interface AILabProject {
 	thumbnail: string;
 	/** Accent color hint for the card overlay (hex, optional). */
 	accent?: string;
+	/** Where the AI Lab card points, when it is NOT a generated /lab/[slug]
+	 * page. Set this and the entry becomes a card only: getStaticPaths skips
+	 * it, so no duplicate case-study route is built for it. */
+	cardHref?: string;
 }
 
 export const aiLabProjects: AILabProject[] = [
+	{
+		slug: 'portfolio-colophon',
+		title: 'This portfolio',
+		subtitle: 'The site you are reading, taken apart.',
+		eyebrow: 'Portfolio · 2026',
+		shortDesc:
+			'How this site is built — the stack, the token set, the method, and an honest account of what was designed by hand and what was not.',
+		intro: '',
+		gallery: [],
+		demoUrl: '/colophon',
+		thumbnail: '/lab-assets/portfolio-colophon/thumbnail.jpg',
+		accent: '#FF5A1F',
+		cardHref: '/colophon',
+	},
 	{
 		slug: 'apex-athletic-club',
 		title: 'APEX Athletic Club',
