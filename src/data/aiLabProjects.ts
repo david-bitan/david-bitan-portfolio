@@ -36,21 +36,10 @@ export interface AILabProject {
 	cardHref?: string;
 }
 
+// Order = display order. New AI Lab projects go at the TOP; the
+// `portfolio-colophon` card stays LAST, always — it is the site itself, not
+// one of the experiments, so it closes the row rather than opening it.
 export const aiLabProjects: AILabProject[] = [
-	{
-		slug: 'portfolio-colophon',
-		title: 'This portfolio',
-		subtitle: 'The site you are reading, taken apart.',
-		eyebrow: 'Portfolio · 2026',
-		shortDesc:
-			'How this site is built — the stack, the token set, the method, and an honest account of what was designed by hand and what was not.',
-		intro: '',
-		gallery: [],
-		demoUrl: '/colophon',
-		thumbnail: '/lab-assets/portfolio-colophon/thumbnail.jpg',
-		accent: '#FF5A1F',
-		cardHref: '/colophon',
-	},
 	{
 		slug: 'apex-athletic-club',
 		title: 'APEX Athletic Club',
@@ -194,5 +183,19 @@ The build is a single self-contained page of hand-written HTML, CSS, and vanilla
 		demoUrl: '/demo/trattoria-fiori/',
 		thumbnail: '/lab-assets/trattoria-fiori/thumbnail.jpg',
 		accent: '#B08D4B',
+	},
+	{
+		slug: 'portfolio-colophon',
+		title: 'This portfolio',
+		subtitle: 'The site you are reading, taken apart.',
+		eyebrow: 'Portfolio · 2026',
+		shortDesc:
+			'How this site is built — the stack, the token set, the method, and an honest account of what was designed by hand and what was not.',
+		intro: '',
+		gallery: [],
+		demoUrl: '/colophon',
+		thumbnail: '/lab-assets/portfolio-colophon/thumbnail.jpg',
+		accent: '#FF5A1F',
+		cardHref: '/colophon',
 	},
 ];
