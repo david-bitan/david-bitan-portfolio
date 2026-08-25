@@ -414,6 +414,24 @@
 		padding: clamp(80px, 10vw, 140px) 0;
 		position: relative;
 	}
+	/* Stacked buttons share one width on phones. Auto-width buttons that
+	   wrap onto separate lines end up two different sizes, which reads as a
+	   mistake rather than a pair. One per row, full width, always equal. */
+	@media (max-width: 560px) {
+		.hero-actions,
+		.btn-row,
+		.contact-actions {
+			flex-direction: column;
+			align-items: stretch;
+		}
+		.hero-actions .btn,
+		.btn-row .btn,
+		.contact-actions .btn {
+			width: 100%;
+			justify-content: center;
+		}
+	}
+
 	/* `class="wrap section"` on the same element: .section uses the padding
 	   SHORTHAND, which resets .wrap's padding-left/right to 0 — so the copy
 	   ran into the screen edge on phones. Restore it for that combination. */
@@ -2254,7 +2272,7 @@
 		</div>
 		<p class="classes-scroll-hint">Scroll sideways to see the full week &rarr;</p>
 
-		<div style="margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap;" data-reveal>
+		<div class="btn-row" style="margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap;" data-reveal>
 			<button class="btn btn-primary" data-book-gate>Book a class</button>
 			<a href="/demo/apex-athletic-club/classes.html" class="btn btn-ghost">See full weekly schedule</a>
 		</div>
@@ -2432,7 +2450,7 @@
 					Guided tour with a coach, 30 minutes on the floor, a smoothie at the bar,
 					and no sales pitch. If APEX isn't your speed, we'll tell you.
 				</p>
-				<div style="display: flex; gap: 12px; flex-wrap: wrap;">
+				<div class="btn-row" style="display: flex; gap: 12px; flex-wrap: wrap;">
 					<button class="btn btn-primary" data-open="guestpass">Get a free guest pass</button>
 					<a href="/demo/apex-athletic-club/contact.html" class="btn btn-ghost">Contact us</a>
 				</div>
