@@ -15,6 +15,18 @@
 		AI-native workflow.
 	</p>
 
+	<!-- Sits under the lead rather than in the button row: beside two pills and
+	     the .docx link it pushed that row well past the text column and made a
+	     single over-long line. inline-flex so the card hugs its content instead
+	     of stretching the full width. Previous version kept in
+	     archives/v188_2026-08-31_before-stagger-nthchild-and-x-size/Hero.astro. -->
+	<div class="mt-5 inline-flex items-center gap-3 rounded-md bg-card px-4 py-3">
+		<span class="text-xl">🏆</span>
+		<p class="text-sm font-medium text-muted">
+			<span class="font-semibold text-ink">12+ Cactus awards</span> in 5 years · Publicis Group team contributor
+		</p>
+	</div>
+
 	<div class="mt-7 flex flex-col gap-4 sm:flex-row sm:items-center">
 		<div class="flex flex-col gap-4 sm:flex-row">
 			<a
@@ -48,12 +60,5 @@
 				or download .docx
 			</a>
 		</p>
-
-		<div class="flex items-center gap-3 rounded-md bg-card px-4 py-3 sm:ml-4">
-			<span class="text-xl">🏆</span>
-			<p class="text-sm font-medium text-muted">
-				<span class="font-semibold text-ink">12+ Cactus awards</span> in 5 years · Publicis Group team contributor
-			</p>
-		</div>
 	</div>
 </section>

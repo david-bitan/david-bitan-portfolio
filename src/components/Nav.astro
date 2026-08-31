@@ -90,8 +90,10 @@ function isActive(href: string) {
 	id="mobile-nav"
 	class="mobile-nav-panel fixed inset-0 z-[60] flex translate-x-full flex-col items-center justify-center gap-8 bg-bg transition-transform duration-[620ms] lg:hidden"
 >
-	<button id="nav-close" type="button" aria-label="Close menu" class="fixed right-6 top-5 flex items-center justify-center">
-		<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+	<button id="nav-close" type="button" aria-label="Close menu" class="absolute right-6 top-5 flex items-center justify-center">
+		<!-- 24px to match the burger bars (w-6). At 28 the X read as the larger of
+		     the two even though both buttons occupy the same 44px box. -->
+		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
 			<path d="M6 6l12 12M18 6L6 18"></path>
 		</svg>
 	</button>
@@ -131,12 +133,16 @@ function isActive(href: string) {
 		opacity: 1;
 		transform: none;
 	}
-	.mobile-nav-panel.is-open .mobile-nav-link:nth-of-type(1) { transition-delay: 150ms; }
-	.mobile-nav-panel.is-open .mobile-nav-link:nth-of-type(2) { transition-delay: 250ms; }
-	.mobile-nav-panel.is-open .mobile-nav-link:nth-of-type(3) { transition-delay: 350ms; }
-	.mobile-nav-panel.is-open .mobile-nav-link:nth-of-type(4) { transition-delay: 450ms; }
-	.mobile-nav-panel.is-open .mobile-nav-link:nth-of-type(5) { transition-delay: 550ms; }
-	.mobile-nav-panel.is-open .mobile-nav-link:nth-of-type(6) { transition-delay: 650ms; }
+	/* nth-child, not nth-of-type: the current page renders as <span aria-current>
+	   among <a> siblings, and nth-of-type counts each tag in its own sequence —
+	   so every delay after the active item was wrong. Child 1 is the close
+	   button, hence the offset. */
+	.mobile-nav-panel.is-open > :nth-child(2) { transition-delay: 150ms; }
+	.mobile-nav-panel.is-open > :nth-child(3) { transition-delay: 250ms; }
+	.mobile-nav-panel.is-open > :nth-child(4) { transition-delay: 350ms; }
+	.mobile-nav-panel.is-open > :nth-child(5) { transition-delay: 450ms; }
+	.mobile-nav-panel.is-open > :nth-child(6) { transition-delay: 550ms; }
+	.mobile-nav-panel.is-open > :nth-child(7) { transition-delay: 650ms; }
 
 	@media (prefers-reduced-motion: reduce) {
 		.mobile-nav-panel { transition-duration: 200ms; }
@@ -178,6 +184,14 @@ function isActive(href: string) {
 		if (!toggle || !close) return;
 		const r = toggle.getBoundingClientRect();
 		if (!r.width) return;
+		// Absolute, not fixed. The panel animates with a transform, and a
+		// transformed ancestor becomes the containing block for fixed children:
+		// the button would ride along with the slide and then jump to the
+		// viewport the moment the transform resolved to none. The panel is
+		// inset-0, so viewport coordinates and panel coordinates are the same
+		// thing and absolute positioning lands in exactly the right place.
+		// No scroll offset: the panel is `fixed inset-0`, so its origin is the
+		// viewport corner, exactly what getBoundingClientRect already returns.
 		close.style.top = r.top + 'px';
 		close.style.left = r.left + 'px';
 		close.style.right = 'auto';
