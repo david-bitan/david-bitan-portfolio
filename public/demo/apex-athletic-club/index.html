@@ -294,8 +294,8 @@
 		/* A fade on its own reads as an instant swap here: the panel is opaque and
 		   full-bleed, so there is no edge for the eye to track. Adding a short
 		   downward travel gives the open a direction and makes it feel deliberate. */
-		transform: translateY(-10px);
-		transition: opacity 240ms ease, transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
+		transform: translateY(-18px);
+		transition: opacity 420ms ease, transform 620ms cubic-bezier(0.22, 0.61, 0.36, 1);
 	}
 	.mobile-nav.open { opacity: 1; pointer-events: auto; transform: none; }
 	/* Links rise in sequence just behind the panel. The close button is left out
@@ -303,17 +303,17 @@
 	.mobile-nav a,
 	.mobile-nav > .btn {
 		opacity: 0;
-		transform: translateY(12px);
-		transition: opacity 260ms ease, transform 300ms cubic-bezier(0.22, 0.61, 0.36, 1);
+		transform: translateY(18px);
+		transition: opacity 440ms ease, transform 560ms cubic-bezier(0.22, 0.61, 0.36, 1);
 	}
 	.mobile-nav.open a,
 	.mobile-nav.open > .btn { opacity: 1; transform: none; }
-	.mobile-nav.open a:nth-of-type(1) { transition-delay: 70ms; }
-	.mobile-nav.open a:nth-of-type(2) { transition-delay: 110ms; }
-	.mobile-nav.open a:nth-of-type(3) { transition-delay: 150ms; }
-	.mobile-nav.open a:nth-of-type(4) { transition-delay: 190ms; }
-	.mobile-nav.open a:nth-of-type(5) { transition-delay: 230ms; }
-	.mobile-nav.open > .btn { transition-delay: 270ms; }
+	.mobile-nav.open a:nth-of-type(1) { transition-delay: 150ms; }
+	.mobile-nav.open a:nth-of-type(2) { transition-delay: 250ms; }
+	.mobile-nav.open a:nth-of-type(3) { transition-delay: 350ms; }
+	.mobile-nav.open a:nth-of-type(4) { transition-delay: 450ms; }
+	.mobile-nav.open a:nth-of-type(5) { transition-delay: 550ms; }
+	.mobile-nav.open > .btn { transition-delay: 650ms; }
 	@media (prefers-reduced-motion: reduce) {
 		.mobile-nav, .mobile-nav a, .mobile-nav > .btn { transition: opacity 120ms ease; transform: none; }
 		.mobile-nav.open a, .mobile-nav.open > .btn { transition-delay: 0s; }
@@ -3816,89 +3816,124 @@ function qrEncode(text, eccLevel) {
 <!-- ===== Back-to-portfolio tab — demo pages only ==============================
      A live demo opens outside the portfolio, so on a phone the visitor can end up
      with no way back: when the demo was opened in a new tab the browser's Back
-     button is greyed out. This tab shows itself for a few seconds so it gets
-     noticed, then slides away and leaves a narrow grip. Tapping the grip brings it
-     back; tapping the open tab navigates. Self-contained — its own colours and a
-     dbk- prefix — so it behaves identically in every demo whatever that demo's
-     palette is. Hidden above 1023px, where browser chrome is always in view.
-     z-index 55 keeps it under every modal and overlay in both demos. -->
-<a class="dbk-back" href="/" data-dbk aria-label="Back to David Bitan's portfolio">
-	<span class="dbk-ico" aria-hidden="true">&#8592;</span>
-	<span class="dbk-txt">Portfolio</span>
-	<span class="dbk-grip" aria-hidden="true">&#8250;</span>
-</a>
+     button is greyed out.
+
+     It introduces itself ONCE per visit — the full label slides out on the first
+     demo page opened, then tucks away. Every page after that starts tucked, so
+     the label never nags. sessionStorage carries that across pages and clears
+     itself when the tab closes, so a fresh visitor always gets the introduction.
+
+     Sits at the same height as the scroll-to-top button, on the opposite edge.
+     Self-contained (own colours, dbk- prefix) so it behaves identically in both
+     demos whatever their palette. Hidden above 1023px, where browser chrome is
+     always in view. z-index 55 keeps it under every modal and overlay. -->
+<div class="dbk" data-dbk data-state="tucked">
+	<a class="dbk-full" href="/" aria-label="Back to David Bitan's portfolio">
+		<span class="dbk-ico" aria-hidden="true">&#8592;</span><span class="dbk-txt">Portfolio</span>
+	</a>
+	<button class="dbk-tab" type="button" aria-label="Show the link back to the portfolio">
+		<span class="dbk-vert">Portfolio</span>
+	</button>
+</div>
 <style>
-	.dbk-back {
+	.dbk {
 		position: fixed;
-		left: 0; top: 50%;
+		left: 0;
+		/* Same baseline as .scroll-top-btn, opposite edge. */
+		bottom: 24px;
 		z-index: 55;
 		display: none;
-		align-items: center;
-		gap: 8px;
-		padding: 11px 30px 11px 13px;
+	}
+	@media (max-width: 1023px) { .dbk { display: block; } }
+	@media (max-width: 640px)  { .dbk { bottom: 18px; } }
+
+	.dbk-full, .dbk-tab {
+		position: absolute;
+		left: 0; bottom: 0;
 		background: #16191E;
 		color: #fff;
 		border: 1px solid rgba(255, 255, 255, 0.3);
 		border-left: 0;
 		border-radius: 0 10px 10px 0;
-		font: 600 11px/1 ui-sans-serif, system-ui, -apple-system, sans-serif;
+		box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+		transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.3s ease;
+	}
+	.dbk-full {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		height: 52px;
+		padding: 0 16px;
+		font: 700 11px/1 ui-sans-serif, system-ui, -apple-system, sans-serif;
 		letter-spacing: 0.14em;
 		text-transform: uppercase;
 		text-decoration: none;
 		white-space: nowrap;
-		box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
-		min-height: 44px;
-		transform: translateY(-50%);
-		transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
 	}
-	/* Tucked, only a 30px strip is reachable — under the 44px minimum for a touch
-	   target. This invisible pad extends the hit area 16px to the right of the
-	   grip so the tap lands reliably without widening anything visible. */
-	.dbk-back.is-tucked::before {
+	.dbk-tab {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 92px;
+		padding: 0;
+	}
+	/* 32px is under the 44px minimum for a touch target; this invisible pad
+	   widens the hit area to the right without widening anything visible. */
+	.dbk-tab::after {
 		content: '';
 		position: absolute;
-		top: 0; bottom: 0; right: -16px;
+		top: 0; bottom: 0; right: -14px;
 		width: 46px;
 	}
-	@media (max-width: 1023px) { .dbk-back { display: flex; } }
-	.dbk-back:hover, .dbk-back:focus-visible { color: #fff; }
-	.dbk-ico, .dbk-txt { transition: opacity 0.25s; }
-	.dbk-grip {
-		position: absolute;
-		right: 9px; top: 50%;
-		transform: translateY(-50%);
-		font-size: 15px;
-		line-height: 1;
-		opacity: 0;
-		transition: opacity 0.25s;
+	.dbk-vert {
+		writing-mode: vertical-rl;
+		/* Rotated so the word reads bottom-to-top, the usual direction for a tab
+		   on the left edge. */
+		transform: rotate(180deg);
+		font: 700 8px/1 ui-sans-serif, system-ui, -apple-system, sans-serif;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
 	}
-	/* Tucked: only the 30px right-hand strip stays on screen — the padding-right
-	   reserves exactly that, so the grip glyph is what remains visible. */
-	.dbk-back.is-tucked { transform: translateY(-50%) translateX(calc(-100% + 30px)); }
-	.dbk-back.is-tucked .dbk-ico,
-	.dbk-back.is-tucked .dbk-txt { opacity: 0; }
-	.dbk-back.is-tucked .dbk-grip { opacity: 1; }
+
+	.dbk[data-state="open"] .dbk-full { transform: none; opacity: 1; }
+	.dbk[data-state="open"] .dbk-tab  { transform: translateX(-100%); opacity: 0; pointer-events: none; }
+	.dbk[data-state="tucked"] .dbk-full { transform: translateX(-100%); opacity: 0; pointer-events: none; }
+	.dbk[data-state="tucked"] .dbk-tab  { transform: none; opacity: 1; }
+
 	@media (prefers-reduced-motion: reduce) {
-		.dbk-back, .dbk-ico, .dbk-txt, .dbk-grip { transition: none; }
+		.dbk-full, .dbk-tab { transition: opacity 0.2s ease; }
 	}
 </style>
 <script>
 	(function () {
-		var el = document.querySelector('[data-dbk]');
-		if (!el) return;
+		var root = document.querySelector('[data-dbk]');
+		if (!root) return;
+		var tab = root.querySelector('.dbk-tab');
 		var timer;
-		function tuck() { el.classList.add('is-tucked'); }
-		function show() {
-			el.classList.remove('is-tucked');
+		// One key per demo, so APEX and the restaurant each get their own
+		// introduction. sessionStorage, not localStorage: a returning visitor in a
+		// new tab should see it again.
+		var KEY = 'dbk-seen:' + (location.pathname.split('/')[2] || 'demo');
+		var seen = false;
+		try { seen = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+
+		function tuck() { root.dataset.state = 'tucked'; }
+		function open() {
+			root.dataset.state = 'open';
 			clearTimeout(timer);
 			timer = setTimeout(tuck, 5000);
 		}
-		timer = setTimeout(tuck, 4000);
-		el.addEventListener('click', function (e) {
-			// While tucked the tab is a grip, not a link: the first tap reopens it,
-			// the second one navigates. Without this a stray tap on the grip would
-			// throw the visitor out of the demo.
-			if (el.classList.contains('is-tucked')) { e.preventDefault(); show(); }
-		});
+
+		if (!seen) {
+			// Markup ships tucked, so this reads as the tab sliding out to introduce
+			// itself rather than as a label that was already sitting there.
+			setTimeout(function () { root.dataset.state = 'open'; }, 400);
+			timer = setTimeout(tuck, 4400);
+			try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+		}
+		// Tucked, .dbk-full is pointer-events:none, so the tab cannot navigate by
+		// accident — it only reopens. No preventDefault needed.
+		tab.addEventListener('click', open);
 	})();
 </script>
