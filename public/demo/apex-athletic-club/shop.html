@@ -29,6 +29,12 @@
 		--pink-dim: #C9265E;
 		--mint: #00E5A0;
 		--mint-dim: #06B37D;
+		/* Deep green for passive ribbons and badges. --mint and --mint-dim are
+		   far too light to carry white text (1.65:1 and 2.71:1). This one reads
+		   5.35:1 in white — the same figure as --pink-dim, so ribbons and pink
+		   surfaces stay legible to the same degree. Pink is now reserved for
+		   actions and selected states; green marks labels you cannot click. */
+		--ribbon: #0B7A53;
 
 		--font-display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
 		--font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
@@ -266,9 +272,33 @@
 		gap: 24px;
 		opacity: 0;
 		pointer-events: none;
-		transition: opacity 240ms ease;
+		/* A fade on its own reads as an instant swap here: the panel is opaque and
+		   full-bleed, so there is no edge for the eye to track. Adding a short
+		   downward travel gives the open a direction and makes it feel deliberate. */
+		transform: translateY(-10px);
+		transition: opacity 240ms ease, transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
 	}
-	.mobile-nav.open { opacity: 1; pointer-events: auto; }
+	.mobile-nav.open { opacity: 1; pointer-events: auto; transform: none; }
+	/* Links rise in sequence just behind the panel. The close button is left out
+	   on purpose — it must be usable the instant the menu exists. */
+	.mobile-nav a,
+	.mobile-nav > .btn {
+		opacity: 0;
+		transform: translateY(12px);
+		transition: opacity 260ms ease, transform 300ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	.mobile-nav.open a,
+	.mobile-nav.open > .btn { opacity: 1; transform: none; }
+	.mobile-nav.open a:nth-of-type(1) { transition-delay: 70ms; }
+	.mobile-nav.open a:nth-of-type(2) { transition-delay: 110ms; }
+	.mobile-nav.open a:nth-of-type(3) { transition-delay: 150ms; }
+	.mobile-nav.open a:nth-of-type(4) { transition-delay: 190ms; }
+	.mobile-nav.open a:nth-of-type(5) { transition-delay: 230ms; }
+	.mobile-nav.open > .btn { transition-delay: 270ms; }
+	@media (prefers-reduced-motion: reduce) {
+		.mobile-nav, .mobile-nav a, .mobile-nav > .btn { transition: opacity 120ms ease; transform: none; }
+		.mobile-nav.open a, .mobile-nav.open > .btn { transition-delay: 0s; }
+	}
 	.mobile-nav a, .mobile-nav span {
 		font-family: var(--font-display);
 		font-weight: 600;
@@ -278,6 +308,11 @@
 		color: var(--white);
 	}
 	.mobile-nav .active { color: var(--pink); pointer-events: none; }
+	/* `.mobile-nav a` (0,1,1) outranks `.btn-primary` (0,1,0), so the pink
+	   button in the mobile menu was inheriting --white (#F5F5F7) instead of
+	   pure #fff. Any text sitting on pink stays pure white. */
+	.mobile-nav a.btn-primary,
+	.mobile-nav a.btn-primary:hover { color: #fff; }
 	.mobile-nav-close {
 		position: absolute;
 		top: 20px; right: 20px;
@@ -944,7 +979,7 @@
 	.dp-day.selected {
 		background: var(--pink);
 		border-color: var(--pink);
-		color: var(--ink);
+		color: #fff;
 		font-weight: 700;
 	}
 	.dp-day:disabled { opacity: 0.25; cursor: not-allowed; }
@@ -1015,10 +1050,11 @@
 		font-size: 9px;
 		letter-spacing: 0.2em;
 		text-transform: uppercase;
-		color: var(--ink);
-		background: var(--pink);
+		color: #fff;
+		background: var(--ribbon);
 		border-radius: 999px;
 		padding: 4px 10px;
+		font-weight: 700;
 	}
 	.pass-name {
 		font-family: var(--font-display);
@@ -1518,7 +1554,7 @@
 		text-transform: uppercase;
 		padding: 4px 9px;
 		border-radius: 999px;
-		background: var(--pink);
+		background: var(--ribbon);
 		color: #fff;
 	}
 	.pc-flag.out { background: var(--ink); border: 1px solid var(--line-strong); color: var(--white-mute); }
@@ -1618,7 +1654,7 @@
 		height: 18px;
 		padding: 0 5px;
 		border-radius: 999px;
-		background: var(--pink);
+		background: var(--ribbon);
 		color: #fff;
 		font-family: var(--font-mono);
 		font-size: 10px;
@@ -3982,5 +4018,95 @@ function qrEncode(text, eccLevel) {
 		jump();
 		window.addEventListener("load", function () { jump(); setTimeout(jump, 300); });
 		if (document.fonts && document.fonts.ready) document.fonts.ready.then(jump);
+	})();
+</script>
+
+<!-- ===== Back-to-portfolio tab — demo pages only ==============================
+     A live demo opens outside the portfolio, so on a phone the visitor can end up
+     with no way back: when the demo was opened in a new tab the browser's Back
+     button is greyed out. This tab shows itself for a few seconds so it gets
+     noticed, then slides away and leaves a narrow grip. Tapping the grip brings it
+     back; tapping the open tab navigates. Self-contained — its own colours and a
+     dbk- prefix — so it behaves identically in every demo whatever that demo's
+     palette is. Hidden above 1023px, where browser chrome is always in view.
+     z-index 55 keeps it under every modal and overlay in both demos. -->
+<a class="dbk-back" href="/" data-dbk aria-label="Back to David Bitan's portfolio">
+	<span class="dbk-ico" aria-hidden="true">&#8592;</span>
+	<span class="dbk-txt">Portfolio</span>
+	<span class="dbk-grip" aria-hidden="true">&#8250;</span>
+</a>
+<style>
+	.dbk-back {
+		position: fixed;
+		left: 0; top: 50%;
+		z-index: 55;
+		display: none;
+		align-items: center;
+		gap: 8px;
+		padding: 11px 30px 11px 13px;
+		background: #16191E;
+		color: #fff;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		border-left: 0;
+		border-radius: 0 10px 10px 0;
+		font: 600 11px/1 ui-sans-serif, system-ui, -apple-system, sans-serif;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		text-decoration: none;
+		white-space: nowrap;
+		box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+		min-height: 44px;
+		transform: translateY(-50%);
+		transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	/* Tucked, only a 30px strip is reachable — under the 44px minimum for a touch
+	   target. This invisible pad extends the hit area 16px to the right of the
+	   grip so the tap lands reliably without widening anything visible. */
+	.dbk-back.is-tucked::before {
+		content: '';
+		position: absolute;
+		top: 0; bottom: 0; right: -16px;
+		width: 46px;
+	}
+	@media (max-width: 1023px) { .dbk-back { display: flex; } }
+	.dbk-back:hover, .dbk-back:focus-visible { color: #fff; }
+	.dbk-ico, .dbk-txt { transition: opacity 0.25s; }
+	.dbk-grip {
+		position: absolute;
+		right: 9px; top: 50%;
+		transform: translateY(-50%);
+		font-size: 15px;
+		line-height: 1;
+		opacity: 0;
+		transition: opacity 0.25s;
+	}
+	/* Tucked: only the 30px right-hand strip stays on screen — the padding-right
+	   reserves exactly that, so the grip glyph is what remains visible. */
+	.dbk-back.is-tucked { transform: translateY(-50%) translateX(calc(-100% + 30px)); }
+	.dbk-back.is-tucked .dbk-ico,
+	.dbk-back.is-tucked .dbk-txt { opacity: 0; }
+	.dbk-back.is-tucked .dbk-grip { opacity: 1; }
+	@media (prefers-reduced-motion: reduce) {
+		.dbk-back, .dbk-ico, .dbk-txt, .dbk-grip { transition: none; }
+	}
+</style>
+<script>
+	(function () {
+		var el = document.querySelector('[data-dbk]');
+		if (!el) return;
+		var timer;
+		function tuck() { el.classList.add('is-tucked'); }
+		function show() {
+			el.classList.remove('is-tucked');
+			clearTimeout(timer);
+			timer = setTimeout(tuck, 5000);
+		}
+		timer = setTimeout(tuck, 4000);
+		el.addEventListener('click', function (e) {
+			// While tucked the tab is a grip, not a link: the first tap reopens it,
+			// the second one navigates. Without this a stray tap on the grip would
+			// throw the visitor out of the demo.
+			if (el.classList.contains('is-tucked')) { e.preventDefault(); show(); }
+		});
 	})();
 </script>

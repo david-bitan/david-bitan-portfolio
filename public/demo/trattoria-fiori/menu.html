@@ -1872,5 +1872,95 @@ html.reserve-lock { overflow: hidden; }
     </div>
   </div>
 </div>
+
+<!-- ===== Back-to-portfolio tab — demo pages only ==============================
+     A live demo opens outside the portfolio, so on a phone the visitor can end up
+     with no way back: when the demo was opened in a new tab the browser's Back
+     button is greyed out. This tab shows itself for a few seconds so it gets
+     noticed, then slides away and leaves a narrow grip. Tapping the grip brings it
+     back; tapping the open tab navigates. Self-contained — its own colours and a
+     dbk- prefix — so it behaves identically in every demo whatever that demo's
+     palette is. Hidden above 1023px, where browser chrome is always in view.
+     z-index 55 keeps it under every modal and overlay in both demos. -->
+<a class="dbk-back" href="/" data-dbk aria-label="Back to David Bitan's portfolio">
+	<span class="dbk-ico" aria-hidden="true">&#8592;</span>
+	<span class="dbk-txt">Portfolio</span>
+	<span class="dbk-grip" aria-hidden="true">&#8250;</span>
+</a>
+<style>
+	.dbk-back {
+		position: fixed;
+		left: 0; top: 50%;
+		z-index: 55;
+		display: none;
+		align-items: center;
+		gap: 8px;
+		padding: 11px 30px 11px 13px;
+		background: #16191E;
+		color: #fff;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		border-left: 0;
+		border-radius: 0 10px 10px 0;
+		font: 600 11px/1 ui-sans-serif, system-ui, -apple-system, sans-serif;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		text-decoration: none;
+		white-space: nowrap;
+		box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+		min-height: 44px;
+		transform: translateY(-50%);
+		transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	/* Tucked, only a 30px strip is reachable — under the 44px minimum for a touch
+	   target. This invisible pad extends the hit area 16px to the right of the
+	   grip so the tap lands reliably without widening anything visible. */
+	.dbk-back.is-tucked::before {
+		content: '';
+		position: absolute;
+		top: 0; bottom: 0; right: -16px;
+		width: 46px;
+	}
+	@media (max-width: 1023px) { .dbk-back { display: flex; } }
+	.dbk-back:hover, .dbk-back:focus-visible { color: #fff; }
+	.dbk-ico, .dbk-txt { transition: opacity 0.25s; }
+	.dbk-grip {
+		position: absolute;
+		right: 9px; top: 50%;
+		transform: translateY(-50%);
+		font-size: 15px;
+		line-height: 1;
+		opacity: 0;
+		transition: opacity 0.25s;
+	}
+	/* Tucked: only the 30px right-hand strip stays on screen — the padding-right
+	   reserves exactly that, so the grip glyph is what remains visible. */
+	.dbk-back.is-tucked { transform: translateY(-50%) translateX(calc(-100% + 30px)); }
+	.dbk-back.is-tucked .dbk-ico,
+	.dbk-back.is-tucked .dbk-txt { opacity: 0; }
+	.dbk-back.is-tucked .dbk-grip { opacity: 1; }
+	@media (prefers-reduced-motion: reduce) {
+		.dbk-back, .dbk-ico, .dbk-txt, .dbk-grip { transition: none; }
+	}
+</style>
+<script>
+	(function () {
+		var el = document.querySelector('[data-dbk]');
+		if (!el) return;
+		var timer;
+		function tuck() { el.classList.add('is-tucked'); }
+		function show() {
+			el.classList.remove('is-tucked');
+			clearTimeout(timer);
+			timer = setTimeout(tuck, 5000);
+		}
+		timer = setTimeout(tuck, 4000);
+		el.addEventListener('click', function (e) {
+			// While tucked the tab is a grip, not a link: the first tap reopens it,
+			// the second one navigates. Without this a stray tap on the grip would
+			// throw the visitor out of the demo.
+			if (el.classList.contains('is-tucked')) { e.preventDefault(); show(); }
+		});
+	})();
+</script>
 </body>
 </html>
