@@ -308,13 +308,15 @@
 	.mobile-nav.open > a,
 	.mobile-nav.open > span,
 	.mobile-nav.open > .btn { opacity: 1; transform: none; }
-	.mobile-nav.open > :nth-child(2) { transition-delay: 150ms; }
-	.mobile-nav.open > :nth-child(3) { transition-delay: 250ms; }
-	.mobile-nav.open > :nth-child(4) { transition-delay: 350ms; }
-	.mobile-nav.open > :nth-child(5) { transition-delay: 450ms; }
-	.mobile-nav.open > :nth-child(6) { transition-delay: 550ms; }
-	.mobile-nav.open > :nth-child(7) { transition-delay: 650ms; }
-	.mobile-nav.open > :nth-child(8) { transition-delay: 750ms; }
+	/* The close button used to be child 1; it now sits outside the panel,
+	   so the links start at 1 and every delay shifts down one child. */
+	.mobile-nav.open > :nth-child(1) { transition-delay: 150ms; }
+	.mobile-nav.open > :nth-child(2) { transition-delay: 250ms; }
+	.mobile-nav.open > :nth-child(3) { transition-delay: 350ms; }
+	.mobile-nav.open > :nth-child(4) { transition-delay: 450ms; }
+	.mobile-nav.open > :nth-child(5) { transition-delay: 550ms; }
+	.mobile-nav.open > :nth-child(6) { transition-delay: 650ms; }
+	.mobile-nav.open > :nth-child(7) { transition-delay: 750ms; }
 	@media (prefers-reduced-motion: reduce) {
 		.mobile-nav, .mobile-nav a, .mobile-nav > .btn { transition: opacity 120ms ease; transform: none; }
 		.mobile-nav.open a, .mobile-nav.open > .btn { transition-delay: 0s; }
@@ -334,20 +336,30 @@
 	.mobile-nav a.btn-primary,
 	.mobile-nav a.btn-primary:hover { color: #fff; }
 	.mobile-nav-close {
-		/* top/right here are only a pre-JS fallback: syncClosePosition copies the
-		   burger's measured box on every open. Hard-coded offsets drifted the
-		   moment the header padding changed. */
-		position: absolute;
+		/* Sibling of the panel, not a child of it, and fixed rather than
+		   absolute. The panel fades in over 420ms, and opacity applies to an
+		   element's whole subtree — a child can never be more opaque than its
+		   parent, so an X inside the panel had no way to appear instantly. Out
+		   here the panel's transition does not touch it: it swaps with the
+		   burger in a single frame, which is what a menu toggle should do.
+		   Nothing above it carries a transform, so `fixed` resolves against the
+		   viewport — the same coordinate space getBoundingClientRect reports,
+		   which is what syncClosePosition copies.
+		   top/right are a pre-JS fallback only. */
+		position: fixed;
 		top: 20px; right: 20px;
+		z-index: 90;
 		width: 44px; height: 44px;
 		border-radius: 10px;
 		border: 1px solid var(--line-strong);
+		background: var(--ink);
 		/* The global `svg { display: block }` turns the icon into a block box,
 		   which parks it top-left and leaves baseline space underneath. */
-		display: flex;
+		display: none;
 		align-items: center;
 		justify-content: center;
 	}
+	.mobile-nav-close.is-visible { display: flex; }
 
 	/* ============================================================
 	   PAGE HERO (compact — not fullscreen like home)
@@ -2067,12 +2079,12 @@
 	</div>
 </header>
 
-<div class="mobile-nav" id="mobile-nav" aria-hidden="true">
 	<button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">
 		<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
 			<path d="M6 6l12 12M18 6L6 18" />
 		</svg>
 	</button>
+<div class="mobile-nav" id="mobile-nav" aria-hidden="true">
 	<a href="/demo/apex-athletic-club/index.html" data-nav-m="home">Home</a>
 	<span class="active" data-nav-m="shop">Shop</span>
 	<a href="/demo/apex-athletic-club/index.html#membership" data-nav-m="membership">Membership</a>
@@ -2735,6 +2747,7 @@
 			syncClosePosition();
 			mobileNav.classList.add("open");
 			mobileToggle?.setAttribute("aria-expanded", "true");
+			mobileClose?.classList.add("is-visible");
 			mobileNav.setAttribute("aria-hidden", "false");
 			document.body.style.overflow = "hidden";
 			lockScrollGutter(true);
@@ -2742,6 +2755,7 @@
 		function closeMobile() {
 			mobileNav.classList.remove("open");
 			mobileToggle?.setAttribute("aria-expanded", "false");
+			mobileClose?.classList.remove("is-visible");
 			mobileNav.setAttribute("aria-hidden", "true");
 			document.body.style.overflow = "";
 			lockScrollGutter(false);
@@ -4086,7 +4100,7 @@ function qrEncode(text, eccLevel) {
 		<span class="dbk-ico" aria-hidden="true">&#8592;</span><span class="dbk-txt">Portfolio</span>
 	</a>
 	<button class="dbk-tab" type="button" aria-label="Show the link back to the portfolio">
-		<span class="dbk-vert">Portfolio</span>
+		<span class="dbk-arrow" aria-hidden="true">&#8592;</span>
 	</button>
 </div>
 <style>
@@ -4124,30 +4138,31 @@ function qrEncode(text, eccLevel) {
 		text-decoration: none;
 		white-space: nowrap;
 	}
+	/* Tucked, the tab is an arrow and nothing else. It used to carry the word
+	   "Portfolio" set vertically over 92px, which is a lot of edge for something
+	   whose only job is to say "there is something here". The word belongs to
+	   the opened state, where it can be read horizontally at a normal size. */
 	.dbk-tab {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 32px;
-		height: 92px;
+		width: 30px;
+		height: 44px;
 		padding: 0;
 	}
-	/* 32px is under the 44px minimum for a touch target; this invisible pad
+	/* 30px is under the 44px minimum for a touch target; this invisible pad
 	   widens the hit area to the right without widening anything visible. */
 	.dbk-tab::after {
 		content: '';
 		position: absolute;
-		top: 0; bottom: 0; right: -14px;
+		top: 0; bottom: 0; right: -16px;
 		width: 46px;
 	}
-	.dbk-vert {
-		writing-mode: vertical-rl;
-		/* Rotated so the word reads bottom-to-top, the usual direction for a tab
-		   on the left edge. */
-		transform: rotate(180deg);
-		font: 700 8px/1 ui-sans-serif, system-ui, -apple-system, sans-serif;
-		letter-spacing: 0.2em;
-		text-transform: uppercase;
+	.dbk-arrow {
+		font: 400 15px/1 ui-sans-serif, system-ui, -apple-system, sans-serif;
+		/* Optical centring: the glyph's ink sits right of its advance width, so
+		   a mathematically centred arrow reads as pushed toward the edge. */
+		transform: translateX(1px);
 	}
 
 	.dbk[data-state="open"] .dbk-full { transform: none; opacity: 1; }

@@ -310,12 +310,14 @@ a { color: inherit; text-decoration: none; }
   transition: opacity 440ms ease, transform 560ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 .mobile-nav.open > a { opacity: 1; transform: none; }
-.mobile-nav.open > :nth-child(2) { transition-delay: 150ms; }
-.mobile-nav.open > :nth-child(3) { transition-delay: 250ms; }
-.mobile-nav.open > :nth-child(4) { transition-delay: 350ms; }
-.mobile-nav.open > :nth-child(5) { transition-delay: 450ms; }
-.mobile-nav.open > :nth-child(6) { transition-delay: 550ms; }
-.mobile-nav.open > :nth-child(7) { transition-delay: 650ms; }
+/* The close button used to be child 1; it now sits outside the panel, so
+   the links start at 1 and every delay shifts down one child. */
+.mobile-nav.open > :nth-child(1) { transition-delay: 150ms; }
+.mobile-nav.open > :nth-child(2) { transition-delay: 250ms; }
+.mobile-nav.open > :nth-child(3) { transition-delay: 350ms; }
+.mobile-nav.open > :nth-child(4) { transition-delay: 450ms; }
+.mobile-nav.open > :nth-child(5) { transition-delay: 550ms; }
+.mobile-nav.open > :nth-child(6) { transition-delay: 650ms; }
 @media (prefers-reduced-motion: reduce) {
   .mobile-nav { transition: opacity 160ms ease; transform: none; }
   .mobile-nav > a { transition: opacity 140ms ease; transform: none; }
@@ -349,17 +351,22 @@ a { color: inherit; text-decoration: none; }
 .mobile-nav .mobile-nav-cta:hover { background: var(--or); color: var(--noir); }
 
 .mobile-nav-close {
-  /* absolute, not fixed: the panel carries a transform while it animates, and a
-     transformed ancestor becomes the containing block for fixed descendants —
-     the button would ride in with the panel and then snap to the viewport the
-     moment the transform resolved. The panel is inset-0, so its local
-     coordinates and the viewport's are the same thing. */
-  position: absolute;
+  /* Sibling of the panel, not a child of it. The panel fades in over 420ms, and
+     opacity applies to an element's whole subtree — a child can never be more
+     opaque than its parent, so an X inside the panel could not appear instantly
+     however it was styled. Out here nothing in the panel's transition reaches
+     it: it swaps with the burger in a single frame.
+     `fixed` is safe now precisely because it is outside: no ancestor carries a
+     transform, so it resolves against the viewport — the coordinate space
+     getBoundingClientRect reports, which is what syncClose copies.
+     top/right are a pre-JS fallback only. */
+  position: fixed;
   top: 20px;
   right: 20px;
+  z-index: 130;
   width: 44px;
   height: 44px;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 0;
@@ -368,6 +375,7 @@ a { color: inherit; text-decoration: none; }
   cursor: pointer;
   color: var(--ivoire);
 }
+.mobile-nav-close.is-visible { display: flex; }
 html.nav-lock { overflow: hidden; }
 
 /* ---------- HERO ---------- */
@@ -1367,12 +1375,12 @@ html.reserve-lock { overflow: hidden; }
   </div>
 </nav>
 
-<div class="mobile-nav" id="mobile-nav" aria-hidden="true">
   <button class="mobile-nav-close" id="mobile-nav-close" type="button" aria-label="Close menu">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
         <path d="M4 4l16 16M20 4L4 20" />
       </svg>
   </button>
+<div class="mobile-nav" id="mobile-nav" aria-hidden="true">
     <a href="#story">Our story</a>
     <a href="menu.html">Menu</a>
     <a href="#wine">Cellar</a>
@@ -2091,7 +2099,7 @@ html.reserve-lock { overflow: hidden; }
 		<span class="dbk-ico" aria-hidden="true">&#8592;</span><span class="dbk-txt">Portfolio</span>
 	</a>
 	<button class="dbk-tab" type="button" aria-label="Show the link back to the portfolio">
-		<span class="dbk-vert">Portfolio</span>
+		<span class="dbk-arrow" aria-hidden="true">&#8592;</span>
 	</button>
 </div>
 <style>
@@ -2129,30 +2137,31 @@ html.reserve-lock { overflow: hidden; }
 		text-decoration: none;
 		white-space: nowrap;
 	}
+	/* Tucked, the tab is an arrow and nothing else. It used to carry the word
+	   "Portfolio" set vertically over 92px, which is a lot of edge for something
+	   whose only job is to say "there is something here". The word belongs to
+	   the opened state, where it can be read horizontally at a normal size. */
 	.dbk-tab {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 32px;
-		height: 92px;
+		width: 30px;
+		height: 44px;
 		padding: 0;
 	}
-	/* 32px is under the 44px minimum for a touch target; this invisible pad
+	/* 30px is under the 44px minimum for a touch target; this invisible pad
 	   widens the hit area to the right without widening anything visible. */
 	.dbk-tab::after {
 		content: '';
 		position: absolute;
-		top: 0; bottom: 0; right: -14px;
+		top: 0; bottom: 0; right: -16px;
 		width: 46px;
 	}
-	.dbk-vert {
-		writing-mode: vertical-rl;
-		/* Rotated so the word reads bottom-to-top, the usual direction for a tab
-		   on the left edge. */
-		transform: rotate(180deg);
-		font: 700 8px/1 ui-sans-serif, system-ui, -apple-system, sans-serif;
-		letter-spacing: 0.2em;
-		text-transform: uppercase;
+	.dbk-arrow {
+		font: 400 15px/1 ui-sans-serif, system-ui, -apple-system, sans-serif;
+		/* Optical centring: the glyph's ink sits right of its advance width, so
+		   a mathematically centred arrow reads as pushed toward the edge. */
+		transform: translateX(1px);
 	}
 
 	.dbk[data-state="open"] .dbk-full { transform: none; opacity: 1; }
@@ -2220,12 +2229,16 @@ html.reserve-lock { overflow: hidden; }
     function open() {
       syncClose();
       panel.classList.add('open');
+      // Shown and hidden outright, never faded: the X is a control, not part of
+      // the panel's content, and it has to be usable on the first frame.
+      closeBtn.classList.add('is-visible');
       panel.setAttribute('aria-hidden', 'false');
       toggle.setAttribute('aria-expanded', 'true');
       document.documentElement.classList.add('nav-lock');
     }
     function close() {
       panel.classList.remove('open');
+      closeBtn.classList.remove('is-visible');
       panel.setAttribute('aria-hidden', 'true');
       toggle.setAttribute('aria-expanded', 'false');
       document.documentElement.classList.remove('nav-lock');
