@@ -2877,7 +2877,7 @@
 		<span class="dbk-ico" aria-hidden="true">&#8592;</span><span class="dbk-txt">Portfolio</span>
 	</a>
 	<button class="dbk-tab" type="button" aria-label="Show the link back to the portfolio">
-		<span class="dbk-arrow" aria-hidden="true">&#8592;</span>
+		<svg class="dbk-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
 	</button>
 </div>
 <style>
@@ -2935,11 +2935,21 @@
 		top: 0; bottom: 0; right: -16px;
 		width: 46px;
 	}
-	.dbk-arrow {
-		font: 400 15px/1 ui-sans-serif, system-ui, -apple-system, sans-serif;
-		/* Optical centring: the glyph's ink sits right of its advance width, so
-		   a mathematically centred arrow reads as pushed toward the edge. */
-		transform: translateX(1px);
+	/* A drawn chevron, not a text glyph. A glyph carries its own side bearings
+	   and sits wherever the font puts it inside its advance width, so it never
+	   lands centred in a 30px tab whatever the flex box says. An SVG's ink is
+	   the box, so flex centring is exact.
+	   It points RIGHT while tucked — the direction the tab travels when opened.
+	   The left arrow belongs to the opened state, next to the word, where it
+	   means "back to the portfolio" rather than "unfold me". */
+	.dbk-chev {
+		display: block;
+		/* The tab has a right border and no left one, so its content box runs
+		   0..29 while the visible tab runs 0..30 — flex centring lands the
+		   chevron half a pixel left of where the eye expects it. A 1px left
+		   margin pushes the centring maths back onto the visible centre:
+		   measured 7px of air on each side instead of 6 and 8. */
+		margin-left: 1px;
 	}
 
 	.dbk[data-state="open"] .dbk-full { transform: none; opacity: 1; }
