@@ -273,10 +273,19 @@
 	}
 	.nav-toggle {
 		display: none;
-		width: 40px; height: 40px;
+		/* 44px, matching the close button exactly. At 40 against the X's 44 the
+		   two never sat on the same footprint however the offsets were tuned. */
+		width: 44px; height: 44px;
 		border: 1px solid var(--line-strong);
 		border-radius: 10px;
 	}
+	/* The panel fades in over 420ms. While it is translucent the burger
+	   underneath shows through, and the X sits almost on top of it: the three
+	   bars plus the cross composite into a small arrow-like mark for one or two
+	   frames. That is the "ghost arrow". Hiding the burger the instant the menu
+	   opens removes the thing being composited. visibility, not display, so the
+	   header keeps its layout and nothing reflows. */
+	.nav-toggle[aria-expanded="true"] { visibility: hidden; }
 	.nav-toggle svg { margin: 0 auto; }
 
 	/* Mobile nav overlay */
@@ -344,10 +353,13 @@
 	.mobile-nav a.btn-primary,
 	.mobile-nav a.btn-primary:hover { color: #fff; }
 	.mobile-nav-close {
+		/* top/right here are only a pre-JS fallback: syncClosePosition copies the
+		   burger's measured box on every open. Hard-coded offsets drifted the
+		   moment the header padding changed. */
 		position: absolute;
 		top: 20px; right: 20px;
 		width: 44px; height: 44px;
-		border-radius: 12px;
+		border-radius: 10px;
 		border: 1px solid var(--line-strong);
 		/* The global `svg { display: block }` turns the icon into a block box,
 		   which parks it top-left and leaves baseline space underneath. */
@@ -1997,8 +2009,8 @@
 			</div>
 
 			<button class="nav-toggle" id="nav-toggle" aria-label="Open menu">
-				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-					<path d="M3 7h18M3 12h18M3 17h18" />
+				<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+					<path d="M3 6h18M3 12h18M3 18h18" />
 				</svg>
 			</button>
 		</div>
@@ -2917,14 +2929,37 @@
 		const mobileToggle = document.getElementById("nav-toggle");
 		const mobileNav = document.getElementById("mobile-nav");
 		const mobileClose = document.getElementById("mobile-nav-close");
+
+		// The X has to land on the burger's footprint, not near it. Measure the
+		// burger and copy its box: absolute inside a `fixed inset-0` panel means
+		// panel coordinates and viewport coordinates are the same thing. Absolute
+		// and not fixed, because the panel carries a transform while it animates
+		// and a transformed ancestor becomes the containing block for fixed
+		// descendants.
+		function syncClosePosition() {
+			if (!mobileToggle || !mobileClose) return;
+			const r = mobileToggle.getBoundingClientRect();
+			if (!r.width) return;
+			mobileClose.style.top = r.top + "px";
+			mobileClose.style.left = r.left + "px";
+			mobileClose.style.right = "auto";
+			mobileClose.style.width = r.width + "px";
+			mobileClose.style.height = r.height + "px";
+		}
+		window.addEventListener("resize", () => {
+			if (mobileNav?.classList.contains("open")) syncClosePosition();
+		});
 		function openMobile() {
+			syncClosePosition();
 			mobileNav.classList.add("open");
+			mobileToggle?.setAttribute("aria-expanded", "true");
 			mobileNav.setAttribute("aria-hidden", "false");
 			document.body.style.overflow = "hidden";
 			lockScrollGutter(true);
 		}
 		function closeMobile() {
 			mobileNav.classList.remove("open");
+			mobileToggle?.setAttribute("aria-expanded", "false");
 			mobileNav.setAttribute("aria-hidden", "true");
 			document.body.style.overflow = "";
 			lockScrollGutter(false);

@@ -395,13 +395,13 @@ The solution: a system of abstract illustrations — colored geometric shapes, t
 			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---example-of-lines-per-section---desktop.png',
 			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---example-of-lines-per-section---desktop-2.png',
 			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---mobile.png',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---mobile-2.png',
+			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---mobile-2-v2.webp',
 			// 02 — About us
 			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/02---about-us/ryze-website---about-us---desktop.png',
 			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/02---about-us/ryze-website---about-us---mobile.png',
 			// 03 — What we do
 			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/03---what-we-do/ryze-website---what-we-do---desktop.png',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/03---what-we-do/ryze-website---what-we-do---mobile.png',
+			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/03---what-we-do/ryze-website---what-we-do---mobile-v2.png',
 			// 04 — Careers
 			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/04---careers/carreer-desktop.png',
 			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/04---careers/carreer-mobile.png',

@@ -397,7 +397,7 @@ const projectJsonLd: Record<string, unknown> = {
 								<div class="space-y-10" data-desktop-stack>
 									{zone.images.map(({ url }, imgIdx) => (
 										<div
-											class="w-full img-skeleton"
+											class="w-full max-w-full img-skeleton"
 											data-desktop-item
 										>
 											<img
@@ -414,16 +414,23 @@ const projectJsonLd: Record<string, unknown> = {
 										</div>
 									))}
 								</div>
-								{/* Narrow items land here at native width. Auto-fit means
-								    the grid packs as many columns as fit (min col = 380px)
-								    and centers whatever it can't fill — so a single 800px
-								    item sits centered at 800, and four 400px items pack
-								    2-3 per row. Inline style expresses what Tailwind's
-								    arbitrary-value scanner can't (repeat + minmax with
-								    max-content). */}
+								{/* Narrow items land here. The track max used to be `max-content`,
+								    which is the image's own natural width — so a 600px-wide email
+								    template made a 600px column no matter how little room there
+								    was. Two of them on a 900px tablet asked for 1232px and the
+								    row simply overflowed; on a phone one column alone was 600
+								    against a ~350 viewport. `1fr` shares the row instead: the
+								    track never exceeds what is available, so the image fills the
+								    width it is given and stops at its natural size (the inline
+								    max-width the probe sets) rather than forcing the layout
+								    wider. The track minimum is 560 rather than 380: at 380 a
+								    tablet fitted two columns of 339px and shrank a 600px email
+								    template to half its size for no reason. At 560 the tablet
+								    gets one full-width row (the item centres at its native 600)
+								    and the 1200px desktop still fits two. */}
 								<div
 									class="mt-10 grid items-start justify-center gap-8"
-									style="grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), max-content));"
+									style="grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr));"
 									data-desktop-narrow-grid
 								></div>
 							</div>
@@ -702,7 +709,20 @@ const projectJsonLd: Record<string, unknown> = {
 						// `style.order = idx` — items are appended in
 						// probe-resolution order (async race), but CSS order
 						// forces them back into the original DOM order.
-						item.style.maxWidth = trueW + 'px';
+						// min() with 100%: the cap is the source width, but never
+						// wider than the track it sits in. Without the 100% term a
+						// 600px email template overflowed a phone-width column.
+						// width:100% is set explicitly, not left to the `w-full`
+						// class. Inside an auto-fit track the item was resolving to
+						// the served image's intrinsic width (309px in one viewport,
+						// 361px in another) instead of filling the track — a 600px
+						// email template rendered at half size and moved when the
+						// window did. With width:100% it fills the track and the
+						// max-width below stops it at the source's own size, so it is
+						// never upscaled and never squeezed.
+						item.style.width = '100%';
+						item.style.maxWidth = 'min(100%, ' + trueW + 'px)';
+						item.style.marginInline = 'auto';
 						item.style.order = String(idx);
 						narrowGrid.appendChild(item);
 					};

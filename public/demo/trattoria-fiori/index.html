@@ -271,6 +271,12 @@ a { color: inherit; text-decoration: none; }
   background: currentColor;
 }
 .nav.is-scrolled .nav-toggle { color: var(--ivoire); }
+/* The panel fades in over 420ms. While it is translucent the burger underneath
+   shows through and the X sits on the same footprint: the three bars plus the
+   cross composite into a small arrow-like mark for a frame or two — the "ghost
+   arrow". Hiding the burger the instant the menu opens removes the thing being
+   composited. visibility, not display: the nav keeps its layout. */
+.nav-toggle[aria-expanded="true"] { visibility: hidden; }
 
 .mobile-nav {
   position: fixed;

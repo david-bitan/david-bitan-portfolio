@@ -97,10 +97,15 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 				<div class="zone-filters-scroll flex h-full items-center gap-2 overflow-x-auto pl-6 pr-6 sm:gap-3 lg:pl-0 lg:pr-0">
 					{deviceOptions.length > 1 && (
 						<>
-							<span class="shrink-0 text-[11px] font-semibold uppercase tracking-widest text-muted">Device</span>
+							{/* The "Device" / "Theme" captions were dropped: on a phone they ate a
+								third of the single scrolling row, and the pills say what they filter
+								("Desktop", "Mobile", "Light", "Dark") well enough on their own. The
+								label survives for screen readers on each button's aria-label, since
+								without it "Dark" alone is ambiguous out of context. */}
 							{deviceOptions.map((f, i) => (
 								<button
 									type="button"
+									aria-label={`Filter by device: ${f.label}`}
 									data-filter-group="device"
 									data-filter-key={f.key}
 									data-active={i === 0 ? 'true' : 'false'}
@@ -118,10 +123,10 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 
 					{themeOptions.length > 1 && (
 						<>
-							<span class="shrink-0 text-[11px] font-semibold uppercase tracking-widest text-muted">Theme</span>
 							{themeOptions.map((f, i) => (
 								<button
 									type="button"
+									aria-label={`Filter by theme: ${f.label}`}
 									data-filter-group="theme"
 									data-filter-key={f.key}
 									data-active={i === 0 ? 'true' : 'false'}
