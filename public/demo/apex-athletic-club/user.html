@@ -2874,7 +2874,7 @@
      always in view. z-index 55 keeps it under every modal and overlay. -->
 <div class="dbk" data-dbk data-state="tucked">
 	<a class="dbk-full" href="/" aria-label="Back to David Bitan's portfolio">
-		<span class="dbk-ico" aria-hidden="true">&#8592;</span><span class="dbk-txt">Portfolio</span>
+		<svg class="dbk-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg><span class="dbk-txt">Portfolio</span>
 	</a>
 	<button class="dbk-tab" type="button" aria-label="Show the link back to the portfolio">
 		<svg class="dbk-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
@@ -2915,6 +2915,19 @@
 		text-decoration: none;
 		white-space: nowrap;
 	}
+	/* Drawn, not the U+2190 glyph. The glyph sat on the text baseline and read
+	   as sunk below the word: `align-items: center` lines up the flex items'
+	   BOXES, and a text box is tall enough to hold descenders the uppercase
+	   label never uses, so its optical centre is above the box centre. An SVG
+	   has no such padding — its ink is its box — and the margin below nudges it
+	   onto the cap-height centre of the word beside it.
+	   Value measured from a render, not guessed: see the ink-extent probe. */
+	.dbk-ico {
+		display: block;
+		flex-shrink: 0;
+		margin-bottom: 1px;
+	}
+
 	/* Tucked, the tab is an arrow and nothing else. It used to carry the word
 	   "Portfolio" set vertically over 92px, which is a lot of edge for something
 	   whose only job is to say "there is something here". The word belongs to
