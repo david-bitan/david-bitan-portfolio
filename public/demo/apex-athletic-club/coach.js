@@ -34,7 +34,7 @@
 	const css = `
 	.cx-launch{position:fixed;right:24px;bottom:24px;z-index:900;display:flex;align-items:center;gap:10px;padding:14px 20px 14px 16px;border-radius:999px;border:1px solid rgba(245,245,247,.22);background:#14141C;color:#F5F5F7;font:600 13px/1 "Space Grotesk",Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.45);transition:border-color .2s,transform .2s}
 	.cx-launch:hover{border-color:#FF2E7E;transform:translateY(-2px)}
-	.cx-launch:focus-visible,.cx-panel button:focus-visible,.cx-panel textarea:focus-visible,.cx-panel a:focus-visible{outline:2px solid #00E5A0;outline-offset:2px}
+	.cx-launch:focus-visible,.cx-panel button:focus-visible,.cx-panel a:focus-visible{outline:2px solid #00E5A0;outline-offset:2px}
 	.cx-spark{width:22px;height:22px;border-radius:50%;background:conic-gradient(from 0deg,#FF2E7E,#00E5A0,#FF2E7E);display:grid;place-items:center}
 	.cx-spark::after{content:"";width:10px;height:10px;border-radius:50%;background:#14141C}
 	.cx-launch[aria-expanded="true"]{opacity:0;pointer-events:none}
@@ -108,7 +108,7 @@
 	.cx-note{margin-top:10px;display:flex;gap:8px;padding:9px 11px;border-radius:10px;font-size:12.5px;background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.3);color:#FFD27A}
 	.cx-note.safe{background:rgba(0,229,160,.07);border-color:rgba(0,229,160,.3);color:#9FF5D6}
 	.cx-note.err{background:rgba(255,46,126,.08);border-color:rgba(255,46,126,.35);color:#FF9DC0}
-	.cx-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+	.cx-chips{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:10px}
 	.cx-chip{border:1px solid rgba(245,245,247,.22);background:transparent;color:#F5F5F7;border-radius:999px;padding:7px 12px;font:500 12.5px/1.2 Inter,sans-serif;cursor:pointer;text-align:left}
 	.cx-chip:hover{border-color:#FF2E7E}
 	.cx-chip.primary{background:#FF2E7E;border-color:#FF2E7E;color:#fff}
