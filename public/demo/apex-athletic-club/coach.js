@@ -85,6 +85,9 @@
 	.cx-seg input:checked+span{background:#F5F5F7;color:#0A0A0F;border-color:#F5F5F7;font-weight:600}
 	.cx-seg input:focus-visible+span{outline:2px solid #00E5A0;outline-offset:2px}
 	.cx-num{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(245,245,247,.6)}
+	.cx-txt{display:flex;margin-top:8px}
+	.cx-mf{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12.5px;color:rgba(245,245,247,.7)}
+	.cx-mf input{width:96px;background:#0A0A0F;border:1px solid rgba(245,245,247,.22);border-radius:10px;color:#F5F5F7;padding:7px 10px;font:500 14px/1 "JetBrains Mono",monospace}.cx-txt input{flex:1;width:auto!important;font:400 13px/1.3 Inter,sans-serif!important}
 	.cx-num input{width:96px;background:#0A0A0F;border:1px solid rgba(245,245,247,.22);border-radius:10px;color:#F5F5F7;padding:7px 10px;font:500 14px/1 "JetBrains Mono",monospace}
 	.cx-build{align-self:flex-start}
 	.cx-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
@@ -215,29 +218,60 @@
 	};
 
 	/* ---------- weekly meal plan ---------- */
-	// [name, kcal, protein g, vegetarian]
+	// [name, kcal, protein g, tags] — tags: meat, red (red meat), pork, fish, shell, dairy, egg, gluten, nuts, soy
 	const MEALS = {
 		Breakfast: [
-			["Greek yogurt, oats & berries", 420, 32, 1], ["Egg-white omelette, spinach, sourdough", 380, 30, 1],
-			["Overnight oats, whey & banana", 450, 35, 1], ["Avocado toast, 2 poached eggs", 460, 22, 1],
-			["Protein pancakes, berries", 430, 34, 1]
+			["Greek yogurt, oats & berries", 420, 32, "dairy gluten"], ["Egg-white omelette, spinach, sourdough", 380, 30, "egg gluten"],
+			["Overnight oats, whey & banana", 450, 35, "dairy gluten"], ["Avocado toast, 2 poached eggs", 460, 22, "egg gluten"],
+			["Protein pancakes, berries", 430, 34, "egg dairy gluten"], ["Tofu scramble, peppers, rye toast", 410, 26, "soy gluten"],
+			["Chia pudding, soy milk, mango & pumpkin seeds", 400, 18, "soy"], ["Smoked salmon & cream cheese bagel", 480, 30, "fish dairy gluten"],
+			["Buckwheat porridge, almond butter & banana", 430, 14, "nuts"], ["Berry smoothie bowl, hemp seeds & buckwheat", 400, 16, ""]
 		],
 		Lunch: [
-			["Grilled chicken, quinoa, roast vegetables", 620, 48, 0], ["Salmon poke bowl, brown rice, edamame", 650, 40, 0],
-			["Turkey & hummus wrap, side salad", 560, 38, 0], ["Lentil & feta salad, wholegrain bread", 580, 28, 1],
-			["Chickpea curry, basmati rice", 600, 22, 1], ["Tofu stir-fry, soba noodles", 590, 30, 1]
+			["Grilled chicken, quinoa, roast vegetables", 620, 48, "meat"], ["Salmon poke bowl, brown rice, edamame", 650, 40, "fish soy"],
+			["Turkey & hummus wrap, side salad", 560, 38, "meat gluten"], ["Lentil & feta salad, wholegrain bread", 580, 28, "dairy gluten"],
+			["Chickpea curry, basmati rice", 600, 22, ""], ["Tofu stir-fry, soba noodles", 590, 30, "soy gluten"],
+			["Tuna niçoise salad, potatoes, egg", 560, 42, "fish egg"], ["Black bean & quinoa bowl, avocado, salsa", 610, 24, ""],
+			["Shrimp & avocado rice bowl", 590, 36, "shell"], ["Beef kofta, bulgur tabbouleh", 640, 42, "meat red gluten"]
 		],
 		Dinner: [
-			["Lean beef, sweet potato, green beans", 650, 45, 0], ["Baked cod, couscous, ratatouille", 560, 42, 0],
-			["Chicken fajitas, peppers, guacamole", 640, 44, 0], ["Shrimp pasta, tomato & basil", 610, 36, 0],
-			["Black bean burrito bowl", 620, 26, 1], ["Halloumi & roast veg traybake, bulgur", 640, 28, 1],
-			["Mushroom & spinach risotto, parmesan", 600, 22, 1]
+			["Lean beef, sweet potato, green beans", 650, 45, "meat red"], ["Baked cod, couscous, ratatouille", 560, 42, "fish gluten"],
+			["Chicken fajitas, peppers, guacamole", 640, 44, "meat gluten"], ["Shrimp pasta, tomato & basil", 610, 36, "shell gluten"],
+			["Black bean burrito bowl", 620, 26, ""], ["Halloumi & roast veg traybake, bulgur", 640, 28, "dairy gluten"],
+			["Mushroom & spinach risotto, parmesan", 600, 22, "dairy"], ["Pork tenderloin, apple & roast potatoes", 620, 46, "meat pork"],
+			["Tempeh & peanut noodle stir-fry", 630, 34, "soy nuts gluten"], ["Red lentil dhal, brown rice & spinach", 590, 26, ""],
+			["Turkey meatballs, tomato sauce, rice", 620, 44, "meat"], ["Grilled salmon, new potatoes, asparagus", 610, 44, "fish"]
 		],
 		Snack: [
-			["Cottage cheese & pineapple", 220, 24, 1], ["Protein shake & apple", 260, 26, 1],
-			["Rice cakes, peanut butter", 240, 9, 1], ["Hummus & veggie sticks", 200, 8, 1], ["Boiled eggs & almonds", 250, 16, 1]
+			["Cottage cheese & pineapple", 220, 24, "dairy"], ["Whey shake & apple", 260, 26, "dairy"],
+			["Rice cakes, peanut butter", 240, 9, "nuts"], ["Hummus & veggie sticks", 200, 8, ""],
+			["Boiled eggs & almonds", 250, 16, "egg nuts"], ["Soy yogurt, granola & berries", 230, 12, "soy gluten"],
+			["Edamame with sea salt", 190, 17, "soy"], ["Roasted chickpeas & fruit", 210, 9, ""], ["Beef jerky & an orange", 200, 22, "meat red"]
 		]
 	};
+	const DIETS = {
+		any: { label: "Everything", no: [] },
+		halal: { label: "Halal", no: ["pork"], note: "Use halal-certified meat." },
+		kosher: { label: "Kosher", no: ["pork", "shell"], note: "Use kosher-certified meat and fish; no meat and dairy in the same meal." },
+		pesca: { label: "Pescatarian", no: ["meat"] },
+		veg: { label: "Vegetarian", no: ["meat", "fish", "shell"] },
+		vegan: { label: "Vegan", no: ["meat", "fish", "shell", "dairy", "egg"] }
+	};
+	const ALLERGENS = [["dairy", "Dairy / lactose"], ["gluten", "Gluten"], ["egg", "Eggs"], ["nuts", "Nuts & peanuts"], ["soy", "Soy"], ["fish", "Fish"], ["shell", "Shellfish"], ["red", "Red meat"]];
+	// French words people type → English words in dish names (or a tag)
+	const FR = { champignon: "mushroom", saumon: "salmon", thon: "tuna", crevette: "shrimp", poulet: "chicken", "bœuf": "beef", boeuf: "beef", porc: "pork", dinde: "turkey", cabillaud: "cod",
+		"œuf": "egg", oeuf: "egg", fromage: "cheese", lentille: "lentil", "pois chiche": "chickpea", avocat: "avocado", banane: "banana", "épinard": "spinach", epinard: "spinach", tofu: "tofu", "riz": "rice", "pâtes": "pasta", pates: "pasta", ananas: "pineapple", haricot: "bean", mangue: "mango" };
+	function dislikeWords(txt0) {
+		return (txt0 || "").toLowerCase().split(/[,;\n]+/).map((w) => w.trim()).filter(Boolean)
+			.map((w) => FR[w] || FR[w.replace(/s$/, "")] || w.replace(/s$/, "")).filter((w) => w.length > 2);
+	}
+	function allowed(m, diet, ex, dis) {
+		const tags = m[3].split(" ");
+		const banned = (DIETS[diet] || DIETS.any).no.concat(ex);
+		if (tags.some((t) => banned.includes(t))) return false;
+		const name = m[0].toLowerCase();
+		return !dis.some((w) => name.includes(w));
+	}
 	const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 	const fmt = (n) => n.toLocaleString("en-US");
 
@@ -284,7 +318,14 @@
 		if (m) p.meals = /4|four|quatre/i.test(m[1]) ? 4 : 3;
 		if (/lose|fat|cut|slim|maigrir|perdre|sèche/i.test(q)) p.goal = "lose";
 		else if (/muscle|bulk|gain|mass|masse|prise/i.test(q)) p.goal = "build";
-		if (/vegetarian|veggie|végé|vege/i.test(q)) p.diet = "veg";
+		if (/vegan|végétalien|vegetalien/i.test(q)) p.diet = "vegan";
+		else if (/vegetarian|veggie|végétarien|vegetarien|végé/i.test(q)) p.diet = "veg";
+		else if (/halal/i.test(q)) p.diet = "halal";
+		else if (/kosher|casher|cacher|kasher/i.test(q)) p.diet = "kosher";
+		else if (/pescatarian|pescétarien|pescetarien/i.test(q)) p.diet = "pesca";
+		if (/lactose|dairy|laitier/i.test(q)) (p.ex = p.ex || []).push("dairy");
+		if (/gluten/i.test(q)) (p.ex = p.ex || []).push("gluten");
+		if (/nut|noix|arachide|cacahu/i.test(q)) (p.ex = p.ex || []).push("nuts");
 		return p;
 	}
 
@@ -292,6 +333,8 @@
 		const c = calc();
 		const goal = p.goal || (c && /lose|cut|deficit/i.test(c.goal) ? "lose" : c && /gain|bulk|build/i.test(c.goal) ? "build" : "maintain");
 		const maint = maintenance() || 2400;
+		let last = {};
+		try { last = JSON.parse(localStorage.getItem("apex_food_prefs")) || {}; } catch (_) {}
 		const seg = (name, opts, val) => `<div class="cx-seg" role="radiogroup" aria-label="${name}">` + opts.map(([v, l]) =>
 			`<label><input type="radio" name="${name}" value="${v}"${String(v) === String(val) ? " checked" : ""}><span>${l}</span></label>`).join("") + "</div>";
 		return `<form class="cx-setup">
@@ -299,11 +342,21 @@
 			<div class="cx-f"><span>Length</span>${seg("weeks", [[1, "1 week"], [2, "2 weeks"], [3, "3 weeks"], [4, "1 month"]], p.weeks || 4)}</div>
 			<div class="cx-f"><span>Training days / week</span>${seg("days", [[2, "2"], [3, "3"], [4, "4"], [5, "5"]], p.days || 3)}</div>
 			<div class="cx-f"><span>Meals / day</span>${seg("meals", [[3, "3"], [4, "4"]], p.meals || 4)}</div>
-			<div class="cx-f"><span>Diet</span>${seg("diet", [["any", "Everything"], ["veg", "Vegetarian"]], p.diet || "any")}</div>
+			<div class="cx-f"><span>Diet</span>${seg("diet", Object.entries(DIETS).map(([k, d]) => [k, d.label]), p.diet || last.diet || "any")}</div>
+			<div class="cx-f"><span>Allergies & foods to avoid</span><div class="cx-seg">${ALLERGENS.map(([k, l]) =>
+				`<label><input type="checkbox" name="ex" value="${k}"${(p.ex || last.ex || []).includes(k) ? " checked" : ""}><span>${l}</span></label>`).join("")}</div>
+			<label class="cx-num cx-txt"><input type="text" name="avoid" maxlength="120" placeholder="Other foods you don't like, e.g. mushrooms, tuna" value="${esc(last.avoid || "")}"></label></div>
 			<div class="cx-f"><span>Maintenance calories</span><label class="cx-num"><input type="number" name="maint" min="1400" max="4500" step="1" value="${maint}"> kcal/day</label>
 			<small>${maintenance() ? "From your calculator." : "An estimate. Use the calculator in My Space for yours."}</small></div>
 			<button type="submit" class="cx-chip primary cx-build">Build my program</button>
 		</form>`;
+	}
+
+	function dietText(P) {
+		const parts = [DIETS[P.diet].label];
+		if (P.ex.length) parts.push("no " + P.ex.map((k) => ALLERGENS.find(([a]) => a === k)[1].toLowerCase()).join(", no "));
+		if (P.avoid) parts.push("avoiding " + P.avoid);
+		return parts.join(", ") + (DIETS[P.diet].note ? ". " + DIETS[P.diet].note : "");
 	}
 
 	function rx(kind, g, w, weeks) {
@@ -332,8 +385,9 @@
 				const session = si >= 0 ? split.s[si] : null;
 				const kcal = session ? trainK : restK;
 				const picks = slots.map((s, k) => {
-					const pool = MEALS[s].filter((m) => p.diet !== "veg" || m[3]);
-					return [s, pool[((w * 7 + d) * (k + 2) + k + w) % pool.length]];
+					let pool = MEALS[s].filter((m) => allowed(m, p.diet, p.ex, p.dis));
+					if (!pool.length) pool = [["Custom meal — ask Priya (dietitian) for a swap", MEALS[s][0][1], MEALS[s][0][2], ""]];
+					return [s, pool[((w * 7 + d) * (k + 2) + k + w + (p.seed || 0) * 3) % pool.length]];
 				});
 				const base = picks.reduce((t, [, m]) => t + m[1], 0);
 				const f = Math.min(1.8, Math.max(0.6, kcal / base));
@@ -398,7 +452,7 @@
 				startY: 48, theme: "grid", head: [["Plan", "Value"]], headStyles: { ...head, fillColor: PINK }, styles: body,
 				body: [["Member", account().name || "Guest"], ["Goal", P.goalLabel], ["Maintenance", `${n(P.maint)} kcal/day`],
 					["Training day", `${n(P.trainK)} kcal`], ["Rest day", `${n(P.restK)} kcal`], ["Protein", `${P.protein} g/day`],
-					["Diet", P.diet === "veg" ? "Vegetarian" : "Everything"], ["Created", new Date().toLocaleDateString("en-GB")]]
+					["Diet", dietText(P)], ["Created", new Date().toLocaleDateString("en-GB")]]
 			});
 			doc.setFontSize(9);
 			doc.text(doc.splitTextToSize("How it fits together: training days get more food (mostly carbs around the session), rest days less, so the weekly average matches your goal. Weights go up when you hit every rep with good form. Weigh in once a week and adjust by ~150 kcal if progress stalls. Estimates only, not medical advice.", W - 28), 14, doc.lastAutoTable.finalY + 8);
@@ -447,6 +501,59 @@
 		setTimeout(() => { btn.disabled = false; btn.textContent = label; }, 2500);
 	}
 
+
+	/* ---------- body metrics: computed in code, always available ---------- */
+	function savedProfile() {
+		const w = num("c-weight"), h = num("c-height");
+		if (w && h) return profile();
+		try { return JSON.parse(localStorage.getItem("apex_profile")) || {}; } catch (_) { return {}; }
+	}
+	function metricForm(kind, pr) {
+		const f = (name, label, val, min, max, opt) => `<label class="cx-mf"><span>${label}</span><input type="number" name="${name}" min="${min}" max="${max}" step="0.1" value="${val || ""}"${opt ? "" : " required"}></label>`;
+		const sex = (pr.sex || "male").toLowerCase().startsWith("f") ? "female" : "male";
+		const sexSeg = `<div class="cx-seg" role="radiogroup" aria-label="Sex">${[["male", "Male"], ["female", "Female"]].map(([v, l]) => `<label><input type="radio" name="sex" value="${v}"${v === sex ? " checked" : ""}><span>${l}</span></label>`).join("")}</div>`;
+		let fields = f("weight", "Weight (kg)", pr.weight, 30, 250) + f("height", "Height (cm)", pr.height, 120, 230);
+		if (kind === "bodyfat") fields = sexSeg + f("height", "Height (cm)", pr.height, 120, 230) + f("waist", "Waist at navel (cm)", pr.waist, 40, 200) + f("neck", "Neck (cm)", pr.neck, 20, 70) + f("hip", "Hips, widest point (cm) · women", pr.hip, 50, 200, true);
+		if (kind === "water") fields += f("hours", "Training hours per week", pr.hours || 4, 0, 30);
+		return `<form class="cx-setup cx-metric" data-kind="${kind}">${fields}<button type="submit" class="cx-chip primary cx-build">Calculate</button></form>`;
+	}
+	function bmiAnswer(pr) {
+		const m = pr.height / 100, bmi = pr.weight / (m * m);
+		const cat = bmi < 18.5 ? "underweight" : bmi < 25 ? "a healthy range" : bmi < 30 ? "overweight" : "obesity range";
+		const lo = Math.round(18.5 * m * m), hi = Math.round(24.9 * m * m);
+		const diff = pr.weight < lo ? `about ${Math.round(lo - pr.weight)} kg below` : pr.weight > hi ? `about ${Math.round(pr.weight - hi)} kg above` : "inside";
+		return {
+			text: `Your BMI is ${bmi.toFixed(1)} (${pr.weight} kg, ${pr.height} cm), which is ${cat}. For your height, a healthy weight range is ${lo}–${hi} kg; you're ${diff} it. BMI = weight ÷ height² (${pr.weight} ÷ ${m.toFixed(2)}²). It doesn't tell muscle from fat, so if you lift regularly, body fat is the better measure.`,
+			html: `<div class="cx-sum"><div><b>${bmi.toFixed(1)}</b><span>BMI</span></div><div><b>${lo}–${hi}</b><span>healthy kg</span></div><div><b>${pr.weight} kg</b><span>your weight</span></div></div>`,
+			chips: [{ label: "Estimate my body fat", ask: "How can I estimate my body fat percentage?" }, { label: "How much water should I drink?", ask: "How much water should I drink per day, including training days?" }]
+		};
+	}
+	function waterAnswer(pr) {
+		const base = pr.weight * 0.035, h = +pr.hours || 0, perSession = 0.6;
+		const trainDay = base + perSession;
+		return {
+			text: `About ${base.toFixed(1)} L a day on rest days (35 ml × ${pr.weight} kg), and ${trainDay.toFixed(1)}–${(base + 0.75).toFixed(1)} L on training days: add 0.5–0.75 L per hour of training, more in Miami heat or if you sweat a lot. ${h ? `Over your ${h} training hours a week that's roughly ${(base * 7 + h * 0.6).toFixed(0)} L a week. ` : ""}Food covers about 20% of it. Simple check: pale-yellow urine means you're on track.`,
+			html: `<div class="cx-sum"><div><b>${base.toFixed(1)} L</b><span>rest day</span></div><div><b>${trainDay.toFixed(1)} L</b><span>training day</span></div><div><b>0.5 L</b><span>2 h before training</span></div></div>`,
+			chips: [{ label: "What's my BMI?", ask: "What's my BMI and what's a healthy weight range for me?" }, { label: "Build my training + meal program", ask: "Build me a program with training and meals" }]
+		};
+	}
+	function bodyfatAnswer(pr) {
+		const L = Math.log10, female = (pr.sex || "").toLowerCase().startsWith("f");
+		if (female && !pr.hip) return { text: "For women the formula also needs your hip measurement. Add it and tap Calculate.", html: metricForm("bodyfat", pr) };
+		const bf = female
+			? 495 / (1.29579 - 0.35004 * L(+pr.waist + +pr.hip - +pr.neck) + 0.221 * L(+pr.height)) - 450
+			: 495 / (1.0324 - 0.19077 * L(+pr.waist - +pr.neck) + 0.15456 * L(+pr.height)) - 450;
+		if (!isFinite(bf) || bf < 2 || bf > 60) return { text: "Those measurements don't give a realistic result. Check that waist is measured at the navel and neck just below the Adam's apple, then try again.", html: metricForm("bodyfat", pr) };
+		const cuts = female ? [[14, "athletic"], [21, "athletic"], [25, "fit"], [32, "average"], [99, "above average"]] : [[6, "athletic"], [14, "athletic"], [18, "fit"], [25, "average"], [99, "above average"]];
+		const cat = cuts.find(([c]) => bf < c)[1];
+		const w = +pr.weight || num("c-weight");
+		const fatKg = w ? (w * bf / 100) : null;
+		return {
+			text: `Estimated body fat: ${bf.toFixed(1)}% (US Navy method, ${female ? "waist + hips − neck" : "waist − neck"} vs height), which is ${cat} for ${female ? "women" : "men"}.${fatKg ? ` That's about ${fatKg.toFixed(1)} kg of fat and ${(w - fatKg).toFixed(1)} kg of lean mass.` : ""} Expect ±3–4% versus a DEXA scan. Measure the same way every 2–4 weeks: the trend matters more than the number.`,
+			html: `<div class="cx-sum"><div><b>${bf.toFixed(1)}%</b><span>body fat</span></div><div><b>${female ? "21–31%" : "14–24%"}</b><span>fit to average</span></div><div><b>${cat}</b><span>category</span></div></div>`,
+			chips: [{ label: "Build a fat-loss program", ask: "Build me a 1 month fat loss program" }, { label: "What's my BMI?", ask: "What's my BMI and what's a healthy weight range for me?" }]
+		};
+	}
 	const intents = [
 		{
 			id: "program",
@@ -458,21 +565,41 @@
 				};
 				const kv = {};
 				q.replace(/^Build program:/, "").split(";").forEach((x) => { const [k, v] = x.split("=").map((y) => y && y.trim()); if (k) kv[k] = v; });
-				const P = buildProgram({ goal: GOALS[kv.goal] ? kv.goal : "maintain", weeks: Math.min(4, Math.max(1, +kv.weeks || 4)), days: Math.min(5, Math.max(2, +kv.days || 3)), meals: +kv.meals === 3 ? 3 : 4, diet: kv.diet === "veg" ? "veg" : "any", maint: Math.min(4500, Math.max(1400, +kv.maint || 2400)) });
+				const P = buildProgram({ goal: GOALS[kv.goal] ? kv.goal : "maintain", weeks: Math.min(4, Math.max(1, +kv.weeks || 4)), days: Math.min(5, Math.max(2, +kv.days || 3)), meals: +kv.meals === 3 ? 3 : 4, diet: DIETS[kv.diet] ? kv.diet : "any", ex: (kv.ex || "").split(",").filter((x) => ALLERGENS.some(([k]) => k === x)), avoid: (kv.avoid || "").replace(/[|]/g, ", "), dis: dislikeWords((kv.avoid || "").replace(/[|]/g, ",")), maint: Math.min(4500, Math.max(1400, +kv.maint || 2400)), seed: +kv.seed || 0 });
 				const id = "p" + Math.abs([...q].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0));
 				PROGS[id] = P;
 				const prog = { 1: "Week 1 is about learning the movements and finding your weights.", 2: "Week 2 adds a rep to every exercise.", 3: "Week 2 adds a rep, week 3 adds a set.", 4: "Week 2 adds a rep, week 3 adds a set, week 4 is a lighter deload week to recover." }[P.weeks.length];
-				const again = (k, v) => "Build program: " + Object.entries({ goal: P.goal, weeks: P.weeks.length, days: P.days, meals: P.meals, diet: P.diet, maint: P.maint, [k]: v }).map(([a, b]) => `${a}=${b}`).join("; ");
+				const again = (k, v) => "Build program: " + Object.entries({ goal: P.goal, weeks: P.weeks.length, days: P.days, meals: P.meals, diet: P.diet, ex: P.ex.join(","), avoid: P.avoid.replace(/,\s*/g, "|"), maint: P.maint, [k]: v }).map(([a, b]) => `${a}=${b}`).join("; ");
 				return {
-					text: `Your ${P.weeks.length === 4 ? "1-month" : P.weeks.length + "-week"} program is ready. ${P.goalLabel}: ${fmt(P.trainK)} kcal on training days and ${fmt(P.restK)} on rest days, averaging ${fmt(P.target)} a day, with ${P.protein} g protein every day. ${P.days} sessions a week. ${prog} Open any day to see the workout and the meals, or download everything as a PDF with log sheets.`,
+					text: `Your ${P.weeks.length === 4 ? "1-month" : P.weeks.length + "-week"} program is ready. ${P.goalLabel}: ${fmt(P.trainK)} kcal on training days and ${fmt(P.restK)} on rest days, averaging ${fmt(P.target)} a day, with ${P.protein} g protein every day. ${P.days} sessions a week. Meals: ${dietText(P)}. ${prog} Open any day to see the workout and the meals, or download everything as a PDF with log sheets.`,
 					html: programView(id, P),
 					note: { kind: "warn", text: "Estimates for a typical adult. Start with weights you can lift for every rep with good form. Not medical advice: see the club doctor if you have an injury or condition." },
 					chips: [
 						{ label: P.days < 5 ? `${P.days + 1} training days` : "4 training days", ask: again("days", P.days < 5 ? P.days + 1 : 4), display: "Rebuild with " + (P.days < 5 ? P.days + 1 : 4) + " training days" },
-						{ label: P.diet === "veg" ? "Include meat & fish" : "Make it vegetarian", ask: again("diet", P.diet === "veg" ? "any" : "veg"), display: P.diet === "veg" ? "Include meat & fish" : "Make it vegetarian" },
+						{ label: "Swap all the meals", ask: again("seed", (+(P.seed || 0) + 1) % 7), display: "Swap all the meals" },
 						{ label: "Change settings", ask: "Change my program settings" }
 					]
 				};
+			}
+		},
+		{
+			id: "metrics",
+			test: /^Metric:|\b(bmi|imc|body ?fat|masse grasse|graisse corporelle|ideal weight|poids idéal|poids ideal|healthy weight|how much water|combien d'eau|quantité d'eau|hydrat)/i,
+			reply: (q) => {
+				let kind = /^Metric:/.test(q) ? q.match(/kind=(\w+)/)[1] : /fat|grasse|graisse/i.test(q) ? "bodyfat" : /water|eau|hydrat/i.test(q) ? "water" : "bmi";
+				const pr = Object.assign({}, savedProfile());
+				if (/^Metric:/.test(q)) q.replace(/^Metric:/, "").split(";").forEach((x) => { const [k, v] = x.split("=").map((y) => y && y.trim()); if (k && v && k !== "kind") pr[k] = isNaN(+v) ? v : +v; });
+				const need = kind === "bodyfat" ? ["height", "waist", "neck"] : ["weight", "height"];
+				if (!/^Metric:/.test(q) || need.some((k) => !pr[k])) {
+					if (kind !== "bodyfat" && need.every((k) => pr[k]) && !/^Metric:/.test(q)) return kind === "bmi" ? bmiAnswer(pr) : waterAnswer(pr);
+					return {
+						text: kind === "bodyfat"
+							? "I'll estimate it with the US Navy method: a tape measure is all you need. Measure your waist at the navel and your neck just below the Adam's apple (women: also hips at the widest point)."
+							: "I just need your weight and height." + (kind === "water" ? " Add your weekly training hours too." : ""),
+						html: metricForm(kind, pr)
+					};
+				}
+				return kind === "bodyfat" ? bodyfatAnswer(pr) : kind === "water" ? waterAnswer(pr) : bmiAnswer(pr);
 			}
 		},
 		{
@@ -538,7 +665,7 @@
 
 	function answer(q) {
 		// Deterministic flows where exactness matters; the live model for everything else.
-		const order = ["medical", "membership", "program", "classes"];
+		const order = ["medical", "metrics", "membership", "program", "classes"];
 		for (const id of order) { const it = intents.find((x) => x.id === id); if (it.test.test(q)) return { id, ...it.reply(q) }; }
 		return { id: "ai", ai: true };
 	}
@@ -646,7 +773,10 @@
 		if (c) { m["calorie target"] = `${c.kcal} kcal (${c.goal})`; m.macros = `P ${c.p} g · C ${c.c} g · F ${c.f} g`; }
 		const bmr = txt("r-bmr"), tdee = txt("r-tdee-raw");
 		if (bmr) m.BMR = bmr + " kcal"; if (tdee) m.TDEE = tdee + " kcal";
-		return { name: account().name || null, tier: tier(), profile: p, metrics: m };
+		let food = null;
+		try { food = JSON.parse(localStorage.getItem("apex_food_prefs")); } catch (_) {}
+		const diet = food ? [DIETS[food.diet] ? DIETS[food.diet].label : null, food.ex && food.ex.length ? "avoid " + food.ex.join(", ") : null, food.avoid ? "dislikes " + food.avoid : null].filter(Boolean).join("; ") : null;
+		return { name: account().name || null, tier: tier(), profile: p, metrics: m, diet };
 	}
 
 	function esc(t) { return t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
@@ -932,12 +1062,27 @@
 	}));
 
 	log.addEventListener("submit", (e) => {
-		const f = e.target.closest(".cx-setup"); if (!f) return;
+		const mf = e.target.closest(".cx-metric");
+		if (mf) {
+			e.preventDefault();
+			const kind = mf.dataset.kind, vals = {};
+			mf.querySelectorAll("input[type=number]").forEach((i) => { if (i.value) vals[i.name] = +i.value; });
+			const sx = mf.querySelector("[name=sex]:checked"); if (sx) vals.sex = sx.value;
+			let saved = {}; try { saved = JSON.parse(localStorage.getItem("apex_profile")) || {}; } catch (_) {}
+			try { localStorage.setItem("apex_profile", JSON.stringify(Object.assign(saved, vals))); } catch (_) {}
+			const label = kind === "bodyfat" ? `Waist ${vals.waist} cm · neck ${vals.neck} cm${vals.hip ? ` · hips ${vals.hip} cm` : ""} · ${vals.height} cm` : `${vals.weight} kg · ${vals.height} cm${vals.hours != null ? ` · ${vals.hours} h training/week` : ""}`;
+			send("Metric: kind=" + kind + "; " + Object.entries(vals).map(([a, b]) => `${a}=${b}`).join("; "), label);
+			return;
+		}
+		const f = e.target.closest(".cx-setup"); if (!f || f.classList.contains("cx-metric")) return;
 		e.preventDefault();
 		const v = (n) => (f.querySelector(`[name="${n}"]:checked`) || f.querySelector(`[name="${n}"]`)).value;
-		const P = { goal: v("goal"), weeks: v("weeks"), days: v("days"), meals: v("meals"), diet: v("diet"), maint: v("maint") };
+		const ex = [...f.querySelectorAll('[name="ex"]:checked')].map((x) => x.value);
+		const avoid = f.querySelector('[name="avoid"]').value.replace(/[;=|]/g, " ").split(",").map((x) => x.trim()).filter(Boolean).join("|");
+		const P = { goal: v("goal"), weeks: v("weeks"), days: v("days"), meals: v("meals"), diet: v("diet"), ex: ex.join(","), avoid, maint: v("maint") };
+		try { localStorage.setItem("apex_food_prefs", JSON.stringify({ diet: P.diet, ex, avoid: avoid.replace(/\|/g, ", ") })); } catch (_) {}
 		const q = "Build program: " + Object.entries(P).map(([a, b]) => `${a}=${b}`).join("; ");
-		const label = `${+P.weeks === 4 ? "1 month" : P.weeks + (+P.weeks > 1 ? " weeks" : " week")} · ${GOALS[P.goal].label} · ${P.days} training days · ${P.meals} meals a day${P.diet === "veg" ? " · vegetarian" : ""}`;
+		const label = `${+P.weeks === 4 ? "1 month" : P.weeks + (+P.weeks > 1 ? " weeks" : " week")} · ${GOALS[P.goal].label} · ${P.days} training days · ${P.meals} meals a day${P.diet !== "any" ? " · " + DIETS[P.diet].label : ""}${ex.length ? " · no " + ex.join(", ") : ""}${avoid ? " · avoid " + avoid.replace(/\|/g, ", ") : ""}`;
 		send(q, label);
 	});
 	log.addEventListener("click", (e) => {

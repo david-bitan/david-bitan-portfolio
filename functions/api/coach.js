@@ -31,6 +31,7 @@ function systemPrompt(ctx) {
 			const p = ctx.profile;
 			lines.push(`Profile from the calculator: ${[p.sex, p.age && `${p.age} y`, p.height && `${p.height} cm`, p.weight && `${p.weight} kg`, p.activity && `activity ${p.activity}`, p.goal && `goal ${p.goal}`].filter(Boolean).join(", ")}`);
 		}
+		if (ctx.diet) lines.push(`Food preferences (always respect them in any food suggestion): ${String(ctx.diet).slice(0, 200)}`);
 		if (ctx.metrics) {
 			const m = ctx.metrics;
 			lines.push(`Computed (trust these numbers, do not recompute): ${Object.entries(m).map(([k, v]) => `${k} ${v}`).join(" · ")}`);
@@ -83,6 +84,11 @@ export async function onRequestPost({ request, env }) {
 	} catch (e) {
 		return bad(502, "model_error");
 	}
+}
+
+// GET /api/coach → health check: tells whether the Workers AI binding is connected.
+export function onRequestGet({ env }) {
+	return new Response(JSON.stringify({ ok: true, ai: Boolean(env.AI), model: MODEL }), { headers: { "content-type": "application/json", "cache-control": "no-store" } });
 }
 
 export function onRequest() {
