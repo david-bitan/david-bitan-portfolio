@@ -26,7 +26,9 @@
 		return { kcal, goal: txt("r-goal-label") || "maintain", p: txt("r-p-g"), c: txt("r-c-g"), f: txt("r-f-g") };
 	}
 	function firstName() { return (account().name || "there").split(" ")[0]; }
-	function tier() { const t = account().tier; return TIERS[t] ? t : "Signature"; }
+	function tier() { const t = account().tier; return TIERS[t] ? t : null; }
+	// Section links work from any APEX page: same-page anchor if present, else the member area.
+	function here(h) { return document.querySelector(h) ? h : BASE + "user.html" + h; }
 
 	/* ---------- styles ---------- */
 	const css = `
@@ -69,6 +71,35 @@
 	.cx-meta{color:rgba(245,245,247,.5);font-size:12px}
 	.cx-row a{color:#FF2E7E;font-weight:600;font-size:12px;text-decoration:none;white-space:nowrap}
 	.cx-row a:hover{text-decoration:underline}
+	.cx-mrow{grid-template-columns:72px 1fr auto}
+	.cx-sub2{padding:8px 12px 4px;font:600 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:#FF2E7E}
+	.cx-setup{margin-top:12px;display:flex;flex-direction:column;gap:12px}
+	.cx-f>span{display:block;font-size:11.5px;color:rgba(245,245,247,.6);margin-bottom:6px}
+	.cx-f small{display:block;margin-top:4px;font-size:11px;color:rgba(245,245,247,.45)}
+	.cx-seg{display:flex;flex-wrap:wrap;gap:6px}
+	.cx-seg label{position:relative}
+	.cx-seg input{position:absolute;opacity:0;inset:0;cursor:pointer}
+	.cx-seg span{display:block;border:1px solid rgba(245,245,247,.22);border-radius:999px;padding:6px 11px;font-size:12.5px}
+	.cx-seg input:checked+span{background:#F5F5F7;color:#0A0A0F;border-color:#F5F5F7;font-weight:600}
+	.cx-seg input:focus-visible+span{outline:2px solid #00E5A0;outline-offset:2px}
+	.cx-num{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(245,245,247,.6)}
+	.cx-num input{width:96px;background:#0A0A0F;border:1px solid rgba(245,245,247,.22);border-radius:10px;color:#F5F5F7;padding:7px 10px;font:500 14px/1 "JetBrains Mono",monospace}
+	.cx-build{align-self:flex-start}
+	.cx-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+	.cx-sum div{background:#0A0A0F;border:1px solid rgba(245,245,247,.10);border-radius:10px;padding:9px 10px}
+	.cx-sum b{display:block;font:700 16px/1.1 "JetBrains Mono",monospace;color:#00E5A0}
+	.cx-sum span{font-size:11px;color:rgba(245,245,247,.55)}
+	.cx-tabs{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+	.cx-tabs button{border:1px solid rgba(245,245,247,.22);background:transparent;color:#F5F5F7;border-radius:999px;padding:6px 12px;font:600 12px/1 Inter,sans-serif;cursor:pointer}
+	.cx-tabs button[aria-selected="true"]{background:#FF2E7E;border-color:#FF2E7E}
+	.cx-pdf{margin-top:12px;width:100%;text-align:center}
+	.cx-pdf:disabled{opacity:.7;cursor:progress}
+	.cx-dd{border-top:1px solid rgba(245,245,247,.06)}.cx-dd:first-child{border-top:0}
+	.cx-dd summary{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;list-style:none}
+	.cx-dd summary::-webkit-details-marker{display:none}
+	.cx-dd summary::after{content:"+";color:rgba(245,245,247,.5);font-weight:600;margin-left:4px}
+	.cx-dd[open] summary::after{content:"−"}
+	.cx-dd[open] summary{background:rgba(245,245,247,.03)}
 	.cx-note{margin-top:10px;display:flex;gap:8px;padding:9px 11px;border-radius:10px;font-size:12.5px;background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.3);color:#FFD27A}
 	.cx-note.safe{background:rgba(0,229,160,.07);border-color:rgba(0,229,160,.3);color:#9FF5D6}
 	.cx-note.err{background:rgba(255,46,126,.08);border-color:rgba(255,46,126,.35);color:#FF9DC0}
@@ -98,6 +129,7 @@
 	.cx-sim.on{display:flex}
 	.cx-sim .cx-chip{font-size:11.5px;padding:5px 10px}
 	.cx-sim .cx-chip[aria-pressed="true"]{border-color:#00E5A0;color:#00E5A0}
+	.scroll-top-btn{bottom:92px!important}
 	.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 	@media (max-width:560px){.cx-panel{right:0;left:0;bottom:0;width:100%;height:100dvh;border-radius:0;border:0}.cx-launch{right:16px;bottom:16px}}
 	@media (prefers-reduced-motion:reduce){.cx-panel,.cx-launch{transition:none}.cx-dots i,.cx-caret::after{animation:none}}
@@ -166,7 +198,7 @@
 	/* ---------- context chips ---------- */
 	function renderCtx() {
 		const c = calc();
-		const bits = [`${tier()} member`, c ? `Calculator: ${c.kcal} kcal · ${c.goal}` : null, "This week's timetable"];
+		const bits = [tier() ? `${tier()} member` : "Guest · not signed in", c ? `Calculator: ${c.kcal} kcal · ${c.goal}` : null, "This week's timetable"];
 		$(".cx-ctx").innerHTML = '<span style="border:0;background:none;padding-left:0">Using:</span>' +
 			bits.filter(Boolean).map((b) => `<span>${b}</span>`).join("");
 	}
@@ -179,20 +211,268 @@
 		"Yoga & Pilates": { room: "Studio One", level: "Beginner" },
 		Recovery: { room: "Recovery Wing", level: "All levels" }
 	};
-	const PLANS = {
-		2: [["Mon", "Strength", "Full body · 50 min"], ["Thu", "Conditioning", "Intervals · 45 min"]],
-		3: [["Mon", "Strength", "Lower body · 50 min"], ["Wed", "Conditioning", "Intervals · 45 min"], ["Fri", "Strength", "Upper body · 50 min"]],
-		4: [["Mon", "Strength", "Lower body · 50 min"], ["Tue", "Yoga & Pilates", "Mobility · 45 min"], ["Thu", "Strength", "Upper body · 50 min"], ["Sat", "Boxing", "Conditioning · 45 min"]]
-	};
 
-	function planCard(days) {
-		const rows = PLANS[days].map(([d, cls, what]) =>
-			`<div class="cx-row"><span class="cx-day">${d}</span><span>${cls}<div class="cx-meta">${what} · ${CLASSES[cls].room}</div></span><a href="${BASE}classes.html">Book →</a></div>`).join("");
-		return `<div class="cx-card">${rows}</div>`;
+	/* ---------- weekly meal plan ---------- */
+	// [name, kcal, protein g, vegetarian]
+	const MEALS = {
+		Breakfast: [
+			["Greek yogurt, oats & berries", 420, 32, 1], ["Egg-white omelette, spinach, sourdough", 380, 30, 1],
+			["Overnight oats, whey & banana", 450, 35, 1], ["Avocado toast, 2 poached eggs", 460, 22, 1],
+			["Protein pancakes, berries", 430, 34, 1]
+		],
+		Lunch: [
+			["Grilled chicken, quinoa, roast vegetables", 620, 48, 0], ["Salmon poke bowl, brown rice, edamame", 650, 40, 0],
+			["Turkey & hummus wrap, side salad", 560, 38, 0], ["Lentil & feta salad, wholegrain bread", 580, 28, 1],
+			["Chickpea curry, basmati rice", 600, 22, 1], ["Tofu stir-fry, soba noodles", 590, 30, 1]
+		],
+		Dinner: [
+			["Lean beef, sweet potato, green beans", 650, 45, 0], ["Baked cod, couscous, ratatouille", 560, 42, 0],
+			["Chicken fajitas, peppers, guacamole", 640, 44, 0], ["Shrimp pasta, tomato & basil", 610, 36, 0],
+			["Black bean burrito bowl", 620, 26, 1], ["Halloumi & roast veg traybake, bulgur", 640, 28, 1],
+			["Mushroom & spinach risotto, parmesan", 600, 22, 1]
+		],
+		Snack: [
+			["Cottage cheese & pineapple", 220, 24, 1], ["Protein shake & apple", 260, 26, 1],
+			["Rice cakes, peanut butter", 240, 9, 1], ["Hummus & veggie sticks", 200, 8, 1], ["Boiled eggs & almonds", 250, 16, 1]
+		]
+	};
+	const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+	const fmt = (n) => n.toLocaleString("en-US");
+
+	/* ---------- program builder: training + meals, matched ---------- */
+	const GOALS = {
+		lose: { label: "Lose fat", factor: 0.8, sets: 3, reps: 12, rest: 60, protein: 0.32 },
+		maintain: { label: "Maintain", factor: 1.0, sets: 3, reps: 10, rest: 75, protein: 0.3 },
+		build: { label: "Build muscle", factor: 1.1, sets: 4, reps: 8, rest: 90, protein: 0.28 }
+	};
+	// [exercise, kind] — main: base reps · acc: base reps + 2 · time: seconds
+	const SESSIONS = {
+		"Full body A": [["Goblet squat", "main"], ["Push-up", "main"], ["Dumbbell row", "main"], ["Hip thrust", "acc"], ["Dead bug", "time"]],
+		"Full body B": [["Deadlift", "main"], ["Dumbbell bench press", "main"], ["Lat pulldown", "acc"], ["Split squat", "acc"], ["Farmer carry", "time"]],
+		"Lower A": [["Back squat", "main"], ["Romanian deadlift", "main"], ["Walking lunge", "acc"], ["Leg press", "acc"], ["Plank", "time"]],
+		"Upper A": [["Bench press", "main"], ["Bent-over row", "main"], ["Overhead press", "main"], ["Lat pulldown", "acc"], ["Biceps curl", "acc"]],
+		"Lower B": [["Deadlift", "main"], ["Front squat", "main"], ["Hip thrust", "acc"], ["Leg curl", "acc"], ["Calf raise", "acc"]],
+		"Upper B": [["Incline dumbbell press", "main"], ["Assisted pull-up", "main"], ["Seated cable row", "acc"], ["Lateral raise", "acc"], ["Triceps pushdown", "acc"]],
+		"Push": [["Bench press", "main"], ["Overhead press", "main"], ["Incline dumbbell press", "acc"], ["Lateral raise", "acc"], ["Triceps pushdown", "acc"]],
+		"Pull": [["Assisted pull-up", "main"], ["Barbell row", "main"], ["Face pull", "acc"], ["Hammer curl", "acc"], ["Back extension", "acc"]]
+	};
+	const SPLITS = {
+		2: { days: [0, 3], s: ["Full body A", "Full body B"] },
+		3: { days: [0, 2, 4], s: ["Lower A", "Upper A", "Full body B"] },
+		4: { days: [0, 1, 3, 5], s: ["Lower A", "Upper A", "Lower B", "Upper B"] },
+		5: { days: [0, 1, 2, 4, 5], s: ["Lower A", "Push", "Pull", "Lower B", "Upper B"] }
+	};
+	const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+	const PROGS = {};
+
+	function maintenance() {
+		const raw = txt("r-tdee-raw");
+		return raw ? +raw.replace(/\D/g, "") : null;
 	}
 
-	// Each intent returns { text (streamed), html (appended after), chips, note }
+	function parseProgramAsk(q) {
+		const p = {};
+		const w = q.match(/\b([1-4]|one|two|three|four|un|une|deux|trois|quatre)\s*(?:-|\s)?\s*(?:weeks?|semaines?)\b/i);
+		const words = { one: 1, un: 1, une: 1, two: 2, deux: 2, three: 3, trois: 3, four: 4, quatre: 4 };
+		if (w) p.weeks = words[w[1].toLowerCase()] || +w[1];
+		if (/\b(month|mois)\b/i.test(q)) p.weeks = 4;
+		const d = q.match(/\b([2-5])\s*(?:-|\s)?\s*(?:days?|jours?|x|times|fois|sessions?|séances?)\s*(?:a|per|par)?\s*(?:week|semaine)?/i);
+		if (d && !/meal|repas/i.test(d[0])) p.days = +d[1];
+		const m = q.match(/\b(3|4|three|four|trois|quatre)\s*(?:meals|repas)/i);
+		if (m) p.meals = /4|four|quatre/i.test(m[1]) ? 4 : 3;
+		if (/lose|fat|cut|slim|maigrir|perdre|sèche/i.test(q)) p.goal = "lose";
+		else if (/muscle|bulk|gain|mass|masse|prise/i.test(q)) p.goal = "build";
+		if (/vegetarian|veggie|végé|vege/i.test(q)) p.diet = "veg";
+		return p;
+	}
+
+	function setupForm(p) {
+		const c = calc();
+		const goal = p.goal || (c && /lose|cut|deficit/i.test(c.goal) ? "lose" : c && /gain|bulk|build/i.test(c.goal) ? "build" : "maintain");
+		const maint = maintenance() || 2400;
+		const seg = (name, opts, val) => `<div class="cx-seg" role="radiogroup" aria-label="${name}">` + opts.map(([v, l]) =>
+			`<label><input type="radio" name="${name}" value="${v}"${String(v) === String(val) ? " checked" : ""}><span>${l}</span></label>`).join("") + "</div>";
+		return `<form class="cx-setup">
+			<div class="cx-f"><span>Goal</span>${seg("goal", [["lose", "Lose fat"], ["maintain", "Maintain"], ["build", "Build muscle"]], goal)}</div>
+			<div class="cx-f"><span>Length</span>${seg("weeks", [[1, "1 week"], [2, "2 weeks"], [3, "3 weeks"], [4, "1 month"]], p.weeks || 4)}</div>
+			<div class="cx-f"><span>Training days / week</span>${seg("days", [[2, "2"], [3, "3"], [4, "4"], [5, "5"]], p.days || 3)}</div>
+			<div class="cx-f"><span>Meals / day</span>${seg("meals", [[3, "3"], [4, "4"]], p.meals || 4)}</div>
+			<div class="cx-f"><span>Diet</span>${seg("diet", [["any", "Everything"], ["veg", "Vegetarian"]], p.diet || "any")}</div>
+			<div class="cx-f"><span>Maintenance calories</span><label class="cx-num"><input type="number" name="maint" min="1400" max="4500" step="1" value="${maint}"> kcal/day</label>
+			<small>${maintenance() ? "From your calculator." : "An estimate. Use the calculator in My Space for yours."}</small></div>
+			<button type="submit" class="cx-chip primary cx-build">Build my program</button>
+		</form>`;
+	}
+
+	function rx(kind, g, w, weeks) {
+		const G = GOALS[g];
+		let sets = G.sets, reps = G.reps + (kind === "acc" ? 2 : 0), note = "";
+		const phase = weeks === 4 && w === 3 ? "deload" : ["base", "reps", "sets"][w % 3];
+		if (phase === "reps") reps += 1;
+		if (phase === "sets") sets += 1;
+		if (phase === "deload") { sets -= 1; note = "-10% load"; }
+		if (kind === "time") return { sets, reps: `${30 + (phase === "reps" ? 10 : phase === "sets" ? 10 : 0)} s`, rest: "45 s", note };
+		return { sets, reps: String(reps), rest: `${G.rest} s`, note };
+	}
+
+	function buildProgram(p) {
+		const G = GOALS[p.goal];
+		const target = Math.round((p.maint * G.factor) / 10) * 10;
+		const split = SPLITS[p.days];
+		const trainK = target + 150;
+		const restK = Math.round(((target * 7 - trainK * p.days) / (7 - p.days)) / 10) * 10;
+		const protein = Math.round((target * G.protein) / 4);
+		const slots = p.meals === 4 ? ["Breakfast", "Lunch", "Snack", "Dinner"] : ["Breakfast", "Lunch", "Dinner"];
+		const weeks = [];
+		for (let w = 0; w < p.weeks; w++) {
+			const days = WEEKDAYS.map((name, d) => {
+				const si = split.days.indexOf(d);
+				const session = si >= 0 ? split.s[si] : null;
+				const kcal = session ? trainK : restK;
+				const picks = slots.map((s, k) => {
+					const pool = MEALS[s].filter((m) => p.diet !== "veg" || m[3]);
+					return [s, pool[((w * 7 + d) * (k + 2) + k + w) % pool.length]];
+				});
+				const base = picks.reduce((t, [, m]) => t + m[1], 0);
+				const f = Math.min(1.8, Math.max(0.6, kcal / base));
+				const meals = picks.map(([s, m]) => ({ slot: s, dish: m[0], kcal: Math.round((m[1] * f) / 10) * 10, p: Math.round(m[2] * f) }));
+				const ex = session ? SESSIONS[session].map(([n, kind]) => ({ name: n, ...rx(kind, p.goal, w, p.weeks) })) : [];
+				if (session && p.goal === "lose") ex.push({ name: "Finisher: bike intervals 30 s hard / 30 s easy", sets: 1, reps: "10 min", rest: "-", note: "" });
+				return { name, session, kcal: meals.reduce((t, m) => t + m.kcal, 0), protein: meals.reduce((t, m) => t + m.p, 0), meals, ex };
+			});
+			weeks.push(days);
+		}
+		return { ...p, goalLabel: G.label, target, trainK, restK, protein, weeks };
+	}
+
+	function programView(id, P) {
+		const tabs = P.weeks.length > 1 ? `<div class="cx-tabs" role="tablist">${P.weeks.map((_, w) =>
+			`<button type="button" role="tab" data-week="${w}" aria-selected="${w === 0}">Week ${w + 1}</button>`).join("")}</div>` : "";
+		const weeks = P.weeks.map((days, w) => `<div class="cx-week" data-w="${w}"${w ? " hidden" : ""}>` + days.map((d, i) => {
+			const train = d.session ? `<div class="cx-sub2">Training · ${d.session}</div>` + d.ex.map((e) =>
+				`<div class="cx-row cx-mrow"><span class="cx-meta">${e.sets} × ${e.reps}</span><span>${e.name}${e.note ? ` <em class="cx-meta">${e.note}</em>` : ""}</span><span class="cx-meta">${e.rest}</span></div>`).join("")
+				: `<div class="cx-sub2">Rest day · walk 30–45 min or a Recovery class</div>`;
+			const meals = `<div class="cx-sub2">Meals</div>` + d.meals.map((m) =>
+				`<div class="cx-row cx-mrow"><span class="cx-day">${m.slot}</span><span>${m.dish}</span><span class="cx-meta">${fmt(m.kcal)} kcal · ${m.p} g</span></div>`).join("");
+			return `<details class="cx-dd"${i === 0 && w === 0 ? " open" : ""}><summary><span><span class="cx-day">${d.name.slice(0, 3)}</span> ${d.session || "Rest"}</span><span class="cx-meta">${fmt(d.kcal)} kcal</span></summary>${train}${meals}</details>`;
+		}).join("") + "</div>").join("");
+		return `<div class="cx-sum">
+				<div><b>${fmt(P.trainK)}</b><span>kcal training day</span></div>
+				<div><b>${fmt(P.restK)}</b><span>kcal rest day</span></div>
+				<div><b>${P.protein} g</b><span>protein / day</span></div>
+			</div>${tabs}<div class="cx-card">${weeks}</div>
+			<button type="button" class="cx-chip primary cx-pdf" data-pdf="${id}">Download PDF · program, meals & workout log</button>`;
+	}
+
+	/* PDF: libraries are loaded only when someone asks for a download. */
+	function loadScript(src) {
+		return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+	}
+	async function pdfLibs() {
+		if (!(window.jspdf && window.jspdf.jsPDF)) await loadScript(BASE + "vendor/jspdf.umd.min.js");
+		if (!window.jspdf.jsPDF.API.autoTable) await loadScript(BASE + "vendor/jspdf.plugin.autotable.min.js");
+		return window.jspdf.jsPDF;
+	}
+
+	async function downloadPdf(P, btn) {
+		const label = btn.textContent;
+		btn.disabled = true; btn.textContent = "Preparing PDF…";
+		try {
+			const JsPDF = await pdfLibs();
+			const doc = new JsPDF({ unit: "mm", format: "a4" });
+			const PINK = [255, 46, 126], INK = [10, 10, 15];
+			const head = { fillColor: INK, textColor: 255, fontStyle: "bold", fontSize: 9 };
+			const body = { fontSize: 9, cellPadding: 2 };
+			const W = doc.internal.pageSize.getWidth();
+			const n = (x) => x.toLocaleString("en-US");
+
+			doc.setFillColor(...INK); doc.rect(0, 0, W, 38, "F");
+			doc.setTextColor(255); doc.setFont("helvetica", "bold"); doc.setFontSize(22);
+			doc.text("APEX Coach", 14, 18);
+			doc.setFontSize(12); doc.setFont("helvetica", "normal");
+			doc.text(`${P.weeks.length}-week program · ${P.goalLabel} · ${P.days} training days · ${P.meals} meals a day`, 14, 28);
+			doc.setTextColor(...INK);
+			doc.autoTable({
+				startY: 48, theme: "grid", head: [["Plan", "Value"]], headStyles: { ...head, fillColor: PINK }, styles: body,
+				body: [["Member", account().name || "Guest"], ["Goal", P.goalLabel], ["Maintenance", `${n(P.maint)} kcal/day`],
+					["Training day", `${n(P.trainK)} kcal`], ["Rest day", `${n(P.restK)} kcal`], ["Protein", `${P.protein} g/day`],
+					["Diet", P.diet === "veg" ? "Vegetarian" : "Everything"], ["Created", new Date().toLocaleDateString("en-GB")]]
+			});
+			doc.setFontSize(9);
+			doc.text(doc.splitTextToSize("How it fits together: training days get more food (mostly carbs around the session), rest days less, so the weekly average matches your goal. Weights go up when you hit every rep with good form. Weigh in once a week and adjust by ~150 kcal if progress stalls. Estimates only, not medical advice.", W - 28), 14, doc.lastAutoTable.finalY + 8);
+
+			P.weeks.forEach((days, w) => {
+				doc.addPage(); doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.text(`Week ${w + 1}`, 14, 16);
+				doc.setFont("helvetica", "normal");
+				const tr = [];
+				days.forEach((d) => d.ex.forEach((e, i) => tr.push([i ? "" : d.name, i ? "" : d.session, e.name, `${e.sets} × ${e.reps}`, e.rest, e.note])));
+				doc.autoTable({ startY: 22, theme: "striped", head: [["Day", "Session", "Exercise", "Sets × reps", "Rest", "Note"]], headStyles: { ...head, fillColor: PINK }, styles: body, body: tr });
+				const ml = [];
+				days.forEach((d) => d.meals.forEach((m, i) => ml.push([i ? "" : d.name, i ? "" : (d.session ? "Training" : "Rest"), m.slot, m.dish, n(m.kcal), `${m.p} g`])));
+				days.forEach(() => {});
+				doc.autoTable({ startY: doc.lastAutoTable.finalY + 8, theme: "striped", head: [["Day", "Type", "Meal", "Dish", "kcal", "Protein"]], headStyles: head, styles: body, body: ml });
+			});
+
+			P.weeks.forEach((days, w) => {
+				doc.addPage(); doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.text(`Workout log · Week ${w + 1}`, 14, 16);
+				doc.setFontSize(9); doc.setFont("helvetica", "normal");
+				doc.text("Write weight × reps for each set. Bodyweight: ________   Notes: ______________________________", 14, 23);
+				let y = 28;
+				days.filter((d) => d.session).forEach((d) => {
+					if (y > 215) { doc.addPage(); y = 16; }
+					doc.autoTable({
+						startY: y, theme: "grid", head: [[`${d.name} · ${d.session}`, "Target", "Set 1", "Set 2", "Set 3", "Set 4", "Set 5"]],
+						headStyles: { ...head, fillColor: INK }, styles: { ...body, minCellHeight: 8 },
+						columnStyles: { 0: { cellWidth: 52 }, 1: { cellWidth: 22 } },
+						body: d.ex.map((e) => [e.name, `${e.sets} × ${e.reps}`, "", "", "", "", ""])
+					});
+					y = doc.lastAutoTable.finalY + 6;
+				});
+			});
+
+			doc.addPage(); doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.text("Progress tracker", 14, 16);
+			doc.autoTable({
+				startY: 22, theme: "grid", head: [["Week", "Date", "Bodyweight", "Waist", "Energy (1-5)", "Notes"]], headStyles: { ...head, fillColor: PINK },
+				styles: { ...body, minCellHeight: 10 }, body: P.weeks.map((_, w) => [`Week ${w + 1}`, "", "", "", "", ""])
+			});
+			const pages = doc.getNumberOfPages();
+			for (let i = 1; i <= pages; i++) { doc.setPage(i); doc.setFontSize(8); doc.setTextColor(120); doc.text(`APEX Athletic Club · Coach (demo) · page ${i}/${pages}`, 14, 290); doc.setTextColor(...INK); }
+			doc.save(`APEX-${P.weeks.length}-week-program.pdf`);
+			btn.textContent = "PDF downloaded ✓";
+		} catch (e) {
+			btn.textContent = "Couldn't create the PDF. Try again";
+		}
+		setTimeout(() => { btn.disabled = false; btn.textContent = label; }, 2500);
+	}
+
 	const intents = [
+		{
+			id: "program",
+			test: /^Build program:|(plan|program|programme|routine|workout|split|menu|nourriture|repas|entraîn|séance|month|mois|\d\s*weeks?|semaines?)/i,
+			reply: (q) => {
+				if (!/^Build program:/.test(q)) return {
+					text: "I'll build a complete program where training and meals are matched: more food on training days, less on rest days, protein every day. I filled in what I could from your message. Adjust anything, then tap Build.",
+					html: setupForm(parseProgramAsk(q))
+				};
+				const kv = {};
+				q.replace(/^Build program:/, "").split(";").forEach((x) => { const [k, v] = x.split("=").map((y) => y && y.trim()); if (k) kv[k] = v; });
+				const P = buildProgram({ goal: GOALS[kv.goal] ? kv.goal : "maintain", weeks: Math.min(4, Math.max(1, +kv.weeks || 4)), days: Math.min(5, Math.max(2, +kv.days || 3)), meals: +kv.meals === 3 ? 3 : 4, diet: kv.diet === "veg" ? "veg" : "any", maint: Math.min(4500, Math.max(1400, +kv.maint || 2400)) });
+				const id = "p" + Math.abs([...q].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0));
+				PROGS[id] = P;
+				const prog = { 1: "Week 1 is about learning the movements and finding your weights.", 2: "Week 2 adds a rep to every exercise.", 3: "Week 2 adds a rep, week 3 adds a set.", 4: "Week 2 adds a rep, week 3 adds a set, week 4 is a lighter deload week to recover." }[P.weeks.length];
+				const again = (k, v) => "Build program: " + Object.entries({ goal: P.goal, weeks: P.weeks.length, days: P.days, meals: P.meals, diet: P.diet, maint: P.maint, [k]: v }).map(([a, b]) => `${a}=${b}`).join("; ");
+				return {
+					text: `Your ${P.weeks.length === 4 ? "1-month" : P.weeks.length + "-week"} program is ready. ${P.goalLabel}: ${fmt(P.trainK)} kcal on training days and ${fmt(P.restK)} on rest days, averaging ${fmt(P.target)} a day, with ${P.protein} g protein every day. ${P.days} sessions a week. ${prog} Open any day to see the workout and the meals, or download everything as a PDF with log sheets.`,
+					html: programView(id, P),
+					note: { kind: "warn", text: "Estimates for a typical adult. Start with weights you can lift for every rep with good form. Not medical advice: see the club doctor if you have an injury or condition." },
+					chips: [
+						{ label: P.days < 5 ? `${P.days + 1} training days` : "4 training days", ask: again("days", P.days < 5 ? P.days + 1 : 4), display: "Rebuild with " + (P.days < 5 ? P.days + 1 : 4) + " training days" },
+						{ label: P.diet === "veg" ? "Include meat & fish" : "Make it vegetarian", ask: again("diet", P.diet === "veg" ? "any" : "veg"), display: P.diet === "veg" ? "Include meat & fish" : "Make it vegetarian" },
+						{ label: "Change settings", ask: "Change my program settings" }
+					]
+				};
+			}
+		},
 		{
 			id: "medical",
 			test: /(pain|hurt|injur|knee|back pain|my back|shoulder|ankle|pregnan|medic|doctor|dizz|chest|surgery|douleur|blessure)/i,
@@ -211,24 +491,6 @@
 			})
 		},
 		{
-			id: "plan",
-			test: /(plan|program|programme|routine|week|workout|split|strength|fat loss|entraîn|séance)/i,
-			reply: (q) => {
-				const m = q.match(/\b([2-4])\s*(?:-|\s)?\s*(?:day|days|x|jours?)\b/i);
-				if (!m) return {
-					text: "How many days a week can you realistically train? I'll build around your real schedule, not an ideal one.",
-					chips: [2, 3, 4].map((n) => ({ label: `${n} days`, ask: `Build me a ${n}-day ${/fat/i.test(q) ? "fat loss" : "strength"} week` }))
-				};
-				const n = +m[1];
-				return {
-					text: `Here's a ${n}-day week built from classes that are actually on the timetable, with at least one rest day between hard sessions.`,
-					html: planCard(n),
-					note: { kind: "warn", text: "Suggested from class schedules only — I can't see your training history. Your coach on the floor can adjust loads." },
-					chips: [{ label: "Make it easier", ask: `Build me an easier ${Math.max(2, n - 1)}-day week` }, { label: "What should I eat on training days?", ask: "What should I eat on training days?" }]
-				};
-			}
-		},
-		{
 			id: "nutrition",
 			test: /(eat|food|meal|protein|calorie|kcal|macro|diet|snack|manger|repas)/i,
 			reply: () => {
@@ -237,8 +499,8 @@
 					text: c
 						? `Based on the calculator above (${c.goal}), you're around ${c.kcal} kcal a day: about ${c.p} g protein, ${c.c} g carbs and ${c.f} g fat. On training days, put most of the carbs around the session and get 25–40 g of protein within a couple of hours after.`
 						: "On training days, put most of your carbs around the session and get 25–40 g of protein within a couple of hours after. Fill in the calculator on this page and I'll use your numbers.",
-					note: { kind: "warn", text: "General guidance, not a meal prescription. " + (tier() === "Basic" ? "Signature and Elite include a dietitian." : "Your plan includes a dietitian who can tailor this.") },
-					chips: [{ label: "Open the calculator", href: "#calc" }, { label: "See this week's meals", href: "#meal-plan" }]
+					note: { kind: "warn", text: "General guidance, not a meal prescription. " + (tier() !== "Signature" && tier() !== "Elite" ? "Signature and Elite include a dietitian." : "Your plan includes a dietitian who can tailor this.") },
+					chips: [{ label: "Build my weekly menu", ask: "Plan my meals for the week", primary: true }, { label: "Open the calculator", href: here("#calc") }]
 				};
 			}
 		},
@@ -260,16 +522,20 @@
 			test: /(member|price|cost|upgrade|downgrade|cancel|tier|elite|basic|signature|my plan|change plan|abonnement|prix)/i,
 			reply: () => {
 				const t = tier();
+				if (!t) return {
+					text: "You're not a member yet. Basic is $149/month, Signature $259 and Elite $549 — Elite adds personal training, the club doctor, physio and a weekly plan. No contracts.",
+					chips: [{ label: "See memberships", href: BASE + "index.html#membership", primary: true }, { label: "Get a free guest pass", href: BASE + "contact.html" }]
+				};
 				return {
 					text: `You're on ${t} ($${TIERS[t]}/month). Basic is $149, Signature $259 and Elite $549 — Elite adds personal training, the club doctor, physio and a weekly plan. I can't change your plan myself; you stay in control of anything involving billing.`,
-					chips: [{ label: "Change my plan", href: "#membership-status", primary: true }, { label: "What does Elite include?", ask: "What does Elite include?" }]
+					chips: [{ label: "Change my plan", href: here("#membership-status"), primary: true }, { label: "What does Elite include?", ask: "What does Elite include?" }]
 				};
 			}
 		}
 	];
 
 	function answer(q) {
-		const order = ["medical", "vague-goal", "membership", "nutrition", "classes", "plan"];
+		const order = ["medical", "membership", "program", "vague-goal", "nutrition", "classes"];
 		for (const id of order) { const it = intents.find((x) => x.id === id); if (it.test.test(q)) return { id, ...it.reply(q) }; }
 		if (/elite/i.test(q)) return intents.find((i) => i.id === "membership").reply(q);
 		return {
@@ -282,7 +548,7 @@
 	function starterChips() {
 		return [
 			{ label: "Build me a 3-day strength week", ask: "Build me a 3-day strength week" },
-			{ label: "What should I eat after training?", ask: "What should I eat after training?" },
+			{ label: "Build my training + meal program", ask: "Build me a program with training and meals" },
 			{ label: "Which class fits a beginner?", ask: "Which class fits a beginner?" },
 			{ label: "My knee hurts when I squat", ask: "My knee hurts when I squat" }
 		];
@@ -290,6 +556,8 @@
 
 	/* ---------- rendering ---------- */
 	let busy = false, cancelFlag = false, history = [];
+	// Limitation notes appear the first time a topic comes up, not on every answer.
+	const seen = new Set();
 
 	function scrollDown() { log.scrollTop = log.scrollHeight; }
 
@@ -313,9 +581,10 @@
 				el.href = c.href;
 				el.style.textDecoration = "none";
 				if (c.href.startsWith("#")) el.addEventListener("click", () => close());
+				else if (c.href.indexOf(location.pathname + "#") === 0) el.addEventListener("click", () => close());
 			} else {
 				el.type = "button";
-				el.addEventListener("click", () => send(c.ask));
+				el.addEventListener("click", () => send(c.ask, c.display));
 			}
 			row.appendChild(el);
 		});
@@ -347,7 +616,7 @@
 		input.disabled = on;
 	}
 
-	async function botTurn(q, wrap) {
+	async function botTurn(q, wrap, display) {
 		const isNew = !wrap;
 		if (isNew) { wrap = document.createElement("div"); wrap.className = "cx-msg cx-bot"; log.appendChild(wrap); }
 		wrap.innerHTML = "";
@@ -403,10 +672,10 @@
 		}
 		p.classList.remove("cx-caret");
 		if (a.html) bubble.insertAdjacentHTML("beforeend", a.html);
-		if (a.note) bubble.appendChild(noteEl(a.note));
+		if (a.note && !seen.has(a.id)) { seen.add(a.id); bubble.appendChild(noteEl(a.note)); }
 		if (a.chips && a.chips.length) wrap.appendChild(chipRow(a.chips));
 		wrap.appendChild(actions(q, wrap, bubble));
-		history.push({ q, id: a.id });
+		history.push({ q, d: display || null, id: a.id });
 		save();
 		setBusy(false); scrollDown();
 	}
@@ -456,13 +725,13 @@
 		return bar;
 	}
 
-	function send(text) {
+	function send(text, display) {
 		text = (text || "").trim();
 		if (!text || busy) return;
 		const e = log.querySelector(".cx-empty"); if (e) e.remove();
-		addUser(text);
+		addUser(display || text);
 		input.value = ""; autosize();
-		botTurn(text);
+		botTurn(text, null, display);
 	}
 
 	/* ---------- persistence (per tab) ---------- */
@@ -473,14 +742,14 @@
 		try { h = JSON.parse(sessionStorage.getItem(KEY)) || []; } catch (_) {}
 		if (!h.length) return emptyState();
 		log.innerHTML = "";
-		h.forEach(({ q }) => {
-			addUser(q);
+		h.forEach(({ q, d }) => {
+			addUser(d || q);
 			const a = answer(q);
 			const wrap = document.createElement("div"); wrap.className = "cx-msg cx-bot";
 			const bubble = document.createElement("div"); bubble.className = "cx-bubble";
 			const p = document.createElement("p"); p.textContent = a.text; bubble.appendChild(p);
 			if (a.html) bubble.insertAdjacentHTML("beforeend", a.html);
-			if (a.note) bubble.appendChild(noteEl(a.note));
+			if (a.note && !seen.has(a.id)) { seen.add(a.id); bubble.appendChild(noteEl(a.note)); }
 			wrap.appendChild(bubble);
 			wrap.appendChild(actions(q, wrap, bubble));
 			log.appendChild(wrap);
@@ -510,7 +779,7 @@
 
 	launch.addEventListener("click", open);
 	$("[data-close]").addEventListener("click", close);
-	$("[data-reset]").addEventListener("click", () => { if (busy) cancelFlag = true; history = []; save(); emptyState(); input.focus(); });
+	$("[data-reset]").addEventListener("click", () => { if (busy) cancelFlag = true; history = []; seen.clear(); save(); emptyState(); input.focus(); });
 	input.addEventListener("input", autosize);
 	input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input.value); } });
 	form.addEventListener("submit", (e) => { e.preventDefault(); if (busy) { cancelFlag = true; return; } send(input.value); });
@@ -529,6 +798,27 @@
 	panel.querySelectorAll("[data-sim]").forEach((b) => b.addEventListener("click", () => {
 		const k = b.dataset.sim; sim[k] = !sim[k]; b.setAttribute("aria-pressed", String(sim[k]));
 	}));
+
+	log.addEventListener("submit", (e) => {
+		const f = e.target.closest(".cx-setup"); if (!f) return;
+		e.preventDefault();
+		const v = (n) => (f.querySelector(`[name="${n}"]:checked`) || f.querySelector(`[name="${n}"]`)).value;
+		const P = { goal: v("goal"), weeks: v("weeks"), days: v("days"), meals: v("meals"), diet: v("diet"), maint: v("maint") };
+		const q = "Build program: " + Object.entries(P).map(([a, b]) => `${a}=${b}`).join("; ");
+		const label = `${+P.weeks === 4 ? "1 month" : P.weeks + (+P.weeks > 1 ? " weeks" : " week")} · ${GOALS[P.goal].label} · ${P.days} training days · ${P.meals} meals a day${P.diet === "veg" ? " · vegetarian" : ""}`;
+		send(q, label);
+	});
+	log.addEventListener("click", (e) => {
+		const tab = e.target.closest("[data-week]");
+		if (tab) {
+			const card = tab.closest(".cx-bubble");
+			card.querySelectorAll("[data-week]").forEach((b) => b.setAttribute("aria-selected", String(b === tab)));
+			card.querySelectorAll(".cx-week").forEach((w) => (w.hidden = w.dataset.w !== tab.dataset.week));
+			return;
+		}
+		const pdf = e.target.closest("[data-pdf]");
+		if (pdf && PROGS[pdf.dataset.pdf]) downloadPdf(PROGS[pdf.dataset.pdf], pdf);
+	});
 
 	restore();
 	if (/[?&]coach=open/.test(location.search)) open();
