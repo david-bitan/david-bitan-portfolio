@@ -133,6 +133,10 @@
 	.cx-bubble>.cx-demo{margin:10px 0 0}
 	.cx-demo-top{display:flex;gap:12px;align-items:center}
 	.cx-views{display:flex;gap:8px;margin-top:8px}
+	.cx-demogrp{margin-top:10px}
+	.cx-demo-pick{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-bottom:8px}
+	.cx-demo-pick button{border:1px solid rgba(0,229,160,.45);background:transparent;color:#00E5A0;border-radius:999px;padding:5px 11px;font:600 12px/1.2 Inter,sans-serif;cursor:pointer}
+	.cx-demo-pick button[aria-selected="true"]{background:#00E5A0;color:#0A0A0F}
 	.cx-views figure{margin:0;flex:1;text-align:center}
 	.cx-views .cx-demo-fig{display:flex;justify-content:center}
 	.cx-views figcaption{font-size:10.5px;color:rgba(245,245,247,.6);margin-top:3px}
@@ -658,6 +662,8 @@
 			case "sled": return `<line x1="${p.toe[0] + 6}" y1="${p.toe[1] - 14}" x2="${p.an[0] - 4}" y2="${p.an[1] + 14}" stroke="#FF2E7E" stroke-width="4" stroke-linecap="round"/><line x1="28" y1="72" x2="64" y2="116" stroke="rgba(245,245,247,.35)" stroke-width="5"/>`;
 			case "step": return `<rect x="56" y="130" width="24" height="8" fill="rgba(245,245,247,.25)"/>`;
 			case "floor": return "";
+			case "dbHandSeat": return `<rect x="${H[0] - 5}" y="${H[1] - 2.5}" width="10" height="5" rx="2" ${pink}/><rect x="40" y="100" width="50" height="5" rx="2" fill="rgba(245,245,247,.3)"/>`;
+			case "seat": return `<rect x="40" y="98" width="34" height="5" rx="2" fill="rgba(245,245,247,.3)"/><line x1="44" y1="98" x2="46" y2="56" stroke="rgba(245,245,247,.3)" stroke-width="5"/><rect x="${p.an[0] - 3}" y="${p.an[1] - 4}" width="8" height="8" rx="3" ${pink}/>`;
 			default: return "";
 		}
 	}
@@ -713,6 +719,7 @@
 			case "cableFront": return line(60, -8, H[0], H[1], 1.5) + line(60, -8, H2[0], H2[1], 1.5);
 			case "boxFront": return `<rect x="36" y="98" width="48" height="32" rx="3" fill="rgba(245,245,247,.18)"/><rect x="44" y="${p.hip[1] - 9}" width="32" height="5" rx="2" ${pink}/>`;
 			case "sledFront": return `<rect x="34" y="${p.an[1] - 10}" width="52" height="20" rx="3" fill="none" stroke="#FF2E7E" stroke-width="3"/>`;
+			case "dbBothBench": return `<rect x="40" y="100" width="40" height="6" rx="2" fill="rgba(245,245,247,.35)"/><line x1="44" y1="106" x2="44" y2="130" stroke="rgba(245,245,247,.35)" stroke-width="3"/><line x1="76" y1="106" x2="76" y2="130" stroke="rgba(245,245,247,.35)" stroke-width="3"/><rect x="${H[0] - 3}" y="${H[1] - 6}" width="6" height="12" rx="2" ${pink}/><rect x="${H2[0] - 3}" y="${H2[1] - 6}" width="6" height="12" rx="2" ${pink}/>`;
 			case "stepFront": return `<rect x="40" y="130" width="40" height="8" fill="rgba(245,245,247,.25)"/>`;
 			default: return "";
 		}
@@ -740,6 +747,83 @@
 		return [poseAt(PATTERNS[key], from, to, k), frontPose(key, from, to, k)];
 	}
 	const VIEW = 100;
+
+	/* ---------- more movements: every major muscle group ---------- */
+	const SEAT = { head: [57, 50], sh: [56, 62], hip: [58, 98], kn: [84, 98], an: [84, 130], toe: [94, 130] };
+	const LIE = { head: [29, 119], sh: [40, 124], hip: [72, 124] };
+	Object.assign(PATTERNS, {
+		wristcurl: { a: Object.assign({}, SEAT, { el: [70, 92], ha: [96, 104] }), b: Object.assign({}, SEAT, { el: [70, 92], ha: [95, 90] }), gear: "dbHandSeat", end: "Wrist up",
+			phases: [["Curl the wrist", 1, "a", "b"], ["Squeeze", 1, "b", "b"], ["Lower", 2, "b", "a"]], cues: ["Forearm resting on the thigh", "Only the wrist moves", "Light weight, full range"] },
+		shrug: { a: P({ ha: [61, 72] }), b: P({ head: [61, 18], sh: [60, 28], el: [60, 47], ha: [61, 66] }), gear: "dbHand", end: "Shoulders up",
+			phases: [["Shrug up", 1, "a", "b"], ["Hold", 1, "b", "b"], ["Lower", 2, "b", "a"]], cues: ["Shoulders straight up to the ears", "No rolling", "Arms stay long"] },
+		neck: { a: P({ el: [70, 40], ha: [70, 20] }), b: P({ head: [66, 27], el: [72, 44], ha: [73, 26] }), gear: "", end: "Chin down",
+			phases: [["Nod down", 3, "a", "b"], ["Hold", 2, "b", "b"], ["Back to neutral", 3, "b", "a"]], cues: ["Slow and small, no weights", "Light hand pressure only", "Stop if you feel pain or dizziness"] },
+		crunch: { a: Object.assign({}, LIE, { el: [36, 110], ha: [28, 114], kn: [84, 104], an: [98, 128], toe: [106, 130] }), b: { head: [41, 104], sh: [49, 113], el: [44, 102], ha: [38, 104], hip: [72, 124], kn: [84, 104], an: [98, 128], toe: [106, 130] }, gear: "floor", end: "Curl up",
+			phases: [["Curl up", 1, "a", "b"], ["Squeeze", 1, "b", "b"], ["Lower", 2, "b", "a"]], cues: ["Lower back stays on the floor", "Ribs toward the hips", "Hands support the head, don't pull"] },
+		legraise: { a: Object.assign({}, LIE, { el: [56, 126], ha: [68, 127], kn: [96, 122], an: [118, 122], toe: [120, 116] }), b: Object.assign({}, LIE, { el: [56, 126], ha: [68, 127], kn: [76, 100], an: [80, 76], toe: [86, 74] }), gear: "floor", end: "Legs up",
+			phases: [["Raise", 1, "a", "b"], ["Pause", 1, "b", "b"], ["Lower slowly", 3, "b", "a"]], cues: ["Press the lower back down", "Legs straight, move slowly", "Stop just above the floor"] },
+		legext: { a: Object.assign({}, SEAT, { head: [53, 48], sh: [52, 60], hip: [56, 96], el: [56, 80], ha: [62, 98], kn: [82, 96], an: [84, 124], toe: [92, 126] }), b: Object.assign({}, SEAT, { head: [53, 48], sh: [52, 60], hip: [56, 96], el: [56, 80], ha: [62, 98], kn: [82, 96], an: [110, 92], toe: [114, 84] }), gear: "seat", end: "Legs straight",
+			phases: [["Extend", 1, "a", "b"], ["Squeeze", 1, "b", "b"], ["Lower", 3, "b", "a"]], cues: ["Back against the pad", "Squeeze the thighs at the top", "Control the way down"] },
+		ohext: { a: P({ el: [60, 12], ha: [50, 26] }), b: P({ el: [60, 12], ha: [60, -6] }), gear: "dbHand", end: "Arms straight",
+			phases: [["Extend", 1, "a", "b"], ["Lock out", 1, "b", "b"], ["Lower behind head", 3, "b", "a"]], cues: ["Elbows point to the ceiling", "Only the forearms move", "Ribs down, no arching"] },
+		fly: { a: { head: [31, 92], sh: [40, 96], el: [42, 74], ha: [42, 58], hip: [76, 96], kn: [97, 96], an: [100, 130], toe: [110, 130] }, b: { head: [31, 92], sh: [40, 96], el: [38, 88], ha: [36, 98], hip: [76, 96], kn: [97, 96], an: [100, 130], toe: [110, 130] }, gear: "bench", end: "Arms open",
+			phases: [["Open", 3, "a", "b"], ["Stretch", 1, "b", "b"], ["Hug back up", 1, "b", "a"]], cues: ["Soft bend in the elbows", "Open until a chest stretch", "Bring the weights together like a hug"] }
+	});
+	Object.assign(FRONT, {
+		wristcurl: { a: F({ head: [60, 50], sh: [48, 62], el: [46, 86], ha: [48, 104], hip: [54, 98], kn: [48, 100], an: [48, 130] }), b: F({ head: [60, 50], sh: [48, 62], el: [46, 86], ha: [48, 94], hip: [54, 98], kn: [48, 100], an: [48, 130] }), gear: "dbBoth" },
+		shrug: { a: F({ ha: [44, 72] }), b: F({ head: [60, 18], sh: [48, 28], el: [46, 47], ha: [44, 66] }), gear: "dbBoth" },
+		neck: { a: F({ el: [52, 40], ha: [56, 20] }), b: F({ head: [60, 26], el: [52, 42], ha: [56, 24] }), gear: "" },
+		crunch: { a: F({ head: [60, 118], sh: [48, 124], el: [44, 116], ha: [52, 116], hip: [54, 124], kn: [50, 104], an: [50, 128] }), b: F({ head: [60, 106], sh: [48, 112], el: [44, 104], ha: [52, 104], hip: [54, 124], kn: [50, 104], an: [50, 128] }), gear: "" },
+		legraise: { a: F({ head: [60, 116], sh: [48, 122], el: [42, 124], ha: [40, 126], hip: [54, 124], kn: [54, 125], an: [54, 126] }), b: F({ head: [60, 116], sh: [48, 122], el: [42, 124], ha: [40, 126], hip: [54, 124], kn: [54, 100], an: [54, 76] }), gear: "" },
+		legext: { a: F({ head: [60, 48], sh: [48, 60], el: [44, 78], ha: [42, 96], hip: [54, 96], kn: [50, 98], an: [50, 124] }), b: F({ head: [60, 48], sh: [48, 60], el: [44, 78], ha: [42, 96], hip: [54, 96], kn: [50, 98], an: [50, 96] }), gear: "" },
+		ohext: { a: F({ el: [52, 12], ha: [58, 26] }), b: F({ el: [52, 12], ha: [58, -6] }), gear: "dbCenter" },
+		fly: { a: F({ head: [60, 90], sh: [46, 98], el: [44, 76], ha: [54, 60], hip: [54, 100], kn: [44, 104], an: [40, 130] }), b: F({ head: [60, 90], sh: [46, 98], el: [26, 92], ha: [14, 98], hip: [54, 100], kn: [44, 104], an: [40, 130] }), gear: "dbBothBench" }
+	});
+	Object.assign(EXERCISES, {
+		"Wrist curl": "wristcurl", "Reverse curl": "curl", "Shrug": "shrug", "Neck nod (flexion & extension)": "neck",
+		"Crunch": "crunch", "Leg raise": "legraise", "Leg extension": "legext", "Overhead triceps extension": "ohext", "Dumbbell fly": "fly"
+	});
+	ALIASES.unshift([/wrist curl|flexion (des|du) poignets?|poignet/i, "Wrist curl"], [/reverse curl|curl invers/i, "Reverse curl"], [/shrugs?|haussements? d'[ée]paules/i, "Shrug"],
+		[/crunch/i, "Crunch"], [/leg raise|relev[ée]s? de jambes/i, "Leg raise"], [/leg extension|extension (des|de) jambes|leg ext/i, "Leg extension"],
+		[/overhead (triceps )?extension|extension (au-dessus|nuque)|french press|barre front/i, "Overhead triceps extension"], [/\bfly\b|flyes?|[ée]cart[ée]s?/i, "Dumbbell fly"]);
+	// Muscle groups (EN + FR) → the movements that train them
+	const MUSCLES = [
+		[/avant-?bras|forearms?|grip|poignets?/i, ["Wrist curl", "Reverse curl", "Farmer carry"]],
+		[/\bcou\b|nuque|neck/i, ["Neck nod (flexion & extension)", "Shrug"]],
+		[/trap[èe]zes?|\btraps?\b/i, ["Shrug", "Face pull"]],
+		[/biceps/i, ["Biceps curl", "Hammer curl", "Assisted pull-up"]],
+		[/triceps/i, ["Triceps pushdown", "Overhead triceps extension", "Push-up"]],
+		[/[ée]paules?|shoulders?|delto/i, ["Overhead press", "Lateral raise", "Face pull"]],
+		[/pectoraux|\bpecs?\b|chest|poitrine/i, ["Bench press", "Push-up", "Dumbbell fly"]],
+		[/lombaires?|lower back|bas du dos/i, ["Back extension", "Romanian deadlift", "Dead bug"]],
+		[/\bdos\b|\bback\b|dorsaux|\blats?\b/i, ["Bent-over row", "Assisted pull-up", "Lat pulldown"]],
+		[/abdo|\babs\b|core|ventre|sangle/i, ["Crunch", "Leg raise", "Plank", "Dead bug"]],
+		[/ischio|hamstrings?/i, ["Romanian deadlift", "Leg curl"]],
+		[/quadri|\bquads?\b|cuisses?|thighs?/i, ["Back squat", "Leg extension", "Walking lunge"]],
+		[/fessiers?|glutes?|butt/i, ["Hip thrust", "Romanian deadlift", "Walking lunge"]],
+		[/mollets?|calf|calves/i, ["Calf raise"]],
+		[/jambes?|\blegs?\b|bas du corps|lower body/i, ["Back squat", "Walking lunge", "Romanian deadlift", "Leg press"]],
+		[/\bbras\b|\barms?\b/i, ["Biceps curl", "Triceps pushdown", "Hammer curl"]],
+		[/tout le corps|full ?body|corps entier/i, ["Deadlift", "Goblet squat", "Push-up", "Farmer carry"]]
+	];
+	// What to show for a message: muscles first, then exercise names (question, then answer).
+	function demosFor(question, answer) {
+		if (/pain|hurt|injur|douleur|bless|mal (au|à|a la|aux)/i.test(question)) return [];
+		for (const [re, list] of MUSCLES) if (re.test(question)) return list;
+		const fromQ = exerciseIn(question);
+		if (fromQ) return [fromQ];
+		const found = [];
+		ALIASES.forEach(([re, ex]) => { if (answer && re.test(answer) && !found.includes(ex) && found.length < 3) found.push(ex); });
+		Object.keys(EXERCISES).forEach((ex) => { if (answer && found.length < 3 && !found.includes(ex) && answer.toLowerCase().includes(ex.toLowerCase())) found.push(ex); });
+		return /\b(show|montre|how|comment|exerci|demo|anim|vid[ée]o|image)/i.test(question) ? found : [];
+	}
+	function demoGroup(list) {
+		list = list.filter((ex) => EXERCISES[ex]).slice(0, 4);
+		if (!list.length) return "";
+		if (list.length === 1) return demoCard(list[0]);
+		return `<div class="cx-demogrp"><div class="cx-demo-pick" role="tablist">${list.map((ex, i) =>
+			`<button type="button" role="tab" data-pick="${esc(ex)}" aria-selected="${i === 0}">${esc(ex)}</button>`).join("")}</div>${demoCard(list[0])}</div>`;
+	}
 
 	function demoCard(ex) {
 		const key = EXERCISES[ex]; if (!key) return "";
@@ -903,7 +987,7 @@
 			{ label: "Build my training + meal program", ask: "Build me a program with training and meals" },
 			{ label: "Which class fits a beginner?", ask: "Which class fits a beginner?" },
 			{ label: "How do I estimate my body fat?", ask: "How can I estimate my body fat percentage?" },
-			{ label: "Show me how to squat", ask: "How do I squat with good form?" }
+			{ label: "Show me exercises for my back", ask: "Show me exercises for my back" }
 		];
 	}
 
@@ -1114,8 +1198,8 @@
 				wrap.appendChild(noteEl({ kind: "err", text: offline
 					? "Live answers aren't switched on for this site yet. I can still build programs, compare memberships and suggest classes."
 					: "Coach couldn't reach the AI service. Your message is safe — nothing was lost." }));
-				const exOff = exerciseIn(userText);
-				if (exOff) { const b2 = document.createElement("div"); b2.className = "cx-bubble"; b2.innerHTML = demoCard(exOff); wrap.appendChild(b2); animateDemos(); }
+				const dOff = demosFor(userText, "");
+				if (dOff.length) { const b2 = document.createElement("div"); b2.className = "cx-bubble"; b2.innerHTML = demoGroup(dOff); wrap.appendChild(b2); animateDemos(); }
 				const r = chipRow(offline ? starterChips().slice(2, 3) : []);
 				if (!offline) {
 					const retry = document.createElement("button");
@@ -1128,8 +1212,8 @@
 				return;
 			}
 			convo.push({ role: "assistant", content: text });
-			const ex = exerciseIn(userText);
-			if (ex) { bubble.insertAdjacentHTML("beforeend", demoCard(ex)); animateDemos(); }
+			const dl = demosFor(userText, text);
+			if (dl.length) { bubble.insertAdjacentHTML("beforeend", demoGroup(dl)); animateDemos(); }
 			wrap.appendChild(actions(q, wrap, bubble, display));
 			history.push({ q, d: display || null, id: "ai", t: text });
 			save();
@@ -1231,7 +1315,7 @@
 			convo.push({ role: "user", content: d || q });
 			if (id === "ai") {
 				const wrap = document.createElement("div"); wrap.className = "cx-msg cx-bot";
-				const bubble = document.createElement("div"); bubble.className = "cx-bubble cx-ai"; bubble.innerHTML = md(t || "") + (exerciseIn(d || q) ? demoCard(exerciseIn(d || q)) : "");
+				const bubble = document.createElement("div"); bubble.className = "cx-bubble cx-ai"; bubble.innerHTML = md(t || "") + demoGroup(demosFor(d || q, t || ""));
 				wrap.appendChild(bubble); wrap.appendChild(actions(q, wrap, bubble, d)); log.appendChild(wrap);
 				convo.push({ role: "assistant", content: t || "" });
 				return;
@@ -1324,6 +1408,14 @@
 			const card = tab.closest(".cx-bubble");
 			card.querySelectorAll("[data-week]").forEach((b) => b.setAttribute("aria-selected", String(b === tab)));
 			card.querySelectorAll(".cx-week").forEach((w) => (w.hidden = w.dataset.w !== tab.dataset.week));
+			return;
+		}
+		const pick = e.target.closest("[data-pick]");
+		if (pick) {
+			const grp = pick.closest(".cx-demogrp");
+			grp.querySelectorAll("[data-pick]").forEach((b) => b.setAttribute("aria-selected", String(b === pick)));
+			grp.querySelector(".cx-demo").outerHTML = demoCard(pick.dataset.pick);
+			animateDemos();
 			return;
 		}
 		const how = e.target.closest(".cx-how");
