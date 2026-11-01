@@ -134,6 +134,8 @@
 	.cx-demo-top{display:flex;gap:12px;align-items:center}
 	.cx-views{display:flex;gap:8px;margin-top:8px}
 	.cx-demogrp{margin-top:10px}
+	.cx-worked{display:flex;align-items:center;gap:7px;margin-top:8px;font-size:12px;color:#BFE3FF}
+	.cx-worked i{width:14px;height:4px;border-radius:2px;background:#7CC8FF;display:inline-block}
 	.cx-demo-pick{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-bottom:8px}
 	.cx-demo-pick button{border:1px solid rgba(0,229,160,.45);background:transparent;color:#00E5A0;border-radius:999px;padding:5px 11px;font:600 12px/1.2 Inter,sans-serif;cursor:pointer}
 	.cx-demo-pick button[aria-selected="true"]{background:#00E5A0;color:#0A0A0F}
@@ -674,7 +676,10 @@
 		const backQ = `<g stroke="rgba(245,245,247,.45)" stroke-linecap="round">${segQ("sh2", "el2", 4)}${segQ("el2", "ha2", 4)}${segQ("hip2", "kn2", 5)}${segQ("kn2", "an2", 5)}${pat.front ? segQ("sh", "sh2", 5) + segQ("hip", "hip2", 5) + segQ("hip2", "sh2", 6) : ""}</g>`;
 		const front = `<g stroke="#F5F5F7" stroke-linecap="round">${segQ("hip", "sh", 6)}${segQ("sh", "el", 4)}${segQ("el", "ha", 4)}${segQ("hip", "kn", 5)}${segQ("kn", "an", 5)}${segQ("an", "toe", 4)}</g>`;
 		const head = `<circle cx="${p.head[0].toFixed(1)}" cy="${p.head[1].toFixed(1)}" r="7" fill="#F5F5F7"/>`;
-		return `<svg viewBox="0 -14 140 154" width="${size}" height="${size * 1.1}" aria-hidden="true"><line x1="0" y1="131" x2="140" y2="131" stroke="rgba(245,245,247,.15)" stroke-width="1"/>${backQ}${gearSvg(pat.gear, p)}${front}${head}</svg>`;
+		const work = pat.work || [];
+		const hlBack = `<g stroke="${WORK_COLOR}" stroke-opacity=".55" stroke-linecap="round">${work.map(([a, b]) => segQ(a === "head" ? a : a + "2", b === "head" ? b : b + "2", 5)).join("")}</g>`;
+		const hl = `<g stroke="${WORK_COLOR}" stroke-linecap="round">${work.map(([a, b]) => segQ(a, b, a === "hip" && b === "sh" ? 7 : 6)).join("")}</g>`;
+		return `<svg viewBox="0 -14 140 154" width="${size}" height="${size * 1.1}" aria-hidden="true"><line x1="0" y1="131" x2="140" y2="131" stroke="rgba(245,245,247,.15)" stroke-width="1"/>${backQ}${hlBack}${gearSvg(pat.gear, p)}${front}${hl}${head}</svg>`;
 	}
 	/* ---------- front view: stance width, grip width, knee tracking ---------- */
 	// Left-side points only; the right side is mirrored around x = 60 unless given.
@@ -729,7 +734,14 @@
 		const feet = `<line x1="${p.an[0].toFixed(1)}" y1="${p.an[1].toFixed(1)}" x2="${(p.an[0] - 5).toFixed(1)}" y2="${(p.an[1] + 1).toFixed(1)}" stroke-width="4"/><line x1="${p.an2[0].toFixed(1)}" y1="${p.an2[1].toFixed(1)}" x2="${(p.an2[0] + 5).toFixed(1)}" y2="${(p.an2[1] + 1).toFixed(1)}" stroke-width="4"/>`;
 		const body = `<g stroke="#F5F5F7" stroke-linecap="round">${s("sh", "sh2", 5)}${s("sh", "hip", 5)}${s("sh2", "hip2", 5)}${s("hip", "hip2", 5)}${s("sh", "el", 4)}${s("el", "ha", 4)}${s("sh2", "el2", 4)}${s("el2", "ha2", 4)}${s("hip", "kn", 5)}${s("kn", "an", 5)}${s("hip2", "kn2", 5)}${s("kn2", "an2", 5)}${feet}</g>`;
 		const fg = FRONT[key] ? FRONT[key].gear : "";
-		return `<svg viewBox="0 -14 120 154" width="${size * 0.86}" height="${size * 1.1}" aria-hidden="true"><line x1="0" y1="131" x2="120" y2="131" stroke="rgba(245,245,247,.15)" stroke-width="1"/>${body}${frontGear(fg, p)}<circle cx="${p.head[0].toFixed(1)}" cy="${p.head[1].toFixed(1)}" r="7" fill="#F5F5F7"/></svg>`;
+		const segs = [];
+		((PATTERNS[key] && PATTERNS[key].work) || []).forEach(([a, b]) => {
+			if (a === "hip" && b === "sh") segs.push(["sh", "hip"], ["sh2", "hip2"], ["sh", "sh2"], ["hip", "hip2"]);
+			else if (b === "head") segs.push(["sh", "head"], ["sh2", "head"]);
+			else segs.push([a, b], [a + "2", b + "2"]);
+		});
+		const hl = `<g stroke="${WORK_COLOR}" stroke-linecap="round">${segs.map(([a, b]) => s(a, b, 6)).join("")}</g>`;
+		return `<svg viewBox="0 -14 120 154" width="${size * 0.86}" height="${size * 1.1}" aria-hidden="true"><line x1="0" y1="131" x2="120" y2="131" stroke="rgba(245,245,247,.15)" stroke-width="1"/>${body}${hl}${frontGear(fg, p)}<circle cx="${p.head[0].toFixed(1)}" cy="${p.head[1].toFixed(1)}" r="7" fill="#F5F5F7"/></svg>`;
 	}
 	function frontPose(key, from, to, t) {
 		const fr = FRONT[key]; if (!fr) return null;
@@ -740,7 +752,7 @@
 	// Lateral raise is already drawn from the front; its "other view" is the side.
 	const LATERAL_SIDE = { a: P({ el: [62, 52], ha: [64, 70] }), b: P({ el: [64, 40], ha: [70, 38] }) };
 
-	function sideView(key, pose) { return key === "lateral" ? figureSvg({ gear: "dbHand" }, pose, VIEW) : figureSvg(PATTERNS[key], pose, VIEW); }
+	function sideView(key, pose) { return key === "lateral" ? figureSvg({ gear: "dbHand", work: PATTERNS.lateral.work }, pose, VIEW) : figureSvg(PATTERNS[key], pose, VIEW); }
 	function frontView(key, pose) { return key === "lateral" ? figureSvg(PATTERNS.lateral, pose, VIEW) : frontSvg(key, pose, VIEW); }
 	function posesAt(key, from, to, k) {
 		if (key === "lateral") return [poseAt(LATERAL_SIDE, from, to, k), poseAt(PATTERNS.lateral, from, to, k)];
@@ -825,6 +837,21 @@
 			`<button type="button" role="tab" data-pick="${esc(ex)}" aria-selected="${i === 0}">${esc(ex)}</button>`).join("")}</div>${demoCard(list[0])}</div>`;
 	}
 
+	/* Worked muscles, drawn in light blue. Segments: torso hip→sh, upper arm sh→el,
+	   forearm el→ha, thigh hip→kn, shin kn→an, neck sh→head. */
+	const WORK_COLOR = "#7CC8FF";
+	const T = ["hip", "sh"], UA = ["sh", "el"], FA = ["el", "ha"], TH = ["hip", "kn"], SH = ["kn", "an"], NK = ["sh", "head"];
+	const WORK = {
+		squat: [[TH], "Quads, glutes"], goblet: [[TH], "Quads, glutes"], lunge: [[TH], "Quads, glutes"], legpress: [[TH], "Quads, glutes"], legext: [[TH], "Quads"],
+		hinge: [[TH, T], "Hamstrings, glutes, lower back"], row: [[T, UA], "Upper back, lats, biceps"], pullup: [[T, UA], "Lats, upper back, biceps"],
+		bench: [[T, UA], "Chest, triceps, front shoulders"], pushup: [[T, UA], "Chest, triceps, core"], fly: [[T, UA], "Chest"],
+		ohp: [[UA], "Shoulders, triceps"], lateral: [[UA], "Side shoulders"], curl: [[UA, FA], "Biceps, forearms"], pushdown: [[UA], "Triceps"], ohext: [[UA], "Triceps"],
+		plank: [[T], "Abs, core"], deadbug: [[T], "Deep abs, core"], crunch: [[T], "Abs"], legraise: [[T, TH], "Lower abs, hip flexors"],
+		bridge: [[TH], "Glutes, hamstrings"], legcurl: [[TH], "Hamstrings"], calf: [[SH], "Calves"], carry: [[FA, T], "Grip, forearms, core"],
+		shrug: [[NK], "Traps"], neck: [[NK], "Neck"], wristcurl: [[FA], "Forearms"]
+	};
+	Object.keys(WORK).forEach((k) => { if (PATTERNS[k]) { PATTERNS[k].work = WORK[k][0]; PATTERNS[k].muscles = WORK[k][1]; } });
+
 	function demoCard(ex) {
 		const key = EXERCISES[ex]; if (!key) return "";
 		const pat = PATTERNS[key];
@@ -834,6 +861,7 @@
 		const thumbs = pat.hold ? "" : `<div class="cx-steps">${th(sideView(key, sa), "1 · Side")}${th(frontView(key, fa), "1 · Front")}${th(sideView(key, sb), "2 · Side")}${th(frontView(key, fb), "2 · Front")}</div><div class="cx-meta" style="margin-top:4px">1 · Start → 2 · ${pat.end}</div>`;
 		return `<div class="cx-demo" data-demo="${key}"><div class="cx-sub2" style="padding:0">How to · ${esc(ex)}</div>
 			<div class="cx-views"><figure><div class="cx-demo-fig" data-view="side">${sideView(key, sa)}</div><figcaption>Side view</figcaption></figure><figure><div class="cx-demo-fig" data-view="front">${frontView(key, fa)}</div><figcaption>Front view</figcaption></figure></div>
+			<div class="cx-worked"><i></i>Worked: ${pat.muscles || ""}</div>
 			<div class="cx-demo-info"><div class="cx-phase">${pat.phases[0][0]}</div><div class="cx-count">${pat.phases[0][1]}<small> s</small></div></div><div class="cx-meta">Tempo: ${tempo}</div>
 			${thumbs}<ul class="cx-cues">${pat.cues.map((c) => `<li>${c}</li>`).join("")}</ul></div>`;
 	}
