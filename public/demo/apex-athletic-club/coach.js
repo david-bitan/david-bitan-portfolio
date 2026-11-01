@@ -126,6 +126,23 @@
 	.cx-form textarea{flex:1;resize:none;border:0;background:transparent;color:#F5F5F7;font:400 14px/1.45 Inter,sans-serif;max-height:110px;padding:7px 0;outline:none}
 	.cx-form textarea::placeholder{color:rgba(245,245,247,.4)}
 	.cx-send{width:38px;height:38px;border-radius:10px;border:0;background:#FF2E7E;color:#fff;cursor:pointer;display:grid;place-items:center;flex:none}
+	.cx-mic{width:38px;height:38px;border-radius:10px;border:1px solid rgba(245,245,247,.22);background:transparent;color:#F5F5F7;cursor:pointer;display:grid;place-items:center;flex:none}
+	.cx-mic:hover{border-color:rgba(245,245,247,.5)}
+	.cx-mic.on{background:#FF2E7E;border-color:#FF2E7E;animation:cxPulse 1.2s infinite}
+	@keyframes cxPulse{0%{box-shadow:0 0 0 0 rgba(255,46,126,.6)}100%{box-shadow:0 0 0 10px rgba(255,46,126,0)}}
+	.cx-how{margin-left:6px;border:1px solid rgba(0,229,160,.5);background:transparent;color:#00E5A0;border-radius:999px;padding:2px 8px;font:600 10.5px/1.4 Inter,sans-serif;cursor:pointer;vertical-align:1px}
+	.cx-how[aria-expanded="true"]{background:#00E5A0;color:#0A0A0F}
+	.cx-demo{margin:8px 10px 10px;padding:12px;border:1px solid rgba(0,229,160,.25);border-radius:12px;background:#0A0A0F}
+	.cx-bubble>.cx-demo{margin:10px 0 0}
+	.cx-demo-top{display:flex;gap:12px;align-items:center}
+	.cx-demo-fig{flex:none;background:#14141C;border-radius:10px;padding:4px}
+	.cx-phase{font:700 18px/1.2 "Space Grotesk",Arial,sans-serif;margin-top:6px}
+	.cx-count{font:700 30px/1 "JetBrains Mono",monospace;color:#00E5A0;margin:4px 0}
+	.cx-count small{font-size:13px;color:rgba(245,245,247,.5)}
+	.cx-steps{display:flex;gap:8px;margin-top:10px}
+	.cx-steps figure{margin:0;background:#14141C;border-radius:8px;padding:4px 4px 2px;text-align:center}
+	.cx-steps figcaption{font-size:10.5px;color:rgba(245,245,247,.6)}
+	.cx-cues{margin:10px 0 0;padding-left:16px;font-size:12.5px;color:rgba(245,245,247,.8)}
 	.cx-send:disabled{background:#2a2a35;color:rgba(245,245,247,.35);cursor:not-allowed}
 	.cx-send.stop{background:#F5F5F7;color:#0A0A0F}
 	.cx-legal{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:11px;color:rgba(245,245,247,.4)}
@@ -145,6 +162,7 @@
 
 	/* ---------- markup ---------- */
 	const I = {
+		mic: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
 		send: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>',
 		stop: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>',
 		close: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
@@ -183,6 +201,7 @@
 			<form class="cx-form">
 				<label class="sr-only" for="cx-input">Message APEX Coach</label>
 				<textarea id="cx-input" rows="1" maxlength="400" placeholder="Ask about training, food or classes…"></textarea>
+				<button type="button" class="cx-mic" aria-label="Speak your question" aria-pressed="false" hidden>${I.mic}</button>
 				<button type="submit" class="cx-send" aria-label="Send" disabled>${I.send}</button>
 			</form>
 			<div class="cx-legal">
@@ -406,7 +425,7 @@
 			`<button type="button" role="tab" data-week="${w}" aria-selected="${w === 0}">Week ${w + 1}</button>`).join("")}</div>` : "";
 		const weeks = P.weeks.map((days, w) => `<div class="cx-week" data-w="${w}"${w ? " hidden" : ""}>` + days.map((d, i) => {
 			const train = d.session ? `<div class="cx-sub2">Training · ${d.session}</div>` + d.ex.map((e) =>
-				`<div class="cx-row cx-mrow"><span class="cx-meta">${e.sets} × ${e.reps}</span><span>${e.name}${e.note ? ` <em class="cx-meta">${e.note}</em>` : ""}</span><span class="cx-meta">${e.rest}</span></div>`).join("")
+				`<div class="cx-row cx-mrow"><span class="cx-meta">${e.sets} × ${e.reps}</span><span>${e.name}${e.note ? ` <em class="cx-meta">${e.note}</em>` : ""}${EXERCISES[e.name] ? ` <button type="button" class="cx-how" data-ex="${e.name}" aria-expanded="false">How to</button>` : ""}</span><span class="cx-meta">${e.rest}</span></div>`).join("")
 				: `<div class="cx-sub2">Rest day · walk 30–45 min or a Recovery class</div>`;
 			const meals = `<div class="cx-sub2">Meals</div>` + d.meals.map((m) =>
 				`<div class="cx-row cx-mrow"><span class="cx-day">${m.slot}</span><span>${m.dish}</span><span class="cx-meta">${fmt(m.kcal)} kcal · ${m.p} g</span></div>`).join("");
@@ -554,6 +573,135 @@
 			chips: [{ label: "Build a fat-loss program", ask: "Build me a 1 month fat loss program" }, { label: "What's my BMI?", ask: "What's my BMI and what's a healthy weight range for me?" }]
 		};
 	}
+	/* ---------- exercise demos: original SVG figure, step by step, with tempo ---------- */
+	// Poses are joint coordinates (side view unless noted). Missing *2 points mirror the first side.
+	const STAND = { head: [61, 22], sh: [60, 34], el: [60, 53], ha: [61, 71], hip: [60, 70], kn: [60, 100], an: [60, 130], toe: [71, 130] };
+	const P = (o) => Object.assign({}, STAND, o);
+	const PATTERNS = {
+		squat: { a: P({ el: [50, 42], ha: [57, 33] }), b: P({ head: [66, 54], sh: [60, 66], el: [50, 72], ha: [57, 64], hip: [40, 100], kn: [72, 102] }), gear: "barBack", end: "Bottom",
+			phases: [["Lower", 3, "a", "b"], ["Pause", 1, "b", "b"], ["Drive up", 1, "b", "a"]], cues: ["Brace, then sit between your hips", "Knees track over the toes", "Stand up through the whole foot"] },
+		goblet: { a: P({ el: [64, 50], ha: [70, 42] }), b: P({ head: [62, 52], sh: [57, 64], el: [62, 82], ha: [70, 72], hip: [40, 100], kn: [72, 102] }), gear: "dbHand", end: "Bottom",
+			phases: [["Lower", 3, "a", "b"], ["Pause", 1, "b", "b"], ["Drive up", 1, "b", "a"]], cues: ["Weight held against the chest", "Elbows inside the knees at the bottom", "Chest up, back neutral"] },
+		hinge: { a: P({ ha: [61, 72] }), b: P({ head: [93, 58], sh: [82, 63], el: [82, 81], ha: [82, 99], hip: [47, 75], kn: [63, 101] }), gear: "barHand", end: "Hinge",
+			phases: [["Hinge down", 3, "a", "b"], ["Pause", 1, "b", "b"], ["Stand tall", 1, "b", "a"]], cues: ["Push the hips back, soft knees", "Bar slides close to the legs", "Flat back, squeeze the glutes to finish"] },
+		row: { a: P({ head: [87, 46], sh: [79, 52], el: [79, 70], ha: [79, 88], hip: [50, 76], kn: [63, 101] }), b: P({ head: [87, 46], sh: [79, 52], el: [62, 58], ha: [70, 72], hip: [50, 76], kn: [63, 101] }), gear: "barHand", end: "Pull",
+			phases: [["Pull", 1, "a", "b"], ["Squeeze", 1, "b", "b"], ["Lower", 3, "b", "a"]], cues: ["Torso still, about 45°", "Pull the elbows toward the hips", "Shoulder blades together at the top"] },
+		pullup: { a: P({ head: [61, 33], sh: [60, 44], el: [61, 28], ha: [61, 12], hip: [60, 80], kn: [64, 106], an: [58, 128], toe: [66, 130] }), b: P({ head: [61, 13], sh: [60, 24], el: [48, 28], ha: [61, 12], hip: [60, 60], kn: [64, 86], an: [58, 108], toe: [66, 110] }), gear: "pullBar", end: "Top",
+			phases: [["Pull up", 1, "a", "b"], ["Squeeze", 1, "b", "b"], ["Lower", 3, "b", "a"]], cues: ["Start from a dead hang, shoulders set", "Lead with the chest", "Full control on the way down"] },
+		bench: { a: { head: [31, 92], sh: [40, 96], el: [41, 78], ha: [42, 60], hip: [76, 96], kn: [97, 96], an: [100, 130], toe: [110, 130] }, b: { head: [31, 92], sh: [40, 96], el: [33, 104], ha: [45, 87], hip: [76, 96], kn: [97, 96], an: [100, 130], toe: [110, 130] }, gear: "bench", end: "Bar to chest",
+			phases: [["Lower", 3, "a", "b"], ["Pause", 1, "b", "b"], ["Press", 1, "b", "a"]], cues: ["Feet planted, shoulder blades pinned", "Touch the lower chest", "Press up and slightly back"] },
+		pushup: { a: { head: [36, 96], sh: [44, 101], el: [44, 115], ha: [44, 130], hip: [79, 114], kn: [97, 121], an: [113, 128], toe: [115, 130] }, b: { head: [36, 113], sh: [44, 117], el: [57, 121], ha: [44, 130], hip: [79, 122], kn: [97, 125], an: [113, 128], toe: [115, 130] }, gear: "", end: "Chest down",
+			phases: [["Lower", 3, "a", "b"], ["Pause", 1, "b", "b"], ["Push up", 1, "b", "a"]], cues: ["Body in one straight line", "Elbows about 45° from the body", "Chest to fist height"] },
+		ohp: { a: P({ el: [70, 44], ha: [64, 32] }), b: P({ el: [62, 14], ha: [61, -4] }), gear: "barHand", end: "Overhead",
+			phases: [["Press", 1, "a", "b"], ["Lock out", 1, "b", "b"], ["Lower", 3, "b", "a"]], cues: ["Squeeze glutes and abs", "Head through once the bar passes", "Bar finishes over the mid-foot"] },
+		lateral: { front: true, a: { head: [60, 22], sh: [50, 34], sh2: [70, 34], el: [46, 52], el2: [74, 52], ha: [44, 70], ha2: [76, 70], hip: [54, 70], hip2: [66, 70], kn: [54, 100], kn2: [66, 100], an: [54, 130], an2: [66, 130] },
+			b: { head: [60, 22], sh: [50, 34], sh2: [70, 34], el: [32, 36], el2: [88, 36], ha: [15, 38], ha2: [105, 38], hip: [54, 70], hip2: [66, 70], kn: [54, 100], kn2: [66, 100], an: [54, 130], an2: [66, 130] }, gear: "dbHand", end: "Shoulder height",
+			phases: [["Raise", 1, "a", "b"], ["Hold", 1, "b", "b"], ["Lower", 3, "b", "a"]], cues: ["Slight bend in the elbows", "Lead with the elbows, not the hands", "Stop at shoulder height"] },
+		curl: { a: P({ el: [60, 53], ha: [63, 71] }), b: P({ el: [60, 53], ha: [70, 37] }), gear: "dbHand", end: "Top",
+			phases: [["Curl", 1, "a", "b"], ["Squeeze", 1, "b", "b"], ["Lower", 3, "b", "a"]], cues: ["Elbows pinned to your sides", "No swinging from the back", "Lower all the way to straight arms"] },
+		pushdown: { a: P({ el: [62, 54], ha: [78, 49] }), b: P({ el: [62, 54], ha: [65, 72] }), gear: "cable", end: "Arms straight",
+			phases: [["Push down", 1, "a", "b"], ["Squeeze", 1, "b", "b"], ["Return", 3, "b", "a"]], cues: ["Elbows stay by the ribs", "Only the forearms move", "Full lockout at the bottom"] },
+		plank: { a: { head: [37, 106], sh: [46, 112], el: [46, 130], ha: [60, 130], hip: [79, 118], kn: [97, 124], an: [113, 128], toe: [115, 130] }, gear: "", end: "Hold", hold: true,
+			phases: [["Hold", 30, "a", "a"]], cues: ["Elbows under the shoulders", "Squeeze glutes, ribs down", "Breathe slowly, don't let hips sag"] },
+		deadbug: { a: { head: [29, 119], sh: [40, 124], el: [40, 108], ha: [40, 92], el2: [41, 108], ha2: [41, 92], hip: [72, 124], kn: [72, 102], an: [90, 102], kn2: [73, 102], an2: [91, 102] },
+			b: { head: [29, 119], sh: [40, 124], el: [27, 114], ha: [15, 120], el2: [41, 108], ha2: [41, 92], hip: [72, 124], kn: [91, 117], an: [110, 121], kn2: [73, 102], an2: [91, 102] }, gear: "floor", end: "Extend",
+			phases: [["Extend", 2, "a", "b"], ["Return", 2, "b", "a"]], cues: ["Lower back pressed into the floor", "Opposite arm and leg move together", "Exhale as you extend"] },
+		lunge: { a: P({ head: [57, 28], sh: [56, 40], el: [57, 58], ha: [58, 76], hip: [56, 76], kn: [70, 102], an: [78, 130], toe: [88, 130], kn2: [46, 104], an2: [34, 128] }),
+			b: P({ head: [53, 52], sh: [52, 64], el: [53, 82], ha: [54, 100], hip: [52, 100], kn: [78, 102], an: [78, 130], toe: [88, 130], kn2: [48, 124], an2: [30, 126] }), gear: "", end: "Bottom",
+			phases: [["Lower", 3, "a", "b"], ["Pause", 1, "b", "b"], ["Drive up", 1, "b", "a"]], cues: ["Front shin close to vertical", "Back knee just above the floor", "Push through the front heel"] },
+		bridge: { a: { head: [29, 93], sh: [38, 98], el: [48, 108], ha: [60, 110], hip: [62, 118], kn: [84, 104], an: [90, 130], toe: [100, 130] }, b: { head: [29, 93], sh: [38, 98], el: [48, 98], ha: [62, 96], hip: [64, 96], kn: [86, 98], an: [90, 130], toe: [100, 130] }, gear: "box", end: "Hips up",
+			phases: [["Drive hips up", 1, "a", "b"], ["Squeeze", 2, "b", "b"], ["Lower", 3, "b", "a"]], cues: ["Upper back on the bench", "Chin tucked, ribs down", "Shins vertical at the top"] },
+		legpress: { a: { head: [27, 76], sh: [34, 84], el: [44, 96], ha: [56, 104], hip: [60, 110], kn: [78, 82], an: [92, 98], toe: [98, 92] }, b: { head: [27, 76], sh: [34, 84], el: [44, 96], ha: [56, 104], hip: [60, 110], kn: [88, 94], an: [116, 82], toe: [122, 76] }, gear: "sled", end: "Legs extended",
+			phases: [["Press", 1, "b", "b"], ["Lower", 3, "b", "a"], ["Press", 1, "a", "b"]], cues: ["Lower back stays on the pad", "Knees in line with the feet", "Don't lock the knees hard"] },
+		legcurl: { a: { head: [19, 92], sh: [30, 96], el: [24, 106], ha: [14, 106], hip: [66, 96], kn: [96, 96], an: [124, 98], toe: [128, 92] }, b: { head: [19, 92], sh: [30, 96], el: [24, 106], ha: [14, 106], hip: [66, 96], kn: [96, 96], an: [104, 69], toe: [110, 66] }, gear: "bench", end: "Curled",
+			phases: [["Curl", 1, "a", "b"], ["Squeeze", 1, "b", "b"], ["Lower", 3, "b", "a"]], cues: ["Hips pressed into the pad", "Curl the heels toward the glutes", "Slow on the way back"] },
+		calf: { a: P({}), b: P({ head: [61, 14], sh: [60, 26], el: [60, 45], ha: [61, 63], hip: [60, 62], kn: [60, 92], an: [62, 122], toe: [71, 130] }), gear: "step", end: "On the toes",
+			phases: [["Rise", 1, "a", "b"], ["Hold", 1, "b", "b"], ["Lower", 3, "b", "a"]], cues: ["Full stretch at the bottom", "Rise onto the big toe", "Pause at the top"] },
+		carry: { a: P({ ha: [61, 72], kn: [66, 100], an: [72, 130], toe: [82, 130], kn2: [54, 100], an2: [48, 130] }), b: P({ ha: [61, 72], kn: [54, 100], an: [48, 130], toe: [58, 130], kn2: [66, 100], an2: [72, 130] }), gear: "dbHand", end: "Walk",
+			phases: [["Step", 0.6, "a", "b"], ["Step", 0.6, "b", "a"]], cues: ["Stand tall, shoulders down", "Short, quick steps", "Grip hard, don't let the weights swing"] }
+	};
+	const EXERCISES = {
+		"Back squat": "squat", "Front squat": "squat", "Goblet squat": "goblet", "Leg press": "legpress",
+		"Romanian deadlift": "hinge", "Deadlift": "hinge", "Back extension": "hinge",
+		"Walking lunge": "lunge", "Split squat": "lunge", "Hip thrust": "bridge", "Leg curl": "legcurl", "Calf raise": "calf",
+		"Bench press": "bench", "Dumbbell bench press": "bench", "Incline dumbbell press": "bench", "Push-up": "pushup", "Overhead press": "ohp",
+		"Lateral raise": "lateral", "Bent-over row": "row", "Barbell row": "row", "Dumbbell row": "row", "Seated cable row": "row", "Face pull": "row",
+		"Lat pulldown": "pullup", "Assisted pull-up": "pullup", "Biceps curl": "curl", "Hammer curl": "curl", "Triceps pushdown": "pushdown",
+		"Plank": "plank", "Dead bug": "deadbug", "Farmer carry": "carry"
+	};
+	// Words people use in questions (EN + FR) → exercise name
+	const ALIASES = [[/squat/i, "Back squat"], [/goblet/i, "Goblet squat"], [/soulev[ée] de terre|deadlift/i, "Deadlift"], [/romanian|rdl|roumain/i, "Romanian deadlift"],
+		[/d[ée]velopp[ée] couch[ée]|bench/i, "Bench press"], [/pompes?|push-?ups?/i, "Push-up"], [/d[ée]velopp[ée] militaire|overhead press|shoulder press|military press/i, "Overhead press"],
+		[/[ée]l[ée]vations? lat[ée]rales?|lateral raise/i, "Lateral raise"], [/rowing|\brow\b/i, "Bent-over row"], [/tractions?|pull-?ups?|chin-?ups?/i, "Assisted pull-up"], [/tirage vertical|pulldown/i, "Lat pulldown"],
+		[/curl/i, "Biceps curl"], [/triceps/i, "Triceps pushdown"], [/planche|gainage|plank/i, "Plank"], [/dead ?bug/i, "Dead bug"], [/fentes?|lunges?/i, "Walking lunge"],
+		[/hip thrust|pont fessier|glute bridge/i, "Hip thrust"], [/presse|leg press/i, "Leg press"], [/leg curl|ischios?/i, "Leg curl"], [/mollets?|calf/i, "Calf raise"], [/farmer|marche du fermier/i, "Farmer carry"]];
+	function exerciseIn(text) { for (const [re, ex] of ALIASES) if (re.test(text)) return ex; return null; }
+
+	function lerp(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; }
+	function poseAt(pat, from, to, t) {
+		const A = pat[from] || pat.a, B = pat[to] || pat.a, out = {};
+		Object.keys(Object.assign({}, A, B)).forEach((k) => { out[k] = lerp(A[k] || B[k], B[k] || A[k], t); });
+		return out;
+	}
+	function gearSvg(g, p) {
+		const H = p.ha, H2 = p.ha2 || p.ha;
+		const pink = 'stroke="#FF2E7E" fill="#FF2E7E"';
+		switch (g) {
+			case "barBack": return `<line x1="${p.sh[0] - 4}" y1="${p.sh[1] - 1}" x2="${p.sh[0] + 4}" y2="${p.sh[1] - 1}" stroke="#FF2E7E" stroke-width="3"/><circle cx="${p.sh[0] - 1}" cy="${p.sh[1] - 1}" r="7" fill="none" stroke="#FF2E7E" stroke-width="3"/>`;
+			case "barHand": return `<circle cx="${H[0]}" cy="${H[1]}" r="7" fill="none" stroke="#FF2E7E" stroke-width="3"/>`;
+			case "dbHand": return `<rect x="${H[0] - 5}" y="${H[1] - 2.5}" width="10" height="5" rx="2" ${pink}/>` + (p.ha2 ? `<rect x="${H2[0] - 5}" y="${H2[1] - 2.5}" width="10" height="5" rx="2" ${pink}/>` : "");
+			case "pullBar": return `<line x1="35" y1="12" x2="95" y2="12" stroke="#FF2E7E" stroke-width="3" stroke-linecap="round"/>`;
+			case "bench": return `<line x1="22" y1="102" x2="100" y2="102" stroke="rgba(245,245,247,.35)" stroke-width="5"/><line x1="40" y1="104" x2="40" y2="130" stroke="rgba(245,245,247,.35)" stroke-width="3"/><line x1="90" y1="104" x2="90" y2="130" stroke="rgba(245,245,247,.35)" stroke-width="3"/>` + (p.ha[1] < 95 && p.ha[0] < 60 ? `<circle cx="${H[0]}" cy="${H[1]}" r="7" fill="none" stroke="#FF2E7E" stroke-width="3"/>` : "");
+			case "cable": return `<line x1="96" y1="-8" x2="${H[0]}" y2="${H[1]}" stroke="#FF2E7E" stroke-width="1.5"/><rect x="${H[0] - 5}" y="${H[1] - 2}" width="10" height="4" rx="2" ${pink}/>`;
+			case "box": return `<rect x="16" y="98" width="26" height="32" rx="3" fill="rgba(245,245,247,.18)"/><rect x="${p.hip[0] - 8}" y="${p.hip[1] - 9}" width="16" height="5" rx="2" ${pink}/>`;
+			case "sled": return `<line x1="${p.toe[0] + 6}" y1="${p.toe[1] - 14}" x2="${p.an[0] - 4}" y2="${p.an[1] + 14}" stroke="#FF2E7E" stroke-width="4" stroke-linecap="round"/><line x1="28" y1="72" x2="64" y2="116" stroke="rgba(245,245,247,.35)" stroke-width="5"/>`;
+			case "step": return `<rect x="56" y="130" width="24" height="8" fill="rgba(245,245,247,.25)"/>`;
+			case "floor": return "";
+			default: return "";
+		}
+	}
+	function figureSvg(pat, p, size) {
+		const q = Object.assign({}, p);
+		["sh", "el", "ha", "hip", "kn", "an"].forEach((k) => { if (!q[k + "2"]) q[k + "2"] = q[k]; });
+		const p2 = q; const segQ = (a, b, w) => p2[a] && p2[b] ? `<line x1="${p2[a][0].toFixed(1)}" y1="${p2[a][1].toFixed(1)}" x2="${p2[b][0].toFixed(1)}" y2="${p2[b][1].toFixed(1)}" stroke-width="${w}"/>` : "";
+		const backQ = `<g stroke="rgba(245,245,247,.45)" stroke-linecap="round">${segQ("sh2", "el2", 4)}${segQ("el2", "ha2", 4)}${segQ("hip2", "kn2", 5)}${segQ("kn2", "an2", 5)}${pat.front ? segQ("sh", "sh2", 5) + segQ("hip", "hip2", 5) + segQ("hip2", "sh2", 6) : ""}</g>`;
+		const front = `<g stroke="#F5F5F7" stroke-linecap="round">${segQ("hip", "sh", 6)}${segQ("sh", "el", 4)}${segQ("el", "ha", 4)}${segQ("hip", "kn", 5)}${segQ("kn", "an", 5)}${segQ("an", "toe", 4)}</g>`;
+		const head = `<circle cx="${p.head[0].toFixed(1)}" cy="${p.head[1].toFixed(1)}" r="7" fill="#F5F5F7"/>`;
+		return `<svg viewBox="0 -14 140 154" width="${size}" height="${size * 1.1}" aria-hidden="true"><line x1="0" y1="131" x2="140" y2="131" stroke="rgba(245,245,247,.15)" stroke-width="1"/>${backQ}${gearSvg(pat.gear, p)}${front}${head}</svg>`;
+	}
+	function demoCard(ex) {
+		const key = EXERCISES[ex]; if (!key) return "";
+		const pat = PATTERNS[key];
+		const tempo = pat.hold ? `Hold ${pat.phases[0][1]} s` : pat.phases.map(([l, sec]) => `${l} ${sec} s`).join(" · ");
+		const thumbs = pat.hold ? "" : `<div class="cx-steps"><figure>${figureSvg(pat, pat.a, 58)}<figcaption>1 · Start</figcaption></figure><figure>${figureSvg(pat, pat.b, 58)}<figcaption>2 · ${pat.end}</figcaption></figure></div>`;
+		return `<div class="cx-demo" data-demo="${key}"><div class="cx-demo-top"><div class="cx-demo-fig">${figureSvg(pat, pat.a, 112)}</div>
+			<div class="cx-demo-info"><div class="cx-sub2" style="padding:0">How to · ${esc(ex)}</div><div class="cx-phase">${pat.phases[0][0]}</div><div class="cx-count">${pat.phases[0][1]}<small> s</small></div><div class="cx-meta">Tempo: ${tempo}</div></div></div>
+			${thumbs}<ul class="cx-cues">${pat.cues.map((c) => `<li>${c}</li>`).join("")}</ul></div>`;
+	}
+	// One loop drives every demo on screen.
+	let demoLoop = null;
+	function animateDemos() {
+		if (demoLoop) return;
+		const t0 = performance.now();
+		const tick = (now) => {
+			const cards = log.querySelectorAll(".cx-demo");
+			if (!cards.length || !panel.classList.contains("open")) { demoLoop = null; return; }
+			cards.forEach((card) => {
+				const pat = PATTERNS[card.dataset.demo];
+				const total = pat.phases.reduce((t, ph) => t + ph[1], 0);
+				let t = ((now - t0) / 1000) % total, i = 0;
+				while (t > pat.phases[i][1]) { t -= pat.phases[i][1]; i++; }
+				const [label, sec, from, to] = pat.phases[i];
+				const k = REDUCED ? 0 : (1 - Math.cos(Math.PI * (t / sec))) / 2;
+				card.querySelector(".cx-demo-fig").innerHTML = figureSvg(pat, REDUCED ? pat[from] || pat.a : poseAt(pat, from, to, k), 112);
+				card.querySelector(".cx-phase").textContent = label;
+				card.querySelector(".cx-count").firstChild.nodeValue = String(Math.max(0, Math.ceil(sec - t)));
+			});
+			demoLoop = requestAnimationFrame(tick);
+		};
+		demoLoop = requestAnimationFrame(tick);
+	}
+
 	const intents = [
 		{
 			id: "program",
@@ -676,7 +824,8 @@
 			{ label: "How much water should I drink?", ask: "How much water should I drink per day, including training days?" },
 			{ label: "Build my training + meal program", ask: "Build me a program with training and meals" },
 			{ label: "Which class fits a beginner?", ask: "Which class fits a beginner?" },
-			{ label: "How do I estimate my body fat?", ask: "How can I estimate my body fat percentage?" }
+			{ label: "How do I estimate my body fat?", ask: "How can I estimate my body fat percentage?" },
+			{ label: "Show me how to squat", ask: "How do I squat with good form?" }
 		];
 	}
 
@@ -887,6 +1036,8 @@
 				wrap.appendChild(noteEl({ kind: "err", text: offline
 					? "Live answers aren't switched on for this site yet. I can still build programs, compare memberships and suggest classes."
 					: "Coach couldn't reach the AI service. Your message is safe — nothing was lost." }));
+				const exOff = exerciseIn(userText);
+				if (exOff) { const b2 = document.createElement("div"); b2.className = "cx-bubble"; b2.innerHTML = demoCard(exOff); wrap.appendChild(b2); animateDemos(); }
 				const r = chipRow(offline ? starterChips().slice(2, 3) : []);
 				if (!offline) {
 					const retry = document.createElement("button");
@@ -899,6 +1050,8 @@
 				return;
 			}
 			convo.push({ role: "assistant", content: text });
+			const ex = exerciseIn(userText);
+			if (ex) { bubble.insertAdjacentHTML("beforeend", demoCard(ex)); animateDemos(); }
 			wrap.appendChild(actions(q, wrap, bubble, display));
 			history.push({ q, d: display || null, id: "ai", t: text });
 			save();
@@ -1000,7 +1153,7 @@
 			convo.push({ role: "user", content: d || q });
 			if (id === "ai") {
 				const wrap = document.createElement("div"); wrap.className = "cx-msg cx-bot";
-				const bubble = document.createElement("div"); bubble.className = "cx-bubble cx-ai"; bubble.innerHTML = md(t || "");
+				const bubble = document.createElement("div"); bubble.className = "cx-bubble cx-ai"; bubble.innerHTML = md(t || "") + (exerciseIn(d || q) ? demoCard(exerciseIn(d || q)) : "");
 				wrap.appendChild(bubble); wrap.appendChild(actions(q, wrap, bubble, d)); log.appendChild(wrap);
 				convo.push({ role: "assistant", content: t || "" });
 				return;
@@ -1029,6 +1182,7 @@
 		launch.setAttribute("aria-expanded", "true");
 		setTimeout(() => input.focus(), 50);
 		scrollDown();
+		animateDemos();
 	}
 	function close() {
 		panel.classList.remove("open");
@@ -1038,6 +1192,40 @@
 	}
 
 	function autosize() { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 110) + "px"; sendBtn.disabled = busy ? false : !input.value.trim(); }
+
+
+	/* ---------- voice input (Web Speech API, where the browser supports it) ---------- */
+	const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+	const micBtn = $(".cx-mic");
+	if (Rec) {
+		micBtn.hidden = false;
+		let rec = null, base = "";
+		const stopMic = () => { if (rec) rec.stop(); };
+		micBtn.addEventListener("click", () => {
+			if (rec) return stopMic();
+			rec = new Rec();
+			rec.lang = navigator.language || "en-US";
+			rec.interimResults = true;
+			rec.continuous = false;
+			base = input.value ? input.value.trim() + " " : "";
+			micBtn.setAttribute("aria-pressed", "true"); micBtn.classList.add("on");
+			input.dataset.ph = input.placeholder; input.placeholder = "Listening… speak now";
+			rec.onresult = (ev) => {
+				let t = "";
+				for (let i = 0; i < ev.results.length; i++) t += ev.results[i][0].transcript;
+				input.value = base + t; autosize();
+			};
+			rec.onerror = (ev) => {
+				if (ev.error === "not-allowed" || ev.error === "service-not-allowed") input.placeholder = "Microphone blocked. Allow it in the browser bar.";
+			};
+			rec.onend = () => {
+				rec = null; micBtn.setAttribute("aria-pressed", "false"); micBtn.classList.remove("on");
+				setTimeout(() => { if (input.dataset.ph) input.placeholder = input.dataset.ph; }, input.placeholder.startsWith("Microphone") ? 3000 : 0);
+				input.focus();
+			};
+			try { rec.start(); } catch (_) { rec = null; }
+		});
+	}
 
 	launch.addEventListener("click", open);
 	$("[data-close]").addEventListener("click", close);
@@ -1091,6 +1279,15 @@
 			const card = tab.closest(".cx-bubble");
 			card.querySelectorAll("[data-week]").forEach((b) => b.setAttribute("aria-selected", String(b === tab)));
 			card.querySelectorAll(".cx-week").forEach((w) => (w.hidden = w.dataset.w !== tab.dataset.week));
+			return;
+		}
+		const how = e.target.closest(".cx-how");
+		if (how) {
+			const row = how.closest(".cx-row"), next = row.nextElementSibling;
+			if (next && next.classList.contains("cx-demo")) { next.remove(); how.setAttribute("aria-expanded", "false"); return; }
+			row.insertAdjacentHTML("afterend", demoCard(how.dataset.ex));
+			how.setAttribute("aria-expanded", "true");
+			animateDemos();
 			return;
 		}
 		const pdf = e.target.closest("[data-pdf]");
