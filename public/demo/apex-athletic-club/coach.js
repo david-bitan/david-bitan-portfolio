@@ -132,6 +132,12 @@
 	.cx-demo{margin:8px 10px 10px;padding:12px;border:1px solid rgba(0,229,160,.25);border-radius:12px;background:#0A0A0F}
 	.cx-bubble>.cx-demo{margin:10px 0 0}
 	.cx-demo-top{display:flex;gap:12px;align-items:center}
+	.cx-views{display:flex;gap:8px;margin-top:8px}
+	.cx-views figure{margin:0;flex:1;text-align:center}
+	.cx-views .cx-demo-fig{display:flex;justify-content:center}
+	.cx-views figcaption{font-size:10.5px;color:rgba(245,245,247,.6);margin-top:3px}
+	.cx-demo-info{display:flex;align-items:baseline;gap:12px;margin-top:8px}
+	.cx-demo-info .cx-phase,.cx-demo-info .cx-count{margin:0}
 	.cx-demo-fig{flex:none;background:#14141C;border-radius:10px;padding:4px}
 	.cx-phase{font:700 18px/1.2 "Space Grotesk",Arial,sans-serif;margin-top:6px}
 	.cx-count{font:700 30px/1 "JetBrains Mono",monospace;color:#00E5A0;margin:4px 0}
@@ -664,13 +670,87 @@
 		const head = `<circle cx="${p.head[0].toFixed(1)}" cy="${p.head[1].toFixed(1)}" r="7" fill="#F5F5F7"/>`;
 		return `<svg viewBox="0 -14 140 154" width="${size}" height="${size * 1.1}" aria-hidden="true"><line x1="0" y1="131" x2="140" y2="131" stroke="rgba(245,245,247,.15)" stroke-width="1"/>${backQ}${gearSvg(pat.gear, p)}${front}${head}</svg>`;
 	}
+	/* ---------- front view: stance width, grip width, knee tracking ---------- */
+	// Left-side points only; the right side is mirrored around x = 60 unless given.
+	const FSTAND = { head: [60, 22], sh: [48, 34], el: [46, 52], ha: [46, 70], hip: [54, 70], kn: [53, 100], an: [52, 130] };
+	function F(o) {
+		const p = Object.assign({}, FSTAND, o);
+		["sh", "el", "ha", "hip", "kn", "an"].forEach((k) => { if (!p[k + "2"]) p[k + "2"] = [120 - p[k][0], p[k][1]]; });
+		return p;
+	}
+	const FRONT = {
+		squat: { a: F({ el: [36, 40], ha: [38, 30], an: [46, 130], kn: [47, 100] }), b: F({ head: [60, 50], sh: [48, 62], el: [36, 68], ha: [38, 58], hip: [52, 98], kn: [38, 102], an: [46, 130] }), gear: "barShoulders" },
+		goblet: { a: F({ el: [48, 50], ha: [56, 44], an: [46, 130], kn: [47, 100] }), b: F({ head: [60, 50], sh: [48, 62], el: [44, 78], ha: [56, 72], hip: [52, 98], kn: [38, 102], an: [46, 130] }), gear: "dbCenter" },
+		hinge: { a: F({ el: [47, 52], ha: [50, 72] }), b: F({ head: [60, 52], sh: [48, 60], el: [48, 78], ha: [50, 96], hip: [54, 74], kn: [53, 101] }), gear: "barWide" },
+		row: { a: F({ head: [60, 44], sh: [48, 52], el: [48, 70], ha: [50, 88], hip: [54, 76], kn: [53, 101] }), b: F({ head: [60, 44], sh: [48, 52], el: [30, 56], ha: [48, 68], hip: [54, 76], kn: [53, 101] }), gear: "barWide" },
+		pullup: { a: F({ head: [60, 33], sh: [48, 44], el: [36, 28], ha: [30, 12], hip: [54, 80], kn: [53, 106], an: [53, 128] }), b: F({ head: [60, 13], sh: [48, 24], el: [28, 30], ha: [30, 12], hip: [54, 60], kn: [53, 86], an: [53, 108] }), gear: "pullBar" },
+		bench: { a: F({ head: [60, 90], sh: [46, 98], el: [38, 80], ha: [34, 62], hip: [54, 100], kn: [44, 104], an: [40, 130] }), b: F({ head: [60, 90], sh: [46, 98], el: [28, 104], ha: [34, 86], hip: [54, 100], kn: [44, 104], an: [40, 130] }), gear: "benchBar" },
+		pushup: { a: F({ head: [60, 94], sh: [47, 101], el: [40, 115], ha: [36, 130], hip: [55, 108], kn: [56, 112], an: [57, 116] }), b: F({ head: [60, 110], sh: [47, 117], el: [30, 121], ha: [36, 130], hip: [55, 120], kn: [56, 122], an: [57, 124] }), gear: "" },
+		ohp: { a: F({ el: [38, 46], ha: [42, 32] }), b: F({ el: [42, 14], ha: [44, -4] }), gear: "barHandsFront" },
+		lateral: null,
+		curl: { a: F({ el: [46, 53], ha: [45, 71] }), b: F({ el: [46, 53], ha: [45, 40] }), gear: "dbBoth" },
+		pushdown: { a: F({ el: [46, 54], ha: [54, 48] }), b: F({ el: [46, 54], ha: [48, 72] }), gear: "cableFront" },
+		plank: { a: F({ head: [60, 104], sh: [48, 112], el: [48, 130], ha: [55, 130], hip: [55, 116], kn: [56, 119], an: [57, 122] }), gear: "" },
+		deadbug: { a: F({ head: [60, 116], sh: [48, 122], el: [48, 106], ha: [50, 90], hip: [54, 124], kn: [52, 104], an: [52, 100] }),
+			b: F({ head: [60, 116], sh: [48, 122], el: [46, 118], ha: [44, 124], el2: [72, 106], ha2: [70, 90], hip: [54, 124], kn: [52, 104], an: [52, 100], kn2: [67, 114], an2: [70, 126] }), gear: "" },
+		lunge: { a: F({ hip: [53, 76], kn: [51, 102], an: [50, 130], kn2: [69, 104], an2: [71, 128] }), b: F({ head: [60, 52], sh: [48, 64], el: [46, 82], ha: [46, 100], hip: [53, 100], kn: [50, 102], an: [50, 130], hip2: [67, 100], kn2: [70, 124], an2: [72, 128] }), gear: "" },
+		bridge: { a: F({ head: [60, 94], sh: [48, 98], el: [44, 108], ha: [52, 112], hip: [52, 118], kn: [44, 104], an: [46, 130] }), b: F({ head: [60, 94], sh: [48, 98], el: [44, 100], ha: [52, 96], hip: [52, 96], kn: [44, 98], an: [46, 130] }), gear: "boxFront" },
+		legpress: { a: F({ head: [60, 76], sh: [48, 84], el: [42, 98], ha: [44, 108], hip: [52, 110], kn: [44, 86], an: [46, 98] }), b: F({ head: [60, 76], sh: [48, 84], el: [42, 98], ha: [44, 108], hip: [52, 110], kn: [46, 96], an: [46, 84] }), gear: "sledFront" },
+		legcurl: { a: F({ head: [60, 88], sh: [48, 94], el: [44, 100], ha: [46, 106], hip: [54, 98], kn: [54, 100], an: [54, 102] }), b: F({ head: [60, 88], sh: [48, 94], el: [44, 100], ha: [46, 106], hip: [54, 98], kn: [54, 100], an: [54, 72] }), gear: "benchFront" },
+		calf: { a: F({ an: [53, 130] }), b: F({ head: [60, 14], sh: [48, 26], el: [46, 44], ha: [46, 62], hip: [54, 62], kn: [53, 92], an: [53, 122] }), gear: "stepFront" },
+		carry: { a: F({ ha: [42, 72], an: [50, 130], an2: [68, 126] }), b: F({ ha: [42, 72], an: [52, 126], an2: [70, 130] }), gear: "dbBoth" }
+	};
+	function frontGear(g, p) {
+		const pink = 'stroke="#FF2E7E" fill="#FF2E7E"', line = (x1, y1, x2, y2, w) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#FF2E7E" stroke-width="${w || 3}" stroke-linecap="round"/>`;
+		const H = p.ha, H2 = p.ha2;
+		switch (g) {
+			case "barShoulders": return line(18, p.sh[1] - 4, 102, p.sh[1] - 4) + `<rect x="12" y="${p.sh[1] - 12}" width="6" height="16" rx="2" ${pink}/><rect x="102" y="${p.sh[1] - 12}" width="6" height="16" rx="2" ${pink}/>`;
+			case "barWide": case "barHandsFront": return line(18, H[1], 102, H2[1]) + `<rect x="12" y="${H[1] - 8}" width="6" height="16" rx="2" ${pink}/><rect x="102" y="${H2[1] - 8}" width="6" height="16" rx="2" ${pink}/>`;
+			case "dbCenter": return `<rect x="54" y="${H[1] - 4}" width="12" height="8" rx="2" ${pink}/>`;
+			case "dbBoth": return `<rect x="${H[0] - 3}" y="${H[1] - 6}" width="6" height="12" rx="2" ${pink}/><rect x="${H2[0] - 3}" y="${H2[1] - 6}" width="6" height="12" rx="2" ${pink}/>`;
+			case "pullBar": return line(10, 12, 110, 12);
+			case "benchFront": case "benchBar": return `<rect x="40" y="100" width="40" height="6" rx="2" fill="rgba(245,245,247,.35)"/><line x1="44" y1="106" x2="44" y2="130" stroke="rgba(245,245,247,.35)" stroke-width="3"/><line x1="76" y1="106" x2="76" y2="130" stroke="rgba(245,245,247,.35)" stroke-width="3"/>` + (g === "benchBar" ? line(18, H[1], 102, H2[1]) : "");
+			case "cableFront": return line(60, -8, H[0], H[1], 1.5) + line(60, -8, H2[0], H2[1], 1.5);
+			case "boxFront": return `<rect x="36" y="98" width="48" height="32" rx="3" fill="rgba(245,245,247,.18)"/><rect x="44" y="${p.hip[1] - 9}" width="32" height="5" rx="2" ${pink}/>`;
+			case "sledFront": return `<rect x="34" y="${p.an[1] - 10}" width="52" height="20" rx="3" fill="none" stroke="#FF2E7E" stroke-width="3"/>`;
+			case "stepFront": return `<rect x="40" y="130" width="40" height="8" fill="rgba(245,245,247,.25)"/>`;
+			default: return "";
+		}
+	}
+	function frontSvg(key, p, size) {
+		const s = (a, b, w) => p[a] && p[b] ? `<line x1="${p[a][0].toFixed(1)}" y1="${p[a][1].toFixed(1)}" x2="${p[b][0].toFixed(1)}" y2="${p[b][1].toFixed(1)}" stroke-width="${w}"/>` : "";
+		const feet = `<line x1="${p.an[0].toFixed(1)}" y1="${p.an[1].toFixed(1)}" x2="${(p.an[0] - 5).toFixed(1)}" y2="${(p.an[1] + 1).toFixed(1)}" stroke-width="4"/><line x1="${p.an2[0].toFixed(1)}" y1="${p.an2[1].toFixed(1)}" x2="${(p.an2[0] + 5).toFixed(1)}" y2="${(p.an2[1] + 1).toFixed(1)}" stroke-width="4"/>`;
+		const body = `<g stroke="#F5F5F7" stroke-linecap="round">${s("sh", "sh2", 5)}${s("sh", "hip", 5)}${s("sh2", "hip2", 5)}${s("hip", "hip2", 5)}${s("sh", "el", 4)}${s("el", "ha", 4)}${s("sh2", "el2", 4)}${s("el2", "ha2", 4)}${s("hip", "kn", 5)}${s("kn", "an", 5)}${s("hip2", "kn2", 5)}${s("kn2", "an2", 5)}${feet}</g>`;
+		const fg = FRONT[key] ? FRONT[key].gear : "";
+		return `<svg viewBox="0 -14 120 154" width="${size * 0.86}" height="${size * 1.1}" aria-hidden="true"><line x1="0" y1="131" x2="120" y2="131" stroke="rgba(245,245,247,.15)" stroke-width="1"/>${body}${frontGear(fg, p)}<circle cx="${p.head[0].toFixed(1)}" cy="${p.head[1].toFixed(1)}" r="7" fill="#F5F5F7"/></svg>`;
+	}
+	function frontPose(key, from, to, t) {
+		const fr = FRONT[key]; if (!fr) return null;
+		const A = fr[from] || fr.a, B = fr[to] || fr.a, out = {};
+		Object.keys(A).forEach((k) => { out[k] = lerp(A[k], B[k] || A[k], t); });
+		return out;
+	}
+	// Lateral raise is already drawn from the front; its "other view" is the side.
+	const LATERAL_SIDE = { a: P({ el: [62, 52], ha: [64, 70] }), b: P({ el: [64, 40], ha: [70, 38] }) };
+
+	function sideView(key, pose) { return key === "lateral" ? figureSvg({ gear: "dbHand" }, pose, VIEW) : figureSvg(PATTERNS[key], pose, VIEW); }
+	function frontView(key, pose) { return key === "lateral" ? figureSvg(PATTERNS.lateral, pose, VIEW) : frontSvg(key, pose, VIEW); }
+	function posesAt(key, from, to, k) {
+		if (key === "lateral") return [poseAt(LATERAL_SIDE, from, to, k), poseAt(PATTERNS.lateral, from, to, k)];
+		return [poseAt(PATTERNS[key], from, to, k), frontPose(key, from, to, k)];
+	}
+	const VIEW = 100;
+
 	function demoCard(ex) {
 		const key = EXERCISES[ex]; if (!key) return "";
 		const pat = PATTERNS[key];
 		const tempo = pat.hold ? `Hold ${pat.phases[0][1]} s` : pat.phases.map(([l, sec]) => `${l} ${sec} s`).join(" · ");
-		const thumbs = pat.hold ? "" : `<div class="cx-steps"><figure>${figureSvg(pat, pat.a, 58)}<figcaption>1 · Start</figcaption></figure><figure>${figureSvg(pat, pat.b, 58)}<figcaption>2 · ${pat.end}</figcaption></figure></div>`;
-		return `<div class="cx-demo" data-demo="${key}"><div class="cx-demo-top"><div class="cx-demo-fig">${figureSvg(pat, pat.a, 112)}</div>
-			<div class="cx-demo-info"><div class="cx-sub2" style="padding:0">How to · ${esc(ex)}</div><div class="cx-phase">${pat.phases[0][0]}</div><div class="cx-count">${pat.phases[0][1]}<small> s</small></div><div class="cx-meta">Tempo: ${tempo}</div></div></div>
+		const [sa, fa] = posesAt(key, "a", "a", 0), [sb, fb] = posesAt(key, "b", "b", 0);
+		const th = (svg, cap) => `<figure>${svg.replace(/width="[\d.]+" height="[\d.]+"/, 'width="52" height="57"')}<figcaption>${cap}</figcaption></figure>`;
+		const thumbs = pat.hold ? "" : `<div class="cx-steps">${th(sideView(key, sa), "1 · Side")}${th(frontView(key, fa), "1 · Front")}${th(sideView(key, sb), "2 · Side")}${th(frontView(key, fb), "2 · Front")}</div><div class="cx-meta" style="margin-top:4px">1 · Start → 2 · ${pat.end}</div>`;
+		return `<div class="cx-demo" data-demo="${key}"><div class="cx-sub2" style="padding:0">How to · ${esc(ex)}</div>
+			<div class="cx-views"><figure><div class="cx-demo-fig" data-view="side">${sideView(key, sa)}</div><figcaption>Side view</figcaption></figure><figure><div class="cx-demo-fig" data-view="front">${frontView(key, fa)}</div><figcaption>Front view</figcaption></figure></div>
+			<div class="cx-demo-info"><div class="cx-phase">${pat.phases[0][0]}</div><div class="cx-count">${pat.phases[0][1]}<small> s</small></div></div><div class="cx-meta">Tempo: ${tempo}</div>
 			${thumbs}<ul class="cx-cues">${pat.cues.map((c) => `<li>${c}</li>`).join("")}</ul></div>`;
 	}
 	// One loop drives every demo on screen.
@@ -688,7 +768,10 @@
 				while (t > pat.phases[i][1]) { t -= pat.phases[i][1]; i++; }
 				const [label, sec, from, to] = pat.phases[i];
 				const k = REDUCED ? 0 : (1 - Math.cos(Math.PI * (t / sec))) / 2;
-				card.querySelector(".cx-demo-fig").innerHTML = figureSvg(pat, REDUCED ? pat[from] || pat.a : poseAt(pat, from, to, k), 112);
+				const key = card.dataset.demo;
+				const [ps, pf] = REDUCED ? posesAt(key, from, from, 0) : posesAt(key, from, to, k);
+				card.querySelector('[data-view="side"]').innerHTML = sideView(key, ps);
+				card.querySelector('[data-view="front"]').innerHTML = frontView(key, pf);
 				card.querySelector(".cx-phase").textContent = label;
 				card.querySelector(".cx-count").firstChild.nodeValue = String(Math.max(0, Math.ceil(sec - t)));
 			});
