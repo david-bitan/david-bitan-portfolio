@@ -126,16 +126,7 @@
 	.cx-form textarea{flex:1;resize:none;border:0;background:transparent;color:#F5F5F7;font:400 14px/1.45 Inter,sans-serif;max-height:110px;padding:7px 0;outline:none}
 	.cx-form textarea::placeholder{color:rgba(245,245,247,.4)}
 	.cx-send{width:38px;height:38px;border-radius:10px;border:0;background:#FF2E7E;color:#fff;cursor:pointer;display:grid;place-items:center;flex:none}
-	.cx-mic{width:38px;height:38px;border-radius:10px;border:1px solid rgba(245,245,247,.22);background:transparent;color:#F5F5F7;cursor:pointer;display:grid;place-items:center;flex:none}
-	.cx-mic:hover{border-color:rgba(245,245,247,.5)}
-	.cx-mic-x,.cx-mic-ok{width:38px;height:38px;border-radius:10px;border:1px solid rgba(245,245,247,.22);background:transparent;color:#F5F5F7;cursor:pointer;display:grid;place-items:center;flex:none}
-	.cx-mic-ok{background:#F5F5F7;color:#0A0A0F;border-color:#F5F5F7}
-	.cx-mic-x:hover{border-color:#FF2E7E;color:#FF2E7E}
-	.cx-form.rec{border-color:#FF2E7E;box-shadow:0 0 0 3px rgba(255,46,126,.18);animation:cxPulse 1.6s infinite}
 	.cx-form [hidden]{display:none!important}
-	.cx-waves{display:flex;align-items:center;gap:3px;height:26px;padding:0 4px;flex:none}
-	.cx-waves i{display:block;width:3px;height:24px;border-radius:2px;background:#FF2E7E;transform:scaleY(.15);transition:transform 80ms linear}
-	@keyframes cxPulse{0%{box-shadow:0 0 0 0 rgba(255,46,126,.6)}100%{box-shadow:0 0 0 10px rgba(255,46,126,0)}}
 	.cx-how{margin-left:6px;border:1px solid rgba(0,229,160,.5);background:transparent;color:#00E5A0;border-radius:999px;padding:2px 8px;font:600 10.5px/1.4 Inter,sans-serif;cursor:pointer;vertical-align:1px}
 	.cx-how[aria-expanded="true"]{background:#00E5A0;color:#0A0A0F}
 	.cx-demo{margin:8px 10px 10px;padding:12px;border:1px solid rgba(0,229,160,.25);border-radius:12px;background:#0A0A0F}
@@ -168,7 +159,6 @@
 
 	/* ---------- markup ---------- */
 	const I = {
-		mic: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
 		send: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>',
 		stop: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>',
 		close: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
@@ -207,10 +197,6 @@
 			<form class="cx-form">
 				<label class="sr-only" for="cx-input">Message APEX Coach</label>
 				<textarea id="cx-input" rows="1" maxlength="400" placeholder="Ask about training, food or classes…"></textarea>
-				<button type="button" class="cx-mic" aria-label="Speak your question" hidden>${I.mic}</button>
-				<span class="cx-waves" aria-hidden="true" hidden><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-				<button type="button" class="cx-mic-x" aria-label="Cancel voice input, discard the text" hidden>${I.close}</button>
-				<button type="button" class="cx-mic-ok" aria-label="Keep the dictated text" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
 				<button type="submit" class="cx-send" aria-label="Send" disabled>${I.send}</button>
 			</form>
 			<div class="cx-legal">
@@ -1202,119 +1188,6 @@
 
 	function autosize() { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 110) + "px"; sendBtn.disabled = busy ? false : !input.value.trim(); }
 
-
-	/* ---------- voice input: mic → waves + ✕ / ✓ (like Claude) ----------
-	   Records the microphone (levels drive the waves, samples become a WAV).
-	   Live text comes from the browser's speech recognition when it works;
-	   on ✓ the recording is transcribed by Whisper (Workers AI) when the
-	   browser produced nothing, so voice typing works in every browser. */
-	const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
-	const micBtn = $(".cx-mic"), micX = $(".cx-mic-x"), micOk = $(".cx-mic-ok"), waves = $(".cx-waves");
-	if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia && (window.AudioContext || window.webkitAudioContext)) {
-		micBtn.hidden = false;
-		const ph = input.placeholder;
-		let st = null; // current session
-		const bars = [...waves.querySelectorAll("i")];
-		const ui = (on) => {
-			form.classList.toggle("rec", on);
-			micBtn.hidden = on; sendBtn.hidden = on; micX.hidden = !on; micOk.hidden = !on; waves.hidden = !on;
-			input.placeholder = on ? "Listening… speak now" : ph;
-			if (!on) { autosize(); input.focus(); }
-		};
-		const flash = (msg) => { input.placeholder = msg; setTimeout(() => { if (!st) input.placeholder = ph; }, 4500); };
-
-		function wav(chunks, rate) {
-			const len = chunks.reduce((t, c) => t + c.length, 0), ratio = rate / 16000, n = Math.floor(len / ratio);
-			const flat = new Float32Array(len); let o = 0; chunks.forEach((c) => { flat.set(c, o); o += c.length; });
-			const buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
-			const w = (off, str) => { for (let k = 0; k < str.length; k++) v.setUint8(off + k, str.charCodeAt(k)); };
-			w(0, "RIFF"); v.setUint32(4, 36 + n * 2, true); w(8, "WAVE"); w(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
-			v.setUint32(24, 16000, true); v.setUint32(28, 32000, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, "data"); v.setUint32(40, n * 2, true);
-			for (let k = 0; k < n; k++) { const x = Math.max(-1, Math.min(1, flat[Math.floor(k * ratio)])); v.setInt16(44 + k * 2, x < 0 ? x * 0x8000 : x * 0x7fff, true); }
-			return new Blob([buf], { type: "audio/wav" });
-		}
-
-		async function begin() {
-			let stream;
-			try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
-			catch (e) { return flash(e && e.name === "NotAllowedError" ? "Microphone blocked. Allow it from the icon in the address bar." : "No microphone found."); }
-			const AC = window.AudioContext || window.webkitAudioContext, ctx = new AC();
-			try { await ctx.resume(); } catch (_) {}
-			const src = ctx.createMediaStreamSource(stream), an = ctx.createAnalyser(); an.fftSize = 256;
-			const proc = ctx.createScriptProcessor(4096, 1, 1);
-			st = { stream, ctx, chunks: [], base: input.value.trim() ? input.value.trim() + " " : "", live: "", heard: false, t0: performance.now(), rec: null };
-			proc.onaudioprocess = (e) => {
-				if (!st || st.chunks.length >= 260) return;
-				const d = e.inputBuffer.getChannelData(0);
-				let pk = 0; for (let k = 0; k < d.length; k++) { const a = Math.abs(d[k]); if (a > pk) pk = a; }
-				st.peak = Math.max(st.peak || 0, pk);
-				st.chunks.push(new Float32Array(d));
-			};
-			src.connect(an); src.connect(proc); proc.connect(ctx.destination);
-			st.proc = proc; st.src = src;
-			ui(true);
-			// waves
-			const data = new Uint8Array(an.fftSize);
-			const draw = () => {
-				if (!st) return;
-				an.getByteTimeDomainData(data);
-				let sum = 0; for (let k = 0; k < data.length; k++) { const d = (data[k] - 128) / 128; sum += d * d; }
-				const lvl = Math.min(1, Math.sqrt(sum / data.length) * 9);
-				if (lvl > 0.12) st.heard = true;
-				bars.forEach((b, k) => { const h = 0.22 + lvl * (0.55 + 0.45 * Math.sin(performance.now() / 120 + k * 1.3)); b.style.transform = `scaleY(${Math.max(0.15, Math.min(1, h))})`; });
-				if (!st.heard && performance.now() - st.t0 > 4000) input.placeholder = "No sound yet. Check your microphone.";
-				st.raf = requestAnimationFrame(draw);
-			};
-			draw();
-			// live text where the browser can do it
-			if (Rec && false) {
-				const startRec = () => {
-					const r = new Rec(); st.rec = r;
-					r.lang = navigator.language || "en-US"; r.interimResults = true; r.continuous = true;
-					let fin = "";
-					r.onresult = (ev) => {
-						let interim = "";
-						for (let k = ev.resultIndex; k < ev.results.length; k++) { if (ev.results[k].isFinal) fin += ev.results[k][0].transcript; else interim += ev.results[k][0].transcript; }
-						st.live = (st.prev || "") + fin + interim;
-						input.value = (st.base + st.live).replace(/\s+/g, " ").trimStart(); autosize();
-					};
-					r.onerror = () => {};
-					r.onend = () => { if (st && st.rec === r) { st.prev = st.live; try { startRec(); } catch (_) {} } };
-					try { r.start(); } catch (_) {}
-				};
-				startRec();
-			}
-		}
-
-		function finish() {
-			const s0 = st; st = null;
-			if (!s0) return null;
-			cancelAnimationFrame(s0.raf);
-			if (s0.rec) { const r = s0.rec; s0.rec = null; try { r.onend = null; r.stop(); } catch (_) {} }
-			try { s0.src.disconnect(); s0.proc.disconnect(); } catch (_) {}
-			s0.stream.getTracks().forEach((t) => t.stop());
-			try { s0.ctx.close(); } catch (_) {}
-			return s0;
-		}
-
-		micBtn.addEventListener("click", () => { if (!st) begin(); });
-		micX.addEventListener("click", () => { const s0 = finish(); if (s0) input.value = s0.base.trim(); ui(false); });
-		micOk.addEventListener("click", async () => {
-			const s0 = finish(); ui(false);
-			if (!s0) return;
-			if (s0.live.trim()) { input.value = (s0.base + s0.live).replace(/\s+/g, " ").trim(); autosize(); return; }
-			if (!s0.chunks.length || (s0.peak || 0) < 0.02) { input.value = s0.base.trim(); flash("I couldn't hear anything. Check the microphone selected in your browser."); return; }
-			input.value = s0.base.trim(); input.disabled = true; input.placeholder = "Transcribing…";
-			try {
-				const res = await fetch("/api/transcribe?lang=" + encodeURIComponent(((navigator.languages && navigator.languages[0]) || navigator.language || "").slice(0, 2)), { method: "POST", headers: { "content-type": "audio/wav" }, body: wav(s0.chunks, s0.ctx.sampleRate) });
-				const j = await res.json().catch(() => ({}));
-				input.disabled = false;
-				if (res.ok && j.text) { input.value = (s0.base + j.text).trim(); input.placeholder = ph; }
-				else { input.value = s0.base.trim(); flash(res.status === 503 ? "Voice typing isn't switched on for this site." : "I couldn't make out what you said. Try again, a bit closer to the mic."); }
-			} catch (_) { input.disabled = false; flash("Voice typing needs an internet connection."); }
-			autosize(); input.focus();
-		});
-	}
 
 	launch.addEventListener("click", open);
 	$("[data-close]").addEventListener("click", close);
