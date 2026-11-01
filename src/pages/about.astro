@@ -7,18 +7,20 @@ import Footer from '../components/Footer.astro';
 const timeline = [
 	{
 		range: '2019 — 2026',
-		role: 'Product UI/AI/UX Designer',
+		role: 'Senior Product Designer (UI / UX / AI)',
 		company: 'Ryze Beyond (formerly TrafficPoint)',
 		highlights: [
-			'Scaled design as the company grew 32 → 110+ employees',
-			'Shipped Sonary Software Stack Manager — dashboards, AI recommendation flows, chatbot UX',
-			'Sole designer on every company website and product throughout — the design team varied from 1 to 4 people, with the other designers covering social media rather than product',
-			'Worked alongside talented designers in the larger-team periods, sharing knowledge in both directions. I tended to handle the more complex system specs given my years in the craft',
-			'Architected reusable Figma component systems — variants, auto-layout, nested and interactive components',
-			'Multiple design systems and icon sets across several product verticals, accessibility-conscious',
+			'Sole product designer on every company website and product, growing with the company from 32 to 110+ employees',
+			'Sonary Software Stack Manager (SaaS dashboard) — sole designer from user interviews to shipped UI: 6 core surfaces including an AI chatbot for natural-language queries, dark and light modes, 2,000+ Figma frames, full visual redesign delivered in 9 working days',
+			'Sonary comparison platform — three major redesigns; design system behind ~3,000 CMS pages across 37 verticals, WordPress → Webflow migration',
+			'Top5 — parametric Figma design system (variables, inherited color tokens) serving ~37 comparison sites from one component library',
+			'Playright (UK online casino comparison) — initial site in ~4 months, then continuous iteration with UKGC responsible-gambling requirements built in',
+			'Also: Ryze Beyond brand site (2026 redesign), Ryze Hub internal portal (self-initiated), Sonary email template system',
+			'Mentored and advised the designers who joined the team over the years — one of them for 4+ years — sharing tools, skills and design-system practice',
 			'User research, usability testing, A/B testing, personas, journey mapping — grounded decisions in real behavior',
-			'Motion and visual craft — SVG micro-interactions and loaders, UI animation, brand logos and marks, 3D concept explorations, and short-form video creation for product and marketing',
-			'AI in daily practice: Claude and ChatGPT for concepting and iteration, Midjourney / Leonardo / Figma AI for visual assets',
+			'5 breakpoints per product, WCAG accessibility built in, developer handoff and post-implementation design QA',
+			'Motion and visual craft — SVG micro-interactions and loaders, UI animation, brand logos and marks, 3D concept explorations, and short-form video for product and marketing',
+			'AI-augmented workflow (Claude, ChatGPT, Midjourney, Leonardo AI, Adobe Firefly, Figma AI) letting one designer cover the output of a three-person team',
 		],
 	},
 	{
@@ -30,7 +32,6 @@ const timeline = [
 			'Rebranded the website, mobile web, and payment application end-to-end',
 			'Built a financial portal from scratch — wireframes, UX flows, UI design, and hand-off specs',
 			'Produced design materials for landing pages, blogs, marketing sites, and social',
-			'Created high-impact visual design assets and reusable design solutions across the team',
 		],
 	},
 	{
@@ -42,7 +43,6 @@ const timeline = [
 			'Researched new features and ideas; owned Wochat brand identity from scratch',
 			'Specified and designed both mobile and desktop sites; built page templates in HTML5 / CSS3',
 			'Designed landing pages, marketing banners, and micro-animations',
-			'Wrote video scenarios and handled the post-production compositing',
 		],
 	},
 	{
@@ -83,7 +83,7 @@ const timeline = [
 		highlights: [
 			'Digital advertising agency inside Publicis Group — designed campaigns for major brands including Bank Leumi, Afeka College of Engineering, and UMI Motors (Cadillac, Chevrolet)',
 			'Interactive rich media, campaign microsites, and animated banner ecosystems in Flash and HTML5',
-			'Contributed to team-designed campaigns awarded 12+ Cactus prizes (Or, Argent, Bronze) — Israel\'s top advertising awards — across five years at Arc Interactive, 2006–2011',
+			'Contributed to team-designed campaigns awarded 12+ Cactus prizes (Gold, Silver, Bronze) — Israel\'s top advertising awards — across five years at Arc Interactive, 2006–2011',
 			'Cross-discipline collaboration with creative directors, copywriters, developers, and account teams inside a full-service agency',
 		],
 	},
@@ -136,7 +136,7 @@ const skillGroups = [
 			'Adobe Firefly',
 			'Figma AI',
 			'Adobe AI (Illustrator, Photoshop, After Effects)',
-			'Runway · Sora · Kling (video gen)',
+			'Runway · Sora · Kling · Higgsfield (video gen)',
 		],
 	},
 	{
@@ -160,6 +160,8 @@ const skillGroups = [
 	},
 ];
 
+const linkedinUrl = 'https://www.linkedin.com/in/david-bitan-81a12552/';
+
 const languages = [
 	{ lang: 'French', level: 'Native' },
 	{ lang: 'Hebrew', level: 'Fluent' },
@@ -176,10 +178,16 @@ const languages = [
 			20+ years of product design craft, now AI-native.
 		</h1>
 		<p class="mt-6 max-w-2xl text-lg text-muted">
-			Senior Product Designer with 20+ years across fintech, gaming, and AI-first startups.
-			Sole designer at Ryze Beyond through two multi-year stretches — the AI-augmented
-			workflow lets a single senior handle what used to take a full team.
+			Senior AI Product Designer with 20+ years across SaaS, fintech, iGaming and digital advertising,
+			focused on AI-augmented product design and AI UX. Sole product designer at Ryze Beyond
+			(2019–2026) — the AI-augmented workflow lets a single senior handle what used to take a full team.
 		</p>
+		<p class="mt-4 text-sm font-semibold text-muted">Open to remote / hybrid roles</p>
+		<div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold">
+			<a href={linkedinUrl} target="_blank" rel="noopener" class="text-accent hover:underline">LinkedIn ↗</a>
+			<a href="/cv/CV-David-Bitan.pdf" class="text-accent hover:underline">Download CV (PDF)</a>
+			<a href="/cv/CV-David-Bitan.docx" class="text-accent hover:underline">Download CV (DOCX)</a>
+		</div>
 	</section>
 
 	<section class="mx-auto max-w-[1200px] px-6 py-16 lg:px-0" data-reveal>
@@ -279,17 +287,17 @@ const languages = [
 				<div class="mt-6 flex flex-col gap-6">
 					<div>
 						<p class="font-semibold">
-							<span class="text-accent">🏆</span> Cactus d'Or, d'Argent & de Bronze
+							<span class="text-accent">🏆</span> Cactus Gold, Silver & Bronze
 						</p>
 						<p class="mt-1 text-muted">
 							Israel's top advertising awards, for Israeli campaigns. Team contributor on 12+ Cactus
-							wins (Or, Argent, Bronze) over five years at Arc Interactive (Publicis Group), 2006–2011.
+							wins (Gold, Silver, Bronze) over five years at Arc Interactive (Publicis Group), 2006–2011.
 						</p>
 					</div>
 					<div>
 						<p class="font-semibold">ORT Strasbourg (France)</p>
 						<p class="mt-1 text-muted">
-							Software Engineering School, 1994–1997 · Specification, design & programming of web
+							Software Engineering School · Specification, design & programming of web
 							applications
 						</p>
 					</div>

@@ -26,6 +26,17 @@ export interface AILabProject {
 	gallery: string[];
 	/** Live demo URL (relative — e.g. /demo/trattoria-fiori/). */
 	demoUrl: string;
+	/** Optional AI feature built into the demo — rendered as its own case-study
+	 * section (#ai-feature) with design decisions and a deep link to try it. */
+	aiFeature?: {
+		eyebrow: string;
+		title: string;
+		lead: string;
+		tryUrl: string;
+		tryLabel: string;
+		states: string[];
+		decisions: Array<{ title: string; body: string }>;
+	};
 	/** Thumbnail image for the AI Lab home section card. */
 	thumbnail: string;
 	/** Accent color hint for the card overlay (hex, optional). */
@@ -46,12 +57,28 @@ export const aiLabProjects: AILabProject[] = [
 		subtitle: 'An oceanfront strength and recovery club in Miami Beach, invented and built out to five pages.',
 		eyebrow: 'Fitness · 2026',
 		shortDesc:
-			'A fictional members club — five interlinked pages, a booking gate, a class timetable that never goes stale, a shop with a persistent cart, and a QR guest pass written from scratch.',
+			'A fictional members club — five interlinked pages, a booking gate, a live timetable, a shop with a persistent cart, a QR guest pass, and APEX Coach, an AI assistant designed state by state.',
 		intro: `APEX Athletic Club is a fictional private gym I invented and built end-to-end, and the brief I set myself was to go past the marketing page: a mini-site is easy to fake in one screen, and much harder to hold together across five.
 
 The visual language is the opposite of the wellness pastel most gyms reach for. Ink canvas, one hot pink accent, one mint signal, Space Grotesk for display and JetBrains Mono for anything numeric — times, prices, capacities — so the timetable reads like a schedule board rather than a brochure. The photography is stock, so the grid imposes its own treatment (grayscale, dimmed, colour returning on hover) instead of hoping six unrelated shoots agree with each other.
 
 Almost all of the work was in the parts that are usually faked. Booking a class is a member action, so the CTA opens an identity gate, not a payment funnel — and after signing in, the booking the visitor originally clicked resumes on its own. The seven-day timetable is generated from the real date, so it can never show a stale week. The shop derives its member discount from the list price at render time rather than storing a second number that could drift. The guest pass emits an actual ticket with a scannable QR, encoded by hand — around 200 lines of Reed-Solomon and mask scoring — and validated by decoding the rendered bitmap, because a QR that looks right and never scans is the easiest thing in the world to ship.`,
+		aiFeature: {
+			eyebrow: 'AI UX · Assistant',
+			title: 'APEX Coach',
+			lead: 'An AI assistant inside the member area that plans training weeks from the real timetable, uses the member’s own calculator numbers, and is honest about what it doesn’t know. Responses are simulated so every state of the conversation can be shown on demand.',
+			tryUrl: '/demo/apex-athletic-club/user.html?coach=open',
+			tryLabel: 'Try APEX Coach',
+			states: ['Empty state with starters', 'Thinking with visible steps', 'Streaming answer', 'Clarifying question', 'Structured plan with actions', 'Low-confidence note', 'Safety refusal', 'Out of scope', 'Error + retry', 'Stop · Regenerate · Copy', 'Feedback with reasons'],
+			decisions: [
+				{ title: 'Show what it uses', body: 'A context bar lists exactly what Coach can see — membership tier, calculator numbers, this week’s timetable. Users trust an answer more when they know where it comes from.' },
+				{ title: 'Ask before guessing', body: 'A vague goal like “lose weight” gets one clarifying question with tappable options instead of a generic plan. One question, not an interview.' },
+				{ title: 'Answers that lead to action', body: 'A training week comes back as a structured card where every session has a Book link into the real class flow, not a wall of text to copy.' },
+				{ title: 'Say when it’s unsure', body: 'Plans and nutrition answers carry a short note on their limits — no access to training history, not a meal prescription — and point to the human who can go further.' },
+				{ title: 'Refuse safely, then redirect', body: 'Pain and injury questions are never answered. Coach explains why in one line and routes to the club doctor, so a refusal still moves the member forward.' },
+				{ title: 'The user stays in control', body: 'Stop mid-answer, regenerate, copy, or flag a bad reply with a reason. Billing changes are never done by the assistant — it links to the plan screen instead.' },
+			],
+		},
 		designSystem: {
 			colors: [
 				{ name: 'Ink', hex: '#0A0A0F', role: 'Canvas · nav · cards · modals' },

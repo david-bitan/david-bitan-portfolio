@@ -22,9 +22,9 @@ interface Props {
 // no image to fetch. Update again when a custom domain lands.
 const SITE_URL = 'https://david-bitan-portfolio.pages.dev';
 const SITE_NAME = 'David Bitan — Portfolio';
-const DEFAULT_TITLE = 'David Bitan — Senior Product Designer';
+const DEFAULT_TITLE = 'David Bitan — Senior AI Product Designer';
 const DEFAULT_DESCRIPTION =
-	'Senior Product Designer based in Israel. Case studies in SaaS, UI/UX, gaming and brand systems for Ryze Beyond, Sonary, Playright and more.';
+	'Senior AI Product Designer based in Israel. Case studies in SaaS, UI/UX, gaming and brand systems for Ryze Beyond, Sonary, Playright and more.';
 const DEFAULT_OG = '/og-image.png';
 
 const {
@@ -48,9 +48,10 @@ const personJsonLd = {
 	'@context': 'https://schema.org',
 	'@type': 'Person',
 	name: 'David Bitan',
-	jobTitle: 'Senior Product Designer',
+	jobTitle: 'Senior AI Product Designer',
 	url: SITE_URL,
 	email: 'mailto:advance26@gmail.com',
+	sameAs: ['https://www.linkedin.com/in/david-bitan-81a12552/'],
 	address: {
 		'@type': 'PostalAddress',
 		addressCountry: 'IL',
@@ -59,7 +60,7 @@ const personJsonLd = {
 ---
 
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<!-- initial-scale=1 is not optional: without it iOS Safari picks its own
@@ -79,7 +80,7 @@ const personJsonLd = {
 		<meta property="og:description" content={description} />
 		<meta property="og:url" content={canonicalUrl} />
 		<meta property="og:image" content={ogImageUrl} />
-		<meta property="og:locale" content="fr_FR" />
+		<meta property="og:locale" content="en_US" />
 
 		<!-- Twitter / X card. summary_large_image → full-width preview. -->
 		<meta name="twitter:card" content="summary_large_image" />

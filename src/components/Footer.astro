@@ -1,6 +1,7 @@
 ---
 const email = 'advance26@gmail.com';
-const phone = '054-9-248-520';
+const phone = '+972 54-924-8520';
+const linkedinUrl = 'https://www.linkedin.com/in/david-bitan-81a12552/';
 const year = new Date().getFullYear();
 ---
 
@@ -13,9 +14,11 @@ const year = new Date().getFullYear();
 	<p class="mt-10 flex flex-col items-center gap-y-2 text-sm font-medium text-footer-muted sm:block">
 		<a href={`mailto:${email}`} class="text-accent hover:underline">{email}</a>
 		<span class="mx-3 hidden sm:inline">·</span>
-		<a href={`tel:${phone.replace(/\D/g, '')}`} class="text-accent hover:underline">{phone}</a>
+		<a href={`tel:+${phone.replace(/\D/g, '')}`} class="text-accent hover:underline">{phone}</a>
 		<span class="mx-3 hidden sm:inline">·</span>
-		<span class="text-footer-ink">Israel</span>
+		<a href={linkedinUrl} target="_blank" rel="noopener" class="text-accent hover:underline">LinkedIn</a>
+		<span class="mx-3 hidden sm:inline">·</span>
+		<span class="text-footer-ink">Israel · Open to remote / hybrid</span>
 	</p>
 
 	<p class="mt-10 text-xs text-footer-muted">© {year} David Bitan. All rights reserved.</p>
