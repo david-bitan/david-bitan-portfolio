@@ -57,6 +57,8 @@
 	.cx-bubble p{margin:0 0 8px}.cx-bubble p:last-child{margin:0}
 	.cx-bubble ul{margin:6px 0 8px;padding-left:18px}.cx-bubble li{margin:2px 0}
 	.cx-bubble strong{color:#fff}
+	.cx-ai.cx-caret:not(:empty)::after{content:none}
+	.cx-ai.cx-caret>:last-child::after,.cx-ai.cx-caret:empty::after{content:"";display:inline-block;width:7px;height:14px;background:#00E5A0;margin-left:2px;vertical-align:-2px;animation:cxBlink 1s steps(2) infinite}
 	.cx-caret::after{content:"";display:inline-block;width:7px;height:14px;background:#00E5A0;margin-left:2px;vertical-align:-2px;animation:cxBlink 1s steps(2) infinite}
 	@keyframes cxBlink{50%{opacity:0}}
 	.cx-think{display:flex;align-items:center;gap:10px;color:rgba(245,245,247,.6);font-size:13px}
@@ -448,7 +450,7 @@
 	const intents = [
 		{
 			id: "program",
-			test: /^Build program:|(plan|program|programme|routine|workout|split|menu|nourriture|repas|entraîn|séance|month|mois|\d\s*weeks?|semaines?)/i,
+			test: /^Build program:|^Change my program settings|(build|make|create|give|fais|crée|donne)[^?.!]{0,40}(plan|program|programme|routine|split|menu|week|semaine)|(meal|training|workout|food|repas|nourriture|entraînement)\s*(plan|program|programme)|program(me)? (sur|for|de)|\b[1-4]\s*(weeks?|semaines?)\b|\b(month|mois)\b|[2-5]-day/i,
 			reply: (q) => {
 				if (!/^Build program:/.test(q)) return {
 					text: "I'll build a complete program where training and meals are matched: more food on training days, less on rest days, protein every day. I filled in what I could from your message. Adjust anything, then tap Build.",
@@ -475,10 +477,10 @@
 		},
 		{
 			id: "medical",
-			test: /(pain|hurt|injur|knee|back pain|my back|shoulder|ankle|pregnan|medic|doctor|dizz|chest|surgery|douleur|blessure)/i,
+			test: /(chest pain|douleur (à la|a la|dans la) poitrine|faint|fainted|passed out|évanoui|can't breathe|cannot breathe|short(ness)? of breath|essoufflé au repos|palpitation)/i,
 			reply: () => ({
-				text: "I can't assess pain or injuries — that needs a professional who can examine you, and guessing could make it worse.",
-				note: { kind: "safe", text: "Safety rule: Coach never gives medical advice. It routes you to the club's medical team instead." },
+				text: "Stop training now. Chest pain, fainting or trouble breathing need a medical check today. If it is severe or doesn't pass within minutes, call emergency services (911 in the US). Tell the front desk and Dr. Lena Okafor.",
+				note: { kind: "safe", text: "Safety rule: warning signs always get a direct, human answer, never an AI guess." },
 				chips: [{ label: "Book Dr. Lena Okafor (club doctor)", href: BASE + "index.html", primary: true }, { label: "Show me low-impact classes", ask: "Which classes are low impact?" }]
 			})
 		},
@@ -506,7 +508,7 @@
 		},
 		{
 			id: "classes",
-			test: /(class|beginner|yoga|pilates|boxing|low impact|recovery|cours|débutant)/i,
+			test: /(which class|what class|class(es)? (for|fit|are)|quel cours|low impact|beginner class)/i,
 			reply: (q) => {
 				const low = /low impact|recovery|beginner|débutant/i.test(q);
 				const list = low ? ["Yoga & Pilates", "Recovery", "Conditioning"] : ["Strength", "Boxing", "Conditioning"];
@@ -519,7 +521,7 @@
 		},
 		{
 			id: "membership",
-			test: /(member|price|cost|upgrade|downgrade|cancel|tier|elite|basic|signature|my plan|change plan|abonnement|prix)/i,
+			test: /(membership|member price|abonnement|upgrade|downgrade|cancel my (plan|membership)|\belite\b|signature plan|basic plan|\bmy plan\b|change plan|plans? (cost|price)|how much (is|does) (it|elite|signature|basic|a membership)|prix de l'abonnement)/i,
 			reply: () => {
 				const t = tier();
 				if (!t) return {
@@ -535,22 +537,19 @@
 	];
 
 	function answer(q) {
-		const order = ["medical", "membership", "program", "vague-goal", "nutrition", "classes"];
+		// Deterministic flows where exactness matters; the live model for everything else.
+		const order = ["medical", "membership", "program", "classes"];
 		for (const id of order) { const it = intents.find((x) => x.id === id); if (it.test.test(q)) return { id, ...it.reply(q) }; }
-		if (/elite/i.test(q)) return intents.find((i) => i.id === "membership").reply(q);
-		return {
-			id: "scope",
-			text: "That's outside what I can help with. I know APEX training, nutrition basics, classes and memberships — and I'd rather say so than make something up.",
-			chips: starterChips()
-		};
+		return { id: "ai", ai: true };
 	}
 
 	function starterChips() {
 		return [
-			{ label: "Build me a 3-day strength week", ask: "Build me a 3-day strength week" },
+			{ label: "What's my BMI and ideal weight range?", ask: "What's my BMI and what's a healthy weight range for me?" },
+			{ label: "How much water should I drink?", ask: "How much water should I drink per day, including training days?" },
 			{ label: "Build my training + meal program", ask: "Build me a program with training and meals" },
 			{ label: "Which class fits a beginner?", ask: "Which class fits a beginner?" },
-			{ label: "My knee hurts when I squat", ask: "My knee hurts when I squat" }
+			{ label: "How do I estimate my body fat?", ask: "How can I estimate my body fat percentage?" }
 		];
 	}
 
@@ -565,7 +564,7 @@
 		log.innerHTML = "";
 		const d = document.createElement("div");
 		d.className = "cx-empty";
-		d.innerHTML = `<span class="cx-badge" style="margin:0">Simulated demo</span><h3>Hi ${firstName()}, what are we working on?</h3><p>I plan weeks from the real timetable, use your calculator numbers, and tell you when I'm not sure.</p>`;
+		d.innerHTML = `<span class="cx-badge" style="margin:0">Live AI · Llama 3.3</span><h3>Hi ${firstName()}, what are we working on?</h3><p>Ask me anything about training, nutrition, body metrics, hydration, recovery or the club. I use your calculator numbers and tell you when I'm not sure.</p>`;
 		d.appendChild(chipRow(starterChips()));
 		log.appendChild(d);
 	}
@@ -616,6 +615,87 @@
 		input.disabled = on;
 	}
 
+
+	/* ---------- live AI ---------- */
+	const convo = [];             // [{role, content}] sent to the model
+	let aborter = null;
+	const API = "/api/coach";
+
+	function num(id) { const el = document.getElementById(id); return el && el.value ? +el.value : null; }
+	function profile() {
+		const w = num("c-weight"), h = num("c-height");
+		if (w && h) {
+			const sexEl = document.getElementById("c-gender"), actEl = document.getElementById("c-activity");
+			const goalEl = document.querySelector('input[name="goal"]:checked');
+			const p = { age: num("c-age"), sex: sexEl ? (sexEl.value || sexEl.options[sexEl.selectedIndex].text) : null, weight: w, height: h,
+				activity: actEl ? actEl.options[actEl.selectedIndex].text : null, goal: goalEl ? goalEl.value : null };
+			try { localStorage.setItem("apex_profile", JSON.stringify(p)); } catch (_) {}
+			return p;
+		}
+		try { return JSON.parse(localStorage.getItem("apex_profile")); } catch (_) { return null; }
+	}
+	function contextPayload() {
+		const p = profile(), c = calc(), m = {};
+		if (p && p.weight && p.height) {
+			const bmi = p.weight / Math.pow(p.height / 100, 2);
+			m.BMI = bmi.toFixed(1);
+			m["healthy weight range (BMI 18.5–24.9)"] = `${Math.round(18.5 * Math.pow(p.height / 100, 2))}–${Math.round(24.9 * Math.pow(p.height / 100, 2))} kg`;
+			m["water/day"] = `${(p.weight * 0.035).toFixed(1)} L + 0.5–0.75 L per training hour`;
+			m["protein range"] = `${Math.round(p.weight * 1.6)}–${Math.round(p.weight * 2.2)} g/day`;
+		}
+		if (c) { m["calorie target"] = `${c.kcal} kcal (${c.goal})`; m.macros = `P ${c.p} g · C ${c.c} g · F ${c.f} g`; }
+		const bmr = txt("r-bmr"), tdee = txt("r-tdee-raw");
+		if (bmr) m.BMR = bmr + " kcal"; if (tdee) m.TDEE = tdee + " kcal";
+		return { name: account().name || null, tier: tier(), profile: p, metrics: m };
+	}
+
+	function esc(t) { return t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+	function md(t) {
+		const inline = (x) => esc(x).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*(?!\s)(.+?)\*(?!\*)/g, "$1<em>$2</em>");
+		const out = []; let list = null;
+		t.split(/\n/).forEach((line) => {
+			const li = line.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)$/);
+			if (li) { if (!list) { list = []; } list.push(`<li>${inline(li[1])}</li>`); return; }
+			if (list) { out.push(`<ul>${list.join("")}</ul>`); list = null; }
+			const h = line.match(/^#{1,4}\s+(.*)$/);
+			if (h) out.push(`<p><strong>${inline(h[1])}</strong></p>`);
+			else if (line.trim()) out.push(`<p>${inline(line)}</p>`);
+		});
+		if (list) out.push(`<ul>${list.join("")}</ul>`);
+		return out.join("");
+	}
+
+	async function streamAI(bubble) {
+		aborter = new AbortController();
+		const res = await fetch(API, {
+			method: "POST", signal: aborter.signal,
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify({ messages: convo.slice(-10), context: contextPayload() })
+		});
+		if (res.status === 503) { const e = new Error("not_configured"); e.code = 503; throw e; }
+		if (!res.ok || !res.body) throw new Error("http_" + res.status);
+		const reader = res.body.getReader(), dec = new TextDecoder();
+		let buf = "", text = "";
+		bubble.classList.add("cx-caret");
+		for (;;) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			buf += dec.decode(value, { stream: true });
+			const lines = buf.split("\n"); buf = lines.pop();
+			for (const l of lines) {
+				const d = l.replace(/^data:\s*/, "").trim();
+				if (!d || d === "[DONE]" || !l.startsWith("data:")) continue;
+				try {
+					const j = JSON.parse(d);
+					const piece = j.response ?? (j.choices && j.choices[0] && (j.choices[0].delta?.content ?? j.choices[0].text)) ?? "";
+					if (piece) { text += piece; bubble.innerHTML = md(text); scrollDown(); }
+				} catch (_) {}
+			}
+		}
+		bubble.classList.remove("cx-caret");
+		return text.trim();
+	}
+
 	async function botTurn(q, wrap, display) {
 		const isNew = !wrap;
 		if (isNew) { wrap = document.createElement("div"); wrap.className = "cx-msg cx-bot"; log.appendChild(wrap); }
@@ -629,7 +709,13 @@
 		think.innerHTML = '<span class="cx-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="cx-step">Reading your question…</span>';
 		wrap.appendChild(think);
 		scrollDown();
-		const steps = ["Checking this week's timetable…", "Looking at your plan…"];
+		const a0 = answer(q);
+		const userText = display || q;
+		if (!convo.length || convo[convo.length - 1].role !== "user" || convo[convo.length - 1].content !== userText) {
+			if (convo.length && convo[convo.length - 1].role === "assistant" && convo.length >= 2 && convo[convo.length - 2].content === userText) convo.pop();
+			else convo.push({ role: "user", content: userText });
+		}
+		const steps = a0.ai ? ["Thinking…"] : ["Checking this week's timetable…", "Looking at your plan…"];
 		for (const s of steps) {
 			await wait(sim.slow ? 1600 : 550);
 			if (cancelFlag) return stopped(wrap);
@@ -654,8 +740,44 @@
 			return;
 		}
 
-		// 3. Stream the text
-		const a = answer(q);
+		// 3a. Live model
+		if (a0.ai) {
+			wrap.innerHTML = "";
+			const bubble = document.createElement("div");
+			bubble.className = "cx-bubble cx-ai";
+			wrap.appendChild(bubble);
+			let text = "";
+			try {
+				text = await streamAI(bubble);
+				if (!text) throw new Error("empty");
+			} catch (err) {
+				if (cancelFlag || (err && err.name === "AbortError")) { bubble.classList.remove("cx-caret"); return stopped(wrap, !!bubble.textContent); }
+				wrap.innerHTML = "";
+				const offline = err && err.code === 503;
+				wrap.appendChild(noteEl({ kind: "err", text: offline
+					? "Live answers aren't switched on for this site yet. I can still build programs, compare memberships and suggest classes."
+					: "Coach couldn't reach the AI service. Your message is safe — nothing was lost." }));
+				const r = chipRow(offline ? starterChips().slice(2, 3) : []);
+				if (!offline) {
+					const retry = document.createElement("button");
+					retry.type = "button"; retry.className = "cx-chip primary"; retry.textContent = "Try again";
+					retry.addEventListener("click", () => botTurn(q, wrap, display));
+					r.appendChild(retry);
+				}
+				wrap.appendChild(r);
+				setBusy(false); scrollDown();
+				return;
+			}
+			convo.push({ role: "assistant", content: text });
+			wrap.appendChild(actions(q, wrap, bubble, display));
+			history.push({ q, d: display || null, id: "ai", t: text });
+			save();
+			setBusy(false); scrollDown();
+			return;
+		}
+
+		// 3b. Scripted flow
+		const a = a0;
 		wrap.innerHTML = "";
 		const bubble = document.createElement("div");
 		bubble.className = "cx-bubble";
@@ -675,6 +797,7 @@
 		if (a.note && !seen.has(a.id)) { seen.add(a.id); bubble.appendChild(noteEl(a.note)); }
 		if (a.chips && a.chips.length) wrap.appendChild(chipRow(a.chips));
 		wrap.appendChild(actions(q, wrap, bubble));
+		convo.push({ role: "assistant", content: a.text });
 		history.push({ q, d: display || null, id: a.id });
 		save();
 		setBusy(false); scrollDown();
@@ -689,7 +812,7 @@
 		setBusy(false); input.focus();
 	}
 
-	function actions(q, wrap, bubble) {
+	function actions(q, wrap, bubble, display) {
 		const bar = document.createElement("div");
 		bar.className = "cx-acts";
 		const mk = (icon, label, fn, pressable) => {
@@ -704,7 +827,7 @@
 			const t = bubble.innerText;
 			(navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => { b.lastChild.textContent = "Copied"; setTimeout(() => (b.lastChild.textContent = "Copy"), 1400); }).catch(() => {});
 		});
-		mk(I.regen, "Regenerate", () => { if (!busy) botTurn(q, wrap); });
+		mk(I.regen, "Regenerate", () => { if (!busy) botTurn(q, wrap, display); });
 		const up = mk(I.up, "", (b) => vote(b, down, true), true);
 		const down = mk(I.down, "", (b) => vote(b, up, false), true);
 		up.setAttribute("aria-label", "Helpful"); down.setAttribute("aria-label", "Not helpful");
@@ -742,9 +865,18 @@
 		try { h = JSON.parse(sessionStorage.getItem(KEY)) || []; } catch (_) {}
 		if (!h.length) return emptyState();
 		log.innerHTML = "";
-		h.forEach(({ q, d }) => {
+		h.forEach(({ q, d, id, t }) => {
 			addUser(d || q);
+			convo.push({ role: "user", content: d || q });
+			if (id === "ai") {
+				const wrap = document.createElement("div"); wrap.className = "cx-msg cx-bot";
+				const bubble = document.createElement("div"); bubble.className = "cx-bubble cx-ai"; bubble.innerHTML = md(t || "");
+				wrap.appendChild(bubble); wrap.appendChild(actions(q, wrap, bubble, d)); log.appendChild(wrap);
+				convo.push({ role: "assistant", content: t || "" });
+				return;
+			}
 			const a = answer(q);
+			convo.push({ role: "assistant", content: a.text });
 			const wrap = document.createElement("div"); wrap.className = "cx-msg cx-bot";
 			const bubble = document.createElement("div"); bubble.className = "cx-bubble";
 			const p = document.createElement("p"); p.textContent = a.text; bubble.appendChild(p);
@@ -779,10 +911,10 @@
 
 	launch.addEventListener("click", open);
 	$("[data-close]").addEventListener("click", close);
-	$("[data-reset]").addEventListener("click", () => { if (busy) cancelFlag = true; history = []; seen.clear(); save(); emptyState(); input.focus(); });
+	$("[data-reset]").addEventListener("click", () => { if (busy) cancelFlag = true; history = []; seen.clear(); convo.length = 0; if (aborter) aborter.abort(); save(); emptyState(); input.focus(); });
 	input.addEventListener("input", autosize);
 	input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input.value); } });
-	form.addEventListener("submit", (e) => { e.preventDefault(); if (busy) { cancelFlag = true; return; } send(input.value); });
+	form.addEventListener("submit", (e) => { e.preventDefault(); if (busy) { cancelFlag = true; if (aborter) aborter.abort(); return; } send(input.value); });
 	panel.addEventListener("keydown", (e) => {
 		if (e.key === "Escape") return close();
 		if (e.key !== "Tab") return;
