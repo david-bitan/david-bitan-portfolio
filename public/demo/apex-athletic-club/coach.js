@@ -128,7 +128,11 @@
 	.cx-send{width:38px;height:38px;border-radius:10px;border:0;background:#FF2E7E;color:#fff;cursor:pointer;display:grid;place-items:center;flex:none}
 	.cx-mic{width:38px;height:38px;border-radius:10px;border:1px solid rgba(245,245,247,.22);background:transparent;color:#F5F5F7;cursor:pointer;display:grid;place-items:center;flex:none}
 	.cx-mic:hover{border-color:rgba(245,245,247,.5)}
-	.cx-mic.on{background:#FF2E7E;border-color:#FF2E7E;animation:cxPulse 1.2s infinite}
+	.cx-mic-x,.cx-mic-ok{width:38px;height:38px;border-radius:10px;border:1px solid rgba(245,245,247,.22);background:transparent;color:#F5F5F7;cursor:pointer;display:grid;place-items:center;flex:none}
+	.cx-mic-ok{background:#F5F5F7;color:#0A0A0F;border-color:#F5F5F7}
+	.cx-mic-x:hover{border-color:#FF2E7E;color:#FF2E7E}
+	.cx-form.rec{border-color:#FF2E7E;box-shadow:0 0 0 3px rgba(255,46,126,.18);animation:cxPulse 1.6s infinite}
+	.cx-form [hidden]{display:none!important}
 	@keyframes cxPulse{0%{box-shadow:0 0 0 0 rgba(255,46,126,.6)}100%{box-shadow:0 0 0 10px rgba(255,46,126,0)}}
 	.cx-how{margin-left:6px;border:1px solid rgba(0,229,160,.5);background:transparent;color:#00E5A0;border-radius:999px;padding:2px 8px;font:600 10.5px/1.4 Inter,sans-serif;cursor:pointer;vertical-align:1px}
 	.cx-how[aria-expanded="true"]{background:#00E5A0;color:#0A0A0F}
@@ -201,7 +205,9 @@
 			<form class="cx-form">
 				<label class="sr-only" for="cx-input">Message APEX Coach</label>
 				<textarea id="cx-input" rows="1" maxlength="400" placeholder="Ask about training, food or classes…"></textarea>
-				<button type="button" class="cx-mic" aria-label="Speak your question" aria-pressed="false" hidden>${I.mic}</button>
+				<button type="button" class="cx-mic" aria-label="Speak your question" hidden>${I.mic}</button>
+				<button type="button" class="cx-mic-x" aria-label="Cancel voice input, discard the text" hidden>${I.close}</button>
+				<button type="button" class="cx-mic-ok" aria-label="Keep the dictated text" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
 				<button type="submit" class="cx-send" aria-label="Send" disabled>${I.send}</button>
 			</form>
 			<div class="cx-legal">
@@ -1194,37 +1200,52 @@
 	function autosize() { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 110) + "px"; sendBtn.disabled = busy ? false : !input.value.trim(); }
 
 
-	/* ---------- voice input (Web Speech API, where the browser supports it) ---------- */
+	/* ---------- voice input (Web Speech API): mic → ✕ / ✓, like Claude ---------- */
 	const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
-	const micBtn = $(".cx-mic");
+	const micBtn = $(".cx-mic"), micX = $(".cx-mic-x"), micOk = $(".cx-mic-ok");
 	if (Rec) {
 		micBtn.hidden = false;
-		let rec = null, base = "";
-		const stopMic = () => { if (rec) rec.stop(); };
-		micBtn.addEventListener("click", () => {
-			if (rec) return stopMic();
+		let rec = null, recording = false, base = "", finalText = "", ph = input.placeholder;
+		const ui = (on) => {
+			recording = on;
+			form.classList.toggle("rec", on);
+			micBtn.hidden = on; sendBtn.hidden = on; micX.hidden = !on; micOk.hidden = !on;
+			input.placeholder = on ? "Listening… speak now" : ph;
+			if (!on) { autosize(); input.focus(); }
+		};
+		const end = () => { recording = false; if (rec) { try { rec.stop(); } catch (_) {} } rec = null; };
+		const start = () => {
 			rec = new Rec();
 			rec.lang = navigator.language || "en-US";
 			rec.interimResults = true;
-			rec.continuous = false;
-			base = input.value ? input.value.trim() + " " : "";
-			micBtn.setAttribute("aria-pressed", "true"); micBtn.classList.add("on");
-			input.dataset.ph = input.placeholder; input.placeholder = "Listening… speak now";
+			rec.continuous = true;
 			rec.onresult = (ev) => {
-				let t = "";
-				for (let i = 0; i < ev.results.length; i++) t += ev.results[i][0].transcript;
-				input.value = base + t; autosize();
+				let interim = "";
+				for (let i = ev.resultIndex; i < ev.results.length; i++) {
+					if (ev.results[i].isFinal) finalText += ev.results[i][0].transcript;
+					else interim += ev.results[i][0].transcript;
+				}
+				input.value = (base + finalText + interim).replace(/\s+/g, " ").trimStart();
+				autosize();
 			};
 			rec.onerror = (ev) => {
-				if (ev.error === "not-allowed" || ev.error === "service-not-allowed") input.placeholder = "Microphone blocked. Allow it in the browser bar.";
+				if (ev.error === "no-speech" || ev.error === "aborted") return;
+				const msg = ev.error === "not-allowed" || ev.error === "service-not-allowed" ? "Microphone blocked. Allow it in the address bar, then try again."
+					: ev.error === "network" ? "Voice typing needs an internet connection." : "Voice typing stopped. Try again.";
+				end(); ui(false); input.placeholder = msg; setTimeout(() => { if (!recording) input.placeholder = ph; }, 4000);
 			};
-			rec.onend = () => {
-				rec = null; micBtn.setAttribute("aria-pressed", "false"); micBtn.classList.remove("on");
-				setTimeout(() => { if (input.dataset.ph) input.placeholder = input.dataset.ph; }, input.placeholder.startsWith("Microphone") ? 3000 : 0);
-				input.focus();
-			};
-			try { rec.start(); } catch (_) { rec = null; }
+			// Browsers stop after a silence: keep listening until the user taps ✕ or ✓.
+			rec.onend = () => { if (recording) { try { start(); } catch (_) { ui(false); } } };
+			try { rec.start(); } catch (_) {}
+		};
+		micBtn.addEventListener("click", () => {
+			base = input.value.trim() ? input.value.trim() + " " : "";
+			finalText = "";
+			ui(true);
+			start();
 		});
+		micX.addEventListener("click", () => { end(); input.value = base.trim(); ui(false); });
+		micOk.addEventListener("click", () => { end(); input.value = input.value.trim(); ui(false); });
 	}
 
 	launch.addEventListener("click", open);
