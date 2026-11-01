@@ -1239,10 +1239,17 @@
 			try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
 			catch (e) { return flash(e && e.name === "NotAllowedError" ? "Microphone blocked. Allow it from the icon in the address bar." : "No microphone found."); }
 			const AC = window.AudioContext || window.webkitAudioContext, ctx = new AC();
+			try { await ctx.resume(); } catch (_) {}
 			const src = ctx.createMediaStreamSource(stream), an = ctx.createAnalyser(); an.fftSize = 256;
 			const proc = ctx.createScriptProcessor(4096, 1, 1);
 			st = { stream, ctx, chunks: [], base: input.value.trim() ? input.value.trim() + " " : "", live: "", heard: false, t0: performance.now(), rec: null };
-			proc.onaudioprocess = (e) => { if (st && st.chunks.length < 260) st.chunks.push(new Float32Array(e.inputBuffer.getChannelData(0))); };
+			proc.onaudioprocess = (e) => {
+				if (!st || st.chunks.length >= 260) return;
+				const d = e.inputBuffer.getChannelData(0);
+				let pk = 0; for (let k = 0; k < d.length; k++) { const a = Math.abs(d[k]); if (a > pk) pk = a; }
+				st.peak = Math.max(st.peak || 0, pk);
+				st.chunks.push(new Float32Array(d));
+			};
 			src.connect(an); src.connect(proc); proc.connect(ctx.destination);
 			st.proc = proc; st.src = src;
 			ui(true);
@@ -1260,7 +1267,7 @@
 			};
 			draw();
 			// live text where the browser can do it
-			if (Rec) {
+			if (Rec && false) {
 				const startRec = () => {
 					const r = new Rec(); st.rec = r;
 					r.lang = navigator.language || "en-US"; r.interimResults = true; r.continuous = true;
@@ -1296,14 +1303,14 @@
 			const s0 = finish(); ui(false);
 			if (!s0) return;
 			if (s0.live.trim()) { input.value = (s0.base + s0.live).replace(/\s+/g, " ").trim(); autosize(); return; }
-			if (!s0.chunks.length) return;
+			if (!s0.chunks.length || (s0.peak || 0) < 0.02) { input.value = s0.base.trim(); flash("I couldn't hear anything. Check the microphone selected in your browser."); return; }
 			input.value = s0.base.trim(); input.disabled = true; input.placeholder = "Transcribing…";
 			try {
-				const res = await fetch("/api/transcribe", { method: "POST", headers: { "content-type": "audio/wav" }, body: wav(s0.chunks, s0.ctx.sampleRate) });
+				const res = await fetch("/api/transcribe?lang=" + encodeURIComponent(((navigator.languages && navigator.languages[0]) || navigator.language || "").slice(0, 2)), { method: "POST", headers: { "content-type": "audio/wav" }, body: wav(s0.chunks, s0.ctx.sampleRate) });
 				const j = await res.json().catch(() => ({}));
 				input.disabled = false;
 				if (res.ok && j.text) { input.value = (s0.base + j.text).trim(); input.placeholder = ph; }
-				else flash(res.status === 503 ? "Voice typing isn't switched on for this site." : "I couldn't make out the audio. Try again a bit closer to the mic.");
+				else { input.value = s0.base.trim(); flash(res.status === 503 ? "Voice typing isn't switched on for this site." : "I couldn't make out what you said. Try again, a bit closer to the mic."); }
 			} catch (_) { input.disabled = false; flash("Voice typing needs an internet connection."); }
 			autosize(); input.focus();
 		});
