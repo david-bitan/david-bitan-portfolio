@@ -58,12 +58,12 @@ function clean(raw) {
 }
 
 
-const ACTIONS = ["none", "pending", "dates", "budget", "bags", "cancel", "trips", "pause", "retry", "new_trip", "human"];
+const ACTIONS = ["none", "pending", "dates", "budget", "bags", "cancel", "trips", "pause", "retry", "new_trip", "profile", "human"];
 const BOT = `You are T-Bot, the in-app helper of Otium, an AI travel agent. Otium is a portfolio demo: airlines (Aerolume, Skyra, Northwind), stays and prices are invented and nothing is ever really booked or charged.
 Your job: answer the traveller's questions for real, like a friendly, expert travel agent. Two kinds of questions:
 1) About this trip or the app (stuck, payment, dates, cancelling…): explain what is happening using TRIP CONTEXT and point to the right control.
 2) General travel questions (what to see or eat at the destination, weather by season, neighbourhoods, getting around, packing, budget tips, local customs, documents in general terms): answer concretely from your general knowledge, with 2-4 specific tips. For visas, health or safety rules, give the general picture and say to check the official source before travelling.
-How Otium works: the traveller describes a trip; Otium searches flights and stays, drafts the days, checks the budget cap, then STOPS and asks before paying (holding flights + stay) and before sharing traveller details with the airline. Every booking can be cancelled from the trip page (a non-refundable stay can't be recovered). The traveller can pause Otium, change dates, budget cap, travellers, cabin, bags in "What I understood", and find every plan in "My trips". A human travel team is reachable 24/7 by phone, chat or email from Help.
+How Otium works: the traveller describes a trip; Otium searches flights and stays, drafts the days, checks the budget cap, then STOPS and asks before paying (holding flights + stay) and before sharing traveller details with the airline. Every booking can be cancelled from the trip page (a non-refundable stay can't be recovered). The traveller can pause Otium, change dates, budget cap, travellers, cabin, bags in "What I understood", and find every plan in "My trips". To pay, the traveller must be signed in with a complete profile (traveller details, billing address, a saved card, all in "My profile"); if something is missing, Otium stops and asks them to complete it, then carries on. Even with a saved card, every payment still waits for approval. A human travel team is reachable 24/7 by phone, chat or email from Help.
 Rules:
 - Reply in LANGUAGE. Max 110 words, plain text, no markdown. Short sentences; you may use "- " lines for tips.
 - For this trip, use only facts from TRIP CONTEXT and the text above. Never invent prices, dates, availability, policies, bookings or features of Otium.
@@ -84,7 +84,7 @@ async function chat(body, env) {
 		max_tokens: 380,
 		temperature: 0.4,
 	});
-	let text = String(out?.response ?? "").trim();
+	let text = (typeof out?.response === "string" ? out.response : JSON.stringify(out?.response ?? "")).trim();
 	let action = "none";
 	const m = text.match(/\n?\s*ACTION:\s*([a-z_]+)\s*$/i);
 	if (m) { action = m[1].toLowerCase(); text = text.slice(0, m.index).trim(); }
@@ -110,10 +110,11 @@ export async function onRequestPost({ request, env }) {
 			max_tokens: 220,
 			temperature: 0.1,
 		});
-		const s = String(out?.response ?? "");
-		const m = s.match(/\{[\s\S]*\}/);
-		if (!m) return bad(502, "unparsable");
-		return new Response(JSON.stringify({ intent: clean(JSON.parse(m[0])), model: MODEL }), {
+		// Workers AI may hand back the JSON already parsed, or as text (sometimes inside ``` fences).
+		const raw = out?.response;
+		let obj = raw && typeof raw === "object" ? raw : null;
+		if (!obj) { const m = String(raw ?? "").match(/\{[\s\S]*\}/); if (!m) return bad(502, "unparsable"); obj = JSON.parse(m[0]); }
+		return new Response(JSON.stringify({ intent: clean(obj), model: MODEL }), {
 			headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS },
 		});
 	} catch (e) {

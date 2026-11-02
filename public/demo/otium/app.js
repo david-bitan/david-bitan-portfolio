@@ -164,6 +164,7 @@
 	function renderExamples() { $("#examples").innerHTML = EXAMPLES.map((x) => `<button class="chip" type="button">${esc(t(x))}</button>`).join(""); }
 	function fitAsk() {
 		const a = $("#ask"); if (!a) return; const MAX = 132;
+		if (!a.value || !a.offsetParent) { a.style.height = ""; a.style.overflowY = ""; $("#composer").classList.remove("multi"); if (!a.value || !a.offsetParent) return; } // empty or hidden: back to the CSS size
 		a.style.height = "auto"; const h = Math.min(a.scrollHeight, MAX);
 		a.style.height = `${h}px`; a.style.overflowY = a.scrollHeight > MAX ? "auto" : "hidden";
 		$("#composer").classList.toggle("multi", h > 34);
@@ -342,20 +343,25 @@
 	}
 	async function understand(text) {
 		if (S.scenario === "offline") return { intent: localParse(text), ai: false };
+		const ask = async (ms) => {
+			const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), ms);
+			try {
+				const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, lang: I.lang }), signal: ctl.signal });
+				if (!r.ok) throw new Error(`HTTP ${r.status}`);
+				const j = await r.json(); if (!j.intent) throw new Error("empty");
+				return j;
+			} finally { clearTimeout(to); }
+		};
 		try {
-			const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 7000);
-			const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, lang: I.lang }), signal: ctl.signal });
-			clearTimeout(to);
-			if (!r.ok) throw new Error(r.status);
-			const j = await r.json();
-			if (!j.intent) throw new Error("empty");
+			// the 70B model can take a while on a cold start: wait longer, and try twice before giving up
+			let j; try { j = await ask(15000); } catch (e) { if (e.name === "AbortError") throw e; console.warn("Otium AI, first try:", e.message); j = await ask(10000); }
 			// Belt and braces: the model may miss a number that is plainly in the text.
 			const loc = localParse(text); const i = j.intent;
 			for (const k of ["nights", "travelers", "budget"]) if (i[k] == null && loc[k] != null) i[k] = loc[k];
 			Object.assign(i, { cabin: loc.cabin, bags: loc.bags, time: loc.time });
 			if (!i.city && loc.city) { i.city = loc.city; i.askedPlace = loc.askedPlace; }
 			return { intent: i, ai: true };
-		} catch { return { intent: localParse(text), ai: false }; }
+		} catch (e) { console.warn("Otium AI unavailable, basic matching used:", e.message); return { intent: localParse(text), ai: false }; }
 	}
 
 	/* ---------------- run engine ---------------- */
@@ -437,7 +443,6 @@
 			const { intent, ai } = await understand(S.text);
 			await beat(id, 500);
 			S.aiUsed = ai; S.intent = intent;
-			if (!ai) $("#notice").innerHTML = `<div class="notice">${ICON.info}<span>${t("Smart reading is offline right now, so Otium used basic matching. Check the details below — you can change any of them.")}</span></div>`;
 			s.sub(t(ai ? "Matched it against six destinations (Llama 3.3)" : "Matched it against six destinations (basic matching)"));
 			if (S.scenario === "overbudget") intent.budget = 400;
 
@@ -697,7 +702,7 @@
 		const fact = (key, vals, cur, label) => dd("k", key, vals, cur, t(label), p.assumed[key] ? "assumed" : "");
 		const pref = (key, vals, label) => dd("p", key, vals, p.prefs[key], t(label), "pref");
 		const caps = [...new Set([300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1500, 2000, 2500, 3000, 4000, 5000, 7500, 10000, p.cap])].sort((a, b) => a - b);
-		box.innerHTML = `<div class="lbl"><span>${t("WHAT I UNDERSTOOD")}</span><span>${t(S.aiUsed ? "Read by AI" : "Basic matching")}</span></div>
+		box.innerHTML = `<div class="lbl"><span>${t("WHAT I UNDERSTOOD")}</span><span ${S.aiUsed ? "" : `title="${esc(t("Smart reading is offline right now, so Otium used basic matching. Check the details below — you can change any of them."))}"`}>${t(S.aiUsed ? "Read by AI" : "Basic matching")}</span></div>
 			<p>${esc(S.text)}</p>
 			<div class="facts">
 				${fact("city", Object.keys(D.cities).map((k) => [k, D.cities[k].name, D.cities[k].country]), p.city, "Destination")}
@@ -1331,10 +1336,12 @@
 	let curView = "home";
 	function show(v, fromPop) {
 		if (v === "trip" && !S.plan && !S.text) v = "home";
-		if (v === "home" && curView !== "home") { $("#ask").value = ""; fitAsk(); } // a new search starts empty
+		const fresh = v === "home" && curView !== "home";
+		if (fresh) $("#ask").value = ""; // a new search starts empty
 		curView = v;
 		$("#home").hidden = v !== "home"; $("#trip").hidden = v !== "trip"; $("#explore").hidden = v !== "explore"; $("#trips").hidden = v !== "trips";
 		if (v === "explore") renderExplore();
+		if (fresh) fitAsk();
 		if (v === "trips") { const L = $("#tripsList"); L.__html = null; L.classList.add("fresh"); renderTrips(); setTimeout(() => L.classList.remove("fresh"), 700); }
 		document.querySelectorAll(".nav [data-go]").forEach((b) => b.setAttribute("aria-current", b.dataset.go === v ? "page" : "false"));
 		renderTripsNav();
