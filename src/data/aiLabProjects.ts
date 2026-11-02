@@ -83,9 +83,7 @@ The language model only reads the request. Prices, the plan, the budget check an
 		},
 		designSystem: {
 			colors: [
-				{ name: 'Vermillion', hex: '#982427', role: 'Brand · primary action · automatic steps · confirmed' },
-				{ name: 'Amber', hex: '#B8680F', role: 'Needs you · waiting for your OK' },
-				{ name: 'Alert red', hex: '#C42B1C', role: 'Over budget · cancel · discard' },
+				{ name: 'Otium red', hex: '#C2344C', role: 'Brand · actions · hearts · notifications · needs you' },
 				{ name: 'Ink', hex: '#222222', role: 'Type · T-Bot button · portfolio strip' },
 				{ name: 'White', hex: '#FFFFFF', role: 'Canvas — light, rounded cards, fine lines' },
 			],
@@ -98,7 +96,7 @@ The language model only reads the request. Prices, the plan, the budget check an
 				'One icon set everywhere — Lucide, thin strokes, no filled shapes',
 				'Steps tick in one by one, then fold so the timeline stays short',
 				'A budget bar with the cap marked, turning rose the moment the plan goes over',
-				'Amber dot on My trips and on T-Bot when something waits for you',
+				'Red dot on My trips and on T-Bot when something waits for you',
 				'Calendar range preview on hover, nights counted live',
 				'Help and T-Bot stacked bottom right, the way back to the portfolio bottom left',
 			],
@@ -130,7 +128,7 @@ The language model only reads the request. Prices, the plan, the budget check an
 		],
 		demoUrl: '/demo/otium/',
 		thumbnail: '/lab-assets/otium/thumbnail.jpg',
-		accent: '#982427',
+		accent: '#C2344C',
 	},
 	{
 		slug: 'apex-athletic-club',
