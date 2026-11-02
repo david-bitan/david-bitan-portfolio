@@ -1112,6 +1112,14 @@ body.lb-open { overflow: hidden; }
 .how .art .mini-ask { background: #fff; border: 0; }
 .how .art .mini-ask span { border-radius: 999px; }
 .how .art .mini-undo > div:first-child { padding-top: 0; }
+
+/* v3.4 gallery: one fixed 3:2 frame for every photo, top-aligned with the info panel */
+.lb-stage, .lb .lb-stage { display: block; height: auto; min-height: 0; padding-top: 0; aspect-ratio: 3 / 2; width: min(100%, calc(min(68vh, 760px) * 1.5)); margin: 0 auto; border-radius: 10px; overflow: hidden; background: #1E1C1A; }
+.lb-stage img, .lb .lb-stage img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; object-fit: cover; border-radius: 0; }
+.lb.has-info .lb-stage { margin: 0; width: min(100%, calc(min(68vh, 760px) * 1.5)); justify-self: start; }
+.lb.has-info .lb-main { align-items: center; }
+@media (max-width: 900px) { .lb-stage, .lb .lb-stage, .lb.has-info .lb-stage { width: min(100%, calc(52vh * 1.5)); margin: 0 auto; } }
+@media (max-width: 640px) { .lb .lb-body { padding-top: 4vh; } }
 </style>
 </head>
 <body>
