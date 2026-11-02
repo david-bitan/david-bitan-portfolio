@@ -52,6 +52,83 @@ export interface AILabProject {
 // one of the experiments, so it closes the row rather than opening it.
 export const aiLabProjects: AILabProject[] = [
 	{
+		slug: 'otium',
+		title: 'Otium',
+		subtitle: 'An AI travel agent that plans in the open and asks before it acts.',
+		eyebrow: 'Travel · 2026',
+		shortDesc:
+			'A fictional AI travel agent — it reads a trip described in plain words, searches, compares and holds flights and a stay, then stops for your OK before it pays or shares your details. Five languages, Hebrew in RTL.',
+		intro: `Otium is a fictional AI travel agent I designed and built end-to-end. The question behind it is the one every agentic product now faces: once an AI can act for you — search, book, pay — how do you stay in control without doing the work yourself?
+
+The answer I designed is an agent that works in the open. You describe a trip in your own words; Otium shows each step as it happens, flags what it assumed, and lets you correct any of it. Searching is automatic. Paying, sharing your details and going over budget always wait for an explicit yes, with a before/after view of what changes. Every booking can be cancelled from the trip, every decision is written to a trip history, and a human travel team is always one tap away.
+
+The language model only reads the request. Prices, the plan, the budget check and every action are computed in code, so the model can never invent a fare or approve a payment. The demo runs on invented airlines, stays and prices; nothing is ever booked or charged.`,
+		aiFeature: {
+			eyebrow: 'AI UX · Agent',
+			title: 'An agent that asks before it acts',
+			lead: 'Otium plans a full short trip on its own — flights, a stay, the days — but every action with consequences waits for the traveller. The request is read by an LLM (Llama 3.3 on Cloudflare Workers AI); everything else is deterministic code. T-Bot, a built-in helper, answers questions along the way and only ever points to the control where the traveller decides.',
+			tryUrl: '/demo/otium/',
+			tryLabel: 'Try Otium',
+			states: ['Request read by AI, with assumptions flagged', 'Basic matching when the AI is offline', 'Clarifying question when the place is missing', 'Destination not covered — no guessing', 'Steps shown live, foldable', 'Pause and resume', 'Over budget — stops and offers options', 'Approval before payment, with before/after', 'Approval before sharing traveller details', 'Fare changed — asks again', 'Flight sold out — plan B', 'Edit flight or stay before approving', 'Cancel one booking or all', 'Trip history, tap to jump to a step', 'Several trips saved in My trips', 'Date-range calendar', 'Tickets and hotel voucher as PDF, calendar file', 'T-Bot helper with action buttons', 'Talk to a human', 'Five languages, Hebrew in RTL'],
+			decisions: [
+				{ title: 'Model for reading, code for acting', body: 'The LLM turns a sentence into fields — city, nights, travellers, budget. Prices, the plan, the budget check and every booking step are computed in code, so the model can never invent a fare or approve a payment.' },
+				{ title: 'Automatic vs. needs you', body: 'Each step carries a tag. Searching and comparing run on their own; paying, sharing personal data and going over budget always stop and wait. Permissions show the same rules in one place.' },
+				{ title: 'Show what it assumed', body: 'Anything the traveller did not say — dates, number of travellers, budget — is shown dashed in “What I understood”. One tap changes it and the agent re-plans from that point.' },
+				{ title: 'Approve with a before/after', body: 'Every approval card shows what changes: amount held, what is refundable, what happens next. Edit and No are as visible as Yes.' },
+				{ title: 'Plan B instead of an error', body: 'A sold-out flight or a fare change does not end in a dead end: the agent explains, proposes the next option and asks again.' },
+				{ title: 'Nothing gets lost', body: 'Every plan is saved in My trips with its status — draft, waiting for your OK, booked. Starting a new plan sets the current one aside instead of replacing it, and the agent resumes exactly where it stopped.' },
+				{ title: 'Help that points, never acts', body: 'T-Bot answers questions in context and offers one button from a fixed list — change dates, show what needs me, cancel options, talk to a human. It never pays, books or cancels on its own.' },
+				{ title: 'Always a human exit', body: 'Help, a phone line, chat and email are reachable from every screen, and the travel team sees the full trip history, so nobody has to explain twice.' },
+			],
+		},
+		designSystem: {
+			colors: [
+				{ name: 'Lagoon', hex: '#0F6E62', role: 'Primary action · automatic steps · confirmed' },
+				{ name: 'Amber', hex: '#B8680F', role: 'Needs you · waiting for your OK' },
+				{ name: 'Rose', hex: '#B4432F', role: 'Over budget · cancel · discard' },
+				{ name: 'Ink', hex: '#222222', role: 'Type · T-Bot button · portfolio strip' },
+				{ name: 'White', hex: '#FFFFFF', role: 'Canvas — light, rounded cards, fine lines' },
+			],
+			typography: [
+				{ family: 'Plus Jakarta Sans', weights: '400 · 500 · 600 · 700', role: 'Interface · headings · body', sample: 'You decide. Otium does the legwork.' },
+				{ family: 'Heebo', weights: '400 · 500 · 700', role: 'Hebrew, right-to-left', sample: 'אתם מחליטים. Otium עושה את העבודה.' },
+				{ family: 'Fraunces', weights: 'Italic 500', role: 'Logotype only', sample: 'otium' },
+			],
+			micro: [
+				'One icon set everywhere — Lucide, thin strokes, no filled shapes',
+				'Steps tick in one by one, then fold so the timeline stays short',
+				'A budget bar with the cap marked, turning rose the moment the plan goes over',
+				'Amber dot on My trips and on T-Bot when something waits for you',
+				'Calendar range preview on hover, nights counted live',
+			],
+			interactions: [
+				'Request in plain words, read by AI, every field editable with custom menus',
+				'Approval cards with before/after, Edit and No as visible as Yes',
+				'Cancel per booking or all, with what is refunded shown first',
+				'My trips: several plans kept side by side, each resumes where it stopped',
+				'Language switch translates every trip in place — nothing is re-planned',
+				'T-Bot chat with contextual suggestions and one safe action per answer',
+			],
+			constraints: [
+				'Plain HTML, CSS and JavaScript — no framework, no bundler, no CDN',
+				'The model only reads; prices and actions are computed in code',
+				'Five languages from one string table, Hebrew in RTL',
+				'Fictional airlines, stays and prices — nothing is booked, charged or sent',
+				'Tested end-to-end in a headless browser: full flow, six tricky cases, mobile at 390 px, five languages',
+			],
+		},
+		gallery: [
+			'/lab-assets/otium/home.jpg',
+			'/lab-assets/otium/plan.jpg',
+			'/lab-assets/otium/calendar.jpg',
+			'/lab-assets/otium/my-trips.jpg',
+			'/lab-assets/otium/t-bot.jpg',
+		],
+		demoUrl: '/demo/otium/',
+		thumbnail: '/lab-assets/otium/thumbnail.jpg',
+		accent: '#0F6E62',
+	},
+	{
 		slug: 'apex-athletic-club',
 		title: 'APEX Athletic Club',
 		subtitle: 'An oceanfront strength and recovery club in Miami Beach, invented and built out to five pages.',

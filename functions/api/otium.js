@@ -30,8 +30,11 @@ Fields:
 - "note": one short sentence (max 18 words) restating what you understood, addressed to the user ("You want..."), written in the language named in the LANGUAGE line.
 Never invent a budget, a city or a number of travelers that the user did not give.`;
 
+// Open CORS: lets the standalone preview file (opened from disk) talk to the live model.
+const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-allow-headers": "content-type" };
+
 function bad(status, msg) {
-	return new Response(JSON.stringify({ error: msg }), { status, headers: { "content-type": "application/json" } });
+	return new Response(JSON.stringify({ error: msg }), { status, headers: { "content-type": "application/json", ...CORS } });
 }
 
 function clampInt(v, lo, hi) {
@@ -57,14 +60,16 @@ function clean(raw) {
 
 const ACTIONS = ["none", "pending", "dates", "budget", "bags", "cancel", "trips", "pause", "retry", "new_trip", "human"];
 const BOT = `You are T-Bot, the in-app helper of Otium, an AI travel agent. Otium is a portfolio demo: airlines (Aerolume, Skyra, Northwind), stays and prices are invented and nothing is ever really booked or charged.
-Your job: help a traveller who is confused or stuck while planning. Explain what is happening and point to the right control.
+Your job: answer the traveller's questions for real, like a friendly, expert travel agent. Two kinds of questions:
+1) About this trip or the app (stuck, payment, dates, cancelling…): explain what is happening using TRIP CONTEXT and point to the right control.
+2) General travel questions (what to see or eat at the destination, weather by season, neighbourhoods, getting around, packing, budget tips, local customs, documents in general terms): answer concretely from your general knowledge, with 2-4 specific tips. For visas, health or safety rules, give the general picture and say to check the official source before travelling.
 How Otium works: the traveller describes a trip; Otium searches flights and stays, drafts the days, checks the budget cap, then STOPS and asks before paying (holding flights + stay) and before sharing traveller details with the airline. Every booking can be cancelled from the trip page (a non-refundable stay can't be recovered). The traveller can pause Otium, change dates, budget cap, travellers, cabin, bags in "What I understood", and find every plan in "My trips". A human travel team is reachable 24/7 by phone, chat or email from Help.
 Rules:
-- Reply in LANGUAGE. 1 to 4 short sentences, max 70 words, plain text, no markdown, no lists.
-- Use only facts from TRIP CONTEXT and the text above. Never invent prices, dates, policies, bookings or features.
+- Reply in LANGUAGE. Max 110 words, plain text, no markdown. Short sentences; you may use "- " lines for tips.
+- For this trip, use only facts from TRIP CONTEXT and the text above. Never invent prices, dates, availability, policies, bookings or features of Otium.
 - You cannot pay, book, cancel or change anything yourself. Say what the traveller can do and where.
 - If you can't solve it, or the traveller is upset, offer a person from the travel team.
-- Off-topic: say kindly in one sentence that you only help with this trip.
+- Questions unrelated to travel: say kindly in one sentence that you help with trips.
 Then on a final separate line write exactly: ACTION: <one of ${ACTIONS.join(", ")}> — the single most useful button to show (pending = scroll to the card waiting for the traveller's decision; human = contact the travel team).`;
 
 async function chat(body, env) {
@@ -76,18 +81,18 @@ async function chat(body, env) {
 	const ctx = JSON.stringify(body?.context ?? {}).slice(0, 1500);
 	const out = await env.AI.run(MODEL, {
 		messages: [{ role: "system", content: `${BOT}\nLANGUAGE: ${LANG}\nTRIP CONTEXT (from the page, trust it): ${ctx}` }, ...msgs],
-		max_tokens: 220,
-		temperature: 0.3,
+		max_tokens: 380,
+		temperature: 0.4,
 	});
 	let text = String(out?.response ?? "").trim();
 	let action = "none";
 	const m = text.match(/\n?\s*ACTION:\s*([a-z_]+)\s*$/i);
 	if (m) { action = m[1].toLowerCase(); text = text.slice(0, m.index).trim(); }
 	if (!ACTIONS.includes(action)) action = "none";
-	text = text.replace(/[*#`]/g, "").slice(0, 600);
+	text = text.replace(/[*#`]/g, "").slice(0, 900);
 	if (!text) return bad(502, "empty_reply");
 	return new Response(JSON.stringify({ reply: text, action: action === "none" ? null : action, model: MODEL }), {
-		headers: { "content-type": "application/json", "cache-control": "no-store" },
+		headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS },
 	});
 }
 
@@ -109,7 +114,7 @@ export async function onRequestPost({ request, env }) {
 		const m = s.match(/\{[\s\S]*\}/);
 		if (!m) return bad(502, "unparsable");
 		return new Response(JSON.stringify({ intent: clean(JSON.parse(m[0])), model: MODEL }), {
-			headers: { "content-type": "application/json", "cache-control": "no-store" },
+			headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS },
 		});
 	} catch (e) {
 		return bad(502, "model_error");
@@ -118,7 +123,11 @@ export async function onRequestPost({ request, env }) {
 
 // GET /api/otium → health check.
 export function onRequestGet({ env }) {
-	return new Response(JSON.stringify({ ok: true, ai: Boolean(env.AI), model: MODEL }), { headers: { "content-type": "application/json", "cache-control": "no-store" } });
+	return new Response(JSON.stringify({ ok: true, ai: Boolean(env.AI), model: MODEL }), { headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS } });
+}
+
+export function onRequestOptions() {
+	return new Response(null, { status: 204, headers: { ...CORS, "access-control-max-age": "86400" } });
 }
 
 export function onRequest() {

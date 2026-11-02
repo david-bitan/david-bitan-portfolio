@@ -17,6 +17,8 @@
 	const $ = (s, r = document) => r.querySelector(s);
 	const eur = (n) => new Intl.NumberFormat(I.locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(Math.round(n));
 	const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+	// The model lives on the published site. Opened anywhere else (a preview file), Otium calls the live endpoint.
+	const API = /(^|\.)david-bitan-portfolio\.pages\.dev$/.test(location.hostname) || /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? "/api/otium" : "https://david-bitan-portfolio.pages.dev/api/otium";
 	const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 	const ORIGIN_FACTOR = { Paris: 1, London: 1.08, "Tel Aviv": 1.45, Berlin: 0.95, Madrid: 0.9, Brussels: 0.98, Dublin: 1.12, Geneva: 1.1, Lyon: 0.96, Milan: 0.92, Munich: 1.02, Vienna: 1.04 };
 	const TICKETS_PP_DAY = 30;
@@ -342,7 +344,7 @@
 		if (S.scenario === "offline") return { intent: localParse(text), ai: false };
 		try {
 			const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 7000);
-			const r = await fetch("/api/otium", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, lang: I.lang }), signal: ctl.signal });
+			const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, lang: I.lang }), signal: ctl.signal });
 			clearTimeout(to);
 			if (!r.ok) throw new Error(r.status);
 			const j = await r.json();
@@ -967,19 +969,20 @@
 	async function botSend(text) {
 		text = text.trim().slice(0, 300); if (!text || BOT.busy) return;
 		BOT.msgs.push({ by: "user", text }); BOT.busy = true; renderBot();
-		const [lt, la] = botLocal(text);
+		let lt = "", la = null; try { [lt, la] = botLocal(text); } catch (e) { console.error(e); }
 		let reply = null, action = null;
 		if (S.scenario !== "offline") {
 			try {
-				const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 9000);
-				const r = await fetch("/api/otium", { method: "POST", headers: { "content-type": "application/json" }, signal: ctl.signal,
+				const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 20000);
+				const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, signal: ctl.signal,
 					body: JSON.stringify({ mode: "chat", lang: I.lang, context: botContext(), messages: BOT.msgs.filter((m) => m.by === "user" || !m.local || m === BOT.msgs[0]).slice(-8).map((m) => ({ role: m.by === "user" ? "user" : "assistant", content: m.text })) }) });
 				clearTimeout(to);
-				if (r.ok) { const j = await r.json(); if (typeof j.reply === "string" && j.reply.trim()) { reply = j.reply.trim().slice(0, 600); action = BOT_ACTIONS[j.action] ? j.action : null; } }
-			} catch { /* offline: scripted answer below */ }
+				if (r.ok) { const j = await r.json(); if (typeof j.reply === "string" && j.reply.trim()) { reply = j.reply.trim().slice(0, 900); action = BOT_ACTIONS[j.action] ? j.action : null; } }
+			} catch { /* AI unreachable: honest scripted answer below */ }
 		}
 		BOT.ai = reply != null;
-		BOT.msgs.push(reply ? { by: "bot", text: reply, action: action || la } : { by: "bot", text: lt, action: la, local: true });
+		// Never pretend: without the model, say so before the scripted answer.
+		BOT.msgs.push(reply ? { by: "bot", text: reply, action } : { by: "bot", text: `${t("My AI can’t be reached right now, so here is the basic answer:")} ${lt || t("I can help with dates, budget, bags, payment, cancelling, or finding a person. What is blocking you?")}`, action: la || "human", local: true });
 		BOT.busy = false; renderBot();
 	}
 	let botTimer = null;
