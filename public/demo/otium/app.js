@@ -27,7 +27,7 @@
 	document.querySelectorAll("i[data-i]").forEach((e) => (e.outerHTML = ic(e.dataset.i)));
 	const ICON = {
 		check: ic("check"), spin: ic("loader-circle"), hand: ic("hand"), x: ic("x"), dot: ic("circle-dot"), lock: ic("lock"), info: ic("info"),
-		edit: ic("pencil"), cal: ic("calendar"), ticket: ic("ticket"), phone: ic("phone"), chat: ic("message-circle"), mail: ic("mail"), pin: ic("pin"),
+		edit: ic("pencil"), cal: ic("calendar"), ticket: ic("ticket"), receipt: ic("receipt"), phone: ic("phone"), chat: ic("message-circle"), mail: ic("mail"), pin: ic("pin"),
 		star: ic("star", "star"), plane: ic("plane"), arrow: ic("arrow-right"), down: ic("chevron-down"), cancel: ic("undo-2"),
 	};
 
@@ -677,6 +677,7 @@
 		s.set("done"); s.detail(t("Everything is in the trip history, and every booking can be cancelled from this page."));
 		setStatus("done", t("Done — nothing else needs you"));
 		S.progress.done = true; renderTrip();
+		setTimeout(() => document.querySelector("#tripCanvas .done-banner")?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" }), 450);
 		toast(t("Your trip is held. You can still cancel anything from this page."));
 	}
 	function restartFrom(stepKey) {
@@ -1357,7 +1358,7 @@
 		<div class="panel budget">
 			<div class="budget-top"><div><b class="num">${k ? eur(k.total) : "—"}</b> <span>${t("estimated total")}</span></div><span class="num">${k ? (over ? `<span class="diff">${t("{x} over", { x: eur(k.total - p.cap) })}</span>` : t("{x} left under your cap", { x: eur(p.cap - k.total) })) : t("Calculating…")}</span></div>
 			<div class="meter${over ? " over" : ""}"><div class="fill" style="width:${k ? (k.total / scale) * 100 : 0}%"></div><div class="cap" style="left:${(p.cap / scale) * 100}%" data-l="${esc(t("Cap {x}", { x: eur(p.cap) }))}"></div></div>
-			${k ? `<div class="split num"><span><i style="background:var(--lagoon)"></i>${t("Flights {x}", { x: eur(k.flights) })}</span><span><i style="background:#B4494C"></i>${t("Stay {x}", { x: eur(k.stay) })}</span>${k.tickets ? `<span><i style="background:var(--sand-2)"></i>${t("Tickets, est. {x}", { x: eur(k.tickets) })}</span>` : ""}</div>` : ""}
+			${k ? `<div class="split num"><span><i style="background:${over ? "var(--rose)" : "var(--ok)"}"></i>${t("Flights {x}", { x: eur(k.flights) })}</span><span><i style="background:${over ? "#E58A99" : "#7CC9A1"}"></i>${t("Stay {x}", { x: eur(k.stay) })}</span>${k.tickets ? `<span><i style="background:var(--sand-2)"></i>${t("Tickets, est. {x}", { x: eur(k.tickets) })}</span>` : ""}</div>` : ""}
 		</div>
 		<div class="panel block">
 			<div class="block-h"><h3>${t("Flights")}</h3><span class="state ${S.held.flights ? "held" : S.progress.pendingHold ? "pending" : ""}">${S.held.flights ? `${t("Held · {c}", { c: S.held.flights.code })} <button class="linkish" data-cancel="flights">${t("Cancel")}</button>` : t(S.progress.pendingHold ? "Waiting for your OK" : fl ? "Not held yet" : "Searching…")}</span></div>
@@ -1415,7 +1416,7 @@
 	}
 	function doneBanner(k) {
 		const h = S.held;
-		return `<div class="panel done-banner"><div class="check">${ICON.check}</div><div><h3>${t("Your trip is held.")}</h3><p>${h.flights || h.stay ? t("{x} held", { x: eur((h.flights?.amount || 0) + (h.stay?.amount || 0)) }) : t("Nothing held")}${t(" · simulated, nothing charged.")}</p><div class="codes">${h.flights ? `${t("Flight")} <b>${h.flights.code}</b>` : t("Flight released")} · ${h.stay ? `${t("Stay")} <b>${h.stay.code}</b>` : t("Stay released")}</div></div><div class="row">${h.flights && h.data ? `<button class="btn btn-primary btn-sm" id="docs">${ICON.ticket} ${t("Tickets & voucher")}</button>` : h.flights ? `<span class="tag">${t("Tickets: send traveller details first")}</span>` : ""}<button class="btn btn-ghost btn-sm" id="ics">${ICON.cal} ${t("Add to calendar")}</button>${h.flights || h.stay ? `<button class="btn btn-text btn-sm" data-cancel="all">${t("Cancel all bookings")}</button>` : ""}<button class="btn btn-text btn-sm" data-help>${t("Need help?")}</button></div></div>`;
+		return `<div class="panel done-banner"><div class="check">${ICON.check}</div><div><h3>${t("Your trip is held.")}</h3><p>${h.flights || h.stay ? t("{x} held", { x: eur((h.flights?.amount || 0) + (h.stay?.amount || 0)) }) : t("Nothing held")}${t(" · simulated, nothing charged.")}</p><div class="codes">${h.flights ? `${t("Flight")} <b>${h.flights.code}</b>` : t("Flight released")} · ${h.stay ? `${t("Stay")} <b>${h.stay.code}</b>` : t("Stay released")}</div></div><div class="row">${h.flights && h.data ? `<button class="btn btn-primary btn-sm" id="docs">${ICON.ticket} ${t("Tickets & voucher")}</button>` : h.flights ? `<span class="tag">${t("Tickets: send traveller details first")}</span>` : ""}${h.flights || h.stay ? `<button class="btn btn-ghost btn-sm" id="invoice">${ICON.receipt} ${t("Invoice")}</button>` : ""}<button class="btn btn-ghost btn-sm" id="ics">${ICON.cal} ${t("Add to calendar")}</button>${h.flights || h.stay ? `<button class="btn btn-text btn-sm" data-cancel="all">${t("Cancel all bookings")}</button>` : ""}<button class="btn btn-text btn-sm" data-help>${t("Need help?")}</button></div></div>`;
 	}
 	$("#tripCanvas").addEventListener("click", (e) => {
 		const p = S.plan; if (!p) return;
@@ -1435,6 +1436,7 @@
 		if (e.target.closest("#editDone")) { editResolve?.(); editResolve = null; return; }
 		if (e.target.closest("#ics")) return downloadIcs();
 		if (e.target.closest("#docs")) return openDocs();
+		if (e.target.closest("#invoice")) return downloadInvoice();
 	});
 
 	/* ---------------- trip history (read-only receipt) + cancelling bookings ---------------- */
@@ -1713,7 +1715,7 @@
 		modal(`<h3 id="modalTitle">${t("Your travel documents")}</h3><p>${P(p.travelers, "1 traveller", "{n} travellers")} · ${t("{n} flights each", { n: L.length })}${S.held.stay ? t(" · 1 hotel voucher") : ""}${t(". The PDF has every pass, one page per traveller.")}</p>
 			<div class="docs">${passHtml(L[0], 0)}
 			${S.held.stay ? `<div class="voucher"><div><span class="pass-dir">${t("Hotel voucher")}</span><b>${esc(k.st.name)}</b><small>${esc(k.st.area)}, ${D.cities[p.city].name} · ${ICON.star} ${k.st.rating}</small></div><dl class="pass-grid"><div><dt>${t("Check-in")}</dt><dd>${fmtDay(d.out)} · 15:00</dd></div><div><dt>${t("Check-out")}</dt><dd>${fmtDay(d.back)} · 11:00</dd></div><div><dt>${t("Guests")}</dt><dd>${p.travelers}</dd></div><div><dt>${t("Booking")}</dt><dd>${S.held.stay.code}</dd></div></dl></div>` : ""}</div>
-			<div class="row"><button class="btn btn-ghost btn-sm" data-m="cancel">${t("Close")}</button><button class="btn btn-primary btn-sm" data-m="pdf">${ICON.ticket} ${t("Download PDF")}</button></div>`, (r) => { if (r === "pdf") downloadPdf(); });
+			<div class="row"><button class="btn btn-ghost btn-sm" data-m="cancel">${t("Close")}</button><button class="btn btn-ghost btn-sm" data-m="inv">${ICON.receipt} ${t("Download invoice")}</button><button class="btn btn-primary btn-sm" data-m="pdf">${ICON.ticket} ${t("Download PDF")}</button></div>`, (r) => { if (r === "pdf") downloadPdf(); if (r === "inv") downloadInvoice(); });
 		$("#modalBox").classList.add("wide");
 	}
 	function loadPdf() {
@@ -1763,6 +1765,45 @@
 		}
 		doc.save(`otium-${p.city}-documents.pdf`);
 		log("You", t("Downloaded tickets and voucher (PDF)"));
+	}
+
+	async function downloadInvoice() {
+		const p = S.plan, h = S.held; if (!p || !(h.flights || h.stay)) return;
+		toast(t("Preparing your invoice…"));
+		let lib; try { lib = await loadPdf(); } catch { toast(t("Couldn’t load the PDF tool. Try again.")); return; }
+		const k = costs(p), L = legs(), d = tripDates(p.nights), city = D.cities[p.city].name;
+		const doc = new lib.jsPDF({ unit: "mm", format: "a4" });
+		const ink = [34, 34, 34], grey = [106, 106, 106], red = [194, 52, 76], green = [30, 138, 90], line = [221, 221, 221];
+		const money = (n) => "EUR " + Number(n).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+		const today = new Date(), iso = (x) => x.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+		const no = `OT-${today.getFullYear()}-${(h.flights || h.stay).code}`;
+		doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(...red); doc.text("otium", 15, 22);
+		doc.setFontSize(18); doc.setTextColor(...ink); doc.text("INVOICE", 195, 22, { align: "right" });
+		doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...grey);
+		doc.text(["Otium Travel (fictional company)", "1 Demo Street, London", "help@otium.example"], 15, 30);
+		[["Invoice no.", no], ["Date", iso(today)], ["Status", "PAID (simulated)"]].forEach(([a, b], i) => { doc.setTextColor(...grey); doc.text(a, 150, 30 + i * 5); doc.setTextColor(...(i === 2 ? green : ink)); doc.setFont("helvetica", "bold"); doc.text(b, 195, 30 + i * 5, { align: "right" }); doc.setFont("helvetica", "normal"); });
+		doc.setDrawColor(...line); doc.line(15, 50, 195, 50);
+		doc.setFontSize(8); doc.setTextColor(...grey); doc.text("BILLED TO", 15, 58); doc.text("TRIP", 110, 58);
+		doc.setFontSize(10); doc.setTextColor(...ink);
+		const who = [fullName() || "Traveller 1", ME.street, [ME.zip, ME.city].filter(Boolean).join(" "), ME.country, ME.email].filter(Boolean);
+		doc.text(who, 15, 64);
+		doc.text([`${city} · ${p.travelers} traveller${p.travelers > 1 ? "s" : ""}`, `${iso(d.out)} - ${iso(d.back)}`, `${p.nights} night${p.nights > 1 ? "s" : ""}`], 110, 64);
+		let y = 96;
+		doc.setFillColor(247, 247, 247); doc.rect(15, y - 6, 180, 9, "F");
+		doc.setFontSize(8); doc.setTextColor(...grey); doc.text("DESCRIPTION", 18, y); doc.text("BOOKING", 128, y); doc.text("AMOUNT", 192, y, { align: "right" });
+		y += 10; doc.setFontSize(10);
+		const row = (a, sub, c, amt) => { doc.setTextColor(...ink); doc.setFont("helvetica", "bold"); doc.text(a, 18, y); doc.setFont("helvetica", "normal"); doc.text(c, 128, y); doc.text(money(amt), 192, y, { align: "right" }); doc.setFontSize(8.5); doc.setTextColor(...grey); doc.text(sub, 18, y + 5); doc.setFontSize(10); y += 13; doc.setDrawColor(...line); doc.line(15, y - 5, 195, y - 5); };
+		if (h.flights) row(`Return flights · ${h.flights.airline}`, `${L[0].from} > ${L[0].to} ${L[0].flight} · ${L[1].from} > ${L[1].to} ${L[1].flight} · ${p.travelers} passenger${p.travelers > 1 ? "s" : ""}`, h.flights.code, h.flights.amount);
+		if (h.stay) row(`Stay · ${k.st.name}`, `${k.st.area}, ${city} · ${p.nights} night${p.nights > 1 ? "s" : ""} x ${money(k.st.nightly)}`, h.stay.code, h.stay.amount);
+		const total = (h.flights?.amount || 0) + (h.stay?.amount || 0);
+		y += 4; doc.setFontSize(10); doc.setTextColor(...grey); doc.text("Subtotal", 132, y); doc.setTextColor(...ink); doc.text(money(total), 192, y, { align: "right" });
+		y += 6; doc.setTextColor(...grey); doc.text("Taxes and fees", 132, y); doc.setTextColor(...ink); doc.text("included", 192, y, { align: "right" });
+		y += 4; doc.setDrawColor(...ink); doc.line(130, y, 195, y); y += 7;
+		doc.setFont("helvetica", "bold"); doc.setFontSize(13); doc.text("Total paid", 132, y); doc.text(money(total), 192, y, { align: "right" }); doc.setFont("helvetica", "normal");
+		y += 16; doc.setFontSize(9); doc.setTextColor(...grey); doc.text("PAYMENT", 15, y); doc.setTextColor(...ink); doc.text(`${cardLabel() || "Card on file"} · ${iso(today)} · approved by you in the app`, 15, y + 5);
+		doc.setFontSize(8); doc.setTextColor(...grey); doc.text("Otium is a fictional demo by David Bitan. Nothing was booked or charged. This invoice is not a valid tax document.", 15, 280);
+		doc.save(`otium-${p.city}-invoice-${no}.pdf`);
+		log("You", t("Downloaded the invoice (PDF)"));
 	}
 
 	function postit() {

@@ -17,7 +17,7 @@
 	--canvas: #FBF8F3; --surface: #FFFFFF; --sand: #F2ECE3; --sand-2: #E9E1D5;
 	--ink: #1D1A17; --ink-2: #5E574F; --ink-3: #8C847A; --line: #E6DED3;
 	--lagoon: #C2344C; --lagoon-2: #A12A3F; --lagoon-soft: #FBEAED;
-	--amber: #C2344C; --amber-soft: #FBEAED; --rose: #C2344C; --rose-soft: #FBEAED;
+	--amber: #C2344C; --amber-soft: #FBEAED; --rose: #C2344C; --rose-soft: #FBEAED; --ok: #1E8A5A; --ok-soft: #E4F3EB; --ok-line: #BFE3CF;
 	--r-lg: 24px; --r-md: 16px; --r-sm: 12px;
 	--shadow: 0 1px 2px rgba(29,26,23,.06), 0 8px 24px rgba(29,26,23,.06);
 	--shadow-lg: 0 2px 6px rgba(29,26,23,.06), 0 24px 60px rgba(29,26,23,.14);
@@ -1120,6 +1120,20 @@ body.lb-open { overflow: hidden; }
 .lb.has-info .lb-main { align-items: center; }
 @media (max-width: 900px) { .lb-stage, .lb .lb-stage, .lb.has-info .lb-stage { width: min(100%, calc(52vh * 1.5)); margin: 0 auto; } }
 @media (max-width: 640px) { .lb .lb-body { padding-top: 4vh; } }
+
+/* v3.6 less red: green = done / automatic / confirmed / refunded; neutral details */
+.step[data-s="done"] .ic, .done-banner .check, .mini-steps > div > svg.i { background: var(--ok); }
+.mini-steps .wait > svg.i { background: var(--amber); }
+.risk.auto, .tag.g, .pchip.ok, .mini-steps em { background: var(--ok-soft); color: var(--ok); }
+.mini-steps .wait em { background: var(--amber-soft); color: var(--amber); }
+.tstate.ok { color: var(--ok); border-color: var(--ok-line); background: var(--ok-soft); }
+.state.held, .mini-undo p { color: var(--ok); }
+.status-tag.ok i { background: #8FD3AE; }
+.done-banner { border-color: var(--ok-line); background: linear-gradient(180deg, var(--ok-soft), #fff 80%); }
+.si-stars { color: var(--ink); }
+.si-facts svg.i, .si-amen svg.i { color: var(--ink-2); }
+.meter .fill { background: var(--ok); }
+.meter.over .fill { background: var(--rose); }
 </style>
 </head>
 <body>
@@ -1163,7 +1177,7 @@ body.lb-open { overflow: hidden; }
 		</div>
 		<div class="promises">
 			<div class="promise" style="--t:#FBEAED;--i:#C2344C"><span class="pi"><i data-i="lock"></i></span><div><b>No payment without your OK</b><small>Each payment waits on a card where you say yes, edit or no.</small></div></div>
-			<div class="promise" style="--t:#FBEAED;--i:#C2344C"><span class="pi"><i data-i="shield-check"></i></span><div><b>Your details stay yours</b><small>Names and passports go to the airline only after you agree.</small></div></div>
+			<div class="promise" style="--t:#E4F3EB;--i:#1E8A5A"><span class="pi"><i data-i="shield-check"></i></span><div><b>Your details stay yours</b><small>Names and passports go to the airline only after you agree.</small></div></div>
 			<div class="promise" style="--t:#ECEBFB;--i:#5146C9"><span class="pi"><i data-i="undo-2"></i></span><div><b>Every step can be undone</b><small>A full history of every action, with an undo on each one.</small></div></div>
 		</div>
 		<div class="cats-h"><h2>What kind of trip?</h2><p>Pick a style to see the destinations that suit it. Tap a destination to start planning it.</p></div>
@@ -1176,11 +1190,11 @@ body.lb-open { overflow: hidden; }
 		</div>
 		<div class="how">
 			<article>
-				<div class="art" style="--t:#FBEAED" aria-hidden="true"><div class="mini mini-steps"><div><i data-i="check"></i><span>Find flights from Paris</span><em>Automatic</em></div><div><i data-i="check"></i><span>Find a place to stay</span><em>Automatic</em></div><div class="wait"><i data-i="hand"></i><span>Hold flights and stay</span><em>Needs you</em></div></div></div>
+				<div class="art" style="--t:#E4F3EB" aria-hidden="true"><div class="mini mini-steps"><div><i data-i="check"></i><span>Find flights from Paris</span><em>Automatic</em></div><div><i data-i="check"></i><span>Find a place to stay</span><em>Automatic</em></div><div class="wait"><i data-i="hand"></i><span>Hold flights and stay</span><em>Needs you</em></div></div></div>
 				<span class="n">01</span><h3>It shows its plan first</h3><p>Every step, its cost and whether it needs you — before anything happens.</p>
 			</article>
 			<article>
-				<div class="art" style="--t:#ECEBFB" aria-hidden="true"><div class="mini mini-ask"><b>Approve this payment?</b><strong>€583</strong><div><span class="y">Approve</span><span class="n">Not now</span></div></div></div>
+				<div class="art" style="--t:#FBEAED" aria-hidden="true"><div class="mini mini-ask"><b>Approve this payment?</b><strong>€583</strong><div><span class="y">Approve</span><span class="n">Not now</span></div></div></div>
 				<span class="n">02</span><h3>It asks when it matters</h3><p>Searching runs on its own. Paying and sharing your details always wait for a yes.</p>
 			</article>
 			<article>
