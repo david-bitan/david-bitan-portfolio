@@ -1134,6 +1134,13 @@ body.lb-open { overflow: hidden; }
 .si-facts svg.i, .si-amen svg.i { color: var(--ink-2); }
 .meter .fill { background: var(--ok); }
 .meter.over .fill { background: var(--rose); }
+/* v3.8 day labels in ink; solid blue "trip is held" banner */
+.day b { color: var(--ink); }
+.done-banner { background: #E6F0FA; border-color: #C6DBF1; }
+.done-banner .check { background: #2F6FB5; }
+@keyframes donePop { 0% { box-shadow: 0 0 0 0 rgba(47,111,181,.45); } 100% { box-shadow: 0 0 0 14px rgba(47,111,181,0); } }
+.done-banner.pop { animation: donePop 1.1s var(--ease) .5s 2; }
+@media (prefers-reduced-motion: reduce) { .done-banner.pop { animation: none; } }
 </style>
 </head>
 <body>
@@ -1178,7 +1185,7 @@ body.lb-open { overflow: hidden; }
 		<div class="promises">
 			<div class="promise" style="--t:#FBEAED;--i:#C2344C"><span class="pi"><i data-i="lock"></i></span><div><b>No payment without your OK</b><small>Each payment waits on a card where you say yes, edit or no.</small></div></div>
 			<div class="promise" style="--t:#E4F3EB;--i:#1E8A5A"><span class="pi"><i data-i="shield-check"></i></span><div><b>Your details stay yours</b><small>Names and passports go to the airline only after you agree.</small></div></div>
-			<div class="promise" style="--t:#ECEBFB;--i:#5146C9"><span class="pi"><i data-i="undo-2"></i></span><div><b>Every step can be undone</b><small>A full history of every action, with an undo on each one.</small></div></div>
+			<div class="promise" style="--t:#E4EFF7;--i:#2F6FB5"><span class="pi"><i data-i="undo-2"></i></span><div><b>Every step can be undone</b><small>A full history of every action, with an undo on each one.</small></div></div>
 		</div>
 		<div class="cats-h"><h2>What kind of trip?</h2><p>Pick a style to see the destinations that suit it. Tap a destination to start planning it.</p></div>
 		<div class="cats" id="cats" role="toolbar" aria-label="Filter destinations"></div>

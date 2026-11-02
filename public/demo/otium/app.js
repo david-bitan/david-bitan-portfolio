@@ -677,7 +677,7 @@
 		s.set("done"); s.detail(t("Everything is in the trip history, and every booking can be cancelled from this page."));
 		setStatus("done", t("Done — nothing else needs you"));
 		S.progress.done = true; renderTrip();
-		setTimeout(() => document.querySelector("#tripCanvas .done-banner")?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" }), 450);
+		showDone();
 		toast(t("Your trip is held. You can still cancel anything from this page."));
 	}
 	function restartFrom(stepKey) {
@@ -1414,6 +1414,15 @@
 		if (S.held.stay || S.progress.done) return "";
 		return `<details class="toggle-alts" data-alts="stays"${(S.progress.editing && !S.progress.editPicked) || openAlts.has("stays") ? " open" : ""}><summary class="btn btn-text btn-sm">${t("Other stays ({n})", { n: c.stays.length - 1 })}</summary><div class="alts">${c.stays.map((s) => `<div class="alt-row"><button class="alt" data-stay="${s.id}" aria-pressed="${s.id === p.stay}"><span><b>${esc(s.name)}</b> · ${esc(s.area)} · ${ICON.star} ${s.rating}${s.freeCancel ? "" : t(" · non-refundable")}</span><span class="num">${eur(s.nightly * p.nights)}</span><span>${t(s.id === p.stay ? "Selected" : "Choose")}</span></button><button type="button" class="alt-pics" data-staypics="${s.id}" aria-label="${esc(t("Photos and details of {x}", { x: s.name }))}">${ic("images")}</button></div>`).join("")}</div></details>${S.progress.editing ? `<div class="row" style="margin-top:12px"><button class="btn btn-primary btn-sm" id="editDone">${t("Done — show me the new total")}</button></div>` : ""}`;
 	}
+	// Trip ready: bring the page back up to the documents banner (tickets, voucher, invoice).
+	function showDone() {
+		const go = () => { const b = document.querySelector("#tripCanvas .done-banner"); if (!b) return;
+			const head = document.querySelector(".top")?.offsetHeight || 70;
+			window.scrollTo({ top: Math.max(0, b.getBoundingClientRect().top + scrollY - head - 24), behavior: reduced ? "auto" : "smooth" });
+			b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); };
+		setTimeout(go, 350);
+	}
+
 	function doneBanner(k) {
 		const h = S.held;
 		return `<div class="panel done-banner"><div class="check">${ICON.check}</div><div><h3>${t("Your trip is held.")}</h3><p>${h.flights || h.stay ? t("{x} held", { x: eur((h.flights?.amount || 0) + (h.stay?.amount || 0)) }) : t("Nothing held")}${t(" · simulated, nothing charged.")}</p><div class="codes">${h.flights ? `${t("Flight")} <b>${h.flights.code}</b>` : t("Flight released")} · ${h.stay ? `${t("Stay")} <b>${h.stay.code}</b>` : t("Stay released")}</div></div><div class="row">${h.flights && h.data ? `<button class="btn btn-primary btn-sm" id="docs">${ICON.ticket} ${t("Tickets & voucher")}</button>` : h.flights ? `<span class="tag">${t("Tickets: send traveller details first")}</span>` : ""}${h.flights || h.stay ? `<button class="btn btn-ghost btn-sm" id="invoice">${ICON.receipt} ${t("Invoice")}</button>` : ""}<button class="btn btn-ghost btn-sm" id="ics">${ICON.cal} ${t("Add to calendar")}</button>${h.flights || h.stay ? `<button class="btn btn-text btn-sm" data-cancel="all">${t("Cancel all bookings")}</button>` : ""}<button class="btn btn-text btn-sm" data-help>${t("Need help?")}</button></div></div>`;
