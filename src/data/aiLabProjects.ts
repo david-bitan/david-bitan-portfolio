@@ -83,7 +83,7 @@ The language model only reads the request. Prices, the plan, the budget check an
 		},
 		designSystem: {
 			colors: [
-				{ name: 'Vermillion', hex: '#D9381E', role: 'Brand · primary action · automatic steps · confirmed' },
+				{ name: 'Vermillion', hex: '#E81C1C', role: 'Brand · primary action · automatic steps · confirmed' },
 				{ name: 'Amber', hex: '#B8680F', role: 'Needs you · waiting for your OK' },
 				{ name: 'Wine', hex: '#8E1B33', role: 'Over budget · cancel · discard' },
 				{ name: 'Ink', hex: '#222222', role: 'Type · T-Bot button · portfolio strip' },
@@ -130,7 +130,7 @@ The language model only reads the request. Prices, the plan, the budget check an
 		],
 		demoUrl: '/demo/otium/',
 		thumbnail: '/lab-assets/otium/thumbnail.jpg',
-		accent: '#D9381E',
+		accent: '#E81C1C',
 	},
 	{
 		slug: 'apex-athletic-club',
