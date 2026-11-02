@@ -1102,6 +1102,16 @@ body.lb-open { overflow: hidden; }
 /* example chips: about 12 % smaller, tighter rows */
 .examples { gap: 6px; }
 .examples .chip { font-size: 12px; padding: 6px 12px; }
+
+/* v3.3 how-it-works: equal insets, concentric radii (outer 16 - padding 10 = inner 6), same-size tags */
+.how .art { height: 124px; padding: 10px; border-radius: 16px; display: grid; place-items: stretch; }
+.how .art .mini { justify-self: center; height: 100%; box-sizing: border-box; border-radius: 6px; display: flex; flex-direction: column; justify-content: center; padding: 10px 12px; }
+.how .art .mini-steps { display: grid; grid-template-columns: auto minmax(0,1fr) auto; column-gap: 7px; row-gap: 7px; align-content: center; align-items: center; }
+.how .art .mini-steps > div { display: contents; }
+.how .art .mini-steps em { text-align: center; justify-self: stretch; margin: 0; }
+.how .art .mini-ask { background: #fff; border: 0; }
+.how .art .mini-ask span { border-radius: 999px; }
+.how .art .mini-undo > div:first-child { padding-top: 0; }
 </style>
 </head>
 <body>
@@ -1162,12 +1172,12 @@ body.lb-open { overflow: hidden; }
 				<span class="n">01</span><h3>It shows its plan first</h3><p>Every step, its cost and whether it needs you — before anything happens.</p>
 			</article>
 			<article>
-				<div class="art" style="--t:#FBEAED" aria-hidden="true"><div class="mini mini-ask"><b>Approve this payment?</b><strong>€583</strong><div><span class="y">Approve</span><span class="n">Not now</span></div></div></div>
+				<div class="art" style="--t:#ECEBFB" aria-hidden="true"><div class="mini mini-ask"><b>Approve this payment?</b><strong>€583</strong><div><span class="y">Approve</span><span class="n">Not now</span></div></div></div>
 				<span class="n">02</span><h3>It asks when it matters</h3><p>Searching runs on its own. Paying and sharing your details always wait for a yes.</p>
 			</article>
 			<article>
-				<div class="art" style="--t:#ECEBFB" aria-hidden="true"><div class="mini mini-undo"><div><i data-i="plane"></i><span>Aerolume · 07:10</span><span class="c"><i data-i="undo-2"></i>Cancel</span></div><div><i data-i="hotel"></i><span>Rua Nova Rooms</span><span class="c"><i data-i="undo-2"></i>Cancel</span></div><p><i data-i="check"></i>Cancelled — €327 back</p></div></div>
-				<span class="n">03</span><h3>Nothing is final</h3><p>A full activity log, an undo on every action, and a budget cap it cannot cross.</p>
+				<div class="art" style="--t:#E4EFF7" aria-hidden="true"><div class="mini mini-undo"><div><i data-i="plane"></i><span>Aerolume · 07:10</span><span class="c"><i data-i="undo-2"></i>Cancel</span></div><div><i data-i="hotel"></i><span>Rua Nova Rooms</span><span class="c"><i data-i="undo-2"></i>Cancel</span></div><p><i data-i="check"></i>Cancelled — €327 back</p></div></div>
+				<span class="n">03</span><h3>Nothing is final</h3><p>Full history, undo on every action, and a budget it can’t exceed.</p>
 			</article>
 		</div>
 	</section>

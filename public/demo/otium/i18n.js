@@ -55,7 +55,7 @@
 		"It asks when it matters": ["Il demande quand ça compte", "Pregunta cuando importa", "Chiede quando conta", "הוא שואל כשזה חשוב"],
 		"Searching runs on its own. Paying and sharing your details always wait for a yes.": ["La recherche se fait seule. Payer et partager vos données attend toujours un oui.", "La búsqueda va sola. Pagar y compartir tus datos siempre espera un sí.", "La ricerca va da sola. Pagare e condividere i tuoi dati aspetta sempre un sì.", "החיפוש רץ לבד. תשלום ושיתוף פרטים תמיד מחכים ל״כן״."],
 		"Nothing is final": ["Rien n’est définitif", "Nada es definitivo", "Niente è definitivo", "שום דבר אינו סופי"],
-		"A full activity log, an undo on every action, and a budget cap it cannot cross.": ["Un historique complet, une annulation pour chaque action, et un budget qu’il ne peut pas dépasser.", "Un historial completo, deshacer en cada acción y un tope de presupuesto que no puede cruzar.", "Uno storico completo, annulla su ogni azione e un tetto di budget che non può superare.", "יומן פעילות מלא, ביטול לכל פעולה ותקרת תקציב שאי אפשר לחצות."],
+		"Full history, undo on every action, and a budget it can’t exceed.": ["Historique complet, annulation à chaque action, budget jamais dépassé.", "Historial completo, deshacer en cada acción y un tope de presupuesto.", "Storico completo, annulla su ogni azione e un tetto di budget fisso.", "יומן מלא, ביטול לכל פעולה ותקרת תקציב קבועה."],
 		"Back": ["Retour", "Volver", "Indietro", "חזרה"],
 		"All destinations": ["Toutes les destinations", "Todos los destinos", "Tutte le mete", "כל היעדים"],
 		"Sort by": ["Trier par", "Ordenar por", "Ordina per", "מיון לפי"],
