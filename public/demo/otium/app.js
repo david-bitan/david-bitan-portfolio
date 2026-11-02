@@ -1234,8 +1234,8 @@
 		const lb = $("#lb");
 		lb.addEventListener("click", (e) => {
 			if (e.target.closest("#lbClose") || e.target === lb) return closeGallery();
-			if (e.target.closest(".lb-nav.prev")) return lbGo(document.dir === "rtl" ? 1 : -1);
-			if (e.target.closest(".lb-nav.next")) return lbGo(document.dir === "rtl" ? -1 : 1);
+			if (e.target.closest(".lb-nav.prev")) return lbGo(-1); // buttons follow reading order (their arrows flip in Hebrew)
+			if (e.target.closest(".lb-nav.next")) return lbGo(1);
 			const th = e.target.closest("[data-lbi]"); if (th) { LB.i = +th.dataset.lbi; lbPaint(); }
 		});
 		document.addEventListener("keydown", (e) => {

@@ -770,20 +770,20 @@ summary, .alt, .opt, .chip, .dd-btn, .dd-list li, .from-list li, .lang-list li, 
 .cal-btn svg.i:first-child { color: var(--lagoon); }
 .cal-btn[aria-expanded="true"] svg.i:last-child { transform: rotate(180deg); }
 .fact.datef { padding: 0; }
-.cal { position: absolute; z-index: 70; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: 0 12px 40px rgba(0,0,0,.14); padding: 16px 18px 14px; width: max-content; max-width: calc(100vw - 32px); animation: rise .2s var(--ease); }
+.cal { position: absolute; z-index: 70; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: 0 12px 40px rgba(0,0,0,.14); padding: 14px 16px 12px; width: max-content; max-width: calc(100vw - 32px); animation: rise .2s var(--ease); }
 .cal-top { position: relative; }
-.cal-ms { display: flex; gap: 28px; }
-.cal-m { width: 252px; }
-.cal-t { text-align: center; font-weight: 700; font-size: 14px; line-height: 30px; height: 30px; text-transform: capitalize; }
-.cal-nav { position: absolute; top: 0; width: 30px; height: 30px; border-radius: 50%; border: 1px solid transparent; background: none; display: grid; place-items: center; color: var(--ink); padding: 0; }
+.cal-ms { display: flex; gap: 24px; }
+.cal-m { width: 224px; }
+.cal-t { text-align: center; font-weight: 700; font-size: 13.5px; line-height: 28px; height: 28px; text-transform: capitalize; }
+.cal-nav { position: absolute; top: 0; width: 28px; height: 28px; border-radius: 50%; border: 1px solid transparent; background: none; display: grid; place-items: center; color: var(--ink); padding: 0; }
 .cal-nav:hover:not(:disabled) { border-color: var(--line); }
 .cal-nav:disabled { opacity: .3; cursor: default; }
 .cal-nav svg.i { width: 16px; height: 16px; }
 .cal-nav.prev { inset-inline-start: 0; } .cal-nav.next { inset-inline-end: 0; }
-.cal-g { display: grid; grid-template-columns: repeat(7, 36px); margin-top: 8px; }
-.cal-h { text-align: center; font-size: 11px; color: var(--ink-3); font-weight: 600; line-height: 24px; }
-.cal-d { position: relative; height: 36px; border: 0; background: none; padding: 0; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink); }
-.cal-d span { position: relative; z-index: 1; display: grid; place-items: center; width: 34px; height: 34px; margin: 1px auto; border-radius: 50%; border: 1.5px solid transparent; }
+.cal-g { display: grid; grid-template-columns: repeat(7, 32px); margin-top: 6px; }
+.cal-h { text-align: center; font-size: 11px; color: var(--ink-3); font-weight: 600; line-height: 22px; }
+.cal-d { position: relative; height: 32px; border: 0; background: none; padding: 0; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--ink); }
+.cal-d span { position: relative; z-index: 1; display: grid; place-items: center; width: 30px; height: 30px; margin: 1px auto; border-radius: 50%; border: 1.5px solid transparent; }
 .cal-d:not(:disabled):hover span { border-color: var(--ink); }
 .cal-d:disabled { color: #C9C2B9; cursor: default; font-weight: 500; }
 .cal-d.c-r::before, .cal-d.c-sr::before, .cal-d.c-e::before { content: ""; position: absolute; top: 1px; bottom: 1px; inset-inline: 0; background: var(--lagoon-soft); }
@@ -793,19 +793,24 @@ summary, .alt, .opt, .chip, .dd-btn, .dd-list li, .from-list li, .lang-list li, 
 .cal-d.c-e.c-tmp span { background: #fff; color: var(--ink); border-color: var(--lagoon); }
 .cal-d:focus-visible { outline: none; }
 .cal-d:focus-visible span { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--lagoon); }
-.cal-quick { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-2); }
+.cal-quick { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-2); }
 .cal-quick > span { margin-inline-end: 4px; font-weight: 600; }
-.cal-quick .chip { padding: 4px 10px; font-size: 12.5px; }
+.cal-quick .chip { padding: 3px 9px; font-size: 12px; }
 .cal-quick .chip[aria-pressed="true"] { border-color: var(--lagoon); color: var(--lagoon); font-weight: 700; }
 .cal-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px 12px; margin-top: 12px; flex-wrap: wrap; }
 .cal-sum { font-size: 13px; color: var(--ink-2); }
 .cal-sum b { color: var(--ink); font-weight: 700; }
 .cal-foot .row { display: flex; gap: 6px; margin-inline-start: auto; flex-wrap: wrap; justify-content: flex-end; }
+/* the calendar is as wide as its months: summary on one line, buttons under it */
+.cal { width: min-content; min-width: 280px; }
+.cal-ms, .cal-quick { width: max-content; max-width: 100%; }
+.cal-foot { flex-direction: column; align-items: stretch; }
+.cal-foot .row { margin-inline-start: 0; }
 @media (max-width: 720px) {
 	.cal { width: calc(100vw - 32px); padding: 16px 12px 14px; }
 	.cal-m { width: auto; }
 	.cal-g { grid-template-columns: repeat(7, minmax(0, 1fr)); }
-	.cal-d span { width: 34px; height: 34px; }
+	.cal-d span { width: 30px; height: 30px; }
 }
 
 /* ---------- back to portfolio (floating, bottom left — mirrors T-Bot) ---------- */
@@ -999,10 +1004,15 @@ body.lb-open { overflow: hidden; }
 .lb-stage { position: relative; display: grid; place-items: center; min-height: 260px; height: min(68vh, 760px); }
 .lb-stage img { max-width: 100%; max-height: min(68vh, 760px); object-fit: contain; border-radius: 10px; opacity: 0; transition: opacity .25s; }
 .lb-stage img.on { opacity: 1; }
-.lb-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); color: var(--ink); display: grid; place-items: center; padding: 0; box-shadow: 0 2px 10px rgba(0,0,0,.3); }
+/* thumbnails centred under the photo; previous / next side by side, right after them */
+.lb-strip { display: flex; align-items: center; justify-content: center; gap: 14px; max-width: 100%; }
+.lb-strip .lb-thumbs { min-width: 0; }
+.lb-ctrl { flex: none; display: flex; gap: 8px; }
+.lb-nav { width: 44px; height: 44px; border-radius: 50%; border: 0; background: #fff; color: var(--ink); display: grid; place-items: center; padding: 0; box-shadow: 0 2px 10px rgba(0,0,0,.3); }
+.lb-nav:hover { background: #F2ECE3; }
 .lb-nav svg.i { width: 20px; height: 20px; }
-.lb-nav.prev { inset-inline-start: 8px; } .lb-nav.next { inset-inline-end: 8px; }
-.lb-cap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; padding: 10px 2px 8px; font-size: 13px; }
+
+.lb-cap { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; padding: 10px 2px 10px; font-size: 13px; text-align: center; }
 .lb-cap span { opacity: .65; }
 .lb-thumbs { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 0 4px; }
 .lb-thumbs::-webkit-scrollbar { display: none; }
@@ -1034,7 +1044,9 @@ body.lb-open { overflow: hidden; }
 }
 @media (max-width: 640px) {
 	.lb-nav { width: 38px; height: 38px; }
-	.lb-thumbs button { width: 64px; height: 46px; }
+	.lb-thumbs button { width: 50px; height: 38px; }
+	.lb-stage { height: auto; min-height: 0; padding-top: 4vh; }
+	.lb-strip { gap: 10px; }
 	.si-amen { grid-template-columns: 1fr; }
 }
 </style>
@@ -1175,8 +1187,9 @@ body.lb-open { overflow: hidden; }
 </aside>
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-labelledby="lbTitle">
 	<div class="lb-top"><div class="lb-t"><b id="lbTitle"></b><span id="lbCount"></span></div><button type="button" class="lb-x" id="lbClose" aria-label="Close"><i data-i="x"></i></button></div>
-	<div class="lb-body"><div class="lb-main"><div class="lb-stage" id="lbStage"><button type="button" class="lb-nav prev" aria-label="Previous photo"><i data-i="chevron-left" class="dir"></i></button><img id="lbImg" alt=""><button type="button" class="lb-nav next" aria-label="Next photo"><i data-i="chevron-right" class="dir"></i></button></div>
-	<div class="lb-cap" id="lbCap"></div><div class="lb-thumbs" id="lbThumbs"></div></div><aside class="lb-info" id="lbInfo"></aside></div>
+	<div class="lb-body"><div class="lb-main"><div class="lb-stage" id="lbStage"><img id="lbImg" alt=""></div>
+	<div class="lb-cap" id="lbCap"></div>
+	<div class="lb-strip"><div class="lb-thumbs" id="lbThumbs"></div><div class="lb-ctrl"><button type="button" class="lb-nav prev" aria-label="Previous photo"><i data-i="chevron-left" class="dir"></i></button><button type="button" class="lb-nav next" aria-label="Next photo"><i data-i="chevron-right" class="dir"></i></button></div></div></div><aside class="lb-info" id="lbInfo"></aside></div>
 </div>
 <aside class="drawer" id="menuDrawer" aria-label="Menu" aria-hidden="true">
 	<div class="drawer-h"><h2>Menu</h2><button class="icon-btn" data-close aria-label="Close"><i data-i="x"></i></button></div>
