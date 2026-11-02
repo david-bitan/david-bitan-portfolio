@@ -22,7 +22,7 @@
 	const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 	const ORIGIN_FACTOR = { Paris: 1, London: 1.08, "Tel Aviv": 1.45, Berlin: 0.95, Madrid: 0.9, Brussels: 0.98, Dublin: 1.12, Geneva: 1.1, Lyon: 0.96, Milan: 0.92, Munich: 1.02, Vienna: 1.04 };
 	const TICKETS_PP_DAY = 30;
-	const SWATCH = { lisbon: ["#E7B98A", "#B5653E"], rome: ["#E2B27C", "#9C5A37"], barcelona: ["#9CC3D5", "#3F7C93"], amsterdam: ["#B9C9B2", "#5E7A63"], athens: ["#D9D3C4", "#8B9BA8"], copenhagen: ["#A9C0CF", "#4F6E86"] };
+	const SWATCH = { lisbon: ["#E7B98A", "#B5653E"], rome: ["#E2B27C", "#9C5A37"], barcelona: ["#9CC3D5", "#3F7C93"], amsterdam: ["#B9C9B2", "#5E7A63"], athens: ["#D9D3C4", "#8B9BA8"], copenhagen: ["#A9C0CF", "#4F6E86"] , porto: ["#D9B48F", "#8E5A3C"], seville: ["#E9C08A", "#B3653A"], valencia: ["#A9CFD9", "#3C7F96"], granada: ["#E2C29A", "#9E6B44"], palma: ["#9DD0D8", "#2F7C8C"], florence: ["#E3B98D", "#A35E3A"], venice: ["#A9C6D3", "#4B7489"], naples: ["#E7B583", "#A84F35"], palermo: ["#EAC28F", "#B0623A"], nice: ["#9CCBDD", "#2E6F8E"], valletta: ["#E8CF9C", "#A97C45"], santorini: ["#B5D3E6", "#3D6E9A"], prague: ["#C9B7A2", "#6E5A4B"], budapest: ["#D8C29C", "#8C6B43"], krakow: ["#CDB9A0", "#7A5E46"], dubrovnik: ["#A8CFE0", "#3A7493"], split: ["#B3D5DC", "#3F7F8A"], istanbul: ["#E0B98E", "#8E4F3A"], marrakech: ["#E5A77C", "#A24E2E"], reykjavik: ["#B9CBD6", "#4F6B80"], edinburgh: ["#BFB8B0", "#5D5650"], stockholm: ["#B6C6D4", "#4D657D"], tallinn: ["#C3BBAE", "#6B6255"], bruges: ["#C8B9A2", "#77654D"] };
 	const ic = window.ic;
 	document.querySelectorAll("i[data-i]").forEach((e) => (e.outerHTML = ic(e.dataset.i)));
 	const ICON = {
@@ -233,7 +233,7 @@
 		["design", "Design", ic("building-2"), "design and architecture"],
 		["night", "Nightlife", ic("moon"), "nightlife"],
 	];
-	const CITY_CATS = { lisbon: ["food", "culture", "night"], rome: ["food", "culture"], barcelona: ["beach", "food", "night", "design"], amsterdam: ["culture", "design", "night"], athens: ["culture", "beach"], copenhagen: ["design", "food"] };
+	const CITY_CATS = { lisbon: ["food", "culture", "night"], rome: ["food", "culture"], barcelona: ["beach", "food", "night", "design"], amsterdam: ["culture", "design", "night"], athens: ["culture", "beach"], copenhagen: ["design", "food"], porto: ["food", "culture"], seville: ["culture", "food", "night"], valencia: ["beach", "food", "design"], granada: ["culture"], palma: ["beach", "food"], florence: ["culture", "food", "design"], venice: ["culture", "design"], naples: ["food", "culture", "beach"], palermo: ["food", "culture", "beach"], nice: ["beach", "food", "culture"], valletta: ["culture", "beach", "food"], santorini: ["beach", "design"], prague: ["culture", "night", "food"], budapest: ["culture", "night"], krakow: ["culture", "food"], dubrovnik: ["beach", "culture"], split: ["beach", "culture", "night"], istanbul: ["food", "culture", "night"], marrakech: ["food", "culture", "design"], reykjavik: ["culture", "design"], edinburgh: ["culture", "night"], stockholm: ["design", "culture"], tallinn: ["culture", "design"], bruges: ["culture", "food"] };
 	const POPULAR = { lisbon: "Most planned", barcelona: "Trending" };
 	let activeCat = "all"; const saved = new Set();
 	function renderCats() {
@@ -314,8 +314,8 @@
 	const fmtDay = (d) => d.toLocaleDateString(I.locale, { weekday: "short", day: "numeric", month: "short" });
 
 	/* ---------------- understanding the request ---------------- */
-	const ALIASES = { lisbon: ["lisbon", "lisboa", "lisbonne", "lisbona", "ליסבון"], rome: ["rome", "roma", "רומא"], barcelona: ["barcelona", "barcelone", "barcellona", "barça", "bcn", "ברצלונה"], amsterdam: ["amsterdam", "ámsterdam", "אמסטרדם"], athens: ["athens", "athina", "athènes", "atenas", "atene", "אתונה"], copenhagen: ["copenhagen", "copenhague", "copenaghen", "københavn", "kobenhavn", "cph", "קופנהגן"] };
-	const ELSEWHERE = ["tokio", "טוקיו", "ניו יורק", "tokyo", "new york", "nyc", "bali", "bangkok", "dubai", "marrakech", "london", "paris", "berlin", "madrid", "prague", "vienna", "istanbul", "iceland", "reykjavik", "mexico", "japan", "thailand", "morocco", "cairo", "sydney", "miami", "eilat"];
+	const ALIASES = { lisbon: ["lisbon", "lisboa", "lisbonne", "lisbona", "ליסבון"], rome: ["rome", "roma", "רומא"], barcelona: ["barcelona", "barcelone", "barcellona", "barça", "bcn", "ברצלונה"], amsterdam: ["amsterdam", "ámsterdam", "אמסטרדם"], athens: ["athens", "athina", "athènes", "atenas", "atene", "אתונה"], copenhagen: ["copenhagen", "copenhague", "copenaghen", "københavn", "kobenhavn", "cph", "קופנהגן"] , porto: ["porto", "oporto", "פורטו"], seville: ["seville", "sevilla", "séville", "siviglia", "סביליה"], valencia: ["valencia", "valence", "valència", "ולנסיה"], granada: ["granada", "grenade", "גרנדה"], palma: ["palma", "mallorca", "majorque", "maiorca", "פלמה", "מיורקה"], florence: ["florence", "firenze", "florencia", "פירנצה"], venice: ["venice", "venezia", "venise", "venecia", "ונציה"], naples: ["naples", "napoli", "nápoles", "נאפולי"], palermo: ["palermo", "palerme", "פלרמו"], nice: ["nice", "nizza", "niza", "ניס"], valletta: ["valletta", "malta", "malte", "לה ולטה", "מלטה"], santorini: ["santorini", "santorin", "סנטוריני"], prague: ["prague", "praha", "praga", "פראג"], budapest: ["budapest", "budapeste", "בודפשט"], krakow: ["krakow", "kraków", "cracovie", "cracovia", "קרקוב"], dubrovnik: ["dubrovnik", "דוברובניק"], split: ["split", "ספליט"], istanbul: ["istanbul", "estambul", "istambul", "איסטנבול"], marrakech: ["marrakech", "marrakesh", "marrakesch", "marrakech", "מרקש"], reykjavik: ["reykjavik", "reikiavik", "reykjavík", "רייקיאוויק", "איסלנד", "iceland", "islande", "islandia", "islanda"], edinburgh: ["edinburgh", "édimbourg", "edimburgo", "אדינבורו"], stockholm: ["stockholm", "estocolmo", "stoccolma", "שטוקהולם"], tallinn: ["tallinn", "tallin", "טאלין"], bruges: ["bruges", "brugge", "brujas", "בריז׳"] };
+	const ELSEWHERE = ["tokio", "טוקיו", "ניו יורק", "tokyo", "new york", "nyc", "bali", "bangkok", "dubai", "london", "paris", "berlin", "madrid", "vienna", "mexico", "japan", "thailand", "morocco", "cairo", "sydney", "miami", "eilat"];
 	const NUM = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7 };
 	function localParse(text) {
 		const s = text.toLowerCase();
@@ -443,7 +443,7 @@
 			const { intent, ai } = await understand(S.text);
 			await beat(id, 500);
 			S.aiUsed = ai; S.intent = intent;
-			s.sub(t(ai ? "Matched it against six destinations (Llama 3.3)" : "Matched it against six destinations (basic matching)"));
+			s.sub(t(ai ? "Matched it against 30 destinations (Llama 3.3)" : "Matched it against 30 destinations (basic matching)"));
 			if (S.scenario === "overbudget") intent.budget = 400;
 
 			if (intent.city === "other" || !intent.city) {
@@ -451,7 +451,7 @@
 				const other = intent.city === "other";
 				s.detail(other ? t("{place} isn’t covered in this demo yet.", { place: esc(intent.askedPlace || t("That place")) }) : t("One thing I need before I start."));
 				setStatus("waiting", t("Waiting for you"));
-				const slot = s.slot(`<div class="card ask"><h4>${t(other ? "Pick one of these instead?" : "Where would you like to go?")}</h4><p>${t(other ? "Otium plans six cities for now. I won’t guess on your behalf." : "Pick a city — I’ll keep the rest of what you said.")}</p><div class="city-pick">${Object.keys(D.cities).map((k) => `<button data-choice="${k}">${pic(D.cities[k].photo, k)}<span>${D.cities[k].name}</span></button>`).join("")}</div></div>`);
+				const slot = s.slot(`<div class="card ask"><h4>${t(other ? "Pick one of these instead?" : "Where would you like to go?")}</h4><p>${t(other ? "Otium plans 30 cities for now. I won’t guess on your behalf." : "Pick a city — I’ll keep the rest of what you said.")}</p><div class="city-pick">${Object.keys(D.cities).slice(0, 8).map((k) => `<button data-choice="${k}">${pic(D.cities[k].photo, k)}<span>${D.cities[k].name}</span></button>`).join("")}</div></div>`);
 				const city = await decide(slot);
 				if (id !== S.run) throw new Stale();
 				intent.city = city; slot.innerHTML = "";
