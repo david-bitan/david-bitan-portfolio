@@ -82,7 +82,6 @@
 			$("#originVal").textContent = on(S.origin);
 			$("#pauseBtn").textContent = t(S.paused ? "Resume" : "Pause");
 			$("#understood").hidden = !S.plan; if (S.plan) renderUnderstood();
-			$("#ask").value = S.text;
 			renderTrip(); renderLog(); renderCase();
 			setStatus(S.status, tr.statusTxt);
 			const w = tr.wake; tr.wake = null; w?.();
@@ -161,12 +160,19 @@
 		"Somewhere warm next month",
 	];
 	function renderExamples() { $("#examples").innerHTML = EXAMPLES.map((x) => `<button class="chip" type="button">${esc(t(x))}</button>`).join(""); }
+	function fitAsk() {
+		const a = $("#ask"); if (!a) return; const MAX = 132;
+		a.style.height = "auto"; const h = Math.min(a.scrollHeight, MAX);
+		a.style.height = `${h}px`; a.style.overflowY = a.scrollHeight > MAX ? "auto" : "hidden";
+		$("#composer").classList.toggle("multi", h > 34);
+	}
+	addEventListener("resize", () => fitAsk());
 	function initHome() {
 		initOrigin();
 		renderExamples();
 		$("#examples").onclick = (e) => {
 			const b = e.target.closest(".chip"); if (!b) return;
-			$("#ask").value = b.textContent; $("#ask").focus();
+			$("#ask").value = b.textContent; fitAsk(); $("#ask").focus();
 		};
 		renderCats(); renderListings();
 		const cardClick = (e) => {
@@ -185,6 +191,7 @@
 		const go = () => { const v = $("#ask").value.trim() || $("#ask").placeholder; $("#ask").value = v; start(v, false, "normal", null); };
 		$("#composer").onsubmit = (e) => { e.preventDefault(); go(); };
 		$("#planBtn").onclick = go;
+		$("#ask").addEventListener("input", fitAsk);
 		$("#ask").onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); go(); } };
 	}
 
@@ -365,6 +372,7 @@
 		S.status = st; $("#agent").dataset.status = st; $("#agentStatus").textContent = txt;
 		$("#pauseBtn").hidden = st === "done" || st === "idle";
 		updateNY(); renderTripsNav();
+		clearTimeout(botTimer); if (st === "waiting") botTimer = setTimeout(botNudge, 40000);
 		if (st === "waiting" && S.case) caseMoment();
 	}
 	function addStep(key, title, risk) {
@@ -648,6 +656,7 @@
 	let editResolve = null;
 	const waitEdit = () => new Promise((r) => (editResolve = r));
 	function failSafe() {
+		setTimeout(botNudge, 600);
 		setStatus("paused", t("Something went wrong — nothing was booked"));
 		$("#notice").innerHTML = `<div class="notice">${ICON.info}<span>${t("Otium hit an error and stopped. Nothing was booked or charged.")} <button class="btn btn-ghost btn-sm" id="retry">${t("Try again")}</button></span></div>`;
 		$("#retry").onclick = () => start(S.text, true);
@@ -862,6 +871,136 @@
 			renderUnderstood(); toast(t("Re-planning with your change…")); restartFrom("flights");
 		});
 	});
+
+	/* ---------------- T-Bot: the in-app helper ----------------
+	 * Explains what is happening and points to the right control. It never pays,
+	 * books or cancels: every action button only opens the place where YOU decide.
+	 * Real AI answers come from POST /api/otium {mode:"chat"}; offline it uses
+	 * the scripted answers below. Actions are a fixed list, checked in code. */
+	const BOT = { msgs: [], busy: false, ai: null, greeted: false };
+	const goTrip = () => { if ($("#trip").hidden && S.plan) show("trip"); };
+	const later = (fn) => { closeDrawers(); setTimeout(fn, 300); };
+	const BOT_ACTIONS = {
+		pending: ["hand", "Show what needs me", () => pendingCard(), () => later(() => { goTrip(); goToCard(); })],
+		dates: ["calendar", "Change dates", () => true, () => later(() => { if (S.plan && !$("#understood").hidden) { goTrip(); const b = $("#dateBtn"); b.scrollIntoView({ block: "center" }); setTimeout(() => b.click(), 250); } else { show("home"); setTimeout(() => $("#whenBtn").click(), 250); } })],
+		budget: ["shield-check", "Change budget cap", () => true, () => later(() => { const b = S.plan && document.querySelector('#understood .dd[data-key="cap"] .dd-btn'); if (b) { goTrip(); b.scrollIntoView({ block: "center" }); setTimeout(() => b.click(), 250); } else openDrawer("rulesDrawer"); })],
+		bags: ["luggage", "Change bags", () => Boolean(S.plan), () => later(() => { goTrip(); const b = document.querySelector('#understood .dd[data-key="bags"] .dd-btn'); if (b) { b.scrollIntoView({ block: "center" }); setTimeout(() => b.click(), 250); } })],
+		cancel: ["undo-2", "Show cancel options", () => Boolean(S.held.flights || S.held.stay), () => later(() => { goTrip(); document.querySelector("#tripCanvas [data-cancel]")?.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" }); })],
+		trips: ["luggage", "Open My trips", () => TRIPS.length > 0, () => later(() => show("trips"))],
+		pause: ["hand", "Pause Otium", () => !S.paused && !$("#pauseBtn").hidden, () => later(() => $("#pauseBtn").click())],
+		retry: ["undo-2", "Try again", () => Boolean($("#retry")), () => later(() => $("#retry")?.click())],
+		new_trip: ["plane", "Plan a new trip", () => true, () => later(() => { show("home"); $("#ask").focus(); })],
+		human: ["phone", "Talk to a human", () => true, () => later(openHelp)],
+	};
+	const KW = (re) => new RegExp(re, "i");
+	const BOT_RULES = [
+		["how", KW("how does|how it works|what is otium|comment (ça )?marche|comment fonctionne|c.est quoi|c[oó]mo funciona|qu[eé] es otium|come funziona|cos.è otium|איך .*עובד|מה זה")],
+		["human", KW("human|person|someone|agent|call|phone|humain|conseiller|appeler|t[ée]l[ée]phone|persona|llamar|humano|umano|chiamare|telefono|אדם|נציג|טלפון|להתקשר")],
+		["cancel", KW("cancel|refund|annul|rembours|cancelar|reembolso|annulla|rimborso|ביטול|לבטל|החזר")],
+		["pay", KW("pay|card|charge|safe|money|pai|carte|payer|pago|tarjeta|pagar|pagamento|carta|soldi|תשלום|כרטיס|לשלם|כסף")],
+		["dates", KW("date|when|calendar|quand|jour|fecha|cu[aá]ndo|d[ií]a|data|quando|giorno|תאריך|מתי|יום")],
+		["budget", KW("budget|cap|expensive|price|cost|cher|prix|presupuesto|caro|precio|costoso|prezzo|תקציב|יקר|מחיר")],
+		["bags", KW("bag|luggage|suitcase|bagage|valise|maleta|equipaje|bagaglio|valigia|מזוודה|כבודה")],
+		["trips", KW("my trips|lost|previous|other trip|saved|mes voyages|perdu|mis viajes|perd|miei viaggi|pers|טיולים|נשמר|הקודם")],
+		["pause", KW("pause|stop|arr[eê]t|detener|pausa|ferma|עצור|השה")],
+		["stuck", KW("stuck|wait|what now|next|blocked|bloqu|attend|que faire|atascad|espera|bloccat|aspett|תקוע|מחכה|מה עכשיו")],
+	];
+	function botLocal(text) {
+		const p = S.plan; const pc = pendingCard(); const held = S.held.flights || S.held.stay;
+		if ($("#retry") && !/human|humain|humano|umano|אדם/i.test(text)) return [t("Otium hit a problem and stopped. Nothing was booked or charged. You can try again, or a person from our team can take over."), "retry"];
+		const hit = (BOT_RULES.find(([, re]) => re.test(text)) || [null])[0];
+		switch (hit) {
+			case "how": return [t("You describe a trip in your own words. Otium searches flights and stays, checks your budget, and stops to ask you before it pays or shares your details. You can change anything, pause or cancel."), S.plan ? null : "new_trip"];
+			case "human": return [t("Our travel team is there 24/7 by phone, chat or email. They see everything Otium did, so you won’t have to explain twice."), "human"];
+			case "cancel": return held ? [t("You can cancel the flight, the stay, or both from your trip page. Otium always shows you what you get back first."), "cancel"] : [t("Nothing is booked yet, so there is nothing to cancel. You can keep the plan as a draft, or delete it from My trips."), TRIPS.length ? "trips" : null];
+			case "pay": return [t("Otium never pays without your OK. Each payment waits on a card where you approve, edit or say no. In this demo, nothing is ever charged."), pc ? "pending" : null];
+			case "dates": return [t("Pick new dates in the calendar and Otium re-plans flights and stay for those days. Nothing booked changes without your OK."), "dates"];
+			case "budget": return [p ? t("Your cap for this trip is {x}. Otium stops and asks before going over it. You can change it in “What I understood”.", { x: eur(p.cap) }) : t("Set a budget cap in Permissions. Otium stops and asks before going over it."), "budget"];
+			case "bags": return [t("Add a checked bag in “What I understood”, under Flight preferences. Otium re-checks flights and price with it."), p ? "bags" : null];
+			case "trips": return [t("Every plan is saved automatically in My trips. Open one to pick up where you left off."), "trips"];
+			case "pause": return [t("You can pause Otium at any moment. Nothing moves until you resume."), "pause"];
+			case "stuck": return pc ? [t("Otium is waiting for you on “{x}”. Nothing happens until you decide.", { x: pc.querySelector("h4")?.textContent || t("your OK") }), "pending"] : [S.plan ? t("Nothing needs you right now. Status: {x}.", { x: $("#agentStatus").textContent }) : t("Describe your trip on the home page and Otium starts planning. I’m here if anything is unclear."), S.plan ? null : "new_trip"];
+		}
+		return [p ? t("I can help with dates, budget, bags, payment, cancelling, or finding a person. What is blocking you?") : t("Tell me what you need: how Otium works, your trips, or a person from our team."), null];
+	}
+	function botContext() {
+		const p = S.plan; const c = p && D.cities[p.city]; let k = null; try { k = p && p.stay ? costs(p) : null; } catch { /* plan not priced yet */ }
+		const d = p ? tripDates(p.nights) : null; const pc = pendingCard();
+		return {
+			screen: ["home", "trip", "trips", "explore"].find((v) => !$("#" + v).hidden) || "home",
+			agent_status: S.plan || S.text ? $("#agentStatus").textContent : "no trip in progress",
+			waiting_for_user_on: pc ? pc.querySelector("h4")?.textContent || "a decision" : null,
+			error: Boolean($("#retry")),
+			trip: p ? { destination: c.name, dates: `${fmtDay(d.out)} – ${fmtDay(d.back)}`, nights: p.nights, travellers: p.travelers, from: S.origin, budget_cap_eur: p.cap, estimated_total_eur: k?.total ?? null, flights_held: Boolean(S.held.flights), stay_held: Boolean(S.held.stay), stay_refundable: S.held.stay ? S.held.stay.refundable : null, trip_ready: Boolean(S.progress.done) } : null,
+			saved_trips: TRIPS.length,
+		};
+	}
+	const BOT_SUGG = () => S.plan ? [pendingCard() ? "What is Otium waiting for?" : null, "Is my payment safe?", "Change my dates", "How do I cancel?"].filter(Boolean).slice(0, 3) : ["How does Otium work?", TRIPS.length ? "Where are my trips?" : null, "Talk to a person"].filter(Boolean);
+	function botGreet() {
+		const pc = pendingCard();
+		const [text, action] = $("#retry") ? botLocal("")
+			: pc ? [t("Otium is waiting for you on “{x}”. Nothing happens until you decide. Ask me anything about it.", { x: pc.querySelector("h4")?.textContent || t("your OK") }), "pending"]
+			: [t("Hi, I’m T-Bot. I help when something is unclear or goes wrong. Ask me anything about your trip."), null];
+		BOT.msgs.push({ by: "bot", text, action, local: true });
+	}
+	function renderBot() {
+		const log = $("#botLog"); if (!log) return;
+		log.innerHTML = BOT.msgs.map((m) => {
+			const a = m.action && BOT_ACTIONS[m.action] && BOT_ACTIONS[m.action][2]() ? BOT_ACTIONS[m.action] : null;
+			return `<div class="bm ${m.by}"><p>${esc(m.text)}</p>${a ? `<button type="button" class="btn btn-ghost btn-sm" data-bot-act="${m.action}">${ic(a[0])}${t(a[1])}</button>` : ""}</div>`;
+		}).join("") + (BOT.busy ? `<div class="bm bot typing"><p>${ICON.spin}${t("T-Bot is thinking…")}</p></div>` : "");
+		$("#botSugg").innerHTML = BOT.busy ? "" : BOT_SUGG().map((x) => `<button type="button" class="chip" data-bot-q="${esc(x)}">${t(x)}</button>`).join("");
+		$("#botMode").textContent = t(BOT.ai === true ? "Your trip helper · AI" : BOT.ai === false ? "Your trip helper · basic answers" : "Your trip helper");
+		log.scrollTop = log.scrollHeight;
+	}
+	function botLabels() {
+		const f = $("#botFab"); if (!f) return;
+		f.setAttribute("aria-label", t("Ask T-Bot, your trip helper")); f.querySelector(".lbl").textContent = t("Ask T-Bot");
+		f.querySelector(".bot-tip").textContent = t("Stuck? Ask T-Bot");
+		$("#botAsk").placeholder = t("Ask anything about your trip");
+	}
+	function openBot() {
+		$("#botFab").classList.remove("nudge", "dot");
+		if (!BOT.greeted || BOT.msgs.at(-1)?.by === "user") { BOT.greeted = true; botGreet(); }
+		renderBot(); openDrawer("botDrawer"); setTimeout(() => $("#botAsk").focus(), 350);
+	}
+	async function botSend(text) {
+		text = text.trim().slice(0, 300); if (!text || BOT.busy) return;
+		BOT.msgs.push({ by: "user", text }); BOT.busy = true; renderBot();
+		const [lt, la] = botLocal(text);
+		let reply = null, action = null;
+		if (S.scenario !== "offline") {
+			try {
+				const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 9000);
+				const r = await fetch("/api/otium", { method: "POST", headers: { "content-type": "application/json" }, signal: ctl.signal,
+					body: JSON.stringify({ mode: "chat", lang: I.lang, context: botContext(), messages: BOT.msgs.filter((m) => m.by === "user" || !m.local || m === BOT.msgs[0]).slice(-8).map((m) => ({ role: m.by === "user" ? "user" : "assistant", content: m.text })) }) });
+				clearTimeout(to);
+				if (r.ok) { const j = await r.json(); if (typeof j.reply === "string" && j.reply.trim()) { reply = j.reply.trim().slice(0, 600); action = BOT_ACTIONS[j.action] ? j.action : null; } }
+			} catch { /* offline: scripted answer below */ }
+		}
+		BOT.ai = reply != null;
+		BOT.msgs.push(reply ? { by: "bot", text: reply, action: action || la } : { by: "bot", text: lt, action: la, local: true });
+		BOT.busy = false; renderBot();
+	}
+	let botTimer = null;
+	function botNudge() { // proactive help when someone seems stuck
+		const f = $("#botFab"); if (!f || $("#botDrawer").classList.contains("on")) return;
+		f.classList.add("nudge", "dot"); setTimeout(() => f.classList.remove("nudge"), 7000);
+	}
+	function initBot() {
+		$("#botFab").onclick = openBot;
+		// no <form>: sandboxed previews block form submission, so Send and Enter call the chat directly
+		const submit = () => { const a = $("#botAsk"); const v = a.value; if (!v.trim()) return a.focus(); a.value = ""; a.style.height = ""; botSend(v); };
+		$("#botSend").onclick = submit;
+		$("#botAsk").onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); submit(); } };
+		$("#botAsk").oninput = (e) => { const a = e.target; a.style.height = "auto"; a.style.height = `${Math.min(a.scrollHeight, 96)}px`; };
+		$("#botHuman").onclick = () => later(openHelp);
+		$("#botDrawer").addEventListener("click", (e) => {
+			const q = e.target.closest("[data-bot-q]"); if (q) return botSend(t(q.dataset.botQ));
+			const a = e.target.closest("[data-bot-act]"); if (a) BOT_ACTIONS[a.dataset.botAct]?.[3]();
+		});
+		botLabels();
+	}
 	function openGroups() {
 		modal(`<h3 id="modalTitle">${t("Groups & companies")}</h3><p>${t("From 10 travellers, a dedicated travel planner builds the trip with you: group fares, several rooms or a whole hotel, meeting rooms, transfers and one invoice. Otium hands over everything it has prepared.")}</p>
 			<div class="help-list">
@@ -904,8 +1043,25 @@
 		</div>
 		<div class="panel block">
 			<div class="block-h"><h3>${t("Your days")}</h3><span class="state">${t(S.settings.activities ? "Draft · nothing bought" : "Free days")}</span></div>
-			${S.progress.days === "ready" ? `<div class="days">${Array.from({ length: p.nights + 1 }, (_, i) => `<div class="day" style="animation-delay:${i * 70}ms"><b>${t("Day {n}", { n: i + 1 })}</b><ul>${(S.settings.activities ? (i === 0 ? [t("Arrive, check in"), ...c.days[0].slice(1)] : c.days[Math.min(i, c.days.length - 1)]).map((x) => `<li>${esc(x)}</li>`).join("") : `<li>${t("Free day — yours to plan")}</li>`)}</ul></div>`).join("")}</div>` : '<div class="skeleton"></div>'}
+			${S.progress.days === "ready" ? `<div class="days">${Array.from({ length: p.nights + 1 }, (_, i) => `<div class="day" style="animation-delay:${i * 70}ms"><b>${t("Day {n}", { n: i + 1 })}</b><ul>${dayPlan(i, c, p).map(([tm, x]) => `<li>${tm ? `<time dir="ltr">${tm}</time>` : ""}<span>${esc(x)}</span></li>`).join("")}</ul></div>`).join("")}</div>` : '<div class="skeleton"></div>'}
 		</div>`;
+	}
+	/* Your days: every activity gets a time slot. Day 1 starts after the flight lands; the last day ends in time for the flight home. */
+	const hm = (x) => { const [h, m] = x.split(":").map(Number); return h * 60 + m; };
+	const hhmm = (n) => `${String(Math.floor(n / 60) % 24).padStart(2, "0")}:${String(n % 60).padStart(2, "0")}`;
+	const SLOTS = [[570, 750], [840, 1050], [1170, 1320]]; // 09:30–12:30, 14:00–17:30, 19:30–22:00
+	function dayPlan(i, c, p) {
+		if (!S.settings.activities) return [["", t("Free day — yours to plan")]];
+		const acts = c.days[Math.min(i, c.days.length - 1)];
+		const fl = flightOptions(p.city, S.origin, p.travelers)[p.flight] || flightOptions(p.city, S.origin, p.travelers)[0];
+		const dur = (() => { const m = String(fl.hours).match(/(\d+)h\s*(\d+)?/); return m ? +m[1] * 60 + (+m[2] || 0) : 150; })();
+		const out = [];
+		let from = 0, until = 1440;
+		if (i === 0) { const land = hm(fl.dep) + dur; from = land + 75; out.push([hhmm(land + 60), t("Arrive, check in")]); }
+		if (i === p.nights) { const back = hm(["16:20", "19:05", "21:40"][fl.i] || "16:20"); until = back - 150; }
+		SLOTS.forEach(([a, b], j) => { if (i === 0 && j === 0) return; if (a >= from && b <= until) out.push([`${hhmm(a)} – ${hhmm(b)}`, acts[j]]); });
+		if (i === p.nights) out.push([hhmm(until), t("Head to the airport")]);
+		return out;
 	}
 	function flightRow(f, c) {
 		return `<div class="flight"><div class="al">${f.airline[0]}</div><div><div class="route">${esc(on(S.origin))} <span class="line">${ICON.plane}</span> ${c.name}</div><small>${esc(f.airline)} · ${t("departs {d}", { d: f.dep })} · ${t(f.kind)} · ${f.hours}</small><div class="tags"><span class="tag g">${t(f.cabin)}</span><span class="tag">${f.aircraft}</span><span class="tag">${t(f.bags ? "Cabin + checked bag" : "Cabin bag only")}</span></div></div><div class="price num">${eur(f.price)}<small>${t("{x} / person, return", { x: eur(f.pp) })}</small></div></div>${airportInfo(f)}`;
@@ -1169,8 +1325,11 @@
 		openTrip(tr.id);
 	});
 	addEventListener("popstate", () => show(typeof history.state?.otium === "string" ? history.state.otium : "home", true));
+	let curView = "home";
 	function show(v, fromPop) {
 		if (v === "trip" && !S.plan && !S.text) v = "home";
+		if (v === "home" && curView !== "home") { $("#ask").value = ""; fitAsk(); } // a new search starts empty
+		curView = v;
 		$("#home").hidden = v !== "home"; $("#trip").hidden = v !== "trip"; $("#explore").hidden = v !== "explore"; $("#trips").hidden = v !== "trips";
 		if (v === "explore") renderExplore();
 		if (v === "trips") { const L = $("#tripsList"); L.__html = null; L.classList.add("fresh"); renderTrips(); setTimeout(() => L.classList.remove("fresh"), 700); }
@@ -1298,22 +1457,39 @@
 		document.addEventListener("click", (e) => { if (!e.target.closest("#langWrap")) open(false); });
 		paint();
 	}
-	function askLang(l) {
-		if (l === I.lang) return;
-		const name = I.LANGS.find((x) => x[0] === l)[1];
-		if (!S.text || $("#trip").hidden) return setLang(l);
-		modal(`<h3 id="modalTitle">${t("Switch language?")}</h3><p>${t("Otium will re-plan this trip from the start in {lang}. Nothing is booked in this demo, so nothing is lost.", { lang: name })}</p>
-			<div class="row"><button class="btn btn-ghost btn-sm" data-m="cancel">${t("Keep {lang}", { lang: I.LANGS.find((x) => x[0] === I.lang)[1] })}</button><button class="btn btn-primary btn-sm" data-m="ok">${t("Switch to {lang}", { lang: name })}</button></div>`, (r) => { if (r === "ok") { setLang(l); start(S.text, true); } });
+	function askLang(l) { if (l !== I.lang) setLang(l); } // every trip is translated in place: nothing is re-planned or lost
+	function valMapper(prev) { // city and departure names written in the previous language → current language
+		const cityBy = {}; for (const k of Object.keys(D.cities)) cityBy[prev === "en" ? EN_CITIES[k].name : (I.CITY[prev]?.[k]?.[0] || EN_CITIES[k].name)] = k;
+		const orgBy = {}; for (const [n] of D.origins) orgBy[prev === "en" ? n : (I.ORIGINS[prev]?.[n] || n)] = n;
+		return (v) => {
+			const x = v.trim(); if (cityBy[x]) return D.cities[cityBy[x]].name; if (orgBy[x]) return on(orgBy[x]);
+			if (/^[^\d]*€[^\d]*[\d.,\s\u00a0\u202f]+$|^[\d.,\s\u00a0\u202f]+[^\d]*€$/.test(x)) { const n = +x.replace(/[^\d]/g, ""); if (n) return eur(n); } // money in the new format
+			return v;
+		};
+	}
+	function retranslateTrips(prev) {
+		const mv = valMapper(prev);
+		const tr = (root) => root && I.retranslate(root, prev, mv);
+		const rs = (x) => (typeof x === "string" ? I.retext(x, prev, mv) : x);
+		tr($("#steps")); tr($("#notice"));
+		$("#agentStatus").textContent = rs($("#agentStatus").textContent);
+		if (S._prev) S._prev[1] = rs(S._prev[1]);
+		S.log.forEach((l) => (l.text = rs(l.text)));
+		for (const x of TRIPS) if (x.s) { tr(x.steps); tr(x.notice); x.statusTxt = rs(x.statusTxt); x.s.log.forEach((l) => (l.text = rs(l.text))); if (x.s._prev) x.s._prev[1] = rs(x.s._prev[1]); }
+		NOTES.forEach((n) => (n.msg = rs(n.msg)));
+		BOT.msgs.forEach((m) => { if (m.local) m.text = rs(m.text); });
 	}
 	function setLang(l) {
+		const prev = I.lang;
 		I.set(l); try { localStorage.setItem("otium-lang", I.lang); } catch {}
 		applyCityLang(); I.translateStatic();
 		$("#langCode").textContent = I.LANGS.find((x) => x[0] === I.lang)[2];
 		$("#originVal").textContent = on(S.origin);
 		$("#pauseBtn").textContent = t(S.paused ? "Resume" : "Pause");
 		renderExamples(); renderCats(); renderListings(); paintWhen(); if (cal) closeCal(); renderScen(); renderLog(); renderNotes(); renderCase();
+		if (prev !== I.lang) retranslateTrips(prev);
 		if (S.plan) { renderUnderstood(); renderTrip(); }
-		renderTripsNav();
+		renderTripsNav(); renderLog(); renderNotes(); botLabels(); renderBot();
 	}
 
 	/* ---------------- boot ---------------- */
@@ -1321,7 +1497,7 @@
 	let startLang = "en"; try { startLang = localStorage.getItem("otium-lang") || "en"; } catch {}
 	if (q.get("lang")) startLang = q.get("lang");
 	I.set(startLang); applyCityLang();
-	initHome(); initWhen(); initLang(); renderLog(); setLang(I.lang);
+	initHome(); initWhen(); initBot(); initLang(); renderLog(); setLang(I.lang);
 	postit();
 	renderScen();
 	if (q.get("from") && D.origins.some(([n]) => n === q.get("from"))) { S.origin = q.get("from"); $("#originVal").textContent = S.origin; }

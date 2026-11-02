@@ -60,6 +60,54 @@
 		"All destinations": ["Toutes les destinations", "Todos los destinos", "Tutte le mete", "כל היעדים"],
 		"Sort by": ["Trier par", "Ordenar por", "Ordina per", "מיון לפי"],
 		"Sort": ["Trier", "Ordenar", "Ordina", "מיון"],
+		/* ---------- T-Bot & days ---------- */
+		"You describe a trip in your own words. Otium searches flights and stays, checks your budget, and stops to ask you before it pays or shares your details. You can change anything, pause or cancel.": ["Vous décrivez un voyage avec vos mots. Otium cherche vols et logements, vérifie votre budget, et s’arrête pour vous demander avant de payer ou de partager vos données. Vous pouvez tout changer, mettre en pause ou annuler.", "Describes un viaje con tus palabras. Otium busca vuelos y alojamiento, revisa tu presupuesto y se detiene a preguntarte antes de pagar o compartir tus datos. Puedes cambiar todo, pausar o cancelar.", "Descrivi un viaggio con parole tue. Otium cerca voli e alloggi, controlla il budget e si ferma a chiederti prima di pagare o condividere i tuoi dati. Puoi cambiare tutto, mettere in pausa o annullare.", "אתם מתארים טיול במילים שלכם. Otium מחפש טיסות ולינה, בודק את התקציב, ועוצר לשאול אתכם לפני שהוא משלם או משתף את הפרטים שלכם. אפשר לשנות הכול, להשהות או לבטל."],
+		"Back to portfolio": ["Retour au portfolio", "Volver al portfolio", "Torna al portfolio", "חזרה לתיק העבודות"],
+		"Head to the airport": ["Départ pour l’aéroport", "Salida al aeropuerto", "Partenza per l’aeroporto", "יציאה לשדה התעופה"],
+		"Ask T-Bot": ["Demander à T-Bot", "Pregunta a T-Bot", "Chiedi a T-Bot", "לשאול את T-Bot"],
+		"Ask T-Bot, your trip helper": ["Demander à T-Bot, votre aide de voyage", "Pregunta a T-Bot, tu ayudante de viaje", "Chiedi a T-Bot, il tuo aiuto di viaggio", "לשאול את T-Bot, העוזר שלכם לטיול"],
+		"Stuck? Ask T-Bot": ["Bloqué ? Demandez à T-Bot", "¿Atascado? Pregunta a T-Bot", "Bloccato? Chiedi a T-Bot", "נתקעתם? שאלו את T-Bot"],
+		"Your trip helper": ["Votre aide de voyage", "Tu ayudante de viaje", "Il tuo aiuto di viaggio", "העוזר שלכם לטיול"],
+		"Your trip helper · AI": ["Votre aide de voyage · IA", "Tu ayudante de viaje · IA", "Il tuo aiuto di viaggio · IA", "העוזר שלכם לטיול · AI"],
+		"Your trip helper · basic answers": ["Votre aide de voyage · réponses simples", "Tu ayudante de viaje · respuestas básicas", "Il tuo aiuto di viaggio · risposte di base", "העוזר שלכם לטיול · תשובות בסיסיות"],
+		"Ask anything about your trip": ["Posez une question sur votre voyage", "Pregunta lo que quieras sobre tu viaje", "Chiedi qualsiasi cosa sul tuo viaggio", "שאלו כל דבר על הטיול"],
+		"Send": ["Envoyer", "Enviar", "Invia", "שליחה"],
+		"T-Bot is thinking…": ["T-Bot réfléchit…", "T-Bot está pensando…", "T-Bot sta pensando…", "T-Bot חושב…"],
+		"T-Bot explains and shows you the right button. It never pays or books on its own.": ["T-Bot explique et vous montre le bon bouton. Il ne paie et ne réserve jamais seul.", "T-Bot explica y te muestra el botón correcto. Nunca paga ni reserva por su cuenta.", "T-Bot spiega e ti mostra il pulsante giusto. Non paga né prenota mai da solo.", "T-Bot מסביר ומראה לכם את הכפתור הנכון. הוא אף פעם לא משלם או מזמין לבד."],
+		"Show what needs me": ["Voir ce qui m’attend", "Ver qué necesita de mí", "Mostra cosa serve da me", "להראות מה מחכה לי"],
+		"Change dates": ["Changer les dates", "Cambiar fechas", "Cambia le date", "שינוי תאריכים"],
+		"Change budget cap": ["Changer le plafond", "Cambiar el tope", "Cambia il tetto", "שינוי תקרת התקציב"],
+		"Change bags": ["Changer les bagages", "Cambiar equipaje", "Cambia i bagagli", "שינוי כבודה"],
+		"Show cancel options": ["Voir les annulations", "Ver opciones de cancelación", "Mostra le cancellazioni", "אפשרויות ביטול"],
+		"Open My trips": ["Ouvrir Mes voyages", "Abrir Mis viajes", "Apri i miei viaggi", "פתיחת הטיולים שלי"],
+		"Pause Otium": ["Mettre Otium en pause", "Pausar Otium", "Metti in pausa Otium", "השהיית Otium"],
+		"Plan a new trip": ["Planifier un nouveau voyage", "Planear un viaje nuevo", "Pianifica un nuovo viaggio", "תכנון טיול חדש"],
+		"What is Otium waiting for?": ["Qu’attend Otium ?", "¿Qué espera Otium?", "Cosa aspetta Otium?", "למה Otium מחכה?"],
+		"Is my payment safe?": ["Mon paiement est-il sûr ?", "¿Mi pago es seguro?", "Il mio pagamento è sicuro?", "התשלום שלי בטוח?"],
+		"Change my dates": ["Changer mes dates", "Cambiar mis fechas", "Cambiare le mie date", "לשנות את התאריכים"],
+		"How do I cancel?": ["Comment annuler ?", "¿Cómo cancelo?", "Come annullo?", "איך מבטלים?"],
+		"How does Otium work?": ["Comment marche Otium ?", "¿Cómo funciona Otium?", "Come funziona Otium?", "איך Otium עובד?"],
+		"Where are my trips?": ["Où sont mes voyages ?", "¿Dónde están mis viajes?", "Dove sono i miei viaggi?", "איפה הטיולים שלי?"],
+		"Talk to a person": ["Parler à une personne", "Hablar con una persona", "Parlare con una persona", "לדבר עם אדם"],
+		"your OK": ["votre accord", "tu aprobación", "il tuo OK", "האישור שלכם"],
+		"Otium hit a problem and stopped. Nothing was booked or charged. You can try again, or a person from our team can take over.": ["Otium a rencontré un problème et s’est arrêté. Rien n’a été réservé ni débité. Vous pouvez réessayer, ou une personne de l’équipe peut prendre le relais.", "Otium tuvo un problema y se detuvo. No se reservó ni se cobró nada. Puedes intentarlo de nuevo o una persona del equipo puede seguir.", "Otium ha avuto un problema e si è fermato. Niente è stato prenotato o addebitato. Puoi riprovare, oppure una persona del team può subentrare.", "Otium נתקל בבעיה ועצר. שום דבר לא הוזמן או חויב. אפשר לנסות שוב, או שאדם מהצוות ימשיך מכאן."],
+		"Our travel team is there 24/7 by phone, chat or email. They see everything Otium did, so you won’t have to explain twice.": ["L’équipe voyage est là 24h/24 par téléphone, chat ou email. Elle voit tout ce qu’Otium a fait : inutile de tout réexpliquer.", "El equipo de viajes está 24/7 por teléfono, chat o email. Ve todo lo que hizo Otium, así que no tendrás que explicarlo dos veces.", "Il team viaggi è disponibile 24/7 via telefono, chat o email. Vede tutto ciò che ha fatto Otium, quindi non dovrai spiegare due volte.", "צוות הנסיעות זמין 24/7 בטלפון, בצ׳אט או במייל. הוא רואה כל מה ש-Otium עשה, כך שלא תצטרכו להסביר פעמיים."],
+		"You can cancel the flight, the stay, or both from your trip page. Otium always shows you what you get back first.": ["Vous pouvez annuler le vol, le logement ou les deux depuis la page du voyage. Otium vous montre toujours d’abord ce que vous récupérez.", "Puedes cancelar el vuelo, el alojamiento o ambos desde la página del viaje. Otium siempre te muestra antes lo que recuperas.", "Puoi annullare il volo, l’alloggio o entrambi dalla pagina del viaggio. Otium ti mostra sempre prima cosa recuperi.", "אפשר לבטל את הטיסה, את הלינה או את שתיהן מדף הטיול. Otium תמיד מראה קודם מה תקבלו בחזרה."],
+		"Nothing is booked yet, so there is nothing to cancel. You can keep the plan as a draft, or delete it from My trips.": ["Rien n’est encore réservé, il n’y a donc rien à annuler. Vous pouvez garder le plan en brouillon ou le supprimer depuis Mes voyages.", "Aún no hay nada reservado, así que no hay nada que cancelar. Puedes guardar el plan como borrador o eliminarlo desde Mis viajes.", "Non c’è ancora nulla di prenotato, quindi niente da annullare. Puoi tenere il piano come bozza o eliminarlo dai miei viaggi.", "עדיין לא הוזמן כלום, אז אין מה לבטל. אפשר לשמור את התוכנית כטיוטה או למחוק אותה מהטיולים שלי."],
+		"Otium never pays without your OK. Each payment waits on a card where you approve, edit or say no. In this demo, nothing is ever charged.": ["Otium ne paie jamais sans votre accord. Chaque paiement attend sur une carte où vous validez, modifiez ou refusez. Dans cette démo, rien n’est jamais débité.", "Otium nunca paga sin tu aprobación. Cada pago espera en una tarjeta donde apruebas, editas o dices que no. En esta demo nunca se cobra nada.", "Otium non paga mai senza il tuo OK. Ogni pagamento attende su una scheda dove approvi, modifichi o rifiuti. In questa demo non viene mai addebitato nulla.", "Otium אף פעם לא משלם בלי האישור שלכם. כל תשלום מחכה בכרטיס שבו אתם מאשרים, עורכים או מסרבים. בדמו הזה שום דבר לא מחויב."],
+		"Pick new dates in the calendar and Otium re-plans flights and stay for those days. Nothing booked changes without your OK.": ["Choisissez de nouvelles dates dans le calendrier : Otium replanifie vols et logement pour ces jours. Rien de réservé ne change sans votre accord.", "Elige nuevas fechas en el calendario y Otium vuelve a planear vuelos y alojamiento. Nada reservado cambia sin tu aprobación.", "Scegli nuove date nel calendario e Otium ripianifica voli e alloggio. Nulla di prenotato cambia senza il tuo OK.", "בחרו תאריכים חדשים בלוח השנה ו-Otium יתכנן מחדש טיסות ולינה. שום הזמנה לא משתנה בלי האישור שלכם."],
+		"Your cap for this trip is {x}. Otium stops and asks before going over it. You can change it in “What I understood”.": ["Votre plafond pour ce voyage est de {x}. Otium s’arrête et demande avant de le dépasser. Vous pouvez le changer dans « Ce que j’ai compris ».", "Tu tope para este viaje es {x}. Otium se detiene y pregunta antes de pasarlo. Puedes cambiarlo en «Lo que entendí».", "Il tuo tetto per questo viaggio è {x}. Otium si ferma e chiede prima di superarlo. Puoi cambiarlo in «Cosa ho capito».", "תקרת התקציב לטיול הזה היא {x}. Otium עוצר ושואל לפני שהוא עובר אותה. אפשר לשנות אותה ב״מה הבנתי״."],
+		"Set a budget cap in Permissions. Otium stops and asks before going over it.": ["Fixez un plafond dans Autorisations. Otium s’arrête et demande avant de le dépasser.", "Fija un tope en Permisos. Otium se detiene y pregunta antes de pasarlo.", "Imposta un tetto in Permessi. Otium si ferma e chiede prima di superarlo.", "הגדירו תקרת תקציב בהרשאות. Otium עוצר ושואל לפני שהוא עובר אותה."],
+		"Add a checked bag in “What I understood”, under Flight preferences. Otium re-checks flights and price with it.": ["Ajoutez un bagage en soute dans « Ce que j’ai compris », sous Préférences de vol. Otium revérifie vols et prix.", "Añade una maleta facturada en «Lo que entendí», en Preferencias de vuelo. Otium vuelve a revisar vuelos y precio.", "Aggiungi un bagaglio da stiva in «Cosa ho capito», sotto Preferenze di volo. Otium ricontrolla voli e prezzo.", "הוסיפו מזוודה לבטן המטוס ב״מה הבנתי״, תחת העדפות טיסה. Otium יבדוק מחדש טיסות ומחיר."],
+		"Every plan is saved automatically in My trips. Open one to pick up where you left off.": ["Chaque plan est enregistré automatiquement dans Mes voyages. Ouvrez-en un pour reprendre là où vous en étiez.", "Cada plan se guarda solo en Mis viajes. Abre uno para seguir donde lo dejaste.", "Ogni piano viene salvato in automatico nei miei viaggi. Aprine uno per riprendere da dove eri rimasto.", "כל תוכנית נשמרת אוטומטית בטיולים שלי. פתחו אחת כדי להמשיך מאיפה שעצרתם."],
+		"You can pause Otium at any moment. Nothing moves until you resume.": ["Vous pouvez mettre Otium en pause à tout moment. Rien ne bouge tant que vous ne reprenez pas.", "Puedes pausar Otium cuando quieras. Nada se mueve hasta que reanudes.", "Puoi mettere in pausa Otium in qualsiasi momento. Niente si muove finché non riprendi.", "אפשר להשהות את Otium בכל רגע. שום דבר לא זז עד שתמשיכו."],
+		"Otium is waiting for you on “{x}”. Nothing happens until you decide.": ["Otium attend votre décision sur « {x} ». Rien ne se passe tant que vous n’avez pas choisi.", "Otium te espera en «{x}». No pasa nada hasta que decidas.", "Otium ti aspetta su «{x}». Non succede nulla finché non decidi.", "Otium מחכה לכם ב״{x}״. שום דבר לא קורה עד שתחליטו."],
+		"Otium is waiting for you on “{x}”. Nothing happens until you decide. Ask me anything about it.": ["Otium attend votre décision sur « {x} ». Rien ne se passe tant que vous n’avez pas choisi. Posez-moi vos questions.", "Otium te espera en «{x}». No pasa nada hasta que decidas. Pregúntame lo que quieras.", "Otium ti aspetta su «{x}». Non succede nulla finché non decidi. Chiedimi pure.", "Otium מחכה לכם ב״{x}״. שום דבר לא קורה עד שתחליטו. שאלו אותי כל דבר."],
+		"Nothing needs you right now. Status: {x}.": ["Rien ne vous attend pour l’instant. Statut : {x}.", "Nada te necesita ahora. Estado: {x}.", "Al momento non serve nulla da te. Stato: {x}.", "כרגע שום דבר לא מחכה לכם. סטטוס: {x}."],
+		"Describe your trip on the home page and Otium starts planning. I’m here if anything is unclear.": ["Décrivez votre voyage sur l’accueil et Otium commence à planifier. Je suis là si quelque chose n’est pas clair.", "Describe tu viaje en la página de inicio y Otium empieza a planear. Estoy aquí si algo no está claro.", "Descrivi il viaggio nella home e Otium inizia a pianificare. Sono qui se qualcosa non è chiaro.", "תארו את הטיול בדף הבית ו-Otium יתחיל לתכנן. אני כאן אם משהו לא ברור."],
+		"I can help with dates, budget, bags, payment, cancelling, or finding a person. What is blocking you?": ["Je peux aider pour les dates, le budget, les bagages, le paiement, l’annulation, ou trouver une personne. Qu’est-ce qui vous bloque ?", "Puedo ayudar con fechas, presupuesto, equipaje, pago, cancelación o encontrar a una persona. ¿Qué te bloquea?", "Posso aiutarti con date, budget, bagagli, pagamento, annullamento o trovare una persona. Cosa ti blocca?", "אני יכול לעזור עם תאריכים, תקציב, כבודה, תשלום, ביטול או חיבור לאדם. מה תוקע אתכם?"],
+		"Tell me what you need: how Otium works, your trips, or a person from our team.": ["Dites-moi ce qu’il vous faut : comment marche Otium, vos voyages, ou une personne de l’équipe.", "Dime qué necesitas: cómo funciona Otium, tus viajes o una persona del equipo.", "Dimmi cosa ti serve: come funziona Otium, i tuoi viaggi o una persona del team.", "ספרו לי מה אתם צריכים: איך Otium עובד, הטיולים שלכם, או אדם מהצוות."],
+		"Hi, I’m T-Bot. I help when something is unclear or goes wrong. Ask me anything about your trip.": ["Bonjour, je suis T-Bot. J’aide quand quelque chose n’est pas clair ou se passe mal. Posez-moi vos questions sur votre voyage.", "Hola, soy T-Bot. Ayudo cuando algo no está claro o sale mal. Pregúntame lo que quieras sobre tu viaje.", "Ciao, sono T-Bot. Aiuto quando qualcosa non è chiaro o va storto. Chiedimi qualsiasi cosa sul viaggio.", "היי, אני T-Bot. אני עוזר כשמשהו לא ברור או משתבש. שאלו אותי כל דבר על הטיול."],
 		/* ---------- calendar ---------- */
 		"When": ["Quand", "Cuándo", "Quando", "מתי"],
 		"Any dates": ["Dates flexibles", "Fechas flexibles", "Date flessibili", "תאריכים גמישים"],
@@ -529,6 +577,58 @@
 	const plural = (n, one, many, vars = {}) => t(n === 1 ? one : many, { n, ...vars });
 	const origin = (n) => (lang !== "en" && ORIGINS[lang]?.[n]) || n;
 
+
+	/* Re-translate text already on screen (a trip's steps, its history, notifications) from the
+	 * language it was written in to the current one. Each English key becomes a pattern in the old
+	 * language; {placeholders} are captured, mapped (city names…) and refilled in the new language. */
+	const RX = {};
+	const reEsc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+	function rxFor(from) {
+		if (RX[from]) return RX[from];
+		const exact = new Map(), tpl = [];
+		for (const en of Object.keys(TR)) {
+			const src = (from === "en" ? en : TR[en][IDX[from]])?.trim(); if (!src) continue;
+			if (!/\{\w+\}/.test(src)) { if (!exact.has(src)) exact.set(src, en); continue; }
+			const lit = src.replace(/\{\w+\}/g, "").trim(); if (lit.length < 3) continue;
+			const names = [];
+			const re = src.split(/(\{\w+\})/).map((part) => { const m = part.match(/^\{(\w+)\}$/); if (m) { names.push(m[1]); return "(.+?)"; } return reEsc(part); }).join("");
+			tpl.push({ en, re: new RegExp(`^${re}$`, "s"), names, lit: lit.length });
+		}
+		tpl.sort((a, b) => b.lit - a.lit);
+		return (RX[from] = { exact, tpl });
+	}
+	function retext(str, from, mapVal = (v) => v) {
+		if (from === lang || typeof str !== "string") return str;
+		const core = str.trim(); if (!core) return str;
+		const lead = str.slice(0, str.indexOf(core)), tail = str.slice(str.indexOf(core) + core.length);
+		const { exact, tpl } = rxFor(from);
+		const conv = (v) => { const k = exact.get(v.trim()); return k ? t(k) : mapVal(v); };
+		let out = null; const e = exact.get(core);
+		if (e) out = t(e);
+		else for (const x of tpl) { const m = core.match(x.re); if (m) { const vars = {}; x.names.forEach((n, i) => (vars[n] = conv(m[i + 1]))); out = t(x.en, vars); break; } }
+		if (out == null) { const v = mapVal(core); if (v !== core) out = v; }
+		return out == null ? str : lead + out + tail;
+	}
+	const escH = (x) => String(x).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+	function retranslateMixed(root, from, mapVal) { // sentences with a <b> inside: "{x} all in — <b>{y}</b> under your cap."
+		root.querySelectorAll("*").forEach((el) => {
+			const kids = [...el.children];
+			if (!kids.length || kids.length > 3 || kids.some((c) => c.children.length || /^(BUTTON|INPUT|SELECT|TEXTAREA|svg)$/i.test(c.tagName))) return;
+			if (![...el.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim())) return;
+			const toks = [];
+			const str = [...el.childNodes].map((n) => (n.nodeType === 3 ? n.nodeValue : (toks.push(n.outerHTML), `\u0001${toks.length - 1}\u0001`))).join("");
+			const v = retext(str, from, mapVal); if (v === str) return;
+			el.innerHTML = v.split(/\u0001(\d+)\u0001/).map((p, i) => (i % 2 ? toks[+p] : escH(p))).join("");
+		});
+	}
+	function retranslate(root, from, mapVal) {
+		if (!root || from === lang) return;
+		retranslateMixed(root, from, mapVal);
+		const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); const nodes = []; let n;
+		while ((n = w.nextNode())) nodes.push(n);
+		for (const nd of nodes) { const v = retext(nd.nodeValue, from, mapVal); if (v !== nd.nodeValue) nd.nodeValue = v; }
+		root.querySelectorAll?.("[aria-label],[title]").forEach((el) => { for (const a of ["aria-label", "title"]) { const v = el.getAttribute(a); if (v) el.setAttribute(a, retext(v, from, mapVal)); } });
+	}
 	/* Translate the static page: text nodes and a few attributes, keyed by their English source. */
 	function translateStatic(root = document.body) {
 		const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest("script,style,#steps,#tripCanvas,#understood,#log,#notes") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
@@ -548,7 +648,7 @@
 	}
 
 	window.OTIUM_I18N = {
-		LANGS, CITY, t, plural, origin, translateStatic,
+		LANGS, CITY, ORIGINS, t, plural, origin, translateStatic, retext, retranslate,
 		get lang() { return lang; }, get locale() { return meta()[3]; },
 		set(l) { lang = LANGS.some((x) => x[0] === l) ? l : "en"; document.documentElement.lang = lang; document.documentElement.dir = lang === "he" ? "rtl" : "ltr"; },
 	};

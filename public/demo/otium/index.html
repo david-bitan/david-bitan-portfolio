@@ -253,8 +253,10 @@ h1 em { font-style: italic; color: var(--lagoon); }
 .days { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
 .day { background: var(--canvas); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 14px; animation: rise .4s var(--ease) both; }
 .day b { font: italic 500 16px var(--serif); color: var(--lagoon); }
-.day ul { margin: 6px 0 0; padding: 0 0 0 16px; font-size: 13px; color: var(--ink-2); }
-.day li { margin: 2px 0; }
+.day ul { margin: 8px 0 0; padding: 0; list-style: none; font-size: 13px; color: var(--ink-2); display: grid; gap: 8px; }
+.day li { margin: 0; padding-inline-start: 12px; border-inline-start: 2px solid var(--lagoon-soft); }
+.day li time { display: block; font-size: 11.5px; font-weight: 700; color: var(--lagoon); letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+.day li span { display: block; line-height: 1.4; color: var(--ink); }
 
 .done-banner { padding: 22px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; border-color: #BFDDD6; background: linear-gradient(180deg, var(--lagoon-soft), #fff 80%); }
 .done-banner .check { width: 48px; height: 48px; border-radius: 50%; background: var(--lagoon); display: grid; place-items: center; color: #fff; flex: none; }
@@ -522,7 +524,8 @@ h1 { font-weight: 700; letter-spacing: -.035em; }
 .seg:hover { background: var(--sand); }
 .seg-l { font-size: 12px; font-weight: 700; color: var(--ink); }
 .seg-ask { flex: 1; }
-.seg-ask textarea { padding: 2px 0 0; min-height: 0; height: 22px; font-size: 14.5px; line-height: 1.5; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.seg-ask textarea { padding: 2px 0 0; min-height: 0; height: 22px; font-size: 14.5px; line-height: 1.5; overflow: hidden; white-space: pre-wrap; overflow-wrap: anywhere; }
+.composer.multi { border-radius: 28px; }
 .seg-from { position: relative; border-left: 1px solid var(--line); border-radius: 0; padding: 6px 20px; background: none; font-size: 14px; color: var(--ink-2); cursor: pointer; }
 .seg-from:hover { background: var(--sand); border-radius: 999px; }
 .seg-from > button { padding: 0; font-weight: 500; color: var(--ink-2); font-size: 14.5px; }
@@ -804,6 +807,44 @@ summary, .alt, .opt, .chip, .dd-btn, .dd-list li, .from-list li, .lang-list li, 
 	.cal-g { grid-template-columns: repeat(7, minmax(0, 1fr)); }
 	.cal-d span { width: 38px; height: 38px; }
 }
+
+/* ---------- T-Bot ---------- */
+.bot-fab { position: fixed; bottom: 22px; inset-inline-end: 22px; z-index: 45; display: inline-flex; align-items: center; gap: 8px; height: 50px; padding: 0 20px 0 16px; border-radius: 999px; border: 0; background: var(--ink); color: #fff; font-weight: 700; font-size: 14.5px; box-shadow: 0 6px 20px rgba(0,0,0,.18); transition: transform .2s var(--ease); }
+.bot-fab:hover { transform: translateY(-2px); }
+.bot-fab svg.i { width: 20px; height: 20px; }
+.bot-fab.dot::after { content: ""; position: absolute; top: 4px; inset-inline-end: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 2px #fff; }
+.bot-tip { position: absolute; bottom: calc(100% + 10px); inset-inline-end: 0; white-space: nowrap; background: #fff; color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; font-size: 13px; font-weight: 600; box-shadow: var(--shadow); opacity: 0; transform: translateY(6px); transition: opacity .25s, transform .25s var(--ease); pointer-events: none; }
+.bot-fab.nudge .bot-tip { opacity: 1; transform: none; }
+.bot-h { display: flex; align-items: center; gap: 12px; }
+.bot-h h2 { line-height: 1.1; }
+.bot-h small { color: var(--ink-2); font-size: 12.5px; }
+.bot-av { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--lagoon-soft); color: var(--lagoon); flex: none; }
+.bot-av svg.i { width: 20px; height: 20px; }
+.bot-log { flex: 1; overflow-y: auto; padding: 18px 22px 8px; display: flex; flex-direction: column; gap: 12px; }
+.bm { max-width: 88%; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.bm p { margin: 0; padding: 11px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5; background: var(--sand); color: var(--ink); border-end-start-radius: 4px; }
+.bm.user { align-self: flex-end; align-items: flex-end; }
+.bm.user p { background: var(--lagoon); color: #fff; border-end-start-radius: 16px; border-end-end-radius: 4px; }
+.bm.typing p { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-2); }
+.bm.typing svg.i { width: 15px; height: 15px; animation: spin 1s linear infinite; }
+.bot-sugg { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 22px 10px; }
+.bot-sugg:empty { display: none; }
+.bot-in { display: flex; align-items: flex-end; gap: 8px; margin: 0 22px; padding: 6px 6px 6px 14px; border: 1px solid var(--line); border-radius: 22px; }
+.bot-in:focus-within { border-color: var(--ink-3); }
+.bot-in textarea { flex: 1; border: 0; resize: none; background: none; font: inherit; font-size: 14.5px; line-height: 1.45; padding: 7px 0; max-height: 96px; outline: none; }
+.bot-send { width: 36px; height: 36px; flex: none; border-radius: 50%; border: 0; background: var(--lagoon); color: #fff; display: grid; place-items: center; padding: 0; }
+.bot-send svg.i { width: 17px; height: 17px; }
+.bot-foot { display: flex; align-items: center; gap: 12px; padding: 12px 22px 18px; font-size: 12px; color: var(--ink-3); line-height: 1.4; }
+.bot-foot .btn { flex: none; }
+[dir="rtl"] .bot-in { padding: 6px 14px 6px 6px; }
+[dir="rtl"] .day li time { text-align: right; }
+body:has(.needs-you.on) .bot-fab { bottom: 92px; } /* never cover the "Otium needs you" bar */
+[dir="rtl"] .bot-send svg.i { transform: scaleX(-1); }
+@media (max-width: 640px) {
+	.bot-fab { width: 54px; height: 54px; padding: 0; justify-content: center; bottom: 16px; inset-inline-end: 16px; }
+	.bot-fab .lbl { display: none; }
+	.bot-foot { flex-direction: column; align-items: stretch; text-align: center; }
+}
 </style>
 </head>
 <body>
@@ -819,7 +860,7 @@ summary, .alt, .opt, .chip, .dd-btn, .dd-list li, .from-list li, .lang-list li, 
 			<button data-go="trips" id="navTrip" disabled hidden>My trips</button>
 		</nav>
 		<div class="top-r">
-			<a class="back-link" href="/lab/otium"><i data-i="arrow-left"></i>Case study</a>
+			<a class="back-link" href="/#ai-lab"><i data-i="arrow-left"></i>Back to portfolio</a>
 			<div class="lang" id="langWrap"><button class="hdr-btn" id="langBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Language"><i data-i="globe"></i><span id="langCode">EN</span></button><ul class="lang-list" id="langList" role="listbox" tabindex="-1" aria-label="Language"></ul></div>
 			<button class="hdr-btn icon-only trips-m" id="navTripsM" data-go="trips" type="button" hidden aria-label="My trips"><i data-i="luggage"></i></button>
 			<button class="hdr-btn" id="openHelp" data-help aria-describedby="tipHelp"><i data-i="circle-help"></i><span class="lbl">Help</span><span class="tip" role="tooltip" id="tipHelp"><b>Talk to a human</b>Call, chat or email Otium’s travel team, 24/7. They see everything the agent did.</span></button>
@@ -916,11 +957,20 @@ summary, .alt, .opt, .chip, .dd-btn, .dd-list li, .from-list li, .lang-list li, 
 
 <footer class="foot">
 	<span>Otium is a fictional product designed and built by David Bitan for his AI Lab. Airlines, stays and prices are invented.</span>
-	<span><a href="/lab/otium">Read the case study</a> · <a href="/">Portfolio</a></span>
+	<span><a href="/lab/otium">Read the case study</a> · <a href="/#ai-lab">Portfolio</a></span>
 </footer>
 
 <!-- activity drawer -->
 <div class="scrim" id="scrim" hidden></div>
+
+<button class="bot-fab" id="botFab" type="button" aria-label="Ask T-Bot, your trip helper"><i data-i="bot"></i><span class="lbl">Ask T-Bot</span><span class="bot-tip" aria-hidden="true">Stuck? Ask T-Bot</span></button>
+<aside class="drawer bot-d" id="botDrawer" aria-label="T-Bot" aria-hidden="true">
+	<div class="drawer-h"><div class="bot-h"><span class="bot-av"><i data-i="bot"></i></span><div><h2>T-Bot</h2><small id="botMode">Your trip helper</small></div></div><button class="icon-btn" data-close aria-label="Close"><i data-i="x"></i></button></div>
+	<div class="bot-log" id="botLog" aria-live="polite"></div>
+	<div class="bot-sugg" id="botSugg"></div>
+	<div class="bot-in" id="botForm"><textarea id="botAsk" rows="1" maxlength="300" placeholder="Ask anything about your trip" aria-label="Ask anything about your trip"></textarea><button class="bot-send" id="botSend" type="button" aria-label="Send"><i data-i="send"></i></button></div>
+	<div class="bot-foot"><span>T-Bot explains and shows you the right button. It never pays or books on its own.</span><button type="button" class="btn btn-ghost btn-sm" id="botHuman"><i data-i="phone"></i>Talk to a human</button></div>
+</aside>
 <aside class="drawer" id="logDrawer" aria-label="Activity" aria-hidden="true">
 	<div class="drawer-h"><h2>Trip history</h2><button class="icon-btn" data-close aria-label="Close"><i data-i="x"></i></button></div>
 	<div class="drawer-b"><p style="margin:0 0 10px;font-size:13px;color:var(--ink-2)">A receipt of what Otium did and what you decided, newest first. Tap a line to jump to that step.</p><ul class="log" id="log"></ul></div>
