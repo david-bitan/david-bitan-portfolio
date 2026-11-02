@@ -245,7 +245,7 @@
 	function cardHtml(k, n) {
 			const c = D.cities[k]; const f = flightOptions(k, S.origin, 1, DEFAULT_PREFS)[0]; const rating = Math.max(...c.stays.map((s) => s.rating));
 			return `<div class="card-l" role="button" tabindex="0" data-city="${k}" style="animation-delay:${n * 50}ms" aria-label="${esc(t("Plan a trip to {city}", { city: c.name }))}">
-				<div class="photo">${pic(c.photo, k, c.name)}<button type="button" class="pics-btn" data-citypics="${k}" aria-label="${esc(t("See {n} photos of {city}", { n: 5, city: c.name }))}">${ic("images")}<span>5</span></button>${POPULAR[k] ? `<span class="pop">${t(POPULAR[k])}</span>` : ""}<button class="heart" type="button" data-city="${k}" aria-pressed="${saved.has(k)}" aria-label="${esc(t("Save {city}", { city: c.name }))}">${ic("heart")}</button></div>
+				<div class="photo">${pic(c.photo, k, c.name)}<button type="button" class="pics-btn" data-citypics="${k}" aria-label="${esc(t("See {n} photos of {city}", { n: galN(k), city: c.name }))}">${ic("images")}<span>${galN(k)}</span></button>${POPULAR[k] ? `<span class="pop">${t(POPULAR[k])}</span>` : ""}<button class="heart" type="button" data-city="${k}" aria-pressed="${saved.has(k)}" aria-label="${esc(t("Save {city}", { city: c.name }))}">${ic("heart")}</button></div>
 				<div class="row1">${c.name}, ${c.country}<span>${ICON.star}${rating.toFixed(1)}</span></div>
 				<div class="sub2">${esc(c.tagline)}</div>
 				<div class="sub2">${t("{h} direct from {o}", { h: f.hours, o: esc(on(S.origin)) })}</div>
@@ -256,18 +256,18 @@
 	}
 	/* Home picks per style: different cities (and a different number of them) for each filter,
 	 * so a click visibly changes the selection. "See all" still lists every match. */
-	const FEATURED = {
-		all: ["lisbon", "santorini", "prague", "marrakech", "barcelona", "reykjavik"],
-		food: ["naples", "istanbul", "porto", "palermo", "seville"],
-		culture: ["florence", "athens", "granada", "krakow", "venice", "edinburgh"],
+	const FEATURED = { // always a multiple of 4: full rows of four cards
+		all: ["lisbon", "santorini", "prague", "marrakech", "barcelona", "reykjavik", "florence", "dubrovnik"],
+		food: ["naples", "istanbul", "porto", "palermo"],
+		culture: ["athens", "granada", "krakow", "venice", "edinburgh", "rome", "seville", "budapest"],
 		beach: ["nice", "dubrovnik", "palma", "split"],
-		design: ["copenhagen", "stockholm", "valencia"],
+		design: ["copenhagen", "stockholm", "valencia", "amsterdam"],
 		night: ["budapest", "amsterdam", "istanbul", "edinburgh"],
 	};
 	function renderListings() {
 		const keys = cityKeys();
 		const pick = (FEATURED[activeCat] || []).filter((k) => keys.includes(k));
-		const shown = pick.length ? pick : keys.slice(0, 6);
+		const shown = pick.length ? pick : keys.slice(0, 8);
 		const m = $("#mosaic"); m.dataset.n = shown.length;
 		m.innerHTML = shown.map(cardHtml).join("");
 		$("#seeAll").innerHTML = `<button type="button" class="btn btn-ghost" data-go="explore">${t("See all {n} destinations", { n: keys.length })} ${ICON.arrow}</button>`;
@@ -886,7 +886,8 @@
 	addEventListener("resize", () => { if (cal) { paintCal(); placeCal(); } });
 	function paintWhen() {
 		const v = $("#whenVal"); if (!v) return;
-		v.textContent = homeWhen ? `${fmtDay(fromIso(homeWhen.out))} – ${fmtDay(addDays(fromIso(homeWhen.out), homeWhen.nights))}` : t("Any dates");
+		const sh = (d) => d.toLocaleDateString(I.locale, { day: "numeric", month: "short" }); // compact: fits the search bar
+		v.textContent = homeWhen ? `${sh(fromIso(homeWhen.out))} – ${sh(addDays(fromIso(homeWhen.out), homeWhen.nights))}` : t("Any dates");
 		v.classList.toggle("ph-v", !homeWhen);
 	}
 	function initWhen() {
@@ -1192,7 +1193,9 @@
 	/* ---------------- photos: destination galleries, stay details, one lightbox ---------------- */
 	const hashN = (x) => { let h = 0; for (const ch of String(x)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; };
 	const credit = (src) => D.credits[String(src).replace(/^media\//, "")] || "";
-	const cityPhotos = (k) => [[D.cities[k].photo, ""], ...[1, 2, 3, 4].map((n) => [`media/g/${k}-${n}.jpg`, ""])];
+	const GAL_N = {"amsterdam": 10, "athens": 6, "barcelona": 7, "bruges": 8, "budapest": 7, "copenhagen": 8, "dubrovnik": 8, "edinburgh": 7, "florence": 10, "granada": 7, "istanbul": 9, "krakow": 6, "lisbon": 8, "marrakech": 8, "naples": 6, "nice": 8, "palermo": 7, "palma": 8, "porto": 7, "prague": 9, "reykjavik": 6, "rome": 9, "santorini": 10, "seville": 9, "split": 7, "stockholm": 6, "tallinn": 5, "valencia": 6, "valletta": 6, "venice": 9}; // photos per destination, hero included (5 to 10)
+	const galN = (k) => GAL_N[k] || 5;
+	const cityPhotos = (k) => [[D.cities[k].photo, ""], ...Array.from({ length: galN(k) - 1 }, (_, i) => [`media/g/${k}-${i + 1}.jpg`, ""])];
 	const STAY_SETS = {
 		"hotel-a": [["media/stay-1.jpg", "Room"], ["media/s/hotel-a-2.jpg", "Lobby"], ["media/s/hotel-a-3.jpg", "Bathroom"], ["media/s/hotel-a-4.jpg", "Breakfast"], ["media/s/hotel-a-5.jpg", "Pool"]],
 		"hotel-b": [["media/s/hotel-b-1.jpg", "Room"], ["media/s/hotel-b-2.jpg", "Lobby"], ["media/s/hotel-b-3.jpg", "Bathroom"], ["media/s/hotel-b-4.jpg", "Breakfast"], ["media/s/hotel-b-5.jpg", "Pool"]],
@@ -1327,7 +1330,7 @@
 	function openGroups() {
 		modal(`<h3 id="modalTitle">${t("Groups & companies")}</h3><p>${t("From 10 travellers, a dedicated travel planner builds the trip with you: group fares, several rooms or a whole hotel, meeting rooms, transfers and one invoice. Otium hands over everything it has prepared.")}</p>
 			<div class="help-list">
-				<a class="help-row" href="tel:${HELP_TEL.replace(/\s/g, "")}"><span class="pi" style="--i:#0F6E62;--t:#E6F4F1">${ICON.phone}</span><span><b>${t("Call the groups team")}</b><small dir="ltr">${HELP_TEL}</small></span></a>
+				<a class="help-row" href="tel:${HELP_TEL.replace(/\s/g, "")}"><span class="pi" style="--i:#D9381E;--t:#FDEDE8">${ICON.phone}</span><span><b>${t("Call the groups team")}</b><small dir="ltr">${HELP_TEL}</small></span></a>
 				<a class="help-row" href="mailto:groups@otium.example?subject=${encodeURIComponent("Group trip")}"><span class="pi" style="--i:#B8680F;--t:#FDF0E1">${ICON.mail}</span><span><b>${t("Send a group request")}</b><small>groups@otium.example</small></span></a>
 			</div>
 			<p class="fine-note">${t("Demo: the number and address are fictional placeholders.")}</p>
@@ -1348,7 +1351,7 @@
 		const over = k && k.total > p.cap;
 		const scale = k ? Math.max(p.cap, k.total) * 1.12 : p.cap * 1.12;
 		box.innerHTML = `
-		<div class="trip-hero">${pic(c.photo, p.city, c.name)}<button type="button" class="pics-btn big" data-citypics="${p.city}">${ic("images")}<span>${t("Photos ({n})", { n: 5 })}</span></button><div class="in"><div><span class="status-tag ${st[0]}"><i></i>${st[1]}</span><h2>${c.name}</h2><div class="meta">${fmtDay(dates.out)} → ${fmtDay(dates.back)} · ${P(p.nights, "1 night", "{n} nights")} · ${P(p.travelers, "1 traveller", "{n} travellers")} · ${t("from {o}", { o: esc(on(S.origin)) })}</div></div></div></div>
+		<div class="trip-hero">${pic(c.photo, p.city, c.name)}<button type="button" class="pics-btn big" data-citypics="${p.city}">${ic("images")}<span>${t("Photos ({n})", { n: galN(p.city) })}</span></button><div class="in"><div><span class="status-tag ${st[0]}"><i></i>${st[1]}</span><h2>${c.name}</h2><div class="meta">${fmtDay(dates.out)} → ${fmtDay(dates.back)} · ${P(p.nights, "1 night", "{n} nights")} · ${P(p.travelers, "1 traveller", "{n} travellers")} · ${t("from {o}", { o: esc(on(S.origin)) })}</div></div></div></div>
 		${S.progress.done ? doneBanner(k) : ""}
 		${S.progress.cancelled && !S.progress.done ? `<div class="panel block draft-note"><b>${t("Bookings cancelled.")}</b> ${t("Your plan is kept as a draft.")} <button class="btn btn-primary btn-sm" data-rebook>${t("Book it again")}</button></div>` : ""}
 		<div class="panel budget">
@@ -1587,7 +1590,7 @@
 		const p = S.plan; const ref = S.held.flights?.code || S.held.stay?.code;
 		modal(`<h3 id="modalTitle">${t("Talk to a human")}</h3><p>${t("Otium’s travel team can fix anything the agent can’t — 24/7, in English, French, Spanish, Italian and Hebrew.")}${ref ? `${t(" Have your booking code ready: ")}<b>${ref}</b>.` : ""}</p>
 			<div class="help-list">
-				<a class="help-row" href="tel:${HELP_TEL.replace(/\s/g, "")}"><span class="pi" style="--i:#0F6E62;--t:#E6F4F1">${ICON.phone}</span><span><b>${t("Call us")}</b><small dir="ltr">${t("{tel} · average wait 2 min", { tel: HELP_TEL })}</small></span></a>
+				<a class="help-row" href="tel:${HELP_TEL.replace(/\s/g, "")}"><span class="pi" style="--i:#D9381E;--t:#FDEDE8">${ICON.phone}</span><span><b>${t("Call us")}</b><small dir="ltr">${t("{tel} · average wait 2 min", { tel: HELP_TEL })}</small></span></a>
 				<button class="help-row" type="button" data-m="chat"><span class="pi" style="--i:#5146C9;--t:#ECEBFB">${ICON.chat}</span><span><b>${t("Chat with an agent")}</b><small>${t("A person joins this trip and sees what Otium did")}</small></span></button>
 				<a class="help-row" href="mailto:help@otium.example?subject=${encodeURIComponent("Trip help" + (ref ? " " + ref : ""))}"><span class="pi" style="--i:#B8680F;--t:#FDF0E1">${ICON.mail}</span><span><b>${t("Email")}</b><small>${t("help@otium.example · reply within 4 h")}</small></span></a>
 			</div>
@@ -1722,7 +1725,7 @@
 		let lib; try { lib = await loadPdf(); } catch { toast(t("Couldn’t load the PDF tool. Try again.")); return; }
 		const p = S.plan; const L = legs(); const k = costs(p); const d = tripDates(p.nights);
 		const doc = new lib.jsPDF({ unit: "mm", format: "a4" });
-		const ink = [34, 34, 34], grey = [106, 106, 106], teal = [15, 110, 98], line = [221, 221, 221];
+		const ink = [34, 34, 34], grey = [106, 106, 106], teal = [217, 56, 30], line = [221, 221, 221];
 		const pass = (l, n, y) => {
 			doc.setDrawColor(...line); doc.setFillColor(255, 255, 255); doc.roundedRect(15, y, 180, 92, 4, 4, "FD");
 			doc.setFillColor(...teal); doc.roundedRect(15, y, 180, 14, 4, 4, "F"); doc.rect(15, y + 8, 180, 6, "F");

@@ -61,6 +61,11 @@
 		"Sort by": ["Trier par", "Ordenar por", "Ordina per", "מיון לפי"],
 		"Sort": ["Trier", "Ordenar", "Ordina", "מיון"],
 		/* ---------- photos, stays, menu ---------- */
+		"No payment without your OK": ["Aucun paiement sans accord", "Ningún pago sin tu OK", "Nessun pagamento senza OK", "שום תשלום בלי אישור"],
+		"Your details stay yours": ["Vos données restent à vous", "Tus datos son tuyos", "I tuoi dati restano tuoi", "הפרטים שלכם נשארים שלכם"],
+		"Each payment waits on a card where you say yes, edit or no.": ["Chaque paiement attend votre oui, une modification ou un non.", "Cada pago espera a que digas sí, lo cambies o digas no.", "Ogni pagamento aspetta il tuo sì, una modifica o un no.", "כל תשלום מחכה לכן, לשינוי או לסירוב שלכם."],
+		"Names and passports go to the airline only after you agree.": ["Noms et passeports ne partent qu’après votre accord.", "Nombres y pasaportes solo se envían tras tu aprobación.", "Nomi e passaporti partono solo dopo il tuo consenso.", "שמות ודרכונים נשלחים לחברת התעופה רק אחרי אישור."],
+		"A full history of every action, with an undo on each one.": ["Un historique complet, et une annulation pour chaque action.", "Un historial completo y una opción de deshacer en cada paso.", "Uno storico completo e un annullamento per ogni azione.", "היסטוריה מלאה של כל פעולה, ואפשרות ביטול לכל אחת."],
 		"Needs you": ["Vous attend", "Te necesita", "Serve a te", "מחכה לכם"],
 		"Approve": ["Valider", "Aprobar", "Approva", "אישור"],
 		"Find flights from Paris": ["Trouver des vols depuis Paris", "Buscar vuelos desde París", "Trovare voli da Parigi", "חיפוש טיסות מפריז"],
