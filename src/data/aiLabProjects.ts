@@ -69,7 +69,7 @@ The language model only reads the request. Prices, the plan, the budget check an
 			lead: 'Otium plans a full short trip on its own — flights, a stay, the days — but every action with consequences waits for the traveller. The request is read by an LLM (Llama 3.3 on Cloudflare Workers AI); everything else is deterministic code. T-Bot, a built-in helper, answers questions along the way and only ever points to the control where the traveller decides.',
 			tryUrl: '/demo/otium/',
 			tryLabel: 'Try Otium',
-			states: ['Request read by AI, with assumptions flagged', 'Basic matching when the AI is offline', 'Clarifying question when the place is missing', 'Destination not covered — no guessing', 'Steps shown live, foldable', 'Pause and resume', 'Over budget — stops and offers options', 'Approval before payment, with before/after', 'Approval before sharing traveller details', 'Fare changed — asks again', 'Flight sold out — plan B', 'Edit flight or stay before approving', 'Cancel one booking or all', 'Trip history, tap to jump to a step', 'Several trips saved in My trips', 'Date-range calendar', 'Tickets and hotel voucher as PDF, calendar file', 'T-Bot helper with action buttons', 'Talk to a human', 'Five languages, Hebrew in RTL'],
+			states: ['Request read by AI, with assumptions flagged', 'Basic matching when the AI is offline', 'Clarifying question when the place is missing', 'Destination not covered — no guessing', 'Steps shown live, foldable', 'Pause and resume', 'Over budget — stops and offers options', 'Approval before payment, with before/after', 'Approval before sharing traveller details', 'Fare changed — asks again', 'Flight sold out — plan B', 'Edit flight or stay before approving', 'Cancel one booking or all', 'Trip history, tap to jump to a step', 'Several trips saved in My trips', 'Date-range calendar', 'Details missing at payment — sends to the profile, then resumes', 'Tickets and hotel voucher as PDF, calendar file', 'T-Bot helper with action buttons', 'Talk to a human', 'Five languages, Hebrew in RTL'],
 			decisions: [
 				{ title: 'Model for reading, code for acting', body: 'The LLM turns a sentence into fields — city, nights, travellers, budget. Prices, the plan, the budget check and every booking step are computed in code, so the model can never invent a fare or approve a payment.' },
 				{ title: 'Automatic vs. needs you', body: 'Each step carries a tag. Searching and comparing run on their own; paying, sharing personal data and going over budget always stop and wait. Permissions show the same rules in one place.' },
@@ -100,6 +100,7 @@ The language model only reads the request. Prices, the plan, the budget check an
 				'A budget bar with the cap marked, turning rose the moment the plan goes over',
 				'Amber dot on My trips and on T-Bot when something waits for you',
 				'Calendar range preview on hover, nights counted live',
+				'Help and T-Bot stacked bottom right, the way back to the portfolio bottom left',
 			],
 			interactions: [
 				'Request in plain words, read by AI, every field editable with custom menus',
@@ -108,12 +109,15 @@ The language model only reads the request. Prices, the plan, the budget check an
 				'My trips: several plans kept side by side, each resumes where it stopped',
 				'Language switch translates every trip in place — nothing is re-planned',
 				'T-Bot chat with contextual suggestions and one safe action per answer',
+				'Sign-in and profile: payment waits until traveller details, address and a card are saved',
+				'30 destinations with filters and sorting',
 			],
 			constraints: [
 				'Plain HTML, CSS and JavaScript — no framework, no bundler, no CDN',
 				'The model only reads; prices and actions are computed in code',
 				'Five languages from one string table, Hebrew in RTL',
 				'Fictional airlines, stays and prices — nothing is booked, charged or sent',
+				'Photography from Pexels (free licence, credits in /demo/otium/media/CREDITS.txt), one daylight treatment for all 30 destinations',
 				'Tested end-to-end in a headless browser: full flow, six tricky cases, mobile at 390 px, five languages',
 			],
 		},

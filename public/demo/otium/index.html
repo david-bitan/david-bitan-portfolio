@@ -815,6 +815,16 @@ summary, .alt, .opt, .chip, .dd-btn, .dd-list li, .from-list li, .lang-list li, 
 [dir="rtl"] .pf-fab svg.i { transform: scaleX(-1); }
 body:has(.needs-you.on) .pf-fab { bottom: 92px; }
 @media (max-width: 640px) { .pf-fab { width: 54px; height: 54px; padding: 0; justify-content: center; bottom: 16px; inset-inline-start: 16px; } .pf-fab .lbl { display: none; } }
+/* ---------- Help (floating, stacked above T-Bot) ---------- */
+.help-fab { position: fixed; bottom: 84px; inset-inline-end: 22px; z-index: 45; display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 16px 0 13px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink); font-weight: 700; font-size: 13.5px; box-shadow: 0 4px 14px rgba(0,0,0,.10); transition: transform .2s var(--ease); }
+.help-fab:hover { transform: translateY(-2px); }
+.help-fab svg.i { width: 17px; height: 17px; }
+.help-fab:hover .bot-tip, .help-fab:focus-visible .bot-tip { opacity: 1; transform: none; }
+.help-fab .bot-tip { bottom: 50%; inset-inline-end: calc(100% + 10px); transform: translate(6px, 50%); }
+[dir="rtl"] .help-fab .bot-tip { transform: translate(-6px, 50%); }
+.help-fab:hover .bot-tip { transform: translate(0, 50%); }
+body:has(.needs-you.on) .help-fab { bottom: 154px; }
+@media (max-width: 640px) { .help-fab { width: 44px; height: 44px; padding: 0; justify-content: center; bottom: 80px; inset-inline-end: 21px; } .help-fab .lbl, .help-fab .bot-tip { display: none; } body:has(.needs-you.on) .help-fab { bottom: 156px; } }
 /* ---------- T-Bot ---------- */
 .bot-fab { position: fixed; bottom: 22px; inset-inline-end: 22px; z-index: 45; display: inline-flex; align-items: center; gap: 8px; height: 50px; padding: 0 20px 0 16px; border-radius: 999px; border: 0; background: var(--ink); color: #fff; font-weight: 700; font-size: 14.5px; box-shadow: 0 6px 20px rgba(0,0,0,.18); transition: transform .2s var(--ease); }
 .bot-fab:hover { transform: translateY(-2px); }
@@ -925,7 +935,6 @@ body:has(.needs-you.on) .bot-fab { bottom: 92px; } /* never cover the "Otium nee
 		<div class="top-r">
 			<div class="lang" id="langWrap"><button class="hdr-btn" id="langBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Language"><i data-i="globe"></i><span id="langCode">EN</span></button><ul class="lang-list" id="langList" role="listbox" tabindex="-1" aria-label="Language"></ul></div>
 			<button class="hdr-btn icon-only trips-m" id="navTripsM" data-go="trips" type="button" hidden aria-label="My trips"><i data-i="luggage"></i></button>
-			<button class="hdr-btn" id="openHelp" data-help aria-describedby="tipHelp"><i data-i="circle-help"></i><span class="lbl">Help</span><span class="tip" role="tooltip" id="tipHelp"><b>Talk to a human</b>Call, chat or email Otium’s travel team, 24/7. They see everything the agent did.</span></button>
 			<button class="hdr-btn icon-only" id="openNotes" aria-label="Notifications" aria-describedby="tipNotes"><i data-i="bell"></i><span class="nbadge" id="notifBadge" hidden>0</span><span class="tip" role="tooltip" id="tipNotes"><b>Notifications</b>Missed a message? Every pop-up is kept here. Keep the ones you need, clear the rest.</span></button>
 			<button class="hdr-btn" id="openRules" aria-describedby="tipRules"><i data-i="shield-check"></i><span class="lbl">Permissions</span><span class="tip" role="tooltip" id="tipRules"><b>What Otium may do</b>Searching is automatic. Paying and sharing your details always wait for your OK. Set your budget cap here.</span></button>
 			<button class="hdr-btn acct" id="acctBtn" type="button" aria-label="Sign in"><i data-i="user"></i><span class="lbl">Sign in</span></button>
@@ -1035,6 +1044,7 @@ body:has(.needs-you.on) .bot-fab { bottom: 92px; } /* never cover the "Otium nee
 <div class="scrim" id="scrim" hidden></div>
 
 <a class="pf-fab" href="/#ai-lab" aria-label="Back to portfolio"><i data-i="arrow-left"></i><span class="lbl">Back to portfolio</span></a>
+<button class="help-fab" id="openHelp" data-help type="button" aria-label="Help — talk to a human"><i data-i="circle-help"></i><span class="lbl">Help</span><span class="bot-tip" aria-hidden="true">Talk to a human, 24/7</span></button>
 <button class="bot-fab" id="botFab" type="button" aria-label="Ask T-Bot, your trip helper"><i data-i="bot"></i><span class="lbl">Ask T-Bot</span><span class="bot-tip" aria-hidden="true">Stuck? Ask T-Bot</span></button>
 <aside class="drawer bot-d" id="botDrawer" aria-label="T-Bot" aria-hidden="true">
 	<div class="drawer-h"><div class="bot-h"><span class="bot-av"><i data-i="bot"></i></span><div><h2>T-Bot</h2><small id="botMode">Your trip helper</small></div></div><button class="icon-btn" data-close aria-label="Close"><i data-i="x"></i></button></div>

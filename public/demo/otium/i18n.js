@@ -61,6 +61,8 @@
 		"Sort by": ["Trier par", "Ordenar por", "Ordina per", "מיון לפי"],
 		"Sort": ["Trier", "Ordenar", "Ordina", "מיון"],
 		/* ---------- account & profile ---------- */
+		"Talk to a human, 24/7": ["Parler à un humain, 24h/24", "Habla con una persona, 24/7", "Parla con una persona, 24/7", "לדבר עם נציג, 24/7"],
+		"Help — talk to a human": ["Aide — parler à un humain", "Ayuda — hablar con una persona", "Aiuto — parla con una persona", "עזרה — לדבר עם נציג"],
 		"Sign in": ["Se connecter", "Iniciar sesión", "Accedi", "התחברות"],
 		"My profile": ["Mon profil", "Mi perfil", "Il mio profilo", "הפרופיל שלי"],
 		"My profile — details missing": ["Mon profil — informations manquantes", "Mi perfil — faltan datos", "Il mio profilo — dati mancanti", "הפרופיל שלי — חסרים פרטים"],
