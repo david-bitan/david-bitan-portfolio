@@ -35,3 +35,157 @@ bruges.jpg — https://www.pexels.com/photo/5612504/ — Cristian Salinas Cister
 stay-1.jpg — https://www.pexels.com/photo/39836703/ — Keegan Checks
 stay-2.jpg — https://www.pexels.com/photo/18470969/ — Alan Antony
 stay-3.jpg — https://www.pexels.com/photo/24807128/ — Ahmet ÇÖTÜR
+
+Galleries (media/g = destinations, media/s = stays)
+g/lisbon-1.jpg — https://www.pexels.com/photo/6068391/ — Dan Raz
+g/lisbon-2.jpg — https://www.pexels.com/photo/5191379/ — Ryutaro Tsukata
+g/lisbon-3.jpg — https://www.pexels.com/photo/35755159/ — Zak Mir
+g/lisbon-4.jpg — https://www.pexels.com/photo/35397656/ — Junior Diniz
+g/barcelona-1.jpg — https://www.pexels.com/photo/16984552/ — Mehmet Turgut Kirkgoz
+g/barcelona-2.jpg — https://www.pexels.com/photo/40470525/ — Jeffrey Eisen
+g/barcelona-3.jpg — https://www.pexels.com/photo/18700104/ — Mehmet Turgut Kirkgoz
+g/barcelona-4.jpg — https://www.pexels.com/photo/13431329/ — Min Nguyen
+g/copenhagen-1.jpg — https://www.pexels.com/photo/16584716/ — rao qingwei
+g/copenhagen-2.jpg — https://www.pexels.com/photo/27079190/ — Zhenyang XU
+g/copenhagen-3.jpg — https://www.pexels.com/photo/20816760/ — Mihai Vlasceanu
+g/copenhagen-4.jpg — https://www.pexels.com/photo/15687419/ — Ezequiel Filiberto
+g/athens-1.jpg — https://www.pexels.com/photo/36825391/ — Audrey Bory
+g/athens-2.jpg — https://www.pexels.com/photo/30312498/ — Ali Durmuş Cevlan
+g/athens-3.jpg — https://www.pexels.com/photo/14080480/ — Stavros Kallis
+g/athens-4.jpg — https://www.pexels.com/photo/39069472/ — Audrey Bory
+g/seville-1.jpg — https://www.pexels.com/photo/34900836/ — Ana Rubio
+g/seville-2.jpg — https://www.pexels.com/photo/37514304/ — Ana Rubio
+g/seville-3.jpg — https://www.pexels.com/photo/35037755/ — Rino Adamo
+g/seville-4.jpg — https://www.pexels.com/photo/16778487/ — Jose Rodriguez Ortega
+g/amsterdam-1.jpg — https://www.pexels.com/photo/15592112/ — Γιώργος Παγούδης
+g/amsterdam-2.jpg — https://www.pexels.com/photo/1006032/ — Robert Stokoe
+g/amsterdam-3.jpg — https://www.pexels.com/photo/39505346/ — Vinicius A. Nascimento
+g/amsterdam-4.jpg — https://www.pexels.com/photo/21792317/ — Petrit Nikolli
+g/porto-1.jpg — https://www.pexels.com/photo/24879031/ — Rafael Rodrigues
+g/porto-2.jpg — https://www.pexels.com/photo/39332636/ — Igor Passchier
+g/porto-3.jpg — https://www.pexels.com/photo/13540077/ — Gotta Be Worth It
+g/porto-4.jpg — https://www.pexels.com/photo/17849332/ — Susanna Marsiglia
+g/rome-1.jpg — https://www.pexels.com/photo/27541217/ — Geni Hoka
+g/rome-2.jpg — https://www.pexels.com/photo/37303403/ — Valentin Ivantsov
+g/rome-3.jpg — https://www.pexels.com/photo/36725970/ — Claudia Solano
+g/rome-4.jpg — https://www.pexels.com/photo/12268449/ — Federica Amerio
+g/valencia-1.jpg — https://www.pexels.com/photo/256146/ — Pixabay
+g/valencia-2.jpg — https://www.pexels.com/photo/35062657/ — Emilio Sánchez Hernández
+g/valencia-3.jpg — https://www.pexels.com/photo/17626412/ — Joaquin Carfagna
+g/valencia-4.jpg — https://www.pexels.com/photo/17628008/ — Joaquin Carfagna
+g/naples-1.jpg — https://www.pexels.com/photo/12464321/ — K
+g/naples-2.jpg — https://www.pexels.com/photo/12496244/ — K
+g/naples-3.jpg — https://www.pexels.com/photo/17311063/ — K
+g/naples-4.jpg — https://www.pexels.com/photo/33242895/ — Rebel Sam Photos
+g/nice-1.jpg — https://www.pexels.com/photo/28602943/ — Huy Phan
+g/nice-2.jpg — https://www.pexels.com/photo/29864448/ — AXP Photography
+g/nice-3.jpg — https://www.pexels.com/photo/21255185/ — Laura Paredis
+g/nice-4.jpg — https://www.pexels.com/photo/27926173/ — Serinus
+g/palermo-1.jpg — https://www.pexels.com/photo/18495537/ — Efrem Efre
+g/palermo-2.jpg — https://www.pexels.com/photo/14213525/ — Inmaculada Peña
+g/palermo-3.jpg — https://www.pexels.com/photo/35811802/ — Dmitry Romanoff
+g/palermo-4.jpg — https://www.pexels.com/photo/35786541/ — Diego HG
+g/florence-1.jpg — https://www.pexels.com/photo/30789595/ — Barkalı
+g/florence-2.jpg — https://www.pexels.com/photo/17565270/ — Wolfgang Weiser
+g/florence-3.jpg — https://www.pexels.com/photo/37607682/ — Claudia Solano
+g/florence-4.jpg — https://www.pexels.com/photo/34519908/ — Simeon Maryska
+g/granada-1.jpg — https://www.pexels.com/photo/14688077/ — Enrique
+g/granada-2.jpg — https://www.pexels.com/photo/30359825/ — Sebastiaan Been
+g/granada-3.jpg — https://www.pexels.com/photo/39245359/ — Pablo Fernandez
+g/granada-4.jpg — https://www.pexels.com/photo/40621731/ — Bartosz Andrzejuk
+g/venice-1.jpg — https://www.pexels.com/photo/38507258/ — Wojciech Wyszkowski
+g/venice-2.jpg — https://www.pexels.com/photo/18781105/ — AXP Photography
+g/venice-3.jpg — https://www.pexels.com/photo/29487687/ — Vladimir Srajber
+g/venice-4.jpg — https://www.pexels.com/photo/15919517/ — Nana V
+g/palma-1.jpg — https://www.pexels.com/photo/2353333/ — Attila Marosi
+g/palma-2.jpg — https://www.pexels.com/photo/8464638/ — Erick González González
+g/palma-3.jpg — https://www.pexels.com/photo/20121622/ — Nadine Ginzel
+g/palma-4.jpg — https://www.pexels.com/photo/25489929/ — David Vives
+g/santorini-1.jpg — https://www.pexels.com/photo/5792915/ — Jeff Stapleton
+g/santorini-2.jpg — https://www.pexels.com/photo/28000949/ — Wolf Art
+g/santorini-3.jpg — https://www.pexels.com/photo/33851769/ — Yuliya Rudavska
+g/santorini-4.jpg — https://www.pexels.com/photo/14712767/ — Ushindi Namegabe
+g/prague-1.jpg — https://www.pexels.com/photo/8305988/ — Toma Ha
+g/prague-2.jpg — https://www.pexels.com/photo/4609803/ — Shahbaz Zaman
+g/prague-3.jpg — https://www.pexels.com/photo/16280399/ — Alex Does Pictures
+g/prague-4.jpg — https://www.pexels.com/photo/16658693/ — Chaitanya Nair
+g/budapest-1.jpg — https://www.pexels.com/photo/18815996/ — Efrem Efre
+g/budapest-2.jpg — https://www.pexels.com/photo/4341403/ — Burkay Canatar
+g/budapest-3.jpg — https://www.pexels.com/photo/8390036/ — Tamás Endre Farkas
+g/budapest-4.jpg — https://www.pexels.com/photo/4597879/ — Kateryna Unuvar
+g/split-1.jpg — https://www.pexels.com/photo/4353557/ — Spencer Davis
+g/split-2.jpg — https://www.pexels.com/photo/13170282/ — Aleksei Pribõlovski
+g/split-3.jpg — https://www.pexels.com/photo/17563087/ — Peter Safranka
+g/split-4.jpg — https://www.pexels.com/photo/13170267/ — Aleksei Pribõlovski
+g/krakow-1.jpg — https://www.pexels.com/photo/38250223/ — Travel Photographer
+g/krakow-2.jpg — https://www.pexels.com/photo/37382967/ — Oleksandr Petroniuk
+g/krakow-3.jpg — https://www.pexels.com/photo/37383043/ — Oleksandr Petroniuk
+g/krakow-4.jpg — https://www.pexels.com/photo/30578083/ — Dominik Gryzbon
+g/dubrovnik-1.jpg — https://www.pexels.com/photo/15552997/ — Diego F. Parra
+g/dubrovnik-2.jpg — https://www.pexels.com/photo/9038831/ — Vitalii Dobrianskyi
+g/dubrovnik-3.jpg — https://www.pexels.com/photo/37212689/ — Dawid Tkocz
+g/dubrovnik-4.jpg — https://www.pexels.com/photo/18301156/ — Judith Alegarbes
+g/istanbul-1.jpg — https://www.pexels.com/photo/40472109/ — Turuncu Sakal
+g/istanbul-2.jpg — https://www.pexels.com/photo/12540277/ — Samet Çolakoğlu
+g/istanbul-3.jpg — https://www.pexels.com/photo/40328365/ — Zülfü Demir
+g/istanbul-4.jpg — https://www.pexels.com/photo/16549145/ — Mehmet Turgut Kirkgoz
+g/valletta-1.jpg — https://www.pexels.com/photo/31997350/ — Dániel Csík
+g/valletta-2.jpg — https://www.pexels.com/photo/39313850/ — Jean-Marc Adler
+g/valletta-3.jpg — https://www.pexels.com/photo/17295937/ — Efrem Efre
+g/valletta-4.jpg — https://www.pexels.com/photo/17755223/ — Efrem Efre
+g/marrakech-1.jpg — https://www.pexels.com/photo/22711558/ — Uiliam Nörnberg
+g/marrakech-2.jpg — https://www.pexels.com/photo/36595611/ — Valentin Vesa
+g/marrakech-3.jpg — https://www.pexels.com/photo/30204572/ — Moussa Idrissi
+g/marrakech-4.jpg — https://www.pexels.com/photo/15360686/ — Moussa Idrissi
+g/edinburgh-1.jpg — https://www.pexels.com/photo/35769512/ — Igor Passchier
+g/edinburgh-2.jpg — https://www.pexels.com/photo/37076511/ — Oleksiy
+g/edinburgh-3.jpg — https://www.pexels.com/photo/37091120/ — Oleksiy
+g/edinburgh-4.jpg — https://www.pexels.com/photo/28586330/ — Mario Spencer
+g/stockholm-1.jpg — https://www.pexels.com/photo/35577822/ — Abhishek Navlakha
+g/stockholm-2.jpg — https://www.pexels.com/photo/33059204/ — Siegfried Poepperl
+g/stockholm-3.jpg — https://www.pexels.com/photo/29157756/ — Lost Wonderer
+g/stockholm-4.jpg — https://www.pexels.com/photo/30158443/ — Jakob Stöberl
+g/bruges-1.jpg — https://www.pexels.com/photo/5612487/ — Cristian Salinas Cisternas
+g/bruges-2.jpg — https://www.pexels.com/photo/19907877/ — Osman Yildiz
+g/bruges-3.jpg — https://www.pexels.com/photo/12737730/ — Magda Ehlers
+g/bruges-4.jpg — https://www.pexels.com/photo/32460400/ — Demetra Ioannidou
+g/reykjavik-1.jpg — https://www.pexels.com/photo/30117977/ — Gylfi Gylfason
+g/reykjavik-2.jpg — https://www.pexels.com/photo/40545949/ — Lajos Kristóf Kántor
+g/reykjavik-3.jpg — https://www.pexels.com/photo/12932486/ — Atlantic Ambience
+g/reykjavik-4.jpg — https://www.pexels.com/photo/17391036/ — Fahad AlAni
+g/tallinn-1.jpg — https://www.pexels.com/photo/37554778/ — Nils Rotura
+g/tallinn-2.jpg — https://www.pexels.com/photo/37548631/ — Margo Evardson
+g/tallinn-3.jpg — https://www.pexels.com/photo/37498202/ — Margo Evardson
+g/tallinn-4.jpg — https://www.pexels.com/photo/40548675/ — Lena Netkach
+s/hotel-a-2.jpg — https://www.pexels.com/photo/28999491/ — Quang Nguyen Vinh
+s/hotel-a-3.jpg — https://www.pexels.com/photo/40624372/ — Faheem Ahamad
+s/hotel-a-4.jpg — https://www.pexels.com/photo/19239909/ — Moussa Idrissi
+s/hotel-a-5.jpg — https://www.pexels.com/photo/33647166/ — Richard
+s/hotel-b-1.jpg — https://www.pexels.com/photo/7722164/ — Max Vakhtbovych
+s/hotel-b-2.jpg — https://www.pexels.com/photo/2869215/ — K
+s/hotel-b-3.jpg — https://www.pexels.com/photo/16113326/ — Hongyue Stone-Jon Lee
+s/hotel-b-4.jpg — https://www.pexels.com/photo/34307858/ — Novkov Visuals
+s/hotel-b-5.jpg — https://www.pexels.com/photo/2149421/ — Matheus Natan
+s/apt-a-2.jpg — https://www.pexels.com/photo/19059041/ — ARM UX/UI
+s/apt-a-3.jpg — https://www.pexels.com/photo/7195739/ — Max Vakhtbovych
+s/apt-a-4.jpg — https://www.pexels.com/photo/7028116/ — Curtis Adams
+s/apt-a-5.jpg — https://www.pexels.com/photo/17000987/ — hi room
+s/apt-b-1.jpg — https://www.pexels.com/photo/19239905/ — Moussa Idrissi
+s/apt-b-2.jpg — https://www.pexels.com/photo/7511695/ — Max Vakhtbovych
+s/apt-b-3.jpg — https://www.pexels.com/photo/7587777/ — Max Vakhtbovych
+s/apt-b-4.jpg — https://www.pexels.com/photo/28589000/ — Uiliam Nörnberg
+s/villa-a-2.jpg — https://www.pexels.com/photo/28054875/ — Ahmet ÇÖTÜR
+s/villa-a-3.jpg — https://www.pexels.com/photo/38127108/ — Mehul
+s/villa-a-4.jpg — https://www.pexels.com/photo/38183822/ — UMUT
+s/villa-a-5.jpg — https://www.pexels.com/photo/18823963/ — Boris Ivas
+s/villa-a-6.jpg — https://www.pexels.com/photo/19075379/ — Ahmet ÇÖTÜR
+s/villa-b-1.jpg — https://www.pexels.com/photo/2155202/ — Quang Nguyen Vinh
+s/villa-b-2.jpg — https://www.pexels.com/photo/31817155/ — Ahmet ÇÖTÜR
+s/villa-b-3.jpg — https://www.pexels.com/photo/27626174/ — Ahmet ÇÖTÜR
+s/villa-b-4.jpg — https://www.pexels.com/photo/19075382/ — Ahmet ÇÖTÜR
+s/villa-b-5.jpg — https://www.pexels.com/photo/9742047/ — Daisuke Fujita
+s/guest-1.jpg — https://www.pexels.com/photo/10573397/ — Zakaria Hanif
+s/guest-2.jpg — https://www.pexels.com/photo/412050/ — Tomas Anunziata
+s/guest-3.jpg — https://www.pexels.com/photo/38891222/ — Philippe Lasry
+s/guest-4.jpg — https://www.pexels.com/photo/15531322/ — Moussa Idrissi
+s/guest-5.jpg — https://www.pexels.com/photo/13871291/ — Matheus Bertelli

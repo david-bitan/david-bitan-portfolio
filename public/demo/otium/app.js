@@ -103,6 +103,7 @@
 		const lab = t("My trips ({n})", { n });
 		b.innerHTML = `${esc(lab)}${wait ? '<span class="tdot" aria-hidden="true"></span>' : ""}`;
 		b.setAttribute("aria-label", wait ? `${lab} · ${t("{n} waiting for your OK", { n: wait })}` : lab);
+		renderMenu();
 		const m = $("#navTripsM");
 		if (m) { m.hidden = !n; m.setAttribute("aria-label", b.getAttribute("aria-label")); m.querySelector(".tdot")?.remove(); if (wait) m.insertAdjacentHTML("beforeend", '<span class="tdot" aria-hidden="true"></span>'); }
 		if (!$("#trips").hidden) renderTrips();
@@ -244,7 +245,7 @@
 	function cardHtml(k, n) {
 			const c = D.cities[k]; const f = flightOptions(k, S.origin, 1, DEFAULT_PREFS)[0]; const rating = Math.max(...c.stays.map((s) => s.rating));
 			return `<div class="card-l" role="button" tabindex="0" data-city="${k}" style="animation-delay:${n * 50}ms" aria-label="${esc(t("Plan a trip to {city}", { city: c.name }))}">
-				<div class="photo">${pic(c.photo, k, c.name)}${POPULAR[k] ? `<span class="pop">${t(POPULAR[k])}</span>` : ""}<button class="heart" type="button" data-city="${k}" aria-pressed="${saved.has(k)}" aria-label="${esc(t("Save {city}", { city: c.name }))}">${ic("heart")}</button></div>
+				<div class="photo">${pic(c.photo, k, c.name)}<button type="button" class="pics-btn" data-citypics="${k}" aria-label="${esc(t("See {n} photos of {city}", { n: 5, city: c.name }))}">${ic("images")}<span>5</span></button>${POPULAR[k] ? `<span class="pop">${t(POPULAR[k])}</span>` : ""}<button class="heart" type="button" data-city="${k}" aria-pressed="${saved.has(k)}" aria-label="${esc(t("Save {city}", { city: c.name }))}">${ic("heart")}</button></div>
 				<div class="row1">${c.name}, ${c.country}<span>${ICON.star}${rating.toFixed(1)}</span></div>
 				<div class="sub2">${esc(c.tagline)}</div>
 				<div class="sub2">${t("{h} direct from {o}", { h: f.hours, o: esc(on(S.origin)) })}</div>
@@ -1055,6 +1056,7 @@
 		if (readyToPay() && profWaiters.length) { profWaiters.splice(0).forEach((r) => r("ready")); }
 	}
 	function renderAcct() {
+		renderMenu();
 		const b = $("#acctBtn"); if (!b) return;
 		const done = readyToPay();
 		b.innerHTML = ME.signedIn
@@ -1173,6 +1175,142 @@
 		});
 		renderAcct();
 	}
+
+	/* ---------------- photos: destination galleries, stay details, one lightbox ---------------- */
+	const hashN = (x) => { let h = 0; for (const ch of String(x)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; };
+	const credit = (src) => D.credits[String(src).replace(/^media\//, "")] || "";
+	const cityPhotos = (k) => [[D.cities[k].photo, ""], ...[1, 2, 3, 4].map((n) => [`media/g/${k}-${n}.jpg`, ""])];
+	const STAY_SETS = {
+		"hotel-a": [["media/stay-1.jpg", "Room"], ["media/s/hotel-a-2.jpg", "Lobby"], ["media/s/hotel-a-3.jpg", "Bathroom"], ["media/s/hotel-a-4.jpg", "Breakfast"], ["media/s/hotel-a-5.jpg", "Pool"]],
+		"hotel-b": [["media/s/hotel-b-1.jpg", "Room"], ["media/s/hotel-b-2.jpg", "Lobby"], ["media/s/hotel-b-3.jpg", "Bathroom"], ["media/s/hotel-b-4.jpg", "Breakfast"], ["media/s/hotel-b-5.jpg", "Pool"]],
+		"apt-a": [["media/stay-2.jpg", "Living room"], ["media/s/apt-a-2.jpg", "Living room"], ["media/s/apt-a-3.jpg", "Kitchen"], ["media/s/apt-a-4.jpg", "Bedroom"], ["media/s/apt-a-5.jpg", "Balcony"]],
+		"apt-b": [["media/s/apt-b-1.jpg", "Living room"], ["media/s/apt-b-2.jpg", "Kitchen"], ["media/s/apt-b-3.jpg", "Bedroom"], ["media/s/apt-b-4.jpg", "Balcony"]],
+		"villa-a": [["media/stay-3.jpg", "Pool"], ["media/s/villa-a-2.jpg", "Pool"], ["media/s/villa-a-3.jpg", "Living room"], ["media/s/villa-a-4.jpg", "Bedroom"], ["media/s/villa-a-5.jpg", "Dining terrace"], ["media/s/villa-a-6.jpg", "View"]],
+		"villa-b": [["media/s/villa-b-1.jpg", "Pool"], ["media/s/villa-b-2.jpg", "Living room"], ["media/s/villa-b-3.jpg", "Bedroom"], ["media/s/villa-b-4.jpg", "View"], ["media/s/villa-b-5.jpg", "Dining terrace"]],
+		"guest-a": [["media/s/guest-1.jpg", "Courtyard"], ["media/s/guest-2.jpg", "Courtyard"], ["media/s/guest-3.jpg", "Lounge"], ["media/s/guest-4.jpg", "Room"], ["media/s/guest-5.jpg", "Breakfast"]],
+	};
+	const STYLES = { hotel: ["Contemporary", "Art deco touches", "Boutique, warm woods"], apt: ["Scandinavian, light", "Industrial loft", "Mid-century modern"], villa: ["Mediterranean", "Modern minimal", "Rustic stone"], guest: ["Traditional, hand-made tiles", "Family-run, antique pieces"] };
+	const AMEN = {
+		wifi: ["wifi", "Wi-Fi"], ac: ["snowflake", "Air conditioning"], breakfast: ["coffee", "Breakfast included"], desk: ["concierge-bell", "24 h reception"], pool: ["waves", "Pool"], ppool: ["waves", "Private pool"],
+		kitchen: ["cooking-pot", "Kitchen"], washer: ["washing-machine", "Washing machine"], balcony: ["sun", "Balcony"], terrace: ["sun", "Terrace and garden"], selfin: ["key-round", "Self check-in"], parking: ["car", "Parking"], host: ["concierge-bell", "Host on site"], patio: ["sun", "Garden patio"],
+	};
+	const KIND = { hotel: ["hotel", "Hotel"], apt: ["house", "Apartment"], villa: ["house", "Villa"], guest: ["house", "Guesthouse"] };
+	function stayMeta(st) {
+		const n = st.name; const h = hashN(st.id);
+		const kind = /villa|finca|yal|lodge|manor|mansion|garden house/i.test(n) ? "villa" : /riad|carmen|patio|casa|courtyard|guest/i.test(n) ? "guest" : /loft|studio|flat|apartment|house|beach flat/i.test(n) ? "apt" : "hotel";
+		const set = kind === "guest" ? "guest-a" : `${kind}-${h % 2 ? "b" : "a"}`;
+		const m = { kind, set, style: STYLES[kind][h % STYLES[kind].length] };
+		if (kind === "hotel") Object.assign(m, { stars: st.rating >= 4.8 ? 5 : 4, rooms: 18 + (h % 40), amen: ["wifi", "ac", "breakfast", "desk", "pool"] });
+		if (kind === "guest") Object.assign(m, { rooms: 5 + (h % 7), amen: ["wifi", "ac", "breakfast", "patio", "host"] });
+		if (kind === "apt") Object.assign(m, { beds: 1 + (h % 2), size: 48 + (h % 40), amen: ["wifi", "ac", "kitchen", "washer", "balcony", "selfin"] });
+		if (kind === "villa") Object.assign(m, { beds: 3 + (h % 3), size: 160 + (h % 120), amen: ["wifi", "ac", "ppool", "kitchen", "terrace", "parking"] });
+		return m;
+	}
+	for (const c of Object.values(D.cities)) for (const st of c.stays) { st.meta = stayMeta(st); st.photo = STAY_SETS[st.meta.set][0][0]; }
+	const stayPhotos = (st, k) => [...STAY_SETS[st.meta.set], [`media/g/${k}-1.jpg`, "NEIGHBOURHOOD"]];
+
+	/* lightbox */
+	const LB = { items: [], i: 0, title: "" };
+	function lbPaint() {
+		const it = LB.items[LB.i]; if (!it) return;
+		const img = $("#lbImg"); img.classList.remove("on"); img.onload = () => img.classList.add("on"); img.src = it[0]; img.alt = it[1] || LB.title;
+		$("#lbCap").innerHTML = `${it[1] ? `<b>${esc(it[1])}</b>` : ""}${credit(it[0]) ? `<span>${t("Photo: {x} · Pexels", { x: esc(credit(it[0])) })}</span>` : ""}`;
+		$("#lbCount").textContent = `${LB.i + 1} / ${LB.items.length}`;
+		$("#lbThumbs").querySelectorAll("button").forEach((b, j) => b.setAttribute("aria-current", j === LB.i ? "true" : "false"));
+		$("#lbThumbs").querySelector('[aria-current="true"]')?.scrollIntoView({ block: "nearest", inline: "nearest" });
+	}
+	function openGallery(items, start = 0, title = "", info = "") {
+		LB.items = items; LB.i = start; LB.title = title; LB.last = document.activeElement;
+		const lb = $("#lb");
+		$("#lbTitle").textContent = title;
+		$("#lbThumbs").innerHTML = items.map(([src, cap], j) => `<button type="button" data-lbi="${j}" aria-label="${esc(cap || title)} ${j + 1}"><img src="${esc(src)}" alt="" loading="lazy"></button>`).join("");
+		$("#lbInfo").innerHTML = info; lb.classList.toggle("has-info", Boolean(info));
+		lb.hidden = false; document.body.classList.add("lb-open"); requestAnimationFrame(() => lb.classList.add("on"));
+		lbPaint(); $("#lbClose").focus();
+	}
+	function closeGallery() { const lb = $("#lb"); if (lb.hidden) return; lb.classList.remove("on"); document.body.classList.remove("lb-open"); setTimeout(() => (lb.hidden = true), 200); LB.last?.focus?.(); }
+	const lbGo = (d) => { LB.i = (LB.i + d + LB.items.length) % LB.items.length; lbPaint(); };
+	function initGallery() {
+		const lb = $("#lb");
+		lb.addEventListener("click", (e) => {
+			if (e.target.closest("#lbClose") || e.target === lb) return closeGallery();
+			if (e.target.closest(".lb-nav.prev")) return lbGo(document.dir === "rtl" ? 1 : -1);
+			if (e.target.closest(".lb-nav.next")) return lbGo(document.dir === "rtl" ? -1 : 1);
+			const th = e.target.closest("[data-lbi]"); if (th) { LB.i = +th.dataset.lbi; lbPaint(); }
+		});
+		document.addEventListener("keydown", (e) => {
+			if (lb.hidden) return;
+			if (e.key === "Escape") { e.preventDefault(); closeGallery(); }
+			if (e.key === "ArrowRight") lbGo(document.dir === "rtl" ? -1 : 1);
+			if (e.key === "ArrowLeft") lbGo(document.dir === "rtl" ? 1 : -1);
+		});
+		let x0 = null; const stage = $("#lbStage");
+		stage.addEventListener("touchstart", (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+		stage.addEventListener("touchend", (e) => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) lbGo((dx < 0 ? 1 : -1) * (document.dir === "rtl" ? -1 : 1)); });
+		document.addEventListener("click", (e) => {
+			const cg = e.target.closest("[data-citypics]"); if (cg) { e.stopPropagation(); e.preventDefault(); const k = cg.dataset.citypics; return openGallery(cityPhotos(k), 0, `${D.cities[k].name}, ${D.cities[k].country}`); }
+			const sg = e.target.closest("[data-staypics]"); if (sg) { e.stopPropagation(); e.preventDefault(); return openStay(sg.dataset.staypics); }
+		}, true);
+	}
+	function openStay(id) {
+		let city = null, st = null; for (const [k, c] of Object.entries(D.cities)) { const x = c.stays.find((y) => y.id === id); if (x) { city = k; st = x; } }
+		if (!st) return; const m = st.meta; const c = D.cities[city];
+		const items = stayPhotos(st, city).map(([src, cap]) => [src, cap === "NEIGHBOURHOOD" ? t("Around: {x}", { x: st.area }) : t(cap)]);
+		const size = m.kind === "hotel" ? t("{n} rooms", { n: m.rooms }) : m.kind === "guest" ? t("{n} rooms, family-run", { n: m.rooms }) : t("{n} bedrooms · sleeps {m} · {s} m²", { n: m.beds, m: m.beds * 2, s: m.size });
+		const n = S.plan?.city === city ? S.plan.nights : 3;
+		const info = `<div class="si-k"><span class="tag g">${ic(KIND[m.kind][0])}${t(KIND[m.kind][1])}</span>${m.stars ? `<span class="si-stars" aria-label="${esc(t("{n} stars", { n: m.stars }))}">${ICON.star.repeat(m.stars)}</span>` : ""}</div>
+			<h3>${esc(st.name)}</h3><p class="si-a">${ic("map-pin")}${esc(st.area)}, ${esc(c.name)} · ${ICON.star} ${st.rating}</p>
+			<ul class="si-facts"><li>${ic(m.kind === "hotel" || m.kind === "guest" ? "bed-double" : "ruler")}<span>${size}</span></li><li>${ic("palette")}<span>${t("Design: {x}", { x: t(m.style) })}</span></li><li>${ic("sun")}<span>${esc(st.perk)}</span></li></ul>
+			<h4>${t("What’s included")}</h4><ul class="si-amen">${m.amen.map((a) => `<li>${ic(AMEN[a][0])}<span>${t(AMEN[a][1])}</span></li>`).join("")}</ul>
+			<div class="si-price"><div><b class="num">${eur(st.nightly)}</b> ${t("per night")}</div><span class="tag ${st.freeCancel ? "g" : "r"}">${t(st.freeCancel ? "Free cancellation" : "Non-refundable")}</span></div>
+			<p class="fine">${ICON.info}<span>${t("Fictional stay — photos are illustrative, from Pexels.")}</span></p>`;
+		openGallery(items, 0, st.name, info);
+	}
+
+	/* ---------------- mobile menu: nothing disappears on small screens ---------------- */
+	function renderMenu() {
+		const m = $("#menuList"); if (!m) return;
+		const wait = TRIPS.filter((tr) => tripState(tripData(tr))[0] === "wait").length;
+		m.innerHTML = [
+			["home", "search", t("Plan a trip")], ["explore", "compass", t("All destinations")],
+			TRIPS.length ? ["trips", "luggage", t("My trips ({n})", { n: TRIPS.length }), wait] : null,
+			["acct", "user", ME.signedIn ? t("My profile") : t("Sign in")],
+			["rules", "shield-check", t("What Otium may do")], ["notes", "bell", t("Notifications")], ["help", "circle-help", t("Help — talk to a human")],
+			["portfolio", "arrow-left", t("Back to portfolio")],
+		].filter(Boolean).map(([k, icn, lab, dot]) => `<li><button type="button" data-menu="${k}">${ic(icn, k === "portfolio" ? "dir" : "")}<span>${esc(lab)}</span>${dot ? '<span class="mdot" aria-hidden="true"></span>' : ""}</button></li>`).join("");
+		const wb = $("#menuBtn"); if (wb) wb.classList.toggle("has-dot", wait > 0);
+	}
+	function initMenu() {
+		$("#menuBtn").onclick = () => { renderMenu(); openDrawer("menuDrawer"); };
+		$("#menuList").addEventListener("click", (e) => {
+			const b = e.target.closest("[data-menu]"); if (!b) return; const k = b.dataset.menu;
+			closeDrawers();
+			setTimeout(() => {
+				if (k === "home" || k === "explore" || k === "trips") show(k);
+				else if (k === "acct") goAccount();
+				else if (k === "rules") openDrawer("rulesDrawer");
+				else if (k === "notes") $("#openNotes").click();
+				else if (k === "help") openHelp();
+				else if (k === "portfolio") location.href = "/#ai-lab";
+			}, 280);
+		});
+		renderMenu();
+	}
+	/* category rows: swipe on touch, arrows on desktop, faded edges show there is more */
+	function initScrollers() {
+		document.querySelectorAll(".cats").forEach((row) => {
+			if (row.parentElement.classList.contains("cats-wrap")) return;
+			const w = document.createElement("div"); w.className = "cats-wrap"; row.before(w); w.append(row);
+			w.insertAdjacentHTML("beforeend", `<button type="button" class="cs-nav prev" aria-label="${esc(t("Previous"))}" tabindex="-1">${ic("chevron-left", "dir")}</button><button type="button" class="cs-nav next" aria-label="${esc(t("Next"))}" tabindex="-1">${ic("chevron-right", "dir")}</button>`);
+			const upd = () => {
+				const max = row.scrollWidth - row.clientWidth; const x = Math.abs(row.scrollLeft);
+				w.classList.toggle("can-prev", max > 2 && x > 2); w.classList.toggle("can-next", max > 2 && x < max - 2);
+			};
+			row.addEventListener("scroll", upd, { passive: true }); addEventListener("resize", upd); new MutationObserver(upd).observe(row, { childList: true });
+			w.querySelectorAll(".cs-nav").forEach((b) => (b.onclick = () => { const dir = b.classList.contains("next") ? 1 : -1; row.scrollBy({ left: dir * (document.dir === "rtl" ? -1 : 1) * row.clientWidth * 0.7, behavior: reduced ? "auto" : "smooth" }); }));
+			setTimeout(upd, 50);
+		});
+	}
 	function openGroups() {
 		modal(`<h3 id="modalTitle">${t("Groups & companies")}</h3><p>${t("From 10 travellers, a dedicated travel planner builds the trip with you: group fares, several rooms or a whole hotel, meeting rooms, transfers and one invoice. Otium hands over everything it has prepared.")}</p>
 			<div class="help-list">
@@ -1197,7 +1335,7 @@
 		const over = k && k.total > p.cap;
 		const scale = k ? Math.max(p.cap, k.total) * 1.12 : p.cap * 1.12;
 		box.innerHTML = `
-		<div class="trip-hero">${pic(c.photo, p.city, c.name)}<div class="in"><div><span class="status-tag ${st[0]}"><i></i>${st[1]}</span><h2>${c.name}</h2><div class="meta">${fmtDay(dates.out)} → ${fmtDay(dates.back)} · ${P(p.nights, "1 night", "{n} nights")} · ${P(p.travelers, "1 traveller", "{n} travellers")} · ${t("from {o}", { o: esc(on(S.origin)) })}</div></div></div></div>
+		<div class="trip-hero">${pic(c.photo, p.city, c.name)}<button type="button" class="pics-btn big" data-citypics="${p.city}">${ic("images")}<span>${t("Photos ({n})", { n: 5 })}</span></button><div class="in"><div><span class="status-tag ${st[0]}"><i></i>${st[1]}</span><h2>${c.name}</h2><div class="meta">${fmtDay(dates.out)} → ${fmtDay(dates.back)} · ${P(p.nights, "1 night", "{n} nights")} · ${P(p.travelers, "1 traveller", "{n} travellers")} · ${t("from {o}", { o: esc(on(S.origin)) })}</div></div></div></div>
 		${S.progress.done ? doneBanner(k) : ""}
 		${S.progress.cancelled && !S.progress.done ? `<div class="panel block draft-note"><b>${t("Bookings cancelled.")}</b> ${t("Your plan is kept as a draft.")} <button class="btn btn-primary btn-sm" data-rebook>${t("Book it again")}</button></div>` : ""}
 		<div class="panel budget">
@@ -1253,11 +1391,11 @@
 		return `<dl class="fl-info"><div><dt>${t("Airport")}</dt><dd>${esc(on(S.origin))} ${o} · ${t("Terminal {n}", { n: 1 + f.i })}</dd></div><div><dt>${t("Be there by")}</dt><dd>${t("{t} (2 h before)", { t: at })}</dd></div><div><dt>${t("Check-in closes")}</dt><dd>${String(Math.floor(close / 60)).padStart(2, "0")}:${String(close % 60).padStart(2, "0")}</dd></div><div><dt>${t("Gate")}</dt><dd>${t("Shown 24 h before")}</dd></div></dl>`;
 	}
 	function stayRow(s, p) {
-		return `<div class="stay"><div class="pic">${pic(s.photo, p.city, s.name)}</div><div><b>${esc(s.name)}</b><br><small>${esc(s.area)} · ${ICON.star} ${s.rating} · ${esc(s.perk)}</small><div class="tags">${s.freeCancel ? `<span class="tag g">${t("Free cancellation")}</span>` : `<span class="tag r">${t("Non-refundable")}</span>`}<span class="tag">${t("Matches your cap")}</span></div></div><div class="price num">${eur(s.nightly * p.nights)}<small>${t("{x} / night", { x: eur(s.nightly) })}</small></div></div>`;
+		return `<div class="stay"><button type="button" class="pic" data-staypics="${s.id}" aria-label="${esc(t("Photos and details of {x}", { x: s.name }))}">${pic(s.photo, p.city, s.name)}<span class="pics-n">${ic("images")}${STAY_SETS[s.meta.set].length + 1}</span></button><div><b>${esc(s.name)}</b><br><small>${t(KIND[s.meta.kind][1])}${s.meta.stars ? ` ${"★".repeat(s.meta.stars)}` : ""} · ${esc(s.area)} · ${ICON.star} ${s.rating} · ${esc(s.perk)}</small><button type="button" class="btn btn-text btn-sm see-stay" data-staypics="${s.id}">${ic("images")}${t("Photos and details")}</button><div class="tags">${s.freeCancel ? `<span class="tag g">${t("Free cancellation")}</span>` : `<span class="tag r">${t("Non-refundable")}</span>`}<span class="tag">${t("Matches your cap")}</span></div></div><div class="price num">${eur(s.nightly * p.nights)}<small>${t("{x} / night", { x: eur(s.nightly) })}</small></div></div>`;
 	}
 	function altStays(c, p) {
 		if (S.held.stay || S.progress.done) return "";
-		return `<details class="toggle-alts" data-alts="stays"${(S.progress.editing && !S.progress.editPicked) || openAlts.has("stays") ? " open" : ""}><summary class="btn btn-text btn-sm">${t("Other stays ({n})", { n: c.stays.length - 1 })}</summary><div class="alts">${c.stays.map((s) => `<button class="alt" data-stay="${s.id}" aria-pressed="${s.id === p.stay}"><span><b>${esc(s.name)}</b> · ${esc(s.area)} · ${ICON.star} ${s.rating}${s.freeCancel ? "" : t(" · non-refundable")}</span><span class="num">${eur(s.nightly * p.nights)}</span><span>${t(s.id === p.stay ? "Selected" : "Choose")}</span></button>`).join("")}</div></details>${S.progress.editing ? `<div class="row" style="margin-top:12px"><button class="btn btn-primary btn-sm" id="editDone">${t("Done — show me the new total")}</button></div>` : ""}`;
+		return `<details class="toggle-alts" data-alts="stays"${(S.progress.editing && !S.progress.editPicked) || openAlts.has("stays") ? " open" : ""}><summary class="btn btn-text btn-sm">${t("Other stays ({n})", { n: c.stays.length - 1 })}</summary><div class="alts">${c.stays.map((s) => `<div class="alt-row"><button class="alt" data-stay="${s.id}" aria-pressed="${s.id === p.stay}"><span><b>${esc(s.name)}</b> · ${esc(s.area)} · ${ICON.star} ${s.rating}${s.freeCancel ? "" : t(" · non-refundable")}</span><span class="num">${eur(s.nightly * p.nights)}</span><span>${t(s.id === p.stay ? "Selected" : "Choose")}</span></button><button type="button" class="alt-pics" data-staypics="${s.id}" aria-label="${esc(t("Photos and details of {x}", { x: s.name }))}">${ic("images")}</button></div>`).join("")}</div></details>${S.progress.editing ? `<div class="row" style="margin-top:12px"><button class="btn btn-primary btn-sm" id="editDone">${t("Done — show me the new total")}</button></div>` : ""}`;
 	}
 	function doneBanner(k) {
 		const h = S.held;
@@ -1664,7 +1802,7 @@
 		renderExamples(); renderCats(); renderListings(); paintWhen(); if (cal) closeCal(); renderScen(); renderLog(); renderNotes(); renderCase();
 		if (prev !== I.lang) retranslateTrips(prev);
 		if (S.plan) { renderUnderstood(); renderTrip(); }
-		renderTripsNav(); renderLog(); renderNotes(); botLabels(); renderBot(); renderAcct(); if (!$("#profile").hidden) renderProfile();
+		renderTripsNav(); renderLog(); renderNotes(); botLabels(); renderBot(); renderAcct(); renderMenu(); if (!$("#profile").hidden) renderProfile();
 	}
 
 	/* ---------------- boot ---------------- */
@@ -1672,7 +1810,7 @@
 	let startLang = "en"; try { startLang = localStorage.getItem("otium-lang") || "en"; } catch {}
 	if (q.get("lang")) startLang = q.get("lang");
 	I.set(startLang); applyCityLang();
-	initHome(); initWhen(); initBot(); initAcct(); initLang(); renderLog(); setLang(I.lang);
+	initHome(); initWhen(); initBot(); initAcct(); initGallery(); initMenu(); initScrollers(); initLang(); renderLog(); setLang(I.lang);
 	postit();
 	renderScen();
 	if (q.get("from") && D.origins.some(([n]) => n === q.get("from"))) { S.origin = q.get("from"); $("#originVal").textContent = S.origin; }
