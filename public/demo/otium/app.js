@@ -555,6 +555,22 @@
 			await beat(id, 450);
 			let approvedAmount = null;
 			const s = addStep("hold", t("Hold flights and stay"), "ok");
+			while (!readyToPay()) {
+				s.set("ask"); setStatus("waiting", t("Waiting for your details"));
+				s.detail(t("Otium needs your details before it can pay."));
+				S.progress.needDetails = true; gateTrip = activeTrip?.id ?? gateTrip; renderTrip();
+				const slot = s.slot(`<div class="card warn" role="group" aria-label="${esc(t("Details needed to pay"))}"><h4>${t(ME.signedIn ? "Add your details to pay" : "Sign in to pay")}</h4>
+					<p>${t("To hold flights and a stay, Otium needs your payment card and traveller details from your profile. Nothing is paid until you approve.")}</p>
+					<ul class="what">${missingList().map((m) => `<li><span>${t(m)}</span><span class="miss">${t("Missing")}</span></li>`).join("")}</ul>
+					<div class="row"><button class="btn btn-amber btn-sm" data-choice="profile">${ic("user")}${t(ME.signedIn ? "Complete my profile" : "Sign in")}</button></div>
+					<p class="fine">${ICON.lock}<span>${t("Your trip stays saved in My trips. Otium carries on by itself once your details are in.")}</span></p></div>`);
+				const ch = await Promise.race([decide(slot), profileReady()]);
+				if (ch === "profile") { goAccount(); await profileReady(); }
+				await beat(id, 0); // waits here if this trip was set aside meanwhile
+				S.progress.needDetails = false;
+				log("Otium", t("Details complete — back to the payment"));
+			}
+			S.progress.needDetails = false;
 			for (;;) {
 				const k = costs(p);
 				s.set("ask"); setStatus("waiting", t("Waiting for your OK"));
@@ -569,6 +585,7 @@
 						<li><span>${esc(k.fl.airline)} · ${k.fl.dep} · ${P(p.travelers, "1 seat", "{n} seats")}</span><span class="num">${eur(k.flights)}</span></li>
 						<li><span>${esc(k.st.name)} · ${P(p.nights, "1 night", "{n} nights")}</span><span class="num">${eur(k.stay)}</span></li>
 						<li><span>${fmtDay(dates.out)} → ${fmtDay(dates.back)}</span><span>${t(k.st.freeCancel ? "Free cancellation" : "Stay non-refundable")}</span></li>
+						<li><span>${t("Paid with")}</span><span>${esc(cardLabel())}</span></li>
 					</ul>
 					<div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Approve {x}", { x: eur(k.hold) })}</button><button class="btn btn-ghost btn-sm" data-choice="edit">${t("Change something")}</button><button class="btn btn-text btn-sm" data-choice="no">${t("Not now")}</button></div>
 					<p class="fine">${ICON.lock}<span>${t("Simulated payment — nothing is charged in this demo. Tickets for activities ({x}) are not part of this payment.", { x: eur(k.tickets) })}</span></p>
@@ -625,7 +642,7 @@
 			const s = addStep("share", t("Send traveller details to {a}", { a: k.fl.airline }), "ok");
 			s.set("ask"); setStatus("waiting", t("Waiting for your OK"));
 			s.detail(t("Airlines need names and passport numbers to issue tickets."));
-			const slot = s.slot(`<div class="card ask"><h4>${t("Share your details with {a}?", { a: esc(k.fl.airline) })}</h4><ul class="what"><li><span>${t("Full names")}</span><span>${P(p.travelers, "1 traveller", "{n} travellers")}</span></li><li><span>${t("Passport numbers")}</span><span>${t("From your profile")}</span></li><li><span>${t("Phone, for delay alerts")}</span><span>${t("Optional")}</span></li></ul><div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Share and issue tickets")}</button><button class="btn btn-ghost btn-sm" data-choice="noPhone">${t("Share without phone")}</button><button class="btn btn-text btn-sm" data-choice="later">${t("I’ll do it myself")}</button></div><p class="fine">${ICON.lock}<span>${t("Shared with the airline only, for this booking. Demo — no data is entered or sent.")}</span></p></div>`);
+			const slot = s.slot(`<div class="card ask"><h4>${t("Share your details with {a}?", { a: esc(k.fl.airline) })}</h4><ul class="what"><li><span>${t("Full names")}</span><span>${esc(fullName())}${p.travelers > 1 ? ` +${p.travelers - 1}` : ""}</span></li><li><span>${t("Passport numbers")}</span><span>${t("From your profile")}</span></li><li><span>${t("Phone, for delay alerts")}</span><span>${t("Optional")}</span></li></ul><div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Share and issue tickets")}</button><button class="btn btn-ghost btn-sm" data-choice="noPhone">${t("Share without phone")}</button><button class="btn btn-text btn-sm" data-choice="later">${t("I’ll do it myself")}</button></div><p class="fine">${ICON.lock}<span>${t("Shared with the airline only, for this booking. Demo — no data is entered or sent.")}</span></p></div>`);
 			const ch = await decide(slot);
 			if (id !== S.run) throw new Stale();
 			slot.innerHTML = "";
@@ -720,6 +737,7 @@
 			${Object.values(p.assumed).some(Boolean) ? `<div class="legend">${t("Dashed = I assumed it. Tap any value to change it — I’ll re-plan.")}</div>` : ""}`;
 	}
 	function pickFact(kind, key, raw, label) {
+		if (kind === "u") { ME[key] = raw; const b = document.querySelector('.dd[data-kind="u"][data-key="' + key + '"] .dd-btn span'); if (b) b.textContent = label; return; }
 		const p = S.plan; if (!p) return;
 		if (kind === "p") {
 			const v = key === "bags" ? +raw : raw; if (p.prefs[key] === v) return;
@@ -898,11 +916,13 @@
 		retry: ["undo-2", "Try again", () => Boolean($("#retry")), () => later(() => $("#retry")?.click())],
 		new_trip: ["plane", "Plan a new trip", () => true, () => later(() => { show("home"); $("#ask").focus(); })],
 		human: ["phone", "Talk to a human", () => true, () => later(openHelp)],
+		profile: ["user", "Open my profile", () => true, () => later(goAccount)],
 	};
 	const KW = (re) => new RegExp(re, "i");
 	const BOT_RULES = [
 		["how", KW("how does|how it works|what is otium|comment (ça )?marche|comment fonctionne|c.est quoi|c[oó]mo funciona|qu[eé] es otium|come funziona|cos.è otium|איך .*עובד|מה זה")],
 		["human", KW("human|person|someone|agent|call|phone|humain|conseiller|appeler|t[ée]l[ée]phone|persona|llamar|humano|umano|chiamare|telefono|אדם|נציג|טלפון|להתקשר")],
+		["profile", KW("profile|account|sign ?in|log ?in|my details|profil|compte|connexion|connecter|perfil|cuenta|iniciar|profilo|accedi|פרופיל|חשבון|התחבר|פרטים")],
 		["cancel", KW("cancel|refund|annul|rembours|cancelar|reembolso|annulla|rimborso|ביטול|לבטל|החזר")],
 		["pay", KW("pay|card|charge|safe|money|pai|carte|payer|pago|tarjeta|pagar|pagamento|carta|soldi|תשלום|כרטיס|לשלם|כסף")],
 		["dates", KW("date|when|calendar|quand|jour|fecha|cu[aá]ndo|d[ií]a|data|quando|giorno|תאריך|מתי|יום")],
@@ -920,7 +940,8 @@
 			case "how": return [t("You describe a trip in your own words. Otium searches flights and stays, checks your budget, and stops to ask you before it pays or shares your details. You can change anything, pause or cancel."), S.plan ? null : "new_trip"];
 			case "human": return [t("Our travel team is there 24/7 by phone, chat or email. They see everything Otium did, so you won’t have to explain twice."), "human"];
 			case "cancel": return held ? [t("You can cancel the flight, the stay, or both from your trip page. Otium always shows you what you get back first."), "cancel"] : [t("Nothing is booked yet, so there is nothing to cancel. You can keep the plan as a draft, or delete it from My trips."), TRIPS.length ? "trips" : null];
-			case "pay": return [t("Otium never pays without your OK. Each payment waits on a card where you approve, edit or say no. In this demo, nothing is ever charged."), pc ? "pending" : null];
+			case "pay": return [t("Otium never pays without your OK. Each payment waits on a card where you approve, edit or say no. In this demo, nothing is ever charged."), !readyToPay() ? "profile" : pc ? "pending" : null];
+			case "profile": return [readyToPay() ? t("Your profile is complete: Otium uses your saved details and card, and still asks before every payment.") : t("Otium needs your traveller details, billing address and a card in your profile before it can pay. It takes a minute."), "profile"];
 			case "dates": return [t("Pick new dates in the calendar and Otium re-plans flights and stay for those days. Nothing booked changes without your OK."), "dates"];
 			case "budget": return [p ? t("Your cap for this trip is {x}. Otium stops and asks before going over it. You can change it in “What I understood”.", { x: eur(p.cap) }) : t("Set a budget cap in Permissions. Otium stops and asks before going over it."), "budget"];
 			case "bags": return [t("Add a checked bag in “What I understood”, under Flight preferences. Otium re-checks flights and price with it."), p ? "bags" : null];
@@ -940,6 +961,7 @@
 			error: Boolean($("#retry")),
 			trip: p ? { destination: c.name, dates: `${fmtDay(d.out)} – ${fmtDay(d.back)}`, nights: p.nights, travellers: p.travelers, from: S.origin, budget_cap_eur: p.cap, estimated_total_eur: k?.total ?? null, flights_held: Boolean(S.held.flights), stay_held: Boolean(S.held.stay), stay_refundable: S.held.stay ? S.held.stay.refundable : null, trip_ready: Boolean(S.progress.done) } : null,
 			saved_trips: TRIPS.length,
+			signed_in: ME.signedIn, profile_complete: readyToPay(), missing_for_payment: readyToPay() ? [] : missingList(),
 		};
 	}
 	const BOT_SUGG = () => S.plan ? [pendingCard() ? "What is Otium waiting for?" : null, "Is my payment safe?", "Change my dates", "How do I cancel?"].filter(Boolean).slice(0, 3) : ["How does Otium work?", TRIPS.length ? "Where are my trips?" : null, "Talk to a person"].filter(Boolean);
@@ -1008,6 +1030,148 @@
 			const a = e.target.closest("[data-bot-act]"); if (a) BOT_ACTIONS[a.dataset.botAct]?.[3]();
 		});
 		botLabels();
+	}
+
+	/* ---------------- account & profile (demo: kept in this tab only, nothing is sent) ----------------
+	 * Paying and issuing tickets need the traveller's details and a card. If something is missing,
+	 * the agent stops on a card that says what, links to the profile, and resumes on its own once it's done. */
+	const ME = { signedIn: false, email: "", first: "", last: "", phone: "", dob: "", passport: "", street: "", city: "", zip: "", country: "", card: null };
+	const COUNTRIES = ["FR", "GB", "IL", "DE", "ES", "IT", "PT", "NL", "BE", "CH", "AT", "IE", "GR", "DK", "US", "CA"];
+	const countryName = (c) => { try { return new Intl.DisplayNames([I.locale], { type: "region" }).of(c); } catch { return c; } };
+	const profileParts = () => ({
+		personal: Boolean(ME.first && ME.last && ME.email && ME.phone && ME.dob && ME.passport),
+		address: Boolean(ME.street && ME.city && ME.zip && ME.country),
+		card: Boolean(ME.card),
+	});
+	const readyToPay = () => ME.signedIn && Object.values(profileParts()).every(Boolean);
+	const cardLabel = () => (ME.card ? `${ME.card.brand} •••• ${ME.card.last4}` : "");
+	const fullName = () => `${ME.first} ${ME.last}`.trim();
+	const missingList = () => { const m = profileParts(); return [!ME.signedIn && "An Otium account", !m.personal && "Traveller details (name, birth date, passport)", !m.address && "Billing address", !m.card && "A payment card"].filter(Boolean); };
+	const profWaiters = [];
+	const profileReady = () => new Promise((r) => profWaiters.push(r));
+	function profileChanged() {
+		renderAcct();
+		if (!$("#profile").hidden) renderProfile();
+		if (readyToPay() && profWaiters.length) { profWaiters.splice(0).forEach((r) => r("ready")); }
+	}
+	function renderAcct() {
+		const b = $("#acctBtn"); if (!b) return;
+		const done = readyToPay();
+		b.innerHTML = ME.signedIn
+			? `<span class="av">${esc((ME.first[0] || ME.email[0] || "?").toUpperCase())}${esc((ME.last[0] || "").toUpperCase())}</span><span class="lbl">${esc(ME.first || t("My profile"))}</span>${done ? "" : '<span class="tdot" aria-hidden="true"></span>'}`
+			: `${ic("user")}<span class="lbl">${t("Sign in")}</span>`;
+		b.setAttribute("aria-label", ME.signedIn ? t(done ? "My profile" : "My profile — details missing") : t("Sign in"));
+		const h = $("#acctHint"); if (!h) return;
+		h.hidden = done;
+		h.innerHTML = done ? "" : `${ic(ME.signedIn ? "credit-card" : "user")}<span>${t(ME.signedIn ? "Finish your profile so Otium can pay the moment you approve." : "Sign in once — Otium fills in your details and card when it books.")}</span><button type="button" class="btn btn-ghost btn-sm" data-acct>${t(ME.signedIn ? "Complete my profile" : "Sign in")}</button>`;
+	}
+	function goAccount() { if (ME.signedIn) show("profile"); else openSignIn(); }
+	function openSignIn(then) {
+		modal(`<h3 id="modalTitle">${t("Sign in to Otium")}</h3><p>${t("Your details and card are filled in for you when Otium books.")}</p>
+			<div class="flds"><label class="fld"><span>${t("Email")}</span><input id="siEmail" type="email" autocomplete="off" spellcheck="false"></label>
+			<label class="fld"><span>${t("Password")}</span><input id="siPass" type="password" autocomplete="off"></label></div>
+			<p class="err" id="siErr" hidden></p>
+			<p class="fine">${ICON.info}<span>${t("Demo: any email and password work. Nothing is checked, stored or sent.")}</span></p>
+			<div class="row"><button class="btn btn-text btn-sm" data-m="cancel">${t("Cancel")}</button><button class="btn btn-ghost btn-sm" id="siDemo" type="button">${t("Use a demo account")}</button><button class="btn btn-primary btn-sm" id="siGo" type="button">${t("Sign in")}</button></div>`, () => {});
+		const go = (demo) => {
+			const em = demo ? "alex.martin@otium.example" : $("#siEmail").value.trim();
+			if (!demo && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em) || !$("#siPass").value)) { const e = $("#siErr"); e.hidden = false; e.textContent = t("Enter an email and a password."); return; }
+			if (demo) Object.assign(ME, { first: "Alex", last: "Martin", phone: "+44 20 7946 0000", dob: "14/03/1990", passport: "X1234567", street: "12 Harbour Lane", city: "London", zip: "N1 7GU", country: "GB", card: { brand: "Visa", last4: "4242", exp: "12/29", name: "Alex Martin" } });
+			else if (ME.email !== em) Object.assign(ME, { first: "", last: "", phone: "", dob: "", passport: "", street: "", city: "", zip: "", country: "", card: null });
+			ME.signedIn = true; ME.email = em;
+			closeModal("ok"); log("You", t("Signed in")); toast(t("Signed in as {x}", { x: em }));
+			profileChanged(); (then || (() => { if (!readyToPay()) show("profile"); }))();
+		};
+		$("#siGo").onclick = () => go(false); $("#siDemo").onclick = () => go(true);
+		$("#siPass").onkeydown = $("#siEmail").onkeydown = (e) => { if (e.key === "Enter") go(false); };
+		setTimeout(() => $("#siEmail")?.focus(), 50);
+	}
+	const fld = (id, label, val, extra = "") => `<label class="fld"><span>${t(label)}</span><input id="${id}" value="${esc(val || "")}" autocomplete="off" ${extra}></label>`;
+	let gateTrip = null; // the trip that stopped to ask for details
+	function waitingTrip() { const tr = TRIPS.find((x) => x.id === gateTrip); return tr && tripData(tr)?.plan ? tripData(tr) : null; }
+	function renderProfile() {
+		const w = $("#profWrap"); if (!w) return;
+		$("#profSub").textContent = ME.signedIn ? ME.email : t("Sign in to save your details and card.");
+		if (!ME.signedIn) { w.innerHTML = `<div class="tempty">${ic("user")}<h3>${t("You’re not signed in")}</h3><p>${t("Sign in once — Otium fills in your details and card when it books.")}</p><button class="btn btn-primary" type="button" data-acct>${t("Sign in")}</button></div>`; return; }
+		const m = profileParts(); const n = Object.values(m).filter(Boolean).length;
+		const wt = waitingTrip();
+		const chip = (ok, label) => `<span class="pchip ${ok ? "ok" : ""}">${ic(ok ? "check" : "circle-dot")}${t(label)}</span>`;
+		const country = dd("u", "country", [["", t("Choose a country")], ...COUNTRIES.map((c) => [c, countryName(c)])], ME.country, t("Country"), "pdd");
+		w.innerHTML = `
+			<div class="pstat"><div><b>${t("{n} of 3 ready", { n })}</b><span>${chip(m.personal, "Traveller details")}${chip(m.address, "Billing address")}${chip(m.card, "Payment card")}</span></div>
+				${wt ? `<div class="pwait">${ICON.hand}<span>${readyToPay() ? t("All set. Your {city} trip can go on.", { city: D.cities[wt.plan.city].name }) : t("Your {city} trip is waiting for these details.", { city: D.cities[wt.plan.city].name })}</span>${readyToPay() ? `<button class="btn btn-primary btn-sm" type="button" data-backtrip>${t("Back to your trip")}</button>` : ""}</div>` : ""}</div>
+			<div class="pgrid">
+				<section class="pcard" data-sec="personal"><h3>${ic("user")}${t("Traveller details")}</h3><p class="psub">${t("As written in your passport. Used for tickets.")}</p>
+					<div class="flds two">${fld("pFirst", "First name", ME.first)}${fld("pLast", "Last name", ME.last)}${fld("pEmail", "Email", ME.email, 'type="email"')}${fld("pPhone", "Phone", ME.phone, 'type="tel" dir="ltr"')}${fld("pDob", "Date of birth", ME.dob, 'placeholder="DD/MM/YYYY" inputmode="numeric" dir="ltr"')}${fld("pPass", "Passport number", ME.passport, 'dir="ltr"')}</div>
+					<p class="err" hidden></p><div class="row"><button class="btn btn-primary btn-sm" type="button" data-save="personal">${t("Save")}</button></div></section>
+				<section class="pcard" data-sec="address"><h3>${ic("map-pin")}${t("Billing address")}</h3><p class="psub">${t("Must match your card.")}</p>
+					<div class="flds two">${fld("pStreet", "Street and number", ME.street)}${fld("pCity", "City", ME.city)}${fld("pZip", "Postcode", ME.zip, 'dir="ltr"')}<div class="fld"><span>${t("Country")}</span>${country}</div></div>
+					<p class="err" hidden></p><div class="row"><button class="btn btn-primary btn-sm" type="button" data-save="address">${t("Save")}</button></div></section>
+				<section class="pcard" data-sec="card"><h3>${ic("credit-card")}${t("Payment card")}</h3>
+					${ME.card ? `<div class="ccard"><b>${esc(cardLabel())}</b><span>${esc(ME.card.name)} · ${t("Expires {x}", { x: ME.card.exp })}</span></div><p class="psub">${t("Otium pays with this card only after you approve each payment.")}</p><div class="row"><button class="btn btn-ghost btn-sm" type="button" data-card="replace">${t("Replace card")}</button><button class="btn btn-text btn-sm danger" type="button" data-card="remove">${t("Remove")}</button></div>`
+					: `<p class="psub">${t("Otium pays with this card only after you approve each payment.")}</p>
+					<div class="flds two">${fld("cName", "Name on card", ME.card?.name || fullName())}${fld("cNum", "Card number", "", 'inputmode="numeric" dir="ltr" placeholder="4242 4242 4242 4242" maxlength="23"')}${fld("cExp", "Expiry (MM/YY)", "", 'inputmode="numeric" dir="ltr" placeholder="12/29" maxlength="5"')}${fld("cCvc", "CVC", "", 'inputmode="numeric" dir="ltr" placeholder="123" maxlength="4"')}</div>
+					<p class="fine">${ICON.lock}<span>${t("Demo: use the test card 4242 4242 4242 4242, never a real one. Only the brand and last 4 digits are kept, in this tab.")}</span></p>
+					<p class="err" hidden></p><div class="row"><button class="btn btn-primary btn-sm" type="button" data-save="card">${t("Save card")}</button></div>`}
+				</section>
+				<section class="pcard pmore"><h3>${ic("shield-check")}${t("Account")}</h3>
+					<button type="button" class="plink" data-go="trips">${ic("luggage")}<span>${t("My trips ({n})", { n: TRIPS.length })}</span>${ICON.arrow}</button>
+					<button type="button" class="plink" data-open="rulesDrawer">${ic("shield-check")}<span>${t("What Otium may do")}</span>${ICON.arrow}</button>
+					<button type="button" class="plink danger" data-signout>${ic("log-out")}<span>${t("Sign out")}</span></button>
+				</section>
+			</div>`;
+	}
+	const luhn = (n) => { let s = 0; [...n].reverse().forEach((d, i) => { let x = +d; if (i % 2) { x *= 2; if (x > 9) x -= 9; } s += x; }); return s % 10 === 0; };
+	const brandOf = (n) => (/^4/.test(n) ? "Visa" : /^(5[1-5]|2[2-7])/.test(n) ? "Mastercard" : /^3[47]/.test(n) ? "Amex" : t("Card"));
+	function saveSection(sec) {
+		const box = document.querySelector(`.pcard[data-sec="${sec}"]`); const err = box.querySelector(".err");
+		const v = (id) => $("#" + id)?.value.trim() || "";
+		let msg = null;
+		if (sec === "personal") {
+			const x = { first: v("pFirst"), last: v("pLast"), email: v("pEmail"), phone: v("pPhone"), dob: v("pDob"), passport: v("pPass") };
+			const dm = x.dob.match(/^(\d{2})\/(\d{2})\/(\d{4})$/); const dd_ = dm && new Date(+dm[3], +dm[2] - 1, +dm[1]);
+			if (Object.values(x).some((y) => !y)) msg = t("Fill in every field.");
+			else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x.email)) msg = t("Check the email address.");
+			else if (x.phone.replace(/\D/g, "").length < 7) msg = t("Check the phone number.");
+			else if (!dd_ || dd_.getMonth() !== +dm[2] - 1 || dd_ > new Date()) msg = t("Date of birth: use DD/MM/YYYY.");
+			else if (!/^[A-Z0-9]{6,9}$/i.test(x.passport)) msg = t("Passport number: 6 to 9 letters or digits.");
+			else Object.assign(ME, x, { passport: x.passport.toUpperCase() });
+		} else if (sec === "address") {
+			const x = { street: v("pStreet"), city: v("pCity"), zip: v("pZip") };
+			if (Object.values(x).some((y) => !y) || !ME.country) msg = t("Fill in every field.");
+			else Object.assign(ME, x);
+		} else if (sec === "card") {
+			const num = v("cNum").replace(/\D/g, ""), exp = v("cExp"), cvc = v("cCvc"), name = v("cName");
+			const em = exp.match(/^(\d{2})\/(\d{2})$/); const now = new Date();
+			if (!name || !num || !exp || !cvc) msg = t("Fill in every field.");
+			else if (num.length < 13 || num.length > 19 || !luhn(num)) msg = t("This card number isn’t valid. In this demo, use 4242 4242 4242 4242.");
+			else if (!em || +em[1] < 1 || +em[1] > 12 || new Date(2000 + +em[2], +em[1], 0) < now) msg = t("Check the expiry date (MM/YY).");
+			else if (!/^\d{3,4}$/.test(cvc)) msg = t("Check the CVC.");
+			else ME.card = { brand: brandOf(num), last4: num.slice(-4), exp, name }; // the full number and CVC are never kept
+		}
+		if (msg) { err.hidden = false; err.textContent = msg; return; }
+		log("You", t(sec === "card" ? "Saved a payment card" : "Updated my profile"));
+		toast(sec === "card" ? t("Card saved: {x}", { x: cardLabel() }) : t("Saved"));
+		profileChanged();
+		if (readyToPay() && waitingTrip()) toast(t("All set. Your {city} trip can go on.", { city: D.cities[waitingTrip().plan.city].name }), t("Back to your trip"), () => backToWaiting());
+	}
+	function backToWaiting() { const tr = TRIPS.find((x) => x.id === gateTrip) || activeTrip; gateTrip = null; if (tr) openTrip(tr.id); else show("home"); }
+	function initAcct() {
+		$("#acctBtn").onclick = goAccount;
+		document.addEventListener("click", (e) => {
+			if (e.target.closest("[data-acct]")) return goAccount();
+			if (e.target.closest("[data-backtrip]")) return backToWaiting();
+			if (e.target.closest("[data-signout]")) { ME.signedIn = false; log("You", t("Signed out")); profileChanged(); show("home"); toast(t("Signed out. Your details stay on this account.")); return; }
+			const sv = e.target.closest("[data-save]"); if (sv) return saveSection(sv.dataset.save);
+			const cd = e.target.closest("[data-card]"); if (cd) { if (cd.dataset.card === "remove") { ME.card = null; log("You", t("Removed the payment card")); } else ME.card = null; profileChanged(); if (cd.dataset.card === "replace") setTimeout(() => $("#cNum")?.focus(), 50); }
+		});
+		document.addEventListener("input", (e) => {
+			if (e.target.id === "cNum") { const d = e.target.value.replace(/\D/g, "").slice(0, 19); e.target.value = d.replace(/(.{4})/g, "$1 ").trim(); }
+			if (e.target.id === "cExp") { const d = e.target.value.replace(/\D/g, "").slice(0, 4); e.target.value = d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d; }
+			if (e.target.id === "pDob") { const d = e.target.value.replace(/\D/g, "").slice(0, 8); e.target.value = [d.slice(0, 2), d.slice(2, 4), d.slice(4)].filter(Boolean).join("/"); }
+			if (e.target.closest?.(".pcard")) { const er = e.target.closest(".pcard").querySelector(".err"); if (er) er.hidden = true; }
+		});
+		renderAcct();
 	}
 	function openGroups() {
 		modal(`<h3 id="modalTitle">${t("Groups & companies")}</h3><p>${t("From 10 travellers, a dedicated travel planner builds the trip with you: group fares, several rooms or a whole hotel, meeting rooms, transfers and one invoice. Otium hands over everything it has prepared.")}</p>
@@ -1339,9 +1503,10 @@
 		const fresh = v === "home" && curView !== "home";
 		if (fresh) $("#ask").value = ""; // a new search starts empty
 		curView = v;
-		$("#home").hidden = v !== "home"; $("#trip").hidden = v !== "trip"; $("#explore").hidden = v !== "explore"; $("#trips").hidden = v !== "trips";
+		$("#home").hidden = v !== "home"; $("#trip").hidden = v !== "trip"; $("#explore").hidden = v !== "explore"; $("#trips").hidden = v !== "trips"; $("#profile").hidden = v !== "profile";
 		if (v === "explore") renderExplore();
 		if (fresh) fitAsk();
+		if (v === "profile") renderProfile();
 		if (v === "trips") { const L = $("#tripsList"); L.__html = null; L.classList.add("fresh"); renderTrips(); setTimeout(() => L.classList.remove("fresh"), 700); }
 		document.querySelectorAll(".nav [data-go]").forEach((b) => b.setAttribute("aria-current", b.dataset.go === v ? "page" : "false"));
 		renderTripsNav();
@@ -1386,7 +1551,7 @@
 		return `<div class="pass"><div class="pass-main">
 			<div class="pass-top"><span class="al">${l.airline[0]}</span><b>${esc(l.airline)}</b><span class="pass-dir">${t(l.dir)} · ${t("E-ticket")}</span></div>
 			<div class="pass-route"><div><big>${l.from}</big><small>${esc(l.fromN)}</small><em>${l.dep}</em></div><div class="pass-plane">${ICON.plane}<small>${l.flight}</small></div><div><big>${l.to}</big><small>${esc(l.toN)}</small><em>${l.arr}</em></div></div>
-			<dl class="pass-grid"><div><dt>${t("Passenger")}</dt><dd>${t("Traveller {n}", { n: n + 1 })}</dd></div><div><dt>${t("Date")}</dt><dd>${fmtDay(l.date)}</dd></div><div><dt>${t("Boarding")}</dt><dd>${l.board}</dd></div><div><dt>${t("Gate")}</dt><dd>${l.gate}</dd></div><div><dt>${t("Seat")}</dt><dd>${seat(n)}</dd></div><div><dt>${t("Cabin")}</dt><dd>${t(l.cabin)}</dd></div><div><dt>${t("Bags")}</dt><dd>${t(l.bags)}</dd></div><div><dt>${t("Booking")}</dt><dd>${l.code}</dd></div></dl>
+			<dl class="pass-grid"><div><dt>${t("Passenger")}</dt><dd>${n === 0 && ME.first ? esc(fullName()) : t("Traveller {n}", { n: n + 1 })}</dd></div><div><dt>${t("Date")}</dt><dd>${fmtDay(l.date)}</dd></div><div><dt>${t("Boarding")}</dt><dd>${l.board}</dd></div><div><dt>${t("Gate")}</dt><dd>${l.gate}</dd></div><div><dt>${t("Seat")}</dt><dd>${seat(n)}</dd></div><div><dt>${t("Cabin")}</dt><dd>${t(l.cabin)}</dd></div><div><dt>${t("Bags")}</dt><dd>${t(l.bags)}</dd></div><div><dt>${t("Booking")}</dt><dd>${l.code}</dd></div></dl>
 		</div><div class="pass-stub"><svg viewBox="0 0 ${x} 56" preserveAspectRatio="none" aria-hidden="true">${b}</svg><b>${l.code}</b><small>${t("DEMO · NOT VALID FOR TRAVEL")}</small></div></div>`;
 	}
 	function openDocs() {
@@ -1499,7 +1664,7 @@
 		renderExamples(); renderCats(); renderListings(); paintWhen(); if (cal) closeCal(); renderScen(); renderLog(); renderNotes(); renderCase();
 		if (prev !== I.lang) retranslateTrips(prev);
 		if (S.plan) { renderUnderstood(); renderTrip(); }
-		renderTripsNav(); renderLog(); renderNotes(); botLabels(); renderBot();
+		renderTripsNav(); renderLog(); renderNotes(); botLabels(); renderBot(); renderAcct(); if (!$("#profile").hidden) renderProfile();
 	}
 
 	/* ---------------- boot ---------------- */
@@ -1507,7 +1672,7 @@
 	let startLang = "en"; try { startLang = localStorage.getItem("otium-lang") || "en"; } catch {}
 	if (q.get("lang")) startLang = q.get("lang");
 	I.set(startLang); applyCityLang();
-	initHome(); initWhen(); initBot(); initLang(); renderLog(); setLang(I.lang);
+	initHome(); initWhen(); initBot(); initAcct(); initLang(); renderLog(); setLang(I.lang);
 	postit();
 	renderScen();
 	if (q.get("from") && D.origins.some(([n]) => n === q.get("from"))) { S.origin = q.get("from"); $("#originVal").textContent = S.origin; }

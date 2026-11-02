@@ -808,6 +808,13 @@ summary, .alt, .opt, .chip, .dd-btn, .dd-list li, .from-list li, .lang-list li, 
 	.cal-d span { width: 34px; height: 34px; }
 }
 
+/* ---------- back to portfolio (floating, bottom left — mirrors T-Bot) ---------- */
+.pf-fab { position: fixed; bottom: 22px; inset-inline-start: 22px; z-index: 45; display: inline-flex; align-items: center; gap: 8px; height: 50px; padding: 0 20px 0 16px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink); font-weight: 700; font-size: 14.5px; text-decoration: none; box-shadow: 0 6px 20px rgba(0,0,0,.12); transition: transform .2s var(--ease); }
+.pf-fab:hover { transform: translateY(-2px); }
+.pf-fab svg.i { width: 18px; height: 18px; }
+[dir="rtl"] .pf-fab svg.i { transform: scaleX(-1); }
+body:has(.needs-you.on) .pf-fab { bottom: 92px; }
+@media (max-width: 640px) { .pf-fab { width: 54px; height: 54px; padding: 0; justify-content: center; bottom: 16px; inset-inline-start: 16px; } .pf-fab .lbl { display: none; } }
 /* ---------- T-Bot ---------- */
 .bot-fab { position: fixed; bottom: 22px; inset-inline-end: 22px; z-index: 45; display: inline-flex; align-items: center; gap: 8px; height: 50px; padding: 0 20px 0 16px; border-radius: 999px; border: 0; background: var(--ink); color: #fff; font-weight: 700; font-size: 14.5px; box-shadow: 0 6px 20px rgba(0,0,0,.18); transition: transform .2s var(--ease); }
 .bot-fab:hover { transform: translateY(-2px); }
@@ -845,6 +852,62 @@ body:has(.needs-you.on) .bot-fab { bottom: 92px; } /* never cover the "Otium nee
 	.bot-fab .lbl { display: none; }
 	.bot-foot { flex-direction: column; align-items: stretch; text-align: center; }
 }
+
+/* ---------- account & profile ---------- */
+.hdr-btn.acct { position: relative; }
+.hdr-btn.acct .av { width: 26px; height: 26px; margin-inline-start: -4px; border-radius: 50%; background: var(--lagoon); color: #fff; display: grid; place-items: center; font-size: 11px; font-weight: 700; letter-spacing: .02em; }
+.hdr-btn.acct .tdot { top: 4px; inset-inline-end: 4px; }
+.acct-hint { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 18px auto 0; max-width: 720px; font-size: 14px; color: var(--ink-2); text-wrap: balance; }
+.acct-hint[hidden], .acct-hint:empty { display: none; }
+.acct-hint > svg.i { width: 18px; height: 18px; color: var(--lagoon); flex: none; }
+.flds { display: grid; gap: 12px; margin: 14px 0 4px; }
+.flds.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.fld { display: grid; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.fld input { width: 100%; font: inherit; font-size: 15px; font-weight: 500; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; outline: none; transition: border-color .15s; }
+.fld input:focus { border-color: var(--ink-3); }
+.fld input::placeholder { color: var(--ink-3); font-weight: 400; }
+.fld .dd { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.fld .dd-btn { width: 100%; justify-content: space-between; padding: 11px 12px; font-size: 15px; font-weight: 500; color: var(--ink); }
+.fld .dd-list { width: 100%; }
+.err { margin: 8px 0 0; color: var(--rose); font-size: 13px; font-weight: 600; }
+.err[hidden] { display: none; }
+.modal .flds { margin-bottom: 10px; }
+.modal .fine { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; color: var(--ink-2); }
+.modal .fine svg.i { width: 15px; height: 15px; flex: none; margin-top: 2px; }
+.prof-v .explore-h p { direction: ltr; unicode-bidi: plaintext; }
+.pstat { margin-top: 22px; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--r-lg); display: grid; gap: 12px; max-width: 980px; }
+.pstat > div:first-child { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.pstat b { font-size: 15px; }
+.pstat > div:first-child > span { display: flex; gap: 6px; flex-wrap: wrap; }
+.pchip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--amber); background: var(--amber-soft); border-radius: 999px; padding: 4px 10px 4px 8px; }
+.pchip svg.i { width: 14px; height: 14px; }
+.pchip.ok { color: var(--lagoon); background: var(--lagoon-soft); }
+.pwait { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; color: var(--ink); padding-top: 12px; border-top: 1px dashed var(--line); }
+.pwait > svg.i { width: 18px; height: 18px; color: var(--amber); }
+.pwait .btn { margin-inline-start: auto; }
+.pgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; max-width: 980px; align-items: start; }
+.pcard { border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px 20px 20px; background: var(--surface); }
+.pcard h3 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 17px; }
+.pcard h3 svg.i { width: 18px; height: 18px; color: var(--lagoon); }
+.psub { margin: 4px 0 0; color: var(--ink-2); font-size: 13.5px; }
+.pcard .row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.pcard .fine { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; color: var(--ink-2); margin: 10px 0 0; }
+.pcard .fine svg.i { width: 15px; height: 15px; flex: none; margin-top: 2px; }
+.ccard { margin-top: 14px; padding: 16px 18px; border-radius: 14px; background: linear-gradient(135deg, #12857A, #0B5A50); color: #fff; display: grid; gap: 4px; max-width: 340px; }
+.ccard b { font-size: 17px; letter-spacing: .04em; direction: ltr; text-align: start; }
+.ccard span { font-size: 13px; opacity: .85; }
+.danger { color: var(--rose) !important; }
+.pmore { display: grid; gap: 2px; }
+.pmore h3 { margin-bottom: 8px; }
+.plink { display: flex; align-items: center; gap: 10px; border: 0; background: none; padding: 10px 2px; font: inherit; font-size: 14.5px; color: var(--ink); text-align: start; border-top: 1px solid var(--line); }
+.plink:first-of-type { border-top: 0; }
+.plink span { flex: 1; }
+.plink svg.i { width: 17px; height: 17px; color: var(--ink-2); }
+.plink:hover span { text-decoration: underline; text-underline-offset: 3px; }
+.card .what .miss { color: var(--rose); }
+[dir="rtl"] .plink svg.i:last-child { transform: scaleX(-1); }
+@media (max-width: 760px) { .pgrid, .flds.two { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { #openRules { display: none; } }
 </style>
 </head>
 <body>
@@ -860,9 +923,9 @@ body:has(.needs-you.on) .bot-fab { bottom: 92px; } /* never cover the "Otium nee
 			<button data-go="trips" id="navTrip" disabled hidden>My trips</button>
 		</nav>
 		<div class="top-r">
-			<a class="back-link" href="/#ai-lab"><i data-i="arrow-left"></i>Back to portfolio</a>
 			<div class="lang" id="langWrap"><button class="hdr-btn" id="langBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Language"><i data-i="globe"></i><span id="langCode">EN</span></button><ul class="lang-list" id="langList" role="listbox" tabindex="-1" aria-label="Language"></ul></div>
 			<button class="hdr-btn icon-only trips-m" id="navTripsM" data-go="trips" type="button" hidden aria-label="My trips"><i data-i="luggage"></i></button>
+			<button class="hdr-btn acct" id="acctBtn" type="button" aria-label="Sign in"><i data-i="user"></i><span class="lbl">Sign in</span></button>
 			<button class="hdr-btn" id="openHelp" data-help aria-describedby="tipHelp"><i data-i="circle-help"></i><span class="lbl">Help</span><span class="tip" role="tooltip" id="tipHelp"><b>Talk to a human</b>Call, chat or email Otium’s travel team, 24/7. They see everything the agent did.</span></button>
 			<button class="hdr-btn icon-only" id="openNotes" aria-label="Notifications" aria-describedby="tipNotes"><i data-i="bell"></i><span class="nbadge" id="notifBadge" hidden>0</span><span class="tip" role="tooltip" id="tipNotes"><b>Notifications</b>Missed a message? Every pop-up is kept here. Keep the ones you need, clear the rest.</span></button>
 			<button class="hdr-btn" id="openRules" aria-describedby="tipRules"><i data-i="shield-check"></i><span class="lbl">Permissions</span><span class="tip" role="tooltip" id="tipRules"><b>What Otium may do</b>Searching is automatic. Paying and sharing your details always wait for your OK. Set your budget cap here.</span></button>
@@ -884,6 +947,7 @@ body:has(.needs-you.on) .bot-fab { bottom: 92px; } /* never cover the "Otium nee
 				<button class="send-round" type="button" id="planBtn"><i data-i="search"></i><span>Plan it</span></button>
 			</form>
 			<div class="examples" id="examples" aria-label="Examples"></div>
+			<div class="acct-hint" id="acctHint"></div>
 		</div>
 		<div class="promises">
 			<div class="promise" style="--t:#E6F4F1;--i:#0F6E62"><span class="pi"><i data-i="lock"></i></span><div><b>Never pays without your OK</b><small>Every payment waits for a yes.</small></div></div>
@@ -921,6 +985,13 @@ body:has(.needs-you.on) .bot-fab { bottom: 92px; } /* never cover the "Otium nee
 		<div class="cats" id="cats2" role="toolbar" aria-label="Filter destinations"></div>
 		<div class="sort-bar" role="toolbar" aria-label="Sort"><span>Sort by</span><div id="sortBar"></div></div>
 		<div class="listings" id="exploreGrid"></div>
+	</section>
+
+	<!-- PROFILE -->
+	<section class="view home explore prof-v" id="profile" hidden>
+		<button class="btn btn-ghost btn-sm" type="button" data-go="home"><i data-i="arrow-left"></i>Back</button>
+		<div class="explore-h"><h1>Your profile</h1><p id="profSub"></p></div>
+		<div id="profWrap"></div>
 	</section>
 
 	<!-- MY TRIPS -->
@@ -963,6 +1034,7 @@ body:has(.needs-you.on) .bot-fab { bottom: 92px; } /* never cover the "Otium nee
 <!-- activity drawer -->
 <div class="scrim" id="scrim" hidden></div>
 
+<a class="pf-fab" href="/#ai-lab" aria-label="Back to portfolio"><i data-i="arrow-left"></i><span class="lbl">Back to portfolio</span></a>
 <button class="bot-fab" id="botFab" type="button" aria-label="Ask T-Bot, your trip helper"><i data-i="bot"></i><span class="lbl">Ask T-Bot</span><span class="bot-tip" aria-hidden="true">Stuck? Ask T-Bot</span></button>
 <aside class="drawer bot-d" id="botDrawer" aria-label="T-Bot" aria-hidden="true">
 	<div class="drawer-h"><div class="bot-h"><span class="bot-av"><i data-i="bot"></i></span><div><h2>T-Bot</h2><small id="botMode">Your trip helper</small></div></div><button class="icon-btn" data-close aria-label="Close"><i data-i="x"></i></button></div>
