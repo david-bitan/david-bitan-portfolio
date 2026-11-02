@@ -927,6 +927,18 @@ body:has(.needs-you.on) .bot-fab { bottom: 104px; } /* never cover the "Otium ne
 /* home picks: 4 cards sit 2 by 2 on wide screens instead of leaving one alone */
 @media (min-width: 900px) { #mosaic[data-n="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (min-width: 900px) { #mosaic[data-n="5"] { grid-template-columns: repeat(6, minmax(0, 1fr)); } #mosaic[data-n="5"] > * { grid-column: span 2; } #mosaic[data-n="5"] > :nth-child(4) { grid-column: 2 / span 2; } }
+/* examples: always two lines (two per line, a long one cut with … rather than a third line) */
+.examples { display: flex; flex-wrap: wrap; justify-content: center; max-width: 900px; margin-inline: auto; }
+.examples .ex-br { flex-basis: 100%; height: 0; }
+.examples .chip { flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* sign-in reminder: one line on desktop */
+@media (min-width: 761px) { .acct-hint { flex-wrap: nowrap; max-width: none; white-space: nowrap; } }
+@media (max-width: 640px) {
+	.examples { display: flex; flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; margin-inline: -16px; padding: 2px 16px; scroll-snap-type: x proximity; }
+	.examples::-webkit-scrollbar { display: none; }
+	.examples .ex-br { display: none; }
+	.examples .chip { flex: none; max-width: 78vw; white-space: normal; text-align: start; scroll-snap-align: start; }
+}
 /* ---------- responsive pass (v3.1) ---------- */
 .menu-btn { display: none !important; position: relative; }
 .menu-btn.has-dot::after { content: ""; position: absolute; top: 5px; inset-inline-end: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 2px #fff; }

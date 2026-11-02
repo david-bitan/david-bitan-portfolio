@@ -158,11 +158,11 @@
 	/* ---------------- home ---------------- */
 	const EXAMPLES = [
 		"A long weekend in Lisbon for two, food and viewpoints, under €900",
+		"Somewhere warm next month",
 		"Rome for 3 nights with my partner, museums, €1,200 max",
 		"Solo weekend in Copenhagen, design and bakeries",
-		"Somewhere warm next month",
 	];
-	function renderExamples() { $("#examples").innerHTML = EXAMPLES.map((x) => `<button class="chip" type="button">${esc(t(x))}</button>`).join(""); }
+	function renderExamples() { $("#examples").innerHTML = EXAMPLES.map((x, i) => `<button class="chip" type="button" title="${esc(t(x))}">${esc(t(x))}</button>${i === 1 ? '<span class="ex-br" aria-hidden="true"></span>' : ""}`).join(""); }
 	function fitAsk() {
 		const a = $("#ask"); if (!a) return; const MAX = 132;
 		if (!a.value || !a.offsetParent) { a.style.height = ""; a.style.overflowY = ""; $("#composer").classList.remove("multi"); if (!a.value || !a.offsetParent) return; } // empty or hidden: back to the CSS size
