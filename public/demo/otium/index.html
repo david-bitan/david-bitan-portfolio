@@ -924,6 +924,9 @@ body:has(.needs-you.on) .bot-fab { bottom: 104px; } /* never cover the "Otium ne
 @media (max-width: 760px) { .pgrid, .flds.two { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { #openRules { display: none; } }
 
+/* home picks: 4 cards sit 2 by 2 on wide screens instead of leaving one alone */
+@media (min-width: 900px) { #mosaic[data-n="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 900px) { #mosaic[data-n="5"] { grid-template-columns: repeat(6, minmax(0, 1fr)); } #mosaic[data-n="5"] > * { grid-column: span 2; } #mosaic[data-n="5"] > :nth-child(4) { grid-column: 2 / span 2; } }
 /* ---------- responsive pass (v3.1) ---------- */
 .menu-btn { display: none !important; position: relative; }
 .menu-btn.has-dot::after { content: ""; position: absolute; top: 5px; inset-inline-end: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 2px #fff; }
@@ -1064,10 +1067,10 @@ body.lb-open { overflow: hidden; }
 			<button data-go="trips" id="navTrip" disabled hidden>My trips</button>
 		</nav>
 		<div class="top-r">
-			<div class="lang" id="langWrap"><button class="hdr-btn" id="langBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Language"><i data-i="globe"></i><span id="langCode">EN</span></button><ul class="lang-list" id="langList" role="listbox" tabindex="-1" aria-label="Language"></ul></div>
 			<button class="hdr-btn icon-only trips-m" id="navTripsM" data-go="trips" type="button" hidden aria-label="My trips"><i data-i="luggage"></i></button>
 			<button class="hdr-btn icon-only" id="openNotes" aria-label="Notifications" aria-describedby="tipNotes"><i data-i="bell"></i><span class="nbadge" id="notifBadge" hidden>0</span><span class="tip" role="tooltip" id="tipNotes"><b>Notifications</b>Missed a message? Every pop-up is kept here. Keep the ones you need, clear the rest.</span></button>
 			<button class="hdr-btn" id="openRules" aria-describedby="tipRules"><i data-i="shield-check"></i><span class="lbl">Permissions</span><span class="tip" role="tooltip" id="tipRules"><b>What Otium may do</b>Searching is automatic. Paying and sharing your details always wait for your OK. Set your budget cap here.</span></button>
+			<div class="lang" id="langWrap"><button class="hdr-btn" id="langBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Language"><i data-i="globe"></i><span id="langCode">EN</span></button><ul class="lang-list" id="langList" role="listbox" tabindex="-1" aria-label="Language"></ul></div>
 			<button class="hdr-btn acct" id="acctBtn" type="button" aria-label="Sign in"><i data-i="user"></i><span class="lbl">Sign in</span></button>
 			<button class="hdr-btn icon-only menu-btn" id="menuBtn" type="button" aria-label="Menu"><i data-i="menu"></i></button>
 		</div>

@@ -254,9 +254,22 @@
 			</div>`;
 		
 	}
+	/* Home picks per style: different cities (and a different number of them) for each filter,
+	 * so a click visibly changes the selection. "See all" still lists every match. */
+	const FEATURED = {
+		all: ["lisbon", "santorini", "prague", "marrakech", "barcelona", "reykjavik"],
+		food: ["naples", "istanbul", "porto", "palermo", "seville"],
+		culture: ["florence", "athens", "granada", "krakow", "venice", "edinburgh"],
+		beach: ["nice", "dubrovnik", "palma", "split"],
+		design: ["copenhagen", "stockholm", "valencia"],
+		night: ["budapest", "amsterdam", "istanbul", "edinburgh"],
+	};
 	function renderListings() {
-		const keys = cityKeys(); const LIMIT = 3;
-		$("#mosaic").innerHTML = keys.slice(0, LIMIT).map(cardHtml).join("");
+		const keys = cityKeys();
+		const pick = (FEATURED[activeCat] || []).filter((k) => keys.includes(k));
+		const shown = pick.length ? pick : keys.slice(0, 6);
+		const m = $("#mosaic"); m.dataset.n = shown.length;
+		m.innerHTML = shown.map(cardHtml).join("");
 		$("#seeAll").innerHTML = `<button type="button" class="btn btn-ghost" data-go="explore">${t("See all {n} destinations", { n: keys.length })} ${ICON.arrow}</button>`;
 		renderExplore();
 	}
