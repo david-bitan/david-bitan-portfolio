@@ -6,7 +6,7 @@
 <title>Otium — Trips planned for you, decided by you</title>
 <meta name="description" content="Otium is a fictional AI travel agent by David Bitan: it plans and holds a short trip, and asks before it pays, shares data or goes over budget.">
 <meta name="robots" content="noindex">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23E81C1C'/%3E%3Cpath d='M7 19a9 9 0 0 1 18 0' fill='none' stroke='%23FBF8F3' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23982427'/%3E%3Cpath d='M7 19a9 9 0 0 1 18 0' fill='none' stroke='%23FBF8F3' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
 @font-face { font-family: "Fraunces"; src: url(fonts/fraunces-latin-wght-normal.woff2) format("woff2"); font-weight: 300 800; font-display: swap; }
 @font-face { font-family: "Fraunces"; src: url(fonts/fraunces-latin-wght-italic.woff2) format("woff2"); font-weight: 300 800; font-style: italic; font-display: swap; }
@@ -16,8 +16,8 @@
 :root {
 	--canvas: #FBF8F3; --surface: #FFFFFF; --sand: #F2ECE3; --sand-2: #E9E1D5;
 	--ink: #1D1A17; --ink-2: #5E574F; --ink-3: #8C847A; --line: #E6DED3;
-	--lagoon: #E81C1C; --lagoon-2: #C6010D; --lagoon-soft: #FDE8E8;
-	--amber: #B8680F; --amber-soft: #FBEEDD; --rose: #8E1B33; --rose-soft: #F7E3E7;
+	--lagoon: #982427; --lagoon-2: #7A1C1F; --lagoon-soft: #F6E7E7;
+	--amber: #B8680F; --amber-soft: #FBEEDD; --rose: #C42B1C; --rose-soft: #FBE4E1;
 	--r-lg: 24px; --r-md: 16px; --r-sm: 12px;
 	--shadow: 0 1px 2px rgba(29,26,23,.06), 0 8px 24px rgba(29,26,23,.06);
 	--shadow-lg: 0 2px 6px rgba(29,26,23,.06), 0 24px 60px rgba(29,26,23,.14);
@@ -124,7 +124,7 @@ h1 em { font-style: italic; color: var(--lagoon); }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow); }
 .agent { position: sticky; top: 140px; max-height: calc(100vh - 156px); display: flex; flex-direction: column; overflow: hidden; }
 .agent-h { display: flex; align-items: center; gap: 12px; padding: 18px 18px 14px; border-bottom: 1px solid var(--line); }
-.orb { width: 38px; height: 38px; border-radius: 50%; flex: none; position: relative; background: radial-gradient(circle at 35% 30%, #F25A5A, var(--lagoon) 60%, #A30008); }
+.orb { width: 38px; height: 38px; border-radius: 50%; flex: none; position: relative; background: radial-gradient(circle at 35% 30%, #B4494C, var(--lagoon) 60%, #63171A); }
 .orb::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid var(--lagoon); opacity: 0; }
 .agent[data-status="working"] .orb::after { animation: ring 1.6s var(--ease) infinite; }
 .agent[data-status="waiting"] .orb { background: radial-gradient(circle at 35% 30%, #F0B46A, var(--amber) 60%, #7A4306); }
@@ -173,7 +173,7 @@ h1 em { font-style: italic; color: var(--lagoon); }
 /* decision cards (approval, question, over budget, error) */
 .card { margin-top: 10px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--surface); padding: 14px; animation: rise .45s var(--ease) both; }
 .card.ask { border-color: #EBC898; background: linear-gradient(180deg, var(--amber-soft), #fff 70%); box-shadow: 0 10px 30px rgba(184,104,15,.12); }
-.card.warn { border-color: #E5B3BE; background: linear-gradient(180deg, var(--rose-soft), #fff 70%); }
+.card.warn { border-color: #F0B7AF; background: linear-gradient(180deg, var(--rose-soft), #fff 70%); }
 .card h4 { margin: 0 0 4px; font-size: 15px; }
 .card p { margin: 0 0 10px; font-size: 13.5px; color: var(--ink-2); }
 .card .amount { font: 500 30px/1 var(--serif); letter-spacing: -.02em; margin: 6px 0 4px; }
@@ -206,7 +206,7 @@ h1 em { font-style: italic; color: var(--lagoon); }
 .trip-hero .meta { font-size: 14px; opacity: .9; }
 .status-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 6px 12px; background: rgba(255,255,255,.18); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .status-tag i { width: 7px; height: 7px; border-radius: 50%; background: #fff; }
-.status-tag.ok i { background: #FFB3B3; }
+.status-tag.ok i { background: #EDB6B7; }
 .status-tag.wait i { background: #F6C27E; }
 
 .budget { padding: 18px 20px; }
@@ -258,7 +258,7 @@ h1 em { font-style: italic; color: var(--lagoon); }
 .day li time { display: block; font-size: 11.5px; font-weight: 700; color: var(--lagoon); letter-spacing: .02em; font-variant-numeric: tabular-nums; }
 .day li span { display: block; line-height: 1.4; color: var(--ink); }
 
-.done-banner { padding: 22px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; border-color: #F5C2C2; background: linear-gradient(180deg, var(--lagoon-soft), #fff 80%); }
+.done-banner { padding: 22px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; border-color: #E8C8C9; background: linear-gradient(180deg, var(--lagoon-soft), #fff 80%); }
 .done-banner .check { width: 48px; height: 48px; border-radius: 50%; background: var(--lagoon); display: grid; place-items: center; color: #fff; flex: none; }
 .done-banner .check svg { width: 24px; height: 24px; }
 .done-banner h3 { margin: 0; font: 500 24px var(--serif); }
@@ -424,7 +424,7 @@ svg.i { width: 18px; height: 18px; flex: none; }
 /* portfolio strip — clearly outside the product */
 .pf-strip { background: #222; color: #EDEDED; font-size: 13px; display: flex; justify-content: center; align-items: center; gap: 14px; padding: 9px 16px; flex-wrap: wrap; text-align: center; }
 .pf-strip button { border: 0; background: #fff; color: #222; border-radius: 999px; padding: 5px 13px; font-weight: 700; font-size: 12.5px; }
-.pf-strip button:hover { background: #FDECEC; }
+.pf-strip button:hover { background: #F7EBEB; }
 .cases { display: grid; gap: 10px; }
 .case { border: 1px solid var(--line); border-radius: var(--r-md); padding: 14px 16px; display: grid; gap: 4px; }
 .case b { font-size: 15px; }
@@ -506,7 +506,7 @@ footer.foot { max-width: 1240px; margin: 0 auto; padding: 24px 24px 90px; font-s
 footer.foot a { color: var(--ink-2); }
 
 /* ===== v2 — Airbnb-inspired: white canvas, photo cards, fine icons, small colour touches ===== */
-:root { --canvas: #FFFFFF; --sand: #F7F7F7; --sand-2: #EBEBEB; --line: #DDDDDD; --ink: #222222; --ink-2: #6A6A6A; --ink-3: #929292; --serif: var(--sans); --r-lg: 16px; --r-md: 12px; --shadow: 0 1px 2px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.05); --shadow-lg: 0 6px 20px rgba(0,0,0,.14); --grad: #E81C1C; }
+:root { --canvas: #FFFFFF; --sand: #F7F7F7; --sand-2: #EBEBEB; --line: #DDDDDD; --ink: #222222; --ink-2: #6A6A6A; --ink-3: #929292; --serif: var(--sans); --r-lg: 16px; --r-md: 12px; --shadow: 0 1px 2px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.05); --shadow-lg: 0 6px 20px rgba(0,0,0,.14); --grad: #982427; }
 .logo b { font-family: "Fraunces", Georgia, serif; }
 .top { background: rgba(255,255,255,.92); }
 .top.scrolled { box-shadow: 0 1px 0 var(--line); }
@@ -517,7 +517,7 @@ h1 { font-weight: 700; letter-spacing: -.035em; }
 .hero2 .accent { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero2 .lead { margin: 0 auto 30px; max-width: 840px; font-size: clamp(15px, 1.95vw, 17px); text-wrap: balance; }
 .badge-ai { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 10px; }
-.badge-ai i { width: 18px; height: 18px; border-radius: 50%; background: conic-gradient(from 200deg, #E81C1C, #F47C7C, #F6C27E, #E81C1C); }
+.badge-ai i { width: 18px; height: 18px; border-radius: 50%; background: conic-gradient(from 200deg, #982427, #C46B6D, #F6C27E, #982427); }
 .composer { display: flex; align-items: center; text-align: left; border-radius: 999px; padding: 8px 8px 8px 0; border: 1px solid var(--line); box-shadow: 0 3px 12px rgba(0,0,0,.08); }
 .composer:focus-within { box-shadow: 0 6px 24px rgba(0,0,0,.14); }
 .seg { display: flex; flex-direction: column; justify-content: center; padding: 6px 24px; border-radius: 999px; min-width: 0; cursor: text; }
@@ -531,7 +531,7 @@ h1 { font-weight: 700; letter-spacing: -.035em; }
 .seg-from > button { padding: 0; font-weight: 500; color: var(--ink-2); font-size: 14.5px; }
 .seg-from > button b { font-weight: 500; }
 .send-round { flex: none; height: 52px; min-width: 52px; border-radius: 999px; border: 0; background: var(--grad); color: #fff; display: inline-flex; align-items: center; gap: 8px; padding: 0 22px 0 18px; font-weight: 700; font-size: 15px; transition: transform .15s var(--ease), filter .15s; }
-.send-round:hover { background: #C6010D; }
+.send-round:hover { background: #7A1C1F; }
 .send-round:active { transform: scale(.96); }
 .send-round svg { width: 18px; height: 18px; }
 .examples { justify-content: center; }
@@ -561,7 +561,7 @@ h1 { font-weight: 700; letter-spacing: -.035em; }
 .card-l .heart { position: absolute; top: 12px; right: 12px; z-index: 2; width: 34px; height: 34px; border: 0; background: none; padding: 0; display: grid; place-items: center; }
 .card-l .heart svg { width: 26px; height: 26px; fill: rgba(0,0,0,.45); stroke: #fff; stroke-width: 2; transition: transform .15s var(--ease), fill .15s; }
 .card-l .heart:hover svg { transform: scale(1.08); }
-.card-l .heart[aria-pressed="true"] svg { fill: #E81C1C; }
+.card-l .heart[aria-pressed="true"] svg { fill: #982427; }
 .card-l .row1 { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; font-weight: 600; font-size: 15px; }
 .card-l .row1 span { font-weight: 500; display: inline-flex; gap: 4px; align-items: center; }
 .card-l .row1 svg { width: 12px; height: 12px; }
@@ -735,7 +735,7 @@ summary, .alt, .opt, .chip, .dd-btn, .dd-list li, .from-list li, .lang-list li, 
 .tstate { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; border-radius: 999px; padding: 4px 11px 4px 9px; border: 1px solid var(--line); color: var(--ink-2); background: #fff; }
 .tstate svg.i { width: 14px; height: 14px; }
 .tstate.wait { color: var(--amber); border-color: #EBC79B; background: var(--amber-soft); }
-.tstate.ok { color: var(--lagoon); border-color: #F5B5B5; background: var(--lagoon-soft); }
+.tstate.ok { color: var(--lagoon); border-color: #E3B9BA; background: var(--lagoon-soft); }
 .tmeta { margin: 0; color: var(--ink-2); font-size: 14px; display: flex; flex-wrap: wrap; column-gap: 0; row-gap: 2px; }
 .tmeta span:not(:last-child)::after { content: "·"; margin: 0 7px; color: var(--ink-3); }
 .tq { margin: 0; color: var(--ink-3); font-size: 13.5px; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -908,7 +908,7 @@ body:has(.needs-you.on) .bot-fab { bottom: 104px; } /* never cover the "Otium ne
 .pcard .row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 .pcard .fine { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; color: var(--ink-2); margin: 10px 0 0; }
 .pcard .fine svg.i { width: 15px; height: 15px; flex: none; margin-top: 2px; }
-.ccard { margin-top: 14px; padding: 16px 18px; border-radius: 14px; background: linear-gradient(135deg, #E81C1C, #C6010D); color: #fff; display: grid; gap: 4px; max-width: 340px; }
+.ccard { margin-top: 14px; padding: 16px 18px; border-radius: 14px; background: linear-gradient(135deg, #982427, #7A1C1F); color: #fff; display: grid; gap: 4px; max-width: 340px; }
 .ccard b { font-size: 17px; letter-spacing: .04em; direction: ltr; text-align: start; }
 .ccard span { font-size: 13px; opacity: .85; }
 .danger { color: var(--rose) !important; }
@@ -1109,7 +1109,7 @@ body.lb-open { overflow: hidden; }
 <header class="top" id="top">
 	<div class="top-in">
 		<button class="logo" data-go="home" aria-label="Otium home">
-			<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#E81C1C"/><path d="M7 19a9 9 0 0 1 18 0" fill="none" stroke="#FBF8F3" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="23" r="1.8" fill="#F6C27E"/></svg>
+			<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#982427"/><path d="M7 19a9 9 0 0 1 18 0" fill="none" stroke="#FBF8F3" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="23" r="1.8" fill="#F6C27E"/></svg>
 			<b>otium</b>
 		</button>
 		<nav class="nav" aria-label="Main">
@@ -1144,7 +1144,7 @@ body.lb-open { overflow: hidden; }
 			<div class="acct-hint" id="acctHint"></div>
 		</div>
 		<div class="promises">
-			<div class="promise" style="--t:#FDECEC;--i:#E81C1C"><span class="pi"><i data-i="lock"></i></span><div><b>No payment without your OK</b><small>Each payment waits on a card where you say yes, edit or no.</small></div></div>
+			<div class="promise" style="--t:#F7EBEB;--i:#982427"><span class="pi"><i data-i="lock"></i></span><div><b>No payment without your OK</b><small>Each payment waits on a card where you say yes, edit or no.</small></div></div>
 			<div class="promise" style="--t:#FDF0E1;--i:#B8680F"><span class="pi"><i data-i="shield-check"></i></span><div><b>Your details stay yours</b><small>Names and passports go to the airline only after you agree.</small></div></div>
 			<div class="promise" style="--t:#ECEBFB;--i:#5146C9"><span class="pi"><i data-i="undo-2"></i></span><div><b>Every step can be undone</b><small>A full history of every action, with an undo on each one.</small></div></div>
 		</div>
@@ -1158,7 +1158,7 @@ body.lb-open { overflow: hidden; }
 		</div>
 		<div class="how">
 			<article>
-				<div class="art" style="--t:#FDECEC" aria-hidden="true"><div class="mini mini-steps"><div><i data-i="check"></i><span>Find flights from Paris</span><em>Automatic</em></div><div><i data-i="check"></i><span>Find a place to stay</span><em>Automatic</em></div><div class="wait"><i data-i="hand"></i><span>Hold flights and stay</span><em>Needs you</em></div></div></div>
+				<div class="art" style="--t:#F7EBEB" aria-hidden="true"><div class="mini mini-steps"><div><i data-i="check"></i><span>Find flights from Paris</span><em>Automatic</em></div><div><i data-i="check"></i><span>Find a place to stay</span><em>Automatic</em></div><div class="wait"><i data-i="hand"></i><span>Hold flights and stay</span><em>Needs you</em></div></div></div>
 				<span class="n">01</span><h3>It shows its plan first</h3><p>Every step, its cost and whether it needs you — before anything happens.</p>
 			</article>
 			<article>

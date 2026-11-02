@@ -1330,7 +1330,7 @@
 	function openGroups() {
 		modal(`<h3 id="modalTitle">${t("Groups & companies")}</h3><p>${t("From 10 travellers, a dedicated travel planner builds the trip with you: group fares, several rooms or a whole hotel, meeting rooms, transfers and one invoice. Otium hands over everything it has prepared.")}</p>
 			<div class="help-list">
-				<a class="help-row" href="tel:${HELP_TEL.replace(/\s/g, "")}"><span class="pi" style="--i:#E81C1C;--t:#FDECEC">${ICON.phone}</span><span><b>${t("Call the groups team")}</b><small dir="ltr">${HELP_TEL}</small></span></a>
+				<a class="help-row" href="tel:${HELP_TEL.replace(/\s/g, "")}"><span class="pi" style="--i:#982427;--t:#F7EBEB">${ICON.phone}</span><span><b>${t("Call the groups team")}</b><small dir="ltr">${HELP_TEL}</small></span></a>
 				<a class="help-row" href="mailto:groups@otium.example?subject=${encodeURIComponent("Group trip")}"><span class="pi" style="--i:#B8680F;--t:#FDF0E1">${ICON.mail}</span><span><b>${t("Send a group request")}</b><small>groups@otium.example</small></span></a>
 			</div>
 			<p class="fine-note">${t("Demo: the number and address are fictional placeholders.")}</p>
@@ -1357,7 +1357,7 @@
 		<div class="panel budget">
 			<div class="budget-top"><div><b class="num">${k ? eur(k.total) : "—"}</b> <span>${t("estimated total")}</span></div><span class="num">${k ? (over ? `<span class="diff">${t("{x} over", { x: eur(k.total - p.cap) })}</span>` : t("{x} left under your cap", { x: eur(p.cap - k.total) })) : t("Calculating…")}</span></div>
 			<div class="meter${over ? " over" : ""}"><div class="fill" style="width:${k ? (k.total / scale) * 100 : 0}%"></div><div class="cap" style="left:${(p.cap / scale) * 100}%" data-l="${esc(t("Cap {x}", { x: eur(p.cap) }))}"></div></div>
-			${k ? `<div class="split num"><span><i style="background:var(--lagoon)"></i>${t("Flights {x}", { x: eur(k.flights) })}</span><span><i style="background:#F25A5A"></i>${t("Stay {x}", { x: eur(k.stay) })}</span>${k.tickets ? `<span><i style="background:var(--sand-2)"></i>${t("Tickets, est. {x}", { x: eur(k.tickets) })}</span>` : ""}</div>` : ""}
+			${k ? `<div class="split num"><span><i style="background:var(--lagoon)"></i>${t("Flights {x}", { x: eur(k.flights) })}</span><span><i style="background:#B4494C"></i>${t("Stay {x}", { x: eur(k.stay) })}</span>${k.tickets ? `<span><i style="background:var(--sand-2)"></i>${t("Tickets, est. {x}", { x: eur(k.tickets) })}</span>` : ""}</div>` : ""}
 		</div>
 		<div class="panel block">
 			<div class="block-h"><h3>${t("Flights")}</h3><span class="state ${S.held.flights ? "held" : S.progress.pendingHold ? "pending" : ""}">${S.held.flights ? `${t("Held · {c}", { c: S.held.flights.code })} <button class="linkish" data-cancel="flights">${t("Cancel")}</button>` : t(S.progress.pendingHold ? "Waiting for your OK" : fl ? "Not held yet" : "Searching…")}</span></div>
@@ -1590,7 +1590,7 @@
 		const p = S.plan; const ref = S.held.flights?.code || S.held.stay?.code;
 		modal(`<h3 id="modalTitle">${t("Talk to a human")}</h3><p>${t("Otium’s travel team can fix anything the agent can’t — 24/7, in English, French, Spanish, Italian and Hebrew.")}${ref ? `${t(" Have your booking code ready: ")}<b>${ref}</b>.` : ""}</p>
 			<div class="help-list">
-				<a class="help-row" href="tel:${HELP_TEL.replace(/\s/g, "")}"><span class="pi" style="--i:#E81C1C;--t:#FDECEC">${ICON.phone}</span><span><b>${t("Call us")}</b><small dir="ltr">${t("{tel} · average wait 2 min", { tel: HELP_TEL })}</small></span></a>
+				<a class="help-row" href="tel:${HELP_TEL.replace(/\s/g, "")}"><span class="pi" style="--i:#982427;--t:#F7EBEB">${ICON.phone}</span><span><b>${t("Call us")}</b><small dir="ltr">${t("{tel} · average wait 2 min", { tel: HELP_TEL })}</small></span></a>
 				<button class="help-row" type="button" data-m="chat"><span class="pi" style="--i:#5146C9;--t:#ECEBFB">${ICON.chat}</span><span><b>${t("Chat with an agent")}</b><small>${t("A person joins this trip and sees what Otium did")}</small></span></button>
 				<a class="help-row" href="mailto:help@otium.example?subject=${encodeURIComponent("Trip help" + (ref ? " " + ref : ""))}"><span class="pi" style="--i:#B8680F;--t:#FDF0E1">${ICON.mail}</span><span><b>${t("Email")}</b><small>${t("help@otium.example · reply within 4 h")}</small></span></a>
 			</div>
@@ -1725,7 +1725,7 @@
 		let lib; try { lib = await loadPdf(); } catch { toast(t("Couldn’t load the PDF tool. Try again.")); return; }
 		const p = S.plan; const L = legs(); const k = costs(p); const d = tripDates(p.nights);
 		const doc = new lib.jsPDF({ unit: "mm", format: "a4" });
-		const ink = [34, 34, 34], grey = [106, 106, 106], teal = [232, 28, 28], line = [221, 221, 221];
+		const ink = [34, 34, 34], grey = [106, 106, 106], teal = [152, 36, 39], line = [221, 221, 221];
 		const pass = (l, n, y) => {
 			doc.setDrawColor(...line); doc.setFillColor(255, 255, 255); doc.roundedRect(15, y, 180, 92, 4, 4, "FD");
 			doc.setFillColor(...teal); doc.roundedRect(15, y, 180, 14, 4, 4, "F"); doc.rect(15, y + 8, 180, 6, "F");

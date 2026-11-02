@@ -83,9 +83,9 @@ The language model only reads the request. Prices, the plan, the budget check an
 		},
 		designSystem: {
 			colors: [
-				{ name: 'Vermillion', hex: '#E81C1C', role: 'Brand · primary action · automatic steps · confirmed' },
+				{ name: 'Vermillion', hex: '#982427', role: 'Brand · primary action · automatic steps · confirmed' },
 				{ name: 'Amber', hex: '#B8680F', role: 'Needs you · waiting for your OK' },
-				{ name: 'Wine', hex: '#8E1B33', role: 'Over budget · cancel · discard' },
+				{ name: 'Alert red', hex: '#C42B1C', role: 'Over budget · cancel · discard' },
 				{ name: 'Ink', hex: '#222222', role: 'Type · T-Bot button · portfolio strip' },
 				{ name: 'White', hex: '#FFFFFF', role: 'Canvas — light, rounded cards, fine lines' },
 			],
@@ -130,7 +130,7 @@ The language model only reads the request. Prices, the plan, the budget check an
 		],
 		demoUrl: '/demo/otium/',
 		thumbnail: '/lab-assets/otium/thumbnail.jpg',
-		accent: '#E81C1C',
+		accent: '#982427',
 	},
 	{
 		slug: 'apex-athletic-club',
