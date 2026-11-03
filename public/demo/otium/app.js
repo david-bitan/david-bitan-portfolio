@@ -1331,6 +1331,8 @@
 	function closeGallery() { const lb = $("#lb"); if (lb.hidden) return; lb.classList.remove("on"); document.body.classList.remove("lb-open"); setTimeout(() => (lb.hidden = true), 200); LB.last?.focus?.(); }
 	const lbGo = (d) => { LB.i = (LB.i + d + LB.items.length) % LB.items.length; lbPaint(); };
 	function initGallery() {
+		// a click on the dimmed backdrop (not on the photo, thumbnails, controls or info panel) closes the gallery
+		$("#lb").addEventListener("click", (e) => { if (!e.target.closest("#lbStage, .lb-thumbs, .lb-ctrl, .lb-info, .lb-x, .lb-cap, .lb-t, button, a")) closeGallery(); });
 		const lb = $("#lb");
 		lb.addEventListener("click", (e) => {
 			if (e.target.closest("#lbClose") || e.target === lb) return closeGallery();
@@ -1508,7 +1510,7 @@
 
 	function doneBanner(k) {
 		const h = S.held;
-		return `<div class="panel done-banner"><div class="check">${ICON.check}</div><div><h3>${t("Your trip is held.")}</h3><p>${h.flights || h.stay ? t("{x} held", { x: eur((h.flights?.amount || 0) + (h.stay?.amount || 0)) }) : t("Nothing held")}${t(" · simulated, nothing charged.")}</p><div class="codes">${h.flights ? `${t("Flight")} <b>${h.flights.code}</b>` : t("Flight released")} · ${h.stay ? `${t("Stay")} <b>${h.stay.code}</b>` : t("Stay released")}</div></div><div class="row">${h.flights && h.data ? `<button class="btn btn-primary btn-ok btn-sm" id="docs">${ICON.ticket} ${t("Tickets & voucher")}</button>` : h.flights ? `<span class="tag">${t("Tickets: send traveller details first")}</span>` : ""}${h.flights || h.stay ? `<button class="btn btn-ghost btn-sm" id="invoice">${ICON.receipt} ${t("Invoice")}</button>` : ""}<button class="btn btn-ghost btn-sm" id="ics">${ICON.cal} ${t("Add to calendar")}</button>${h.flights || h.stay ? `<button class="btn btn-text btn-sm" data-cancel="all">${t("Cancel all bookings")}</button>` : ""}<button class="btn btn-text btn-sm" data-help>${t("Need help?")}</button></div></div>`;
+		return `<div class="panel done-banner"><div class="check">${ICON.check}</div><div><h3>${t("Your trip is held.")}</h3><p>${h.flights || h.stay ? t("{x} held", { x: eur((h.flights?.amount || 0) + (h.stay?.amount || 0)) }) : t("Nothing held")}${t(" · simulated, nothing charged.")}</p><div class="codes">${h.flights ? `${t("Flight")} <b>${h.flights.code}</b>` : t("Flight released")} · ${h.stay ? `${t("Stay")} <b>${h.stay.code}</b>` : t("Stay released")}</div></div><div class="row">${h.flights && h.data ? `<button class="btn btn-primary btn-ok btn-sm" id="docs">${ICON.ticket} ${t("Tickets & voucher")}</button>` : h.flights ? `<span class="tag">${t("Tickets: send traveller details first")}</span>` : ""}${h.flights || h.stay ? `<button class="btn btn-ghost btn-sm" id="summaryBtn">${ic("file-text")} ${t("Trip summary")}</button>` : ""}${h.flights || h.stay ? `<button class="btn btn-ghost btn-sm" id="invoice">${ICON.receipt} ${t("Invoice")}</button>` : ""}<button class="btn btn-ghost btn-sm" id="ics">${ICON.cal} ${t("Add to calendar")}</button>${h.flights || h.stay ? `<button class="btn btn-text btn-sm" data-cancel="all">${t("Cancel all bookings")}</button>` : ""}<button class="btn btn-text btn-sm" data-help>${t("Need help?")}</button></div></div>`;
 	}
 	$("#tripCanvas").addEventListener("click", (e) => {
 		const p = S.plan; if (!p) return;
@@ -1529,6 +1531,7 @@
 		if (e.target.closest("#ics")) return downloadIcs();
 		if (e.target.closest("#docs")) return openDocs();
 		if (e.target.closest("#invoice")) return downloadInvoice();
+		if (e.target.closest("#summaryBtn")) return show("summary");
 	});
 
 	/* ---------------- trip history (read-only receipt) + cancelling bookings ---------------- */
@@ -1765,10 +1768,11 @@
 		const fresh = v === "home" && curView !== "home";
 		if (fresh) $("#ask").value = ""; // a new search starts empty
 		curView = v;
-		$("#home").hidden = v !== "home"; $("#trip").hidden = v !== "trip"; $("#explore").hidden = v !== "explore"; $("#trips").hidden = v !== "trips"; $("#profile").hidden = v !== "profile";
+		$("#home").hidden = v !== "home"; $("#trip").hidden = v !== "trip"; $("#explore").hidden = v !== "explore"; $("#trips").hidden = v !== "trips"; $("#profile").hidden = v !== "profile"; $("#summary").hidden = v !== "summary";
 		if (v === "explore") renderExplore();
 		if (fresh) fitAsk();
 		if (v === "profile") renderProfile();
+		if (v === "summary") { if (!S.plan) return show("home"); renderSummary(); scrollTo(0, 0); }
 		if (v === "trips") { const L = $("#tripsList"); L.__html = null; L.classList.add("fresh"); renderTrips(); setTimeout(() => L.classList.remove("fresh"), 700); }
 		document.querySelectorAll(".nav [data-go]").forEach((b) => b.setAttribute("aria-current", b.dataset.go === v ? "page" : "false"));
 		renderTripsNav();
@@ -1802,26 +1806,76 @@
 			{ dir: "Return", from: c.code, fromN: c.name, to: oc, toN: S.origin, date: d.back, dep: retDep, arr: add(retDep, k.fl.hours), board: board(retDep), flight: no(401 + k.fl.i * 37), gate: "A" + (4 + k.fl.i) },
 		].map((l) => ({ ...l, cabin: k.fl.cabin, bags: k.fl.bags ? "Cabin + hold" : "Cabin only", airline: k.fl.airline, aircraft: k.fl.aircraft, code: S.held.flights.code }));
 	}
-	const seat = (n) => `${{ Business: 2, "Premium economy": 8 }[costs(S.plan).fl.cabin] || 14}${"ABCDEF"[n % 6]}`;
+	/* Seats: a 30-row 3-3 cabin per flight. Some seats are taken (stable per flight), the travellers' seats
+	 * can be moved to any free seat, or swapped with each other. Choices are kept per flight (outbound / return). */
+	const ROWS = 30, COLS = "ABCDEF";
+	const seatRow0 = () => ({ Business: 2, "Premium economy": 8 }[costs(S.plan).fl.cabin] || 14);
+	const defaultSeat = (n) => `${seatRow0() + Math.floor(n / 6)}${COLS[n % 6]}`;
+	const seat = (n, j = 0) => S.held.seats?.[j]?.[n] || defaultSeat(n);
 	const seatKind = (letter) => ("AF".includes(letter) ? "Window seat" : "CD".includes(letter) ? "Aisle seat" : "Middle seat");
-	/* Seat map: three rows around the travellers' row, 3-3 cabin, their seats in blue. */
-	function seatMap(travelers) {
-		const seats = Array.from({ length: Math.min(travelers, 6) }, (_, n) => seat(n));
-		const row = parseInt(seats[0], 10), taken = new Set(seats.map((x) => x.replace(/\d+/, "")));
-		const W = 22, H = 20, gap = 4, aisle = 22, x0 = 40, y0 = 26;
-		const colX = (i) => x0 + i * (W + gap) + (i > 2 ? aisle : 0);
-		let g = "";
-		"ABCDEF".split("").forEach((L, i) => { g += `<text x="${colX(i) + W / 2}" y="16" class="sm-l">${L}</text>`; });
-		[row - 1, row, row + 1].forEach((r, j) => {
-			const y = y0 + j * (H + 8);
-			g += `<text x="24" y="${y + 14}" class="sm-r">${r}</text>`;
-			"ABCDEF".split("").forEach((L, i) => { const on = r === row && taken.has(L); g += `<rect x="${colX(i)}" y="${y}" width="${W}" height="${H}" rx="5" class="${on ? "sm-on" : "sm-s"}"/>${on ? `<text x="${colX(i) + W / 2}" y="${y + 14}" class="sm-t">${L}</text>` : ""}`; });
-		});
-		const w = colX(5) + W + 14, h = y0 + 3 * (H + 8) + 2;
-		g = `<rect x="2" y="2" width="${w - 4}" height="${h - 4}" rx="16" class="sm-f"/><line x1="8" y1="${y0}" x2="8" y2="${h - 12}" class="sm-w"/><line x1="${w - 8}" y1="${y0}" x2="${w - 8}" y2="${h - 12}" class="sm-w"/>` + g;
-		const who = (n) => (n === 0 && ME.first ? fullName() : t("Traveller {n}", { n: n + 1 }));
-		return `<div class="seatmap"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(t("Your seats on the plane"))}">${g}</svg><ul>${seats.map((x, n) => `<li><b>${x}</b><span>${esc(who(n))}</span><em>${t(seatKind(x.slice(-1)))}</em></li>`).join("")}</ul></div>`;
+	const SEATUI = { j: 0, n: 0, from: null };
+	function takenSeats(j) {
+		const L = legs(), key = (S.held.flights?.code || "") + L[j].flight, out = new Set();
+		const mine = new Set(Array.from({ length: S.plan.travelers }, (_, n) => defaultSeat(n)));
+		for (let r = 1; r <= ROWS; r++) for (const c of COLS) { const id = `${r}${c}`; let h = hashN(key + ":" + id); h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995) >>> 0; h ^= h >>> 15; if (!mine.has(id) && h % 100 < 64) out.add(id); }
+		return out;
 	}
+	function seatMap(travelers) {
+		const L = legs(), j = Math.min(SEATUI.j, L.length - 1), n0 = Math.min(SEATUI.n, travelers - 1);
+		const taken = takenSeats(j), mine = Array.from({ length: travelers }, (_, n) => seat(n, j));
+		const myRow = parseInt(mine[n0], 10), span = 10;
+		if (SEATUI.from == null || SEATUI.from > myRow || SEATUI.from + span - 1 < myRow) SEATUI.from = Math.max(1, Math.min(ROWS - span + 1, myRow - 4));
+		const from = SEATUI.from, rows = Array.from({ length: span }, (_, i) => from + i);
+		const W = 24, H = 22, gx = 5, gy = 4, aisle = 18, x0 = 30, y0 = 22;
+		const cy = (i) => y0 + i * (H + gy) + (i > 2 ? aisle : 0), rx = (k) => x0 + k * (W + gx);
+		let g = "";
+		COLS.split("").forEach((c, i) => { g += `<text x="14" y="${cy(i) + 15}" class="sm-r">${c}</text>`; });
+		rows.forEach((r, k) => {
+			g += `<text x="${rx(k) + W / 2}" y="14" class="sm-l">${r}</text>`;
+			COLS.split("").forEach((c, i) => {
+				const id = `${r}${c}`, who = mine.indexOf(id), isTaken = taken.has(id);
+				const cls = who >= 0 ? (who === n0 ? "sm-on" : "sm-mine") : isTaken ? "sm-x" : "sm-s";
+				const lab = who >= 0 ? t("{s}: {w}", { s: id, w: who === 0 && ME.first ? fullName() : t("Traveller {n}", { n: who + 1 }) }) : t(isTaken ? "{s}: taken" : "{s}: free", { s: id });
+				g += `<g class="sm-seat${isTaken ? "" : " pick"}" ${isTaken ? "" : `data-seat="${id}" role="button" tabindex="0"`} aria-label="${esc(lab)}"><title>${esc(lab)}</title><rect x="${rx(k)}" y="${cy(i)}" width="${W}" height="${H}" rx="5" class="${cls}"/>${who >= 0 ? `<text x="${rx(k) + W / 2}" y="${cy(i) + 15}" class="sm-t">${who + 1}</text>` : ""}</g>`;
+			});
+		});
+		const w = rx(span - 1) + W + 12, h = cy(5) + H + 8;
+		g = `<rect x="2" y="2" width="${w - 4}" height="${h - 4}" rx="14" class="sm-f"/>` + g;
+		const total = ROWS * COLS.length, used = taken.size + travelers;
+		const nm = (n) => (n === 0 && ME.first ? fullName() : t("Traveller {n}", { n: n + 1 }));
+		return `<div class="seat-pick">
+			<div class="sp-top">${L.length > 1 ? `<div class="chips">${L.map((l, k) => `<button type="button" class="chip" data-seat-leg="${k}" aria-pressed="${k === j}">${t(l.dir)} · ${l.from}–${l.to}</button>`).join("")}</div>` : ""}
+			<div class="sp-stats"><span><b>${total}</b> ${t("seats")}</span><span><b>${used}</b> ${t("passengers on board")}</span><span class="free"><b>${total - used}</b> ${t("free")}</span></div></div>
+			<div class="seatmap"><div class="sp-plane"><button type="button" class="icon-btn sp-pg" data-seat-pg="-1" aria-label="${esc(t("Front rows"))}"${from <= 1 ? " disabled" : ""}>${ic("chevron-left")}</button><svg viewBox="0 0 ${w} ${h}" role="group" aria-label="${esc(t("Your seats on the plane"))}">${g}</svg><button type="button" class="icon-btn sp-pg" data-seat-pg="1" aria-label="${esc(t("Back rows"))}"${from + span - 1 >= ROWS ? " disabled" : ""}>${ic("chevron-right")}</button></div>
+			<ul>${mine.map((x, n) => `<li><button type="button" class="sp-who" data-seat-trav="${n}" aria-pressed="${n === n0}"><span class="sp-n">${n + 1}</span><b>${x}</b><span>${esc(nm(n))}</span><em>${t(seatKind(x.slice(-1)))}</em></button></li>`).join("")}</ul></div>
+			<div class="sp-legend"><span><i class="lg-on"></i>${t("Your seats")}</span><span><i class="lg-s"></i>${t("Free")}</span><span><i class="lg-x"></i>${t("Taken")}</span><small>${t("Pick a traveller, then tap a free seat. Tap another traveller’s seat to swap.")}</small></div>
+		</div>`;
+	}
+	function refreshSeats() {
+		document.querySelectorAll(".seat-pick").forEach((el) => { el.outerHTML = seatMap(S.plan.travelers); });
+		const pb = $("#passBox"); if (pb && pb.dataset.n != null) pb.innerHTML = passHtml(legs()[+pb.dataset.j], +pb.dataset.n);
+	}
+	function moveSeat(id) {
+		const j = SEATUI.j, n = SEATUI.n, tr = S.plan.travelers;
+		const cur = Array.from({ length: tr }, (_, k) => seat(k, j)), before = cur.slice();
+		const other = cur.indexOf(id); if (other === n) return;
+		if (other >= 0) [cur[n], cur[other]] = [cur[other], cur[n]]; else cur[n] = id;
+		S.held.seats = S.held.seats || {}; S.held.seats[j] = cur;
+		const L = legs();
+		log("You", t(other >= 0 ? "Swapped seats {a} and {b} ({f})" : "Moved to seat {b} ({f})", { a: before[n], b: id, f: `${L[j].from}–${L[j].to}` }));
+		refreshSeats();
+		toast(t(other >= 0 ? "Seats swapped." : "Seat changed to {b}.", { b: id }), t("Undo"), () => { S.held.seats[j] = before; refreshSeats(); });
+	}
+	document.addEventListener("click", (e) => {
+		if (!S.plan || !e.target.closest(".seat-pick")) return;
+		const lg = e.target.closest("[data-seat-leg]"), tv = e.target.closest("[data-seat-trav]"), pg = e.target.closest("[data-seat-pg]"), st = e.target.closest("[data-seat]");
+		if (lg) { SEATUI.j = +lg.dataset.seatLeg; SEATUI.from = null; return refreshSeats(); }
+		if (tv) { SEATUI.n = +tv.dataset.seatTrav; SEATUI.from = null; return refreshSeats(); }
+		if (pg) { SEATUI.from = Math.max(1, Math.min(ROWS - 9, SEATUI.from + 10 * +pg.dataset.seatPg)); return refreshSeats(); }
+		if (st) return moveSeat(st.dataset.seat);
+	});
+	document.addEventListener("keydown", (e) => { const st = e.target.closest?.(".seat-pick [data-seat]"); if (st && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); moveSeat(st.dataset.seat); } });
+
 	function bars(seed) {
 		let h = 0; for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
 		const out = []; for (let i = 0; i < 46; i++) { h = (h * 1103515245 + 12345) >>> 0; out.push(1 + (h >> 16) % 3); }
@@ -1832,13 +1886,13 @@
 		return `<div class="pass"><div class="pass-main">
 			<div class="pass-top"><span class="al">${l.airline[0]}</span><b>${esc(l.airline)}</b><span class="pass-dir">${t(l.dir)} · ${t("E-ticket")}</span></div>
 			<div class="pass-route"><div><big>${l.from}</big><small>${esc(l.fromN)}</small><em>${l.dep}</em></div><div class="pass-plane">${ICON.plane}<small>${l.flight}</small></div><div><big>${l.to}</big><small>${esc(l.toN)}</small><em>${l.arr}</em></div></div>
-			<dl class="pass-grid"><div><dt>${t("Passenger")}</dt><dd>${n === 0 && ME.first ? esc(fullName()) : t("Traveller {n}", { n: n + 1 })}</dd></div><div><dt>${t("Date")}</dt><dd>${fmtDay(l.date)}</dd></div><div><dt>${t("Boarding")}</dt><dd>${l.board}</dd></div><div><dt>${t("Gate")}</dt><dd>${l.gate}</dd></div><div><dt>${t("Seat")}</dt><dd>${seat(n)}</dd></div><div><dt>${t("Cabin")}</dt><dd>${t(l.cabin)}</dd></div><div><dt>${t("Bags")}</dt><dd>${t(l.bags)}</dd></div><div><dt>${t("Booking")}</dt><dd>${l.code}</dd></div></dl>
+			<dl class="pass-grid"><div><dt>${t("Passenger")}</dt><dd>${n === 0 && ME.first ? esc(fullName()) : t("Traveller {n}", { n: n + 1 })}</dd></div><div><dt>${t("Date")}</dt><dd>${fmtDay(l.date)}</dd></div><div><dt>${t("Boarding")}</dt><dd>${l.board}</dd></div><div><dt>${t("Gate")}</dt><dd>${l.gate}</dd></div><div><dt>${t("Seat")}</dt><dd>${seat(n, l.dir === "Return" ? 1 : 0)}</dd></div><div><dt>${t("Cabin")}</dt><dd>${t(l.cabin)}</dd></div><div><dt>${t("Bags")}</dt><dd>${t(l.bags)}</dd></div><div><dt>${t("Booking")}</dt><dd>${l.code}</dd></div></dl>
 		</div><div class="pass-stub"><svg viewBox="0 0 ${x} 56" preserveAspectRatio="none" aria-hidden="true">${b}</svg><b>${l.code}</b><small>${t("DEMO · NOT VALID FOR TRAVEL")}</small></div></div>`;
 	}
 	function openDocs() {
 		const p = S.plan; const L = legs(); const k = costs(p); const d = tripDates(p.nights);
 		modal(`<h3 id="modalTitle">${t("Your travel documents")}</h3><p>${P(p.travelers, "1 traveller", "{n} travellers")} · ${t("{n} flights each", { n: L.length })}${S.held.stay ? t(" · 1 hotel voucher") : ""}${t(". The PDF has every pass, one page per traveller.")}</p>
-			<div class="docs"><div class="pass-pick"><div class="chips" role="group" aria-label="${esc(t("Traveller"))}">${Array.from({ length: p.travelers }, (_, n) => `<button type="button" class="chip" data-pt="${n}" aria-pressed="${n === 0}">${esc(n === 0 && ME.first ? fullName() : t("Traveller {n}", { n: n + 1 }))}</button>`).join("")}</div><div class="chips" role="group" aria-label="${esc(t("Flight"))}">${L.map((l, j) => `<button type="button" class="chip" data-pl="${j}" aria-pressed="${j === 0}">${t(l.dir)} · ${l.from}–${l.to}</button>`).join("")}</div><small>${t("{n} boarding passes in all", { n: p.travelers * L.length })}</small></div><div id="passBox">${passHtml(L[0], 0)}</div><div class="voucher"><span class="pass-dir">${t("Your seats on the plane")}</span>${seatMap(p.travelers)}</div>
+			<div class="docs"><div class="pass-pick"><div class="chips" role="group" aria-label="${esc(t("Traveller"))}">${Array.from({ length: p.travelers }, (_, n) => `<button type="button" class="chip" data-pt="${n}" aria-pressed="${n === 0}">${esc(n === 0 && ME.first ? fullName() : t("Traveller {n}", { n: n + 1 }))}</button>`).join("")}</div><div class="chips" role="group" aria-label="${esc(t("Flight"))}">${L.map((l, j) => `<button type="button" class="chip" data-pl="${j}" aria-pressed="${j === 0}">${t(l.dir)} · ${l.from}–${l.to}</button>`).join("")}</div><small>${t("{n} boarding passes in all", { n: p.travelers * L.length })}</small></div><div id="passBox" data-n="0" data-j="0">${passHtml(L[0], 0)}</div><div class="voucher"><span class="pass-dir">${t("Your seats on the plane")}</span>${seatMap(p.travelers)}</div>
 			${S.held.stay ? `<div class="voucher"><div><span class="pass-dir">${t("Hotel voucher")}</span><b>${esc(k.st.name)}</b><small>${esc(k.st.area)}, ${D.cities[p.city].name} · ${ICON.star} ${k.st.rating}</small></div><dl class="pass-grid"><div><dt>${t("Check-in")}</dt><dd>${fmtDay(d.out)} · 15:00</dd></div><div><dt>${t("Check-out")}</dt><dd>${fmtDay(d.back)} · 11:00</dd></div><div><dt>${t("Guests")}</dt><dd>${p.travelers}</dd></div><div><dt>${t("Booking")}</dt><dd>${S.held.stay.code}</dd></div></dl></div>` : ""}</div>
 			<div class="row"><button class="btn btn-ghost btn-sm" data-m="cancel">${t("Close")}</button><button class="btn btn-ghost btn-sm" data-m="inv">${ICON.receipt} ${t("Download invoice")}</button><button class="btn btn-primary btn-ok btn-sm" data-m="pdf">${ICON.ticket} ${t("Download PDF")}</button></div>`, (r) => { if (r === "pdf") downloadPdf(); if (r === "inv") downloadInvoice(); });
 		$("#modalBox").classList.add("wide");
@@ -1848,7 +1902,7 @@
 			if (a) pick.n = +a.dataset.pt; if (b) pick.j = +b.dataset.pl;
 			$("#modalBox").querySelectorAll("[data-pt]").forEach((x) => x.setAttribute("aria-pressed", String(+x.dataset.pt === pick.n)));
 			$("#modalBox").querySelectorAll("[data-pl]").forEach((x) => x.setAttribute("aria-pressed", String(+x.dataset.pl === pick.j)));
-			$("#passBox").innerHTML = passHtml(L[pick.j], pick.n);
+			$("#passBox").dataset.n = pick.n; $("#passBox").dataset.j = pick.j; $("#passBox").innerHTML = passHtml(L[pick.j], pick.n);
 		};
 	}
 	function loadPdf() {
@@ -1870,7 +1924,7 @@
 			doc.setFontSize(11); doc.text(l.dep, 22, y + 41); doc.text(l.arr, 112, y + 41);
 			doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...grey); doc.text(l.fromN, 22, y + 46); doc.text(l.toN, 112, y + 46);
 			doc.setDrawColor(...grey); doc.setLineDashPattern([1, 1], 0); doc.line(52, y + 30, 106, y + 30); doc.setLineDashPattern([], 0); doc.text(l.flight, 79, y + 27, { align: "center" });
-			const f = [["PASSENGER", n === 0 && ME.first ? fullName() : `Traveller ${n + 1}`], ["DATE", fmtDay(l.date)], ["BOARDING", l.board], ["GATE", l.gate], ["SEAT", seat(n)], ["CABIN", l.cabin], ["BAGS", l.bags], ["BOOKING", l.code]];
+			const f = [["PASSENGER", n === 0 && ME.first ? fullName() : `Traveller ${n + 1}`], ["DATE", fmtDay(l.date)], ["BOARDING", l.board], ["GATE", l.gate], ["SEAT", seat(n, l.dir === "Return" ? 1 : 0)], ["CABIN", l.cabin], ["BAGS", l.bags], ["BOOKING", l.code]];
 			f.forEach(([a, b], i) => { const x = 22 + (i % 4) * 34, yy = y + 58 + Math.floor(i / 4) * 14; doc.setFontSize(7); doc.setTextColor(...grey); doc.text(a, x, yy); doc.setFontSize(10); doc.setTextColor(...ink); doc.setFont("helvetica", "bold"); doc.text(String(b), x, yy + 5); doc.setFont("helvetica", "normal"); });
 			doc.setDrawColor(...line); doc.setLineDashPattern([2, 2], 0); doc.line(160, y + 16, 160, y + 90); doc.setLineDashPattern([], 0);
 			let bx = 165; doc.setFillColor(...ink); bars(l.code + l.flight + n).forEach((w, i) => { if (!(i % 2)) doc.rect(bx, y + 22, w * 0.28, 44, "F"); bx += (w + 1) * 0.28; });
@@ -1937,6 +1991,57 @@
 		doc.setFontSize(8); doc.setTextColor(...grey); doc.text("Otium is a fictional demo by David Bitan. Nothing was booked or charged. This invoice is not a valid tax document.", 15, 280);
 		doc.save(`otium-${p.city}-invoice-${no}.pdf`);
 		log("You", t("Downloaded the invoice (PDF)"));
+	}
+
+	/* ---------------- trip summary: one page with everything, plus a PDF of it ---------------- */
+	function summaryData(en) {
+		const p = S.plan, h = S.held, k = costs(p), L = legs(), d = tripDates(p.nights), c = en ? EN_CITIES[p.city] : D.cities[p.city];
+		const T = (x, v) => (en ? x.replace(/\{(\w+)\}/g, (_, q) => v?.[q] ?? "") : t(x, v));
+		const day = (x) => (en ? x.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }) : fmtDay(x));
+		const who = (n) => (n === 0 && ME.first ? fullName() : T("Traveller {n}", { n: n + 1 }));
+		const st = k.st, stEn = en ? EN_CITIES[p.city].stays.find((x) => x.id === st.id) || st : st;
+		const sec = [];
+		sec.push({ title: T("Overview"), rows: [[T("Destination"), `${c.name}, ${c.country}`], [T("Dates"), `${day(d.out)} – ${day(d.back)} · ${en ? `${p.nights} night${p.nights > 1 ? "s" : ""}` : P(p.nights, "1 night", "{n} nights")}`], [T("Travellers"), Array.from({ length: p.travelers }, (_, n) => who(n)).join(", ")], [T("From"), en ? S.origin : on(S.origin)], [T("Status"), T(h.flights || h.stay ? "Held · simulated, nothing charged" : "Draft · nothing booked")]] });
+		if (h.flights) L.forEach((l, j) => {
+			const [hh, mm] = l.dep.split(":").map(Number), at = (m) => `${String(Math.floor(((m + 1440) % 1440) / 60)).padStart(2, "0")}:${String((m + 1440) % 60).padStart(2, "0")}`;
+			sec.push({ title: `${T(l.dir === "Return" ? "Return flight" : "Outbound flight")} · ${l.from} ${en ? "to" : "→"} ${l.to}`, rows: [[T("Date"), day(l.date)], [T("Flight"), `${k.fl.airline} ${l.flight} · ${T(k.fl.cabin)}`], [T("Departs"), `${l.dep} · ${l.fromN}`], [T("Arrives"), `${l.arr} · ${l.toN}`], [T("Be there by"), at(hh * 60 + mm - 120)], [T("Check-in closes"), at(hh * 60 + mm - 45)], [T("Boarding"), `${l.board} · ${T("Gate")} ${l.gate}`], [T("Bags"), T(k.fl.bags ? "Cabin + checked bag" : "Cabin bag only")], [T("Booking"), h.flights.code], ...Array.from({ length: p.travelers }, (_, n) => [T("Seat"), `${seat(n, j)} · ${who(n)} · ${T(seatKind(seat(n, j).slice(-1)))}`])] });
+		});
+		if (h.stay) sec.push({ title: T("Stay"), rows: [[T("Name"), st.name], [T("Area"), `${stEn.area}, ${c.name}`], [T("Check-in"), `${day(d.out)} · 15:00`], [T("Check-out"), `${day(d.back)} · 11:00`], [T("Guests"), String(p.travelers)], [T("Cancellation"), T(st.freeCancel ? "Free until 48 h before" : "Non-refundable")], [T("Booking"), h.stay.code]] });
+		if (S.settings.activities) sec.push({ title: T("Your days"), rows: Array.from({ length: p.nights + 1 }, (_, i) => [T("Day {n}", { n: i + 1 }), dayPlan(i, c, p).map(([tm, x]) => `${tm ? tm + " " : ""}${en ? ({ [t("Arrive, check in")]: "Arrive, check in", [t("Head to the airport")]: "Head to the airport" }[x] || x) : x}`).join("\n")]) });
+		const money2 = (n) => (en ? `${cur()[0]} ${Math.round(n * cur()[1]).toLocaleString("en-GB")}` : eur(n));
+		sec.push({ title: T("Costs"), rows: [[T("Flights"), money2(k.flights)], [T("Stay"), money2(k.stay)], ...(k.tickets ? [[T("Activities (estimate)"), money2(k.tickets)]] : []), [T("Total"), money2(k.total)], [T("Budget cap"), money2(p.cap)], [T("Held and approved"), money2((h.flights?.amount || 0) + (h.stay?.amount || 0))], [T("Payment"), cardLabel() || "—"]] });
+		sec.push({ title: T("Contact"), rows: [[T("Lead traveller"), fullName() || "—"], [T("Email"), ME.email || "—"], [T("Phone"), ME.phone || "—"], [T("Need help?"), `${HELP_TEL} · help@otium.example (${T("fictional")})`]] });
+		return { title: `${c.name} · ${day(d.out)} – ${day(d.back)}`, sec };
+	}
+	function renderSummary() {
+		const D2 = summaryData(false);
+		$("#sumBox").innerHTML = `<div class="sum-h"><div><span class="eyebrow">${t("Trip summary")}</span><h1>${esc(D2.title)}</h1><p>${t("Everything about this trip on one page. Nothing here was really booked or charged.")}</p></div><div class="row"><button type="button" class="btn btn-ghost btn-sm" data-go="trip">${ic("arrow-left")}${t("Back to my trip")}</button><button type="button" class="btn btn-ghost btn-sm" id="sumPrint">${ic("file-text")}${t("Print")}</button><button type="button" class="btn btn-primary btn-ok btn-sm" id="sumPdf">${ICON.ticket}${t("Download PDF")}</button></div></div>
+			<div class="sum-grid">${D2.sec.map((x) => `<section class="panel sum-card"><h2>${esc(x.title)}</h2><dl>${x.rows.map(([a, b]) => `<div><dt>${esc(a)}</dt><dd>${esc(b).replace(/\n/g, "<br>")}</dd></div>`).join("")}</dl></section>`).join("")}</div>`;
+		$("#sumPdf").onclick = downloadSummary; $("#sumPrint").onclick = () => print();
+	}
+	async function downloadSummary() {
+		toast(t("Preparing your PDF…"));
+		let lib; try { lib = await loadPdf(); } catch { toast(t("Couldn’t load the PDF tool. Try again.")); return; }
+		const D2 = summaryData(true), doc = new lib.jsPDF({ unit: "mm", format: "a4" });
+		const ink = [34, 34, 34], grey = [106, 106, 106], red = [194, 52, 76], line = [221, 221, 221];
+		let y = 22;
+		doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(...red); doc.text("otium", 15, y);
+		doc.setFontSize(10); doc.setTextColor(...grey); doc.setFont("helvetica", "normal"); doc.text("TRIP SUMMARY", 195, y, { align: "right" });
+		y += 10; doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.setTextColor(...ink); doc.text(D2.title, 15, y); y += 8;
+		const need = (h) => { if (y + h > 280) { doc.addPage(); y = 20; } };
+		D2.sec.forEach((x) => {
+			need(16); doc.setDrawColor(...line); doc.line(15, y, 195, y); y += 7;
+			doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(...red); doc.text(x.title.toUpperCase(), 15, y); y += 6;
+			x.rows.forEach(([a, b]) => {
+				const lines = doc.splitTextToSize(String(b), 125); need(lines.length * 5 + 2);
+				doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...grey); doc.text(String(a), 15, y);
+				doc.setFontSize(10); doc.setTextColor(...ink); doc.text(lines, 65, y); y += lines.length * 5 + 1.5;
+			});
+			y += 3;
+		});
+		need(10); doc.setFontSize(8); doc.setTextColor(...grey); doc.text("Otium is a fictional demo by David Bitan. Nothing was booked or charged.", 15, Math.max(y + 4, 285));
+		doc.save(`otium-${S.plan.city}-summary.pdf`);
+		log("You", t("Downloaded the trip summary (PDF)"));
 	}
 
 	function postit() {
