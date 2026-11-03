@@ -191,8 +191,9 @@
 
 	/* ---------------- media ---------------- */
 	const thumbOf = (src) => String(src).replace(/^media\/([a-z]+)\.jpg$/, "media/t/$1.webp"); // light card images; galleries keep the full photo
-	function pic(src, key, alt = "") {
+	function pic(src, key, alt = "", hero = false) {
 		const [c1, c2] = SWATCH[key] || ["#C9B79C", "#8E7A62"];
+		if (hero) return `<img class="ph-t" src="${esc(thumbOf(src))}" alt="" aria-hidden="true"><img src="${esc(src)}" alt="${esc(alt)}" fetchpriority="high" decoding="async" onerror="this.remove()">`; // the thumbnail is already cached from the home page: no empty colour block while the big photo loads
 		return `<div class="ph" style="--c1:${c1};--c2:${c2}"></div><img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" onerror="this.remove()">`;
 	}
 
@@ -1552,7 +1553,7 @@
 	function renderTrip() {
 		const box = $("#tripCanvas"); const p = S.plan;
 		if (!p) {
-			box.innerHTML = `<div class="trip-hero"><div class="ph"></div><div class="in"><div><span class="status-tag"><i></i>${t("Starting")}</span><h2>${t("Your trip")}</h2><div class="meta">${t("Otium is reading your request…")}</div></div></div></div><div class="panel block"><div class="skeleton"></div></div><div class="panel block"><div class="skeleton"></div></div>`;
+			box.innerHTML = `<div class="trip-hero"><div class="in"><div><span class="status-tag"><i></i>${t("Starting")}</span><h2>${t("Your trip")}</h2><div class="meta">${t("Otium is reading your request…")}</div></div></div></div><div class="panel block"><div class="skeleton"></div></div><div class="panel block"><div class="skeleton"></div></div>`;
 			return;
 		}
 		const c = D.cities[p.city]; const dates = tripDates(p.nights);
@@ -1562,7 +1563,7 @@
 		const over = k && k.total > p.cap;
 		const scale = k ? Math.max(p.cap, k.total) * 1.12 : p.cap * 1.12;
 		box.innerHTML = `
-		<div class="trip-hero">${pic(c.photo, p.city, c.name)}<button type="button" class="pics-btn big" data-citypics="${p.city}">${ic("images")}<span>${t("Photos ({n})", { n: galN(p.city) })}</span></button><div class="in"><div><span class="status-tag ${st[0]}"><i></i>${st[1]}</span><h2>${c.name}</h2><div class="meta">${fmtDay(dates.out)} → ${fmtDay(dates.back)} · ${P(p.nights, "1 night", "{n} nights")} · ${P(p.travelers, "1 traveller", "{n} travellers")} · ${t("from {o}", { o: esc(on(S.origin)) })}</div></div></div></div>
+		<div class="trip-hero">${pic(c.photo, p.city, c.name, true)}<button type="button" class="pics-btn big" data-citypics="${p.city}">${ic("images")}<span>${t("Photos ({n})", { n: galN(p.city) })}</span></button><div class="in"><div><span class="status-tag ${st[0]}"><i></i>${st[1]}</span><h2>${c.name}</h2><div class="meta">${fmtDay(dates.out)} → ${fmtDay(dates.back)} · ${P(p.nights, "1 night", "{n} nights")} · ${P(p.travelers, "1 traveller", "{n} travellers")} · ${t("from {o}", { o: esc(on(S.origin)) })}</div></div></div></div>
 		${S.progress.done ? doneBanner(k) : ""}
 		${S.progress.cancelled && !S.progress.done ? `<div class="panel block draft-note"><b>${t("Bookings cancelled.")}</b> ${t("Your plan is kept as a draft.")} <button class="btn btn-primary btn-sm" data-rebook>${t("Book it again")}</button></div>` : ""}
 		<div class="panel budget">
@@ -1761,7 +1762,7 @@
 
 	let modalCb = null;
 	function modal(html, cb) {
-		const m = $("#modal"); $("#modalBox").innerHTML = html; $("#modalBox").classList.remove("wide"); modalCb = cb;
+		const m = $("#modal"); $("#modalBox").innerHTML = html; $("#modalBox").classList.remove("wide", "video"); modalCb = cb;
 		m.hidden = false; $("#scrim").hidden = false;
 		requestAnimationFrame(() => { m.classList.add("on"); $("#scrim").classList.add("on"); });
 		$("#modalBox").querySelector("[data-m]")?.focus();
@@ -2145,22 +2146,22 @@
 		const who = (n) => S.plan.names?.[n] || (n === 0 && ME.first ? fullName() : T("Traveller {n}", { n: n + 1 }));
 		const st = k.st, stEn = en ? EN_CITIES[p.city].stays.find((x) => x.id === st.id) || st : st;
 		const sec = [];
-		sec.push({ title: T("Overview"), rows: [[T("Destination"), `${c.name}, ${c.country}`], [T("Dates"), `${day(d.out)} – ${day(d.back)} · ${en ? `${p.nights} night${p.nights > 1 ? "s" : ""}` : P(p.nights, "1 night", "{n} nights")}`], [T("Travellers"), Array.from({ length: p.travelers }, (_, n) => who(n)).join(", ")], [T("From"), en ? S.origin : on(S.origin)], [T("Status"), T(h.flights || h.stay ? "Held · simulated, nothing charged" : "Draft · nothing booked")], ...(ME.assist ? [[T("Travel assistance"), T((ASSIST.find((a) => a[0] === ME.assist) || ["", "None"])[1]) + " · " + T("requested with the airline (simulated)")]] : []), ...(S.progress.coOk ? [[T("Also approved by"), S.progress.coOk]] : [])] });
+		sec.push({ k: "over", title: T("Overview"), rows: [[T("Destination"), `${c.name}, ${c.country}`], [T("Dates"), `${day(d.out)} – ${day(d.back)} · ${en ? `${p.nights} night${p.nights > 1 ? "s" : ""}` : P(p.nights, "1 night", "{n} nights")}`], [T("Travellers"), Array.from({ length: p.travelers }, (_, n) => who(n)).join(", ")], [T("From"), en ? S.origin : on(S.origin)], [T("Status"), T(h.flights || h.stay ? "Held · simulated, nothing charged" : "Draft · nothing booked")], ...(ME.assist ? [[T("Travel assistance"), T((ASSIST.find((a) => a[0] === ME.assist) || ["", "None"])[1]) + " · " + T("requested with the airline (simulated)")]] : []), ...(S.progress.coOk ? [[T("Also approved by"), S.progress.coOk]] : [])] });
 		if (h.flights) L.forEach((l, j) => {
 			const [hh, mm] = l.dep.split(":").map(Number), at = (m) => `${String(Math.floor(((m + 1440) % 1440) / 60)).padStart(2, "0")}:${String((m + 1440) % 60).padStart(2, "0")}`;
-			sec.push({ title: `${T(l.dir === "Return" ? "Return flight" : "Outbound flight")} · ${l.from} ${en ? "to" : "→"} ${l.to}`, rows: [[T("Date"), day(l.date)], [T("Flight"), `${k.fl.airline} ${l.flight} · ${T(k.fl.cabin)}`], [T("Departs"), `${l.dep} · ${l.fromN}`], [T("Arrives"), `${l.arr} · ${l.toN}`], [T("Be there by"), at(hh * 60 + mm - 120)], [T("Check-in closes"), at(hh * 60 + mm - 45)], [T("Boarding"), `${l.board} · ${T("Gate")} ${l.gate}`], [T("Bags"), T(k.fl.bags ? "Cabin + checked bag" : "Cabin bag only")], [T("Booking"), h.flights.code], ...Array.from({ length: p.travelers }, (_, n) => [T("Seat"), `${seat(n, j)} · ${who(n)} · ${T(seatKind(seat(n, j).slice(-1)))}`])] });
+			sec.push({ k: l.dir === "Return" ? "ret" : "out", title: `${T(l.dir === "Return" ? "Return flight" : "Outbound flight")} · ${l.from} ${en ? "to" : "→"} ${l.to}`, rows: [[T("Date"), day(l.date)], [T("Flight"), `${k.fl.airline} ${l.flight} · ${T(k.fl.cabin)}`], [T("Departs"), `${l.dep} · ${l.fromN}`], [T("Arrives"), `${l.arr} · ${l.toN}`], [T("Be there by"), at(hh * 60 + mm - 120)], [T("Check-in closes"), at(hh * 60 + mm - 45)], [T("Boarding"), `${l.board} · ${T("Gate")} ${l.gate}`], [T("Bags"), T(k.fl.bags ? "Cabin + checked bag" : "Cabin bag only")], [T("Booking"), h.flights.code], ...Array.from({ length: p.travelers }, (_, n) => [T("Seat"), `${seat(n, j)} · ${who(n)} · ${T(seatKind(seat(n, j).slice(-1)))}`])] });
 		});
-		if (h.stay) sec.push({ title: T("Stay"), rows: [[T("Name"), st.name], [T("Area"), `${stEn.area}, ${c.name}`], [T("Check-in"), `${day(d.out)} · 15:00`], [T("Check-out"), `${day(d.back)} · 11:00`], [T("Guests"), String(p.travelers)], [T("Cancellation"), T(st.freeCancel ? "Free until 48 h before" : "Non-refundable")], [T("Booking"), h.stay.code]] });
-		if (S.settings.activities) sec.push({ title: T("Your days"), rows: Array.from({ length: p.nights + 1 }, (_, i) => [T("Day {n}", { n: i + 1 }), dayPlan(i, c, p).map(([tm, x]) => `${tm ? tm + " " : ""}${en ? ({ [t("Arrive, check in")]: "Arrive, check in", [t("Head to the airport")]: "Head to the airport" }[x] || x) : x}`).join("\n")]) });
+		if (h.stay) sec.push({ k: "stay", title: T("Stay"), rows: [[T("Name"), st.name], [T("Area"), `${stEn.area}, ${c.name}`], [T("Check-in"), `${day(d.out)} · 15:00`], [T("Check-out"), `${day(d.back)} · 11:00`], [T("Guests"), String(p.travelers)], [T("Cancellation"), T(st.freeCancel ? "Free until 48 h before" : "Non-refundable")], [T("Booking"), h.stay.code]] });
+		if (S.settings.activities) sec.push({ k: "days", title: T("Your days"), rows: Array.from({ length: p.nights + 1 }, (_, i) => [T("Day {n}", { n: i + 1 }), dayPlan(i, c, p).map(([tm, x]) => `${tm ? tm + " " : ""}${en ? ({ [t("Arrive, check in")]: "Arrive, check in", [t("Head to the airport")]: "Head to the airport" }[x] || x) : x}`).join("\n")]) });
 		const money2 = (n) => (en ? `${cur()[0]} ${Math.round(n * cur()[1]).toLocaleString("en-GB")}` : eur(n));
-		sec.push({ title: T("Costs"), rows: [[T("Flights"), money2(k.flights)], [T("Stay"), money2(k.stay)], ...(k.tickets ? [[T("Activities (estimate)"), money2(k.tickets)]] : []), [T("Total"), money2(k.total)], [T("Budget cap"), money2(p.cap)], [T("Held and approved"), money2((h.flights?.amount || 0) + (h.stay?.amount || 0))], [T("Payment"), cardLabel() || "—"]] });
-		sec.push({ title: T("Contact"), rows: [[T("Lead traveller"), fullName() || "—"], [T("Email"), ME.email || "—"], [T("Phone"), ME.phone || "—"], [T("Need help?"), `${HELP_TEL} · help@otium.example (${T("fictional")})`]] });
-		return { title: `${c.name} · ${day(d.out)} – ${day(d.back)}`, sec };
+		sec.push({ k: "costs", title: T("Costs"), rows: [[T("Flights"), money2(k.flights)], [T("Stay"), money2(k.stay)], ...(k.tickets ? [[T("Activities (estimate)"), money2(k.tickets)]] : []), [T("Total"), money2(k.total)], [T("Budget cap"), money2(p.cap)], [T("Held and approved"), money2((h.flights?.amount || 0) + (h.stay?.amount || 0))], [T("Payment"), cardLabel() || "—"]] });
+		sec.push({ k: "contact", title: T("Contact"), rows: [[T("Lead traveller"), fullName() || "—"], [T("Email"), ME.email || "—"], [T("Phone"), ME.phone || "—"], [T("Need help?"), `${HELP_TEL} · help@otium.example (${T("fictional")})`]] });
+		return { title: `${c.name} · ${day(d.out)} – ${day(d.back)}`, sec, photo: c.photo, place: c.name };
 	}
 	function renderSummary() {
 		const D2 = summaryData(false);
 		$("#sumBox").innerHTML = `<div class="sum-h"><div><span class="eyebrow">${t("Trip summary")}</span><h1>${esc(D2.title)}</h1><p>${t("Everything about this trip on one page. Nothing here was really booked or charged.")}</p></div><div class="row"><button type="button" class="btn btn-ghost btn-sm" data-go="trip">${ic("arrow-left")}${t("Back to my trip")}</button><button type="button" class="btn btn-ghost btn-sm" id="sumPrint">${ic("file-text")}${t("Print")}</button><button type="button" class="btn btn-primary btn-ok btn-sm" id="sumPdf">${ICON.ticket}${t("Download PDF")}</button></div></div>
-			<div class="sum-grid">${D2.sec.map((x) => `<section class="panel sum-card"><h2>${esc(x.title)}</h2><dl>${x.rows.map(([a, b]) => `<div><dt>${esc(a)}</dt><dd>${esc(b).replace(/\n/g, "<br>")}</dd></div>`).join("")}</dl></section>`).join("")}</div>`;
+			<div class="sum-grid bento"><figure class="panel sum-photo"><img src="${esc(D2.photo)}" alt="${esc(D2.place)}" fetchpriority="high"></figure>${D2.sec.map((x) => `<section class="panel sum-card k-${x.k || "x"}"><h2>${esc(x.title)}</h2><dl>${x.rows.map(([a, b]) => `<div><dt>${esc(a)}</dt><dd>${esc(b).replace(/\n/g, "<br>")}</dd></div>`).join("")}</dl></section>`).join("")}</div>`;
 		$("#sumPdf").onclick = downloadSummary; $("#sumPrint").onclick = () => print();
 	}
 	async function downloadSummary() {

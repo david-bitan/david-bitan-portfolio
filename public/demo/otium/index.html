@@ -1332,10 +1332,28 @@ body.touring #tourCard { pointer-events: auto; }
 @media (max-width: 400px) { .legtabs button svg.i { display: none; } .sp-legend { gap: 4px 10px; } }
 /* v4.9 — flat colours only (no gradients) */
 .card.ask { background: var(--surface); }
-.done-banner { background: var(--surface); }
 .orb, .agent[data-status="waiting"] .orb { background: var(--lagoon); }
 .agent[data-status="paused"] .orb { background: #8C847A; }
 .ph { background: var(--c2, #8E7A62); }
+/* trip hero: blurred light thumbnail under the full photo */
+.trip-hero .ph-t { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(6px); transform: scale(1.04); }
+.trip-hero { background: var(--sand); }
+/* trip summary as a bento */
+.sum-grid.bento { grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: stretch; grid-auto-flow: row dense; }
+.bento > * { grid-column: span 2; margin: 0; }
+.bento .sum-photo, .bento .k-over, .bento .k-out, .bento .k-ret { grid-column: span 3; }
+.bento .k-days { grid-column: 1 / -1; }
+.bento .sum-photo { position: relative; padding: 0; overflow: hidden; min-height: 220px; }
+.bento .sum-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.bento .k-days dl { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.bento .k-days dl > div { display: block; border-top: 0; padding: 12px 14px; border-radius: calc(var(--r-lg) - 18px); background: var(--sand); } /* concentric: panel 24 = 6 + 18 */
+.bento .k-days dt { font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.bento .k-costs dl > div:has(dt + dd) { align-items: baseline; }
+@media (max-width: 900px) { .sum-grid.bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bento > *, .bento .sum-photo, .bento .k-over, .bento .k-out, .bento .k-ret { grid-column: span 1; } .bento .k-days, .bento .k-contact { grid-column: 1 / -1; } }
+@media (max-width: 640px) { .sum-grid.bento { grid-template-columns: 1fr; } .bento > * { grid-column: 1 / -1 !important; } .bento .sum-photo { min-height: 180px; } }
+@media print { .bento .sum-photo { display: none; } }
+.sum-card dt { overflow-wrap: normal; hyphens: auto; }
+@media (max-width: 640px) { .sum-card dl > div { grid-template-columns: minmax(118px, 40%) minmax(0, 1fr); } }
 /* empty required field */
 [aria-invalid="true"] { border-color: var(--lagoon) !important; }
 /* no inner scroll in dialogs: the dialog grows, the page behind it scrolls */

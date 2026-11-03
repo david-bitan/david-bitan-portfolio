@@ -24,6 +24,8 @@ export interface AILabProject {
 	};
 	/** Gallery images (root-relative paths under /public). */
 	gallery: string[];
+	/** Optional phone screenshots, shown four across under the gallery. */
+	mobileGallery?: string[];
 	/** Live demo URL (relative — e.g. /demo/trattoria-fiori/). */
 	demoUrl: string;
 	/** Optional AI feature built into the demo — rendered as its own case-study
@@ -67,8 +69,8 @@ The language model only reads the request. Prices, the plan, the budget check an
 			eyebrow: 'AI UX · Agent',
 			title: 'An agent that asks before it acts',
 			lead: 'Otium plans a full short trip on its own — flights, a stay, the days — but every action with consequences waits for the traveller. The request is read by an LLM (Llama 3.3 on Cloudflare Workers AI); everything else is deterministic code. T-Bot, a built-in helper, answers questions along the way and only ever points to the control where the traveller decides.',
-			tryUrl: '/demo/otium/?video=1',
-			tryLabel: 'Watch the 1-minute video',
+			tryUrl: '/demo/otium/',
+			tryLabel: 'Try the demo',
 			states: ['Request read by AI, with assumptions flagged', 'Basic matching when the AI is offline', 'Clarifying question when the place is missing', 'Destination not covered — no guessing', 'Steps shown live, foldable', 'Pause and resume', 'Over budget — stops and offers options', 'Approval before payment, with before/after', 'Approval before sharing traveller details', 'Ask before every choice', 'Pay alone up to a limit — labelled on the step', 'Co-traveller approval', 'Price drop after booking — asks before rebooking', 'Trip picked up after a refresh', 'One-minute video of a full run, plus a step-by-step tour', 'Fare changed — asks again', 'Flight sold out — plan B', 'Edit flight or stay before approving', 'Cancel one booking or all', 'Trip history, tap to jump to a step', 'Several trips saved in My trips', 'Date-range calendar', 'Details missing at payment — sends to the profile, then resumes', 'Tickets and hotel voucher as PDF, calendar file', 'T-Bot helper with action buttons', 'Talk to a human', 'Five languages, Hebrew in RTL'],
 			decisions: [
 				{ title: 'Model for reading, code for acting', body: 'The LLM turns a sentence into fields — city, nights, travellers, budget. Prices, the plan, the budget check and every booking step are computed in code, so the model can never invent a fare or approve a payment.' },
@@ -130,12 +132,19 @@ The language model only reads the request. Prices, the plan, the budget check an
 		},
 		gallery: [
 			'/lab-assets/otium/home.webp',
+			'/lab-assets/otium/approve.webp',
 			'/lab-assets/otium/plan.webp',
 			'/lab-assets/otium/seats.webp',
+			'/lab-assets/otium/summary.webp',
 			'/lab-assets/otium/permissions.webp',
-			'/lab-assets/otium/calendar.webp',
-			'/lab-assets/otium/my-trips.webp',
 			'/lab-assets/otium/t-bot.webp',
+			'/lab-assets/otium/my-trips.webp',
+		],
+		mobileGallery: [
+			'/lab-assets/otium/m-home.webp',
+			'/lab-assets/otium/m-approve.webp',
+			'/lab-assets/otium/m-seats.webp',
+			'/lab-assets/otium/m-summary.webp',
 		],
 		demoUrl: '/demo/otium/',
 		thumbnail: '/lab-assets/otium/thumbnail.jpg',
