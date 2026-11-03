@@ -168,13 +168,30 @@ const ds = project.designSystem;
 
 					<p class="mt-10 text-sm font-semibold uppercase tracking-widest text-muted">Design decisions</p>
 					<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-						{project.aiFeature.decisions.map((d) => (
+						{project.aiFeature.decisions.slice(0, 3).map((d) => (
 							<div>
 								<p class="font-semibold">{d.title}</p>
 								<p class="mt-2 text-sm text-muted">{d.body}</p>
 							</div>
 						))}
 					</div>
+					{project.aiFeature.decisions.length > 3 && (
+						<details class="ai-more mt-8">
+							<summary class="inline-flex cursor-pointer list-none items-center gap-2 rounded-pill border border-ink/15 px-4 py-2 text-sm font-semibold">
+								<span class="ai-more-open">See the {project.aiFeature.decisions.length - 3} other decisions</span>
+								<span class="ai-more-close">Show fewer decisions</span>
+								<svg class="ai-more-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+							</summary>
+							<div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+								{project.aiFeature.decisions.slice(3).map((d) => (
+									<div>
+										<p class="font-semibold">{d.title}</p>
+										<p class="mt-2 text-sm text-muted">{d.body}</p>
+									</div>
+								))}
+							</div>
+						</details>
+					)}
 				</div>
 			</section>
 		)
@@ -410,6 +427,13 @@ const ds = project.designSystem;
 		margin-top: 0.5rem;
 	}
 
+	/* folded design decisions */
+	.ai-more summary::-webkit-details-marker { display: none; }
+	.ai-more .ai-more-close { display: none; }
+	.ai-more[open] .ai-more-open { display: none; }
+	.ai-more[open] .ai-more-close { display: inline; }
+	.ai-more .ai-more-ic { transition: transform 0.2s ease; }
+	.ai-more[open] .ai-more-ic { transform: rotate(180deg); }
 </style>
 
 <script is:inline>
