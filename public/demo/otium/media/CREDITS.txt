@@ -266,3 +266,22 @@ g/stockholm-5.jpg — https://www.pexels.com/photo/35662997/ — Abhishek Navlak
 g/bruges-5.jpg — https://www.pexels.com/photo/34378455/ — Ryan Thomas
 g/bruges-6.jpg — https://www.pexels.com/photo/18969096/ — Santiago C.
 g/bruges-7.jpg — https://www.pexels.com/photo/30319631/ — Kristina Bekher
+telaviv.jpg — https://www.pexels.com/photo/18837986/ — Виктор Соломоник
+jerusalem.jpg — https://www.pexels.com/photo/30284228/ — Duc Tinh Ngo
+g/telaviv-1.jpg — https://www.pexels.com/photo/17291323/ — K
+g/telaviv-2.jpg — https://www.pexels.com/photo/18809933/ — רון סרפיק
+g/telaviv-3.jpg — https://www.pexels.com/photo/20873890/ — Zeev Hazenfratz
+g/telaviv-4.jpg — https://www.pexels.com/photo/33933850/ — Mark Direen
+g/telaviv-5.jpg — https://www.pexels.com/photo/35916176/ — Samar L.
+g/telaviv-6.jpg — https://www.pexels.com/photo/6159073/ — Karolína Balogová
+g/telaviv-7.jpg — https://www.pexels.com/photo/5028008/ — Yeshaya Dinerstein
+g/telaviv-8.jpg — https://www.pexels.com/photo/36007237/ — Samar L.
+g/jerusalem-1.jpg — https://www.pexels.com/photo/11696778/ — Yasir Gürbüz
+g/jerusalem-2.jpg — https://www.pexels.com/photo/11696783/ — Yasir Gürbüz
+g/jerusalem-3.jpg — https://www.pexels.com/photo/34497941/ — Michelle Chadwick
+g/jerusalem-4.jpg — https://www.pexels.com/photo/38446004/ — Anat Landa
+g/jerusalem-5.jpg — https://www.pexels.com/photo/38446000/ — Anat Landa
+g/jerusalem-6.jpg — https://www.pexels.com/photo/6159081/ — Karolína Balogová
+g/jerusalem-7.jpg — https://www.pexels.com/photo/6851494/ — Leon Natan
+g/jerusalem-8.jpg — https://www.pexels.com/photo/38445997/ — Anat Landa
+g/jerusalem-9.jpg — https://www.pexels.com/photo/40426494/ — Сокіл Sokil

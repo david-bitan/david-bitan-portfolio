@@ -16,11 +16,11 @@
  */
 
 const MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
-const CITIES = ["lisbon", "rome", "barcelona", "amsterdam", "athens", "copenhagen", "porto", "seville", "valencia", "granada", "palma", "florence", "venice", "naples", "palermo", "nice", "valletta", "santorini", "prague", "budapest", "krakow", "dubrovnik", "split", "istanbul", "marrakech", "reykjavik", "edinburgh", "stockholm", "tallinn", "bruges"];
+const CITIES = ["telaviv", "jerusalem", "lisbon", "rome", "barcelona", "amsterdam", "athens", "copenhagen", "porto", "seville", "valencia", "granada", "palma", "florence", "venice", "naples", "palermo", "nice", "valletta", "santorini", "prague", "budapest", "krakow", "dubrovnik", "split", "istanbul", "marrakech", "reykjavik", "edinburgh", "stockholm", "tallinn", "bruges"];
 
 const SYSTEM = `You read short travel requests and extract fields. Reply with ONE JSON object and nothing else.
 Fields:
-- "city": one of ${CITIES.join(", ")} if the user names or clearly implies it (Mallorca/Majorca = palma, Malta = valletta, Iceland = reykjavik, Hvar = split); "other" if they name a place outside this list; null if no place is given.
+- "city": one of ${CITIES.join(", ")} if the user names or clearly implies it (Mallorca/Majorca = palma, Malta = valletta, Iceland = reykjavik, Hvar = split, Jaffa or just Israel = telaviv); "other" if they name a place outside this list; null if no place is given.
 - "asked_place": the place the user typed, as written, or null.
 - "nights": integer 1-28 or null. "a weekend" = 2, "long weekend" = 3, "a week" = 7, "two weeks" = 14, "a month" = 28.
 - "travelers": integer 1-50 or null. "couple", "my partner and I", "for two" = 2. "solo", "alone" = 1.

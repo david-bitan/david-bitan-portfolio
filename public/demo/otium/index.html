@@ -1141,6 +1141,20 @@ body.lb-open { overflow: hidden; }
 @keyframes donePop { 0% { box-shadow: 0 0 0 0 rgba(47,111,181,.45); } 100% { box-shadow: 0 0 0 14px rgba(47,111,181,0); } }
 .done-banner.pop { animation: donePop 1.1s var(--ease) .5s 2; }
 @media (prefers-reduced-motion: reduce) { .done-banner.pop { animation: none; } }
+/* day plan times: neutral pill instead of red */
+.day li { padding-inline-start: 0; border-inline-start: 0; }
+.day li time { display: inline-block; margin-bottom: 3px; padding: 1px 7px; border-radius: 6px; background: var(--sand); color: var(--ink-2); font-weight: 600; }
+/* v3.9: gallery header hugs the photo; calm blue for selected options; custom-length chip */
+.lb-top { width: min(100%, calc(min(68vh, 760px) * 1.5 + 36px)); margin: 0 auto; padding: 18px 18px 10px; box-sizing: border-box; }
+.lb.has-info .lb-top { width: 100%; max-width: 1280px; }
+@media (max-width: 900px) { .lb-top, .lb.has-info .lb-top { width: min(100%, calc(52vh * 1.5 + 36px)); } }
+.lb .lb-body { flex: 0 0 auto; }
+.lb { justify-content: center; }
+.alt[aria-pressed="true"] { border-color: #2F6FB5; box-shadow: inset 0 0 0 1px #2F6FB5; background: #F3F8FD; }
+.cal-quick .chip[aria-pressed="true"] { border-color: #2F6FB5; color: #2F6FB5; }
+:focus-visible { outline-color: #2F6FB5; }
+.card-l:focus-visible { outline-color: #2F6FB5; }
+@keyframes flash { 0%, 60% { background: #E6F0FA; border-radius: 12px; } 100% { background: transparent; } }
 </style>
 </head>
 <body>
@@ -1239,7 +1253,7 @@ body.lb-open { overflow: hidden; }
 		<div class="case-banner" id="caseBanner" hidden></div>
 		<div class="work-bar">
 			<div class="col-l"><button class="btn btn-ghost btn-sm" id="newTrip" type="button"><i data-i="arrow-left"></i>New trip</button><span class="col-t">What Otium is doing</span></div>
-			<div class="col-r"><span class="col-t">Your trip</span><span class="col-h">Updates live. Nothing is final until you approve.</span><button class="btn btn-text btn-sm" id="openHistory" type="button"><i data-i="history"></i>Trip history</button><button class="btn btn-text btn-sm discard" id="discardTrip" type="button"><i data-i="trash-2"></i>Discard trip</button></div>
+			<div class="col-r"><span class="col-t">Your trip</span><span class="col-h">Updates live. Nothing is final until you approve.</span><button class="btn btn-text btn-sm" id="openHistory" type="button"><i data-i="history"></i>Trip history</button><button class="btn btn-text btn-sm discard" id="discardTrip" type="button"><i data-i="trash-2"></i>Cancel this trip</button></div>
 		</div>
 		<aside class="panel agent" id="agent" data-status="working" aria-label="Agent">
 			<div class="agent-h">

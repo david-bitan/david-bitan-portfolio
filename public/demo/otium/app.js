@@ -22,7 +22,7 @@
 	const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 	const ORIGIN_FACTOR = { Paris: 1, London: 1.08, "Tel Aviv": 1.45, Berlin: 0.95, Madrid: 0.9, Brussels: 0.98, Dublin: 1.12, Geneva: 1.1, Lyon: 0.96, Milan: 0.92, Munich: 1.02, Vienna: 1.04 };
 	const TICKETS_PP_DAY = 30;
-	const SWATCH = { lisbon: ["#E7B98A", "#B5653E"], rome: ["#E2B27C", "#9C5A37"], barcelona: ["#9CC3D5", "#3F7C93"], amsterdam: ["#B9C9B2", "#5E7A63"], athens: ["#D9D3C4", "#8B9BA8"], copenhagen: ["#A9C0CF", "#4F6E86"] , porto: ["#D9B48F", "#8E5A3C"], seville: ["#E9C08A", "#B3653A"], valencia: ["#A9CFD9", "#3C7F96"], granada: ["#E2C29A", "#9E6B44"], palma: ["#9DD0D8", "#2F7C8C"], florence: ["#E3B98D", "#A35E3A"], venice: ["#A9C6D3", "#4B7489"], naples: ["#E7B583", "#A84F35"], palermo: ["#EAC28F", "#B0623A"], nice: ["#9CCBDD", "#2E6F8E"], valletta: ["#E8CF9C", "#A97C45"], santorini: ["#B5D3E6", "#3D6E9A"], prague: ["#C9B7A2", "#6E5A4B"], budapest: ["#D8C29C", "#8C6B43"], krakow: ["#CDB9A0", "#7A5E46"], dubrovnik: ["#A8CFE0", "#3A7493"], split: ["#B3D5DC", "#3F7F8A"], istanbul: ["#E0B98E", "#8E4F3A"], marrakech: ["#E5A77C", "#A24E2E"], reykjavik: ["#B9CBD6", "#4F6B80"], edinburgh: ["#BFB8B0", "#5D5650"], stockholm: ["#B6C6D4", "#4D657D"], tallinn: ["#C3BBAE", "#6B6255"], bruges: ["#C8B9A2", "#77654D"] };
+	const SWATCH = { telaviv: ["#A9CFE0", "#3E7FA0"], jerusalem: ["#E3CFA6", "#9C7A45"], lisbon: ["#E7B98A", "#B5653E"], rome: ["#E2B27C", "#9C5A37"], barcelona: ["#9CC3D5", "#3F7C93"], amsterdam: ["#B9C9B2", "#5E7A63"], athens: ["#D9D3C4", "#8B9BA8"], copenhagen: ["#A9C0CF", "#4F6E86"] , porto: ["#D9B48F", "#8E5A3C"], seville: ["#E9C08A", "#B3653A"], valencia: ["#A9CFD9", "#3C7F96"], granada: ["#E2C29A", "#9E6B44"], palma: ["#9DD0D8", "#2F7C8C"], florence: ["#E3B98D", "#A35E3A"], venice: ["#A9C6D3", "#4B7489"], naples: ["#E7B583", "#A84F35"], palermo: ["#EAC28F", "#B0623A"], nice: ["#9CCBDD", "#2E6F8E"], valletta: ["#E8CF9C", "#A97C45"], santorini: ["#B5D3E6", "#3D6E9A"], prague: ["#C9B7A2", "#6E5A4B"], budapest: ["#D8C29C", "#8C6B43"], krakow: ["#CDB9A0", "#7A5E46"], dubrovnik: ["#A8CFE0", "#3A7493"], split: ["#B3D5DC", "#3F7F8A"], istanbul: ["#E0B98E", "#8E4F3A"], marrakech: ["#E5A77C", "#A24E2E"], reykjavik: ["#B9CBD6", "#4F6B80"], edinburgh: ["#BFB8B0", "#5D5650"], stockholm: ["#B6C6D4", "#4D657D"], tallinn: ["#C3BBAE", "#6B6255"], bruges: ["#C8B9A2", "#77654D"] };
 	const ic = window.ic;
 	document.querySelectorAll("i[data-i]").forEach((e) => (e.outerHTML = ic(e.dataset.i)));
 	const ICON = {
@@ -181,7 +181,7 @@
 		renderCats(); renderListings();
 		const cardClick = (e) => {
 			const h = e.target.closest(".heart");
-			if (h) { const on = h.getAttribute("aria-pressed") !== "true"; h.setAttribute("aria-pressed", on); saved[on ? "add" : "delete"](h.dataset.city); toast(on ? t("{city} saved to your wishlist", { city: D.cities[h.dataset.city].name }) : t("Removed from your wishlist")); return; }
+			if (h) { const on = h.getAttribute("aria-pressed") !== "true"; h.setAttribute("aria-pressed", on); saved[on ? "add" : "delete"](h.dataset.city); keepSaved(); toast(on ? t("{city} saved to your wishlist", { city: D.cities[h.dataset.city].name }) : t("Removed from your wishlist")); return; }
 			const card = e.target.closest(".card-l"); if (!card) return;
 			const cat = CATS.find((c) => c[0] === activeCat);
 			const q = t("A long weekend in {city} for two", { city: D.cities[card.dataset.city].name }) + (cat && cat[0] !== "all" ? `, ${t(cat[3])}` : "");
@@ -234,9 +234,10 @@
 		["design", "Design", ic("building-2"), "design and architecture"],
 		["night", "Nightlife", ic("moon"), "nightlife"],
 	];
-	const CITY_CATS = { lisbon: ["food", "culture", "night"], rome: ["food", "culture"], barcelona: ["beach", "food", "night", "design"], amsterdam: ["culture", "design", "night"], athens: ["culture", "beach"], copenhagen: ["design", "food"], porto: ["food", "culture"], seville: ["culture", "food", "night"], valencia: ["beach", "food", "design"], granada: ["culture"], palma: ["beach", "food"], florence: ["culture", "food", "design"], venice: ["culture", "design"], naples: ["food", "culture", "beach"], palermo: ["food", "culture", "beach"], nice: ["beach", "food", "culture"], valletta: ["culture", "beach", "food"], santorini: ["beach", "design"], prague: ["culture", "night", "food"], budapest: ["culture", "night"], krakow: ["culture", "food"], dubrovnik: ["beach", "culture"], split: ["beach", "culture", "night"], istanbul: ["food", "culture", "night"], marrakech: ["food", "culture", "design"], reykjavik: ["culture", "design"], edinburgh: ["culture", "night"], stockholm: ["design", "culture"], tallinn: ["culture", "design"], bruges: ["culture", "food"] };
+	const CITY_CATS = { telaviv: ["beach", "food", "night", "design"], jerusalem: ["culture", "food"], lisbon: ["food", "culture", "night"], rome: ["food", "culture"], barcelona: ["beach", "food", "night", "design"], amsterdam: ["culture", "design", "night"], athens: ["culture", "beach"], copenhagen: ["design", "food"], porto: ["food", "culture"], seville: ["culture", "food", "night"], valencia: ["beach", "food", "design"], granada: ["culture"], palma: ["beach", "food"], florence: ["culture", "food", "design"], venice: ["culture", "design"], naples: ["food", "culture", "beach"], palermo: ["food", "culture", "beach"], nice: ["beach", "food", "culture"], valletta: ["culture", "beach", "food"], santorini: ["beach", "design"], prague: ["culture", "night", "food"], budapest: ["culture", "night"], krakow: ["culture", "food"], dubrovnik: ["beach", "culture"], split: ["beach", "culture", "night"], istanbul: ["food", "culture", "night"], marrakech: ["food", "culture", "design"], reykjavik: ["culture", "design"], edinburgh: ["culture", "night"], stockholm: ["design", "culture"], tallinn: ["culture", "design"], bruges: ["culture", "food"] };
 	const POPULAR = { lisbon: "Most planned", barcelona: "Trending" };
-	let activeCat = "all"; const saved = new Set();
+	let activeCat = "all"; const saved = new Set((() => { try { return JSON.parse(localStorage.getItem("otium-saved") || "[]"); } catch { return []; } })());
+	const keepSaved = () => { try { localStorage.setItem("otium-saved", JSON.stringify([...saved])); } catch {} };
 	function renderCats() {
 		$("#cats").innerHTML = CATS.map(([k, label, icon]) => `<button type="button" data-cat="${k}" aria-pressed="${k === activeCat}">${icon}${t(label)}</button>`).join("");
 	}
@@ -259,10 +260,10 @@
 	const FEATURED = { // always a multiple of 4: full rows of four cards
 		all: ["lisbon", "santorini", "prague", "marrakech", "barcelona", "reykjavik", "florence", "dubrovnik"],
 		food: ["naples", "istanbul", "porto", "palermo"],
-		culture: ["athens", "granada", "krakow", "venice", "edinburgh", "rome", "seville", "budapest"],
-		beach: ["nice", "dubrovnik", "palma", "split"],
+		culture: ["jerusalem", "athens", "granada", "krakow", "venice", "edinburgh", "rome", "budapest"],
+		beach: ["telaviv", "nice", "dubrovnik", "palma"],
 		design: ["copenhagen", "stockholm", "valencia", "amsterdam"],
-		night: ["budapest", "amsterdam", "istanbul", "edinburgh"],
+		night: ["telaviv", "budapest", "amsterdam", "istanbul"],
 	};
 	function renderListings() {
 		const keys = cityKeys();
@@ -328,7 +329,7 @@
 	const fmtDay = (d) => d.toLocaleDateString(I.locale, { weekday: "short", day: "numeric", month: "short" });
 
 	/* ---------------- understanding the request ---------------- */
-	const ALIASES = { lisbon: ["lisbon", "lisboa", "lisbonne", "lisbona", "ליסבון"], rome: ["rome", "roma", "רומא"], barcelona: ["barcelona", "barcelone", "barcellona", "barça", "bcn", "ברצלונה"], amsterdam: ["amsterdam", "ámsterdam", "אמסטרדם"], athens: ["athens", "athina", "athènes", "atenas", "atene", "אתונה"], copenhagen: ["copenhagen", "copenhague", "copenaghen", "københavn", "kobenhavn", "cph", "קופנהגן"] , porto: ["porto", "oporto", "פורטו"], seville: ["seville", "sevilla", "séville", "siviglia", "סביליה"], valencia: ["valencia", "valence", "valència", "ולנסיה"], granada: ["granada", "grenade", "גרנדה"], palma: ["palma", "mallorca", "majorque", "maiorca", "פלמה", "מיורקה"], florence: ["florence", "firenze", "florencia", "פירנצה"], venice: ["venice", "venezia", "venise", "venecia", "ונציה"], naples: ["naples", "napoli", "nápoles", "נאפולי"], palermo: ["palermo", "palerme", "פלרמו"], nice: ["nice", "nizza", "niza", "ניס"], valletta: ["valletta", "malta", "malte", "לה ולטה", "מלטה"], santorini: ["santorini", "santorin", "סנטוריני"], prague: ["prague", "praha", "praga", "פראג"], budapest: ["budapest", "budapeste", "בודפשט"], krakow: ["krakow", "kraków", "cracovie", "cracovia", "קרקוב"], dubrovnik: ["dubrovnik", "דוברובניק"], split: ["split", "ספליט"], istanbul: ["istanbul", "estambul", "istambul", "איסטנבול"], marrakech: ["marrakech", "marrakesh", "marrakesch", "marrakech", "מרקש"], reykjavik: ["reykjavik", "reikiavik", "reykjavík", "רייקיאוויק", "איסלנד", "iceland", "islande", "islandia", "islanda"], edinburgh: ["edinburgh", "édimbourg", "edimburgo", "אדינבורו"], stockholm: ["stockholm", "estocolmo", "stoccolma", "שטוקהולם"], tallinn: ["tallinn", "tallin", "טאלין"], bruges: ["bruges", "brugge", "brujas", "בריז׳"] };
+	const ALIASES = { telaviv: ["tel aviv", "tel-aviv", "telaviv", "tlv", "jaffa", "yafo", "תל אביב", "תל-אביב"], jerusalem: ["jerusalem", "jérusalem", "jerusalén", "gerusalemme", "ירושלים"], lisbon: ["lisbon", "lisboa", "lisbonne", "lisbona", "ליסבון"], rome: ["rome", "roma", "רומא"], barcelona: ["barcelona", "barcelone", "barcellona", "barça", "bcn", "ברצלונה"], amsterdam: ["amsterdam", "ámsterdam", "אמסטרדם"], athens: ["athens", "athina", "athènes", "atenas", "atene", "אתונה"], copenhagen: ["copenhagen", "copenhague", "copenaghen", "københavn", "kobenhavn", "cph", "קופנהגן"] , porto: ["porto", "oporto", "פורטו"], seville: ["seville", "sevilla", "séville", "siviglia", "סביליה"], valencia: ["valencia", "valence", "valència", "ולנסיה"], granada: ["granada", "grenade", "גרנדה"], palma: ["palma", "mallorca", "majorque", "maiorca", "פלמה", "מיורקה"], florence: ["florence", "firenze", "florencia", "פירנצה"], venice: ["venice", "venezia", "venise", "venecia", "ונציה"], naples: ["naples", "napoli", "nápoles", "נאפולי"], palermo: ["palermo", "palerme", "פלרמו"], nice: ["nice", "nizza", "niza", "ניס"], valletta: ["valletta", "malta", "malte", "לה ולטה", "מלטה"], santorini: ["santorini", "santorin", "סנטוריני"], prague: ["prague", "praha", "praga", "פראג"], budapest: ["budapest", "budapeste", "בודפשט"], krakow: ["krakow", "kraków", "cracovie", "cracovia", "קרקוב"], dubrovnik: ["dubrovnik", "דוברובניק"], split: ["split", "ספליט"], istanbul: ["istanbul", "estambul", "istambul", "איסטנבול"], marrakech: ["marrakech", "marrakesh", "marrakesch", "marrakech", "מרקש"], reykjavik: ["reykjavik", "reikiavik", "reykjavík", "רייקיאוויק", "איסלנד", "iceland", "islande", "islandia", "islanda"], edinburgh: ["edinburgh", "édimbourg", "edimburgo", "אדינבורו"], stockholm: ["stockholm", "estocolmo", "stoccolma", "שטוקהולם"], tallinn: ["tallinn", "tallin", "טאלין"], bruges: ["bruges", "brugge", "brujas", "בריז׳"] };
 	const ELSEWHERE = ["tokio", "טוקיו", "ניו יורק", "tokyo", "new york", "nyc", "bali", "bangkok", "dubai", "london", "paris", "berlin", "madrid", "vienna", "mexico", "japan", "thailand", "morocco", "cairo", "sydney", "miami", "eilat"];
 	const NUM = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7 };
 	function localParse(text) {
@@ -825,7 +826,7 @@
 				<div class="cal-ms">${calMonth(cal.month)}${two ? calMonth(m2) : ""}</div>
 				<button type="button" class="cal-nav next" data-cal="next" aria-label="${esc(t("Next month"))}" ${canNext ? "" : "disabled"}>${ic("chevron-right", "dir")}</button>
 			</div>
-			<div class="cal-quick"><span>${t("Stay for")}</span>${QUICK_NIGHTS.map((n) => `<button type="button" class="chip" data-n="${n}" aria-pressed="false">${P(n, "1 night", "{n} nights")}</button>`).join("")}</div>
+			<div class="cal-quick"><span>${t("Stay for")}</span>${QUICK_NIGHTS.map((n) => `<button type="button" class="chip" data-n="${n}" aria-pressed="false">${P(n, "1 night", "{n} nights")}</button>`).join("")}<button type="button" class="chip cal-custom" data-n="" aria-pressed="true" hidden></button></div>
 			<div class="cal-foot"><div class="cal-sum" aria-live="polite"></div><div class="row">${cal.onClear ? `<button type="button" class="btn btn-text btn-sm" data-cal="clear">${t("Clear dates")}</button>` : ""}<button type="button" class="btn btn-ghost btn-sm" data-cal="cancel">${t("Cancel")}</button><button type="button" class="btn btn-primary btn-sm" data-cal="apply">${t("Apply dates")}</button></div></div>`;
 		markCal();
 	}
@@ -849,7 +850,8 @@
 			: !cal.b ? `<b>${fmtDay(A)}</b> · ${t("now pick your return day")}`
 			: `<b>${fmtDay(A)} – ${fmtDay(cal.b)}</b> · ${P(n, "1 night", "{n} nights")}`;
 		el.querySelector('[data-cal="apply"]').disabled = !n;
-		el.querySelectorAll(".cal-quick .chip").forEach((c) => c.setAttribute("aria-pressed", String(n === +c.dataset.n)));
+		el.querySelectorAll(".cal-quick .chip:not(.cal-custom)").forEach((c) => c.setAttribute("aria-pressed", String(n === +c.dataset.n)));
+		const cc = el.querySelector(".cal-custom"); if (cc) { const own = n > 0 && !QUICK_NIGHTS.includes(n); cc.hidden = !own; if (own) { cc.dataset.n = n; cc.textContent = P(n, "1 night", "{n} nights"); } }
 	}
 	function calShow(d) { // make sure a date is in the visible month(s)
 		const two = innerWidth > 720; const m = new Date(d.getFullYear(), d.getMonth(), 1, 12);
@@ -1052,6 +1054,8 @@
 	 * Paying and issuing tickets need the traveller's details and a card. If something is missing,
 	 * the agent stops on a card that says what, links to the profile, and resumes on its own once it's done. */
 	const ME = { signedIn: false, email: "", first: "", last: "", phone: "", dob: "", passport: "", street: "", city: "", zip: "", country: "", card: null };
+	try { const keep = JSON.parse(localStorage.getItem("otium-me") || "null"); if (keep && typeof keep === "object") Object.keys(ME).forEach((k) => { if (k in keep) ME[k] = keep[k]; }); } catch {}
+	const saveMe = () => { try { localStorage.setItem("otium-me", JSON.stringify(ME)); } catch {} };
 	const COUNTRIES = ["FR", "GB", "IL", "DE", "ES", "IT", "PT", "NL", "BE", "CH", "AT", "IE", "GR", "DK", "US", "CA"];
 	const countryName = (c) => { try { return new Intl.DisplayNames([I.locale], { type: "region" }).of(c); } catch { return c; } };
 	const profileParts = () => ({
@@ -1066,6 +1070,7 @@
 	const profWaiters = [];
 	const profileReady = () => new Promise((r) => profWaiters.push(r));
 	function profileChanged() {
+		saveMe();
 		renderAcct();
 		if (!$("#profile").hidden) renderProfile();
 		if (readyToPay() && profWaiters.length) { profWaiters.splice(0).forEach((r) => r("ready")); }
@@ -1088,7 +1093,7 @@
 			<div class="flds"><label class="fld"><span>${t("Email")}</span><input id="siEmail" type="email" autocomplete="off" spellcheck="false"></label>
 			<label class="fld"><span>${t("Password")}</span><input id="siPass" type="password" autocomplete="off"></label></div>
 			<p class="err" id="siErr" hidden></p>
-			<p class="fine">${ICON.info}<span>${t("Demo: any email and password work. Nothing is checked, stored or sent.")}</span></p>
+			<p class="fine">${ICON.info}<span>${t("Demo: any email and password work. Nothing is checked or sent; you stay signed in on this browser until you sign out.")}</span></p>
 			<div class="row"><button class="btn btn-text btn-sm" data-m="cancel">${t("Cancel")}</button><button class="btn btn-ghost btn-sm" id="siDemo" type="button">${t("Use a demo account")}</button><button class="btn btn-primary btn-sm" id="siGo" type="button">${t("Sign in")}</button></div>`, () => {});
 		const go = (demo) => {
 			const em = demo ? "alex.martin@otium.example" : $("#siEmail").value.trim();
@@ -1194,7 +1199,7 @@
 	/* ---------------- photos: destination galleries, stay details, one lightbox ---------------- */
 	const hashN = (x) => { let h = 0; for (const ch of String(x)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; };
 	const credit = (src) => D.credits[String(src).replace(/^media\//, "")] || "";
-	const GAL_N = {"amsterdam": 10, "athens": 6, "barcelona": 7, "bruges": 8, "budapest": 7, "copenhagen": 8, "dubrovnik": 8, "edinburgh": 7, "florence": 10, "granada": 7, "istanbul": 9, "krakow": 6, "lisbon": 8, "marrakech": 8, "naples": 6, "nice": 8, "palermo": 7, "palma": 8, "porto": 7, "prague": 9, "reykjavik": 6, "rome": 9, "santorini": 10, "seville": 9, "split": 7, "stockholm": 6, "tallinn": 5, "valencia": 6, "valletta": 6, "venice": 9}; // photos per destination, hero included (5 to 10)
+	const GAL_N = {"telaviv": 9, "jerusalem": 10, "amsterdam": 10, "athens": 6, "barcelona": 7, "bruges": 8, "budapest": 7, "copenhagen": 8, "dubrovnik": 8, "edinburgh": 7, "florence": 10, "granada": 7, "istanbul": 9, "krakow": 6, "lisbon": 8, "marrakech": 8, "naples": 6, "nice": 8, "palermo": 7, "palma": 8, "porto": 7, "prague": 9, "reykjavik": 6, "rome": 9, "santorini": 10, "seville": 9, "split": 7, "stockholm": 6, "tallinn": 5, "valencia": 6, "valletta": 6, "venice": 9}; // photos per destination, hero included (5 to 10)
 	const galN = (k) => GAL_N[k] || 5;
 	const cityPhotos = (k) => [[D.cities[k].photo, ""], ...Array.from({ length: galN(k) - 1 }, (_, i) => [`media/g/${k}-${i + 1}.jpg`, ""])];
 	const STAY_SETS = {
@@ -1408,7 +1413,7 @@
 		return `<dl class="fl-info"><div><dt>${t("Airport")}</dt><dd>${esc(on(S.origin))} ${o} · ${t("Terminal {n}", { n: 1 + f.i })}</dd></div><div><dt>${t("Be there by")}</dt><dd>${t("{t} (2 h before)", { t: at })}</dd></div><div><dt>${t("Check-in closes")}</dt><dd>${String(Math.floor(close / 60)).padStart(2, "0")}:${String(close % 60).padStart(2, "0")}</dd></div><div><dt>${t("Gate")}</dt><dd>${t("Shown 24 h before")}</dd></div></dl>`;
 	}
 	function stayRow(s, p) {
-		return `<div class="stay"><button type="button" class="pic" data-staypics="${s.id}" aria-label="${esc(t("Photos and details of {x}", { x: s.name }))}">${pic(s.photo, p.city, s.name)}<span class="pics-n">${ic("images")}${STAY_SETS[s.meta.set].length + 1}</span></button><div><b>${esc(s.name)}</b><br><small>${t(KIND[s.meta.kind][1])}${s.meta.stars ? ` ${"★".repeat(s.meta.stars)}` : ""} · ${esc(s.area)} · ${ICON.star} ${s.rating} · ${esc(s.perk)}</small><button type="button" class="btn btn-text btn-sm see-stay" data-staypics="${s.id}">${ic("images")}${t("Photos and details")}</button><div class="tags">${s.freeCancel ? `<span class="tag g">${t("Free cancellation")}</span>` : `<span class="tag r">${t("Non-refundable")}</span>`}<span class="tag">${t("Matches your cap")}</span></div></div><div class="price num">${eur(s.nightly * p.nights)}<small>${t("{x} / night", { x: eur(s.nightly) })}</small></div></div>`;
+		return `<div class="stay"><button type="button" class="pic" data-staypics="${s.id}" aria-label="${esc(t("Photos and details of {x}", { x: s.name }))}">${pic(s.photo, p.city, s.name)}<span class="pics-n">${ic("images")}${STAY_SETS[s.meta.set].length + 1}</span></button><div><b>${esc(s.name)}</b><br><small>${t(KIND[s.meta.kind][1])}${s.meta.stars ? ` ${"★".repeat(s.meta.stars)}` : ""} · ${esc(s.area)} · ${ICON.star} ${s.rating} · ${esc(s.perk)}</small><div class="tags">${s.freeCancel ? `<span class="tag g">${t("Free cancellation")}</span>` : `<span class="tag r">${t("Non-refundable")}</span>`}<span class="tag">${t("Matches your cap")}</span></div></div><div class="price num">${eur(s.nightly * p.nights)}<small>${t("{x} / night", { x: eur(s.nightly) })}</small></div></div>`;
 	}
 	function altStays(c, p) {
 		if (S.held.stay || S.progress.done) return "";
@@ -1588,9 +1593,9 @@
 	$("#steps").addEventListener("click", (e) => { const b = e.target.closest(".peek"); if (!b) return; const li = b.closest(".step"); const open = li.classList.toggle("folded") === false; b.setAttribute("aria-expanded", open); });
 	$("#discardTrip").onclick = () => {
 		const heldAmt = (S.held.flights?.amount || 0) + (S.held.stay?.amount || 0);
-		modal(`<h3 id="modalTitle">${t("Discard this trip?")}</h3><p>${heldAmt ? t("Otium will release everything it holds first. ") + t(S.held.stay && !S.held.stay.refundable ? "The stay is non-refundable, so that part can’t be recovered." : "Nothing is lost.") : t("Nothing has been booked yet, so nothing is lost.")}</p>
+		modal(`<h3 id="modalTitle">${t("Cancel this trip?")}</h3><p>${heldAmt ? t("Otium will release everything it holds first. ") + t(S.held.stay && !S.held.stay.refundable ? "The stay is non-refundable, so that part can’t be recovered." : "Nothing is lost.") : t("Nothing has been booked yet, so nothing is lost.")}</p>
 			<div class="ba"><div><b>${t("Now")}</b>${D.cities[S.plan?.city]?.name || t("Draft")} · ${heldAmt ? t("{x} held", { x: eur(heldAmt) }) : t("draft")}</div><span class="arrow">${ICON.arrow}</span><div class="after"><b>${t("After")}</b>${t("No trip")} · ${heldAmt ? t("{x} released", { x: eur(heldAmt) }) : t("back to start")}</div></div>
-			<div class="row"><button class="btn btn-ghost btn-sm" data-m="cancel">${t("Keep it")}</button><button class="btn btn-danger btn-sm" data-m="ok">${t("Discard trip")}</button></div>`, (r) => {
+			<div class="row"><button class="btn btn-ghost btn-sm" data-m="cancel">${t("Keep it")}</button><button class="btn btn-danger btn-sm" data-m="ok">${t("Cancel this trip")}</button></div>`, (r) => {
 			if (r !== "ok") return;
 			const tr = activeTrip; clearActive(); if (tr) dropTrip(tr);
 			show("home"); toast(t("Trip discarded. Nothing is held."));
