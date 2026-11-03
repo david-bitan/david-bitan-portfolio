@@ -15,9 +15,10 @@
 		}
 	}
 	const $ = (s, r = document) => r.querySelector(s);
-	/* Prices live in euros internally and are shown in the departure city's currency (demo rates, rounded). */
-	const CUR_BY_ORIGIN = { London: ["GBP", 0.86, 1], "Tel Aviv": ["ILS", 3.9, 4], Geneva: ["CHF", 0.94, 1] };
-	const cur = () => CUR_BY_ORIGIN[S.origin] || ["EUR", 1, 1];
+	/* Prices live in euros internally and are shown in the currency of the site language (demo rates, rounded):
+	 * English £, Hebrew ₪, French / Spanish / Italian €. The third value scales the budget steps. */
+	const CUR_BY_LANG = { en: ["GBP", 0.86, 1], he: ["ILS", 3.9, 4] };
+	const cur = () => CUR_BY_LANG[I.lang] || ["EUR", 1, 1];
 	const money = (local) => new Intl.NumberFormat(I.locale, { style: "currency", currency: cur()[0], currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(Math.round(local));
 	const eur = (n) => money(n * cur()[1]);
 	const fromLocal = (x) => x / cur()[1];
@@ -166,9 +167,9 @@
 
 	/* ---------------- home ---------------- */
 	const EXAMPLES = [
-		"A long weekend in Lisbon for two, food and viewpoints, under €900",
+		"A long weekend in Lisbon for two, food and viewpoints, under £900",
 		"Somewhere warm next month",
-		"Rome for 3 nights with my partner, museums, €1,200 max",
+		"Rome for 3 nights with my partner, museums, £1,200 max",
 		"Solo weekend in Copenhagen, design and bakeries",
 	];
 	const EXAMPLE_SHORT = ["Lisbon for two", "Somewhere sunny", "Rome, 3 nights, museums", "Solo in Copenhagen"];
@@ -223,7 +224,6 @@
 		};
 		const pick = (n) => {
 			S.origin = n; $("#originVal").textContent = on(n); open(false); btn.focus();
-			S.settings.cap = snapCap(S.settings.cap); if (S.plan && !S.progress?.done) S.plan.cap = snapCap(S.plan.cap);
 			renderListings(); renderBudget(Boolean($("#budgetOut")?.innerHTML)); if (!$("#rules")?.closest("[hidden]")) try { renderRules?.(); } catch {}
 		};
 		btn.onclick = (e) => { e.stopPropagation(); open(!list.classList.contains("on")); };
@@ -359,7 +359,7 @@
 		else if ((m = s.match(/(\d|three|four|five|six) (people|of us|adults|friends)/)) || (m = s.match(/for (\d|three|four|five|six)\b(?!\s*(nights?|days?|weeks?))/))) travelers = NUM[m[1]] || +m[1];
 		else if (/family/.test(s)) travelers = 4;
 		let budget = null;
-		if ((m = s.match(/[€$£]\s?(\d[\d,.\s]*)/)) || (m = s.match(/(\d[\d,.]*)\s?(€|eur|euros?|\$|usd|dollars?|£)/)) || (m = s.match(/(?:under|max|budget(?: of)?|up to|moins de|menos de|sotto i?|עד)\s+(\d[\d,.]*)/))) budget = parseInt(m[1].replace(/[,.\s]/g, ""), 10) || null;
+		if ((m = s.match(/[€$£₪]\s?(\d[\d,.\s]*)/)) || (m = s.match(/(\d[\d,.]*)\s?(€|eur|euros?|\$|usd|dollars?|£|₪|nis|ils|ש״ח|שקל)/)) || (m = s.match(/(?:under|max|budget(?: of)?|up to|moins de|menos de|sotto i?|עד)\s+(\d[\d,.]*)/))) budget = parseInt(m[1].replace(/[,.\s]/g, ""), 10) || null;
 		const KW = { food: ["food", "gastronomie", "comida", "cibo", "אוכל"], museums: ["museum", "musée", "museo", "musei", "מוזיאון"], beach: ["beach", "plage", "playa", "spiaggia", "mare", "חוף"], nightlife: ["nightlife", "vie nocturne", "vida nocturna", "vita notturna", "חיי לילה"], design: ["design", "diseño", "עיצוב"], viewpoints: ["viewpoint", "belvédère", "mirador", "belvedere", "תצפית"], history: ["history", "histoire", "historia", "storia", "היסטוריה"], bakeries: ["bakeries", "boulangerie", "panader", "panetteri", "מאפי"], art: [" art", "arte", "אמנות"] };
 		const interests = Object.keys(KW).filter((k) => KW[k].some((w) => s.includes(w))).slice(0, 3);
 		const pace = /\b(relax|slow|chill|lazy)\b/.test(s) ? "slow" : /\b(packed|see everything|busy)\b/.test(s) ? "packed" : "balanced";
@@ -459,7 +459,7 @@
 	}
 	function renderBudget(show) {
 		const box = $("#budgetOut"); if (!box) return;
-		$("#budCur").textContent = money(0).replace(/[\d\s.,\u00a0\u202f]/g, "");
+		$("#budCur").textContent = money(0).replace(/[\d\s.,\u00a0\u202f\u200e\u200f\u061c]/g, "");
 		$("#budDD").innerHTML = dd("b", "nights", [2, 3, 4, 5, 7].map((n) => [n, P(n, "1 night", "{n} nights")]), BUD.nights, t("Nights")) + dd("b", "travelers", [1, 2, 3, 4].map((n) => [n, P(n, "1 traveller", "{n} travellers")]), BUD.travelers, t("Travellers"));
 		const raw = +String($("#budAmt").value).replace(/[^\d]/g, "");
 		if (!show) return;
@@ -1590,7 +1590,7 @@
 			<div class="setting" style="display:block"><b>${t("Default budget cap")}</b><small>${t("Used when you don’t give one. Otium stops instead of going over.")}</small><input class="range" type="range" min="0" max="${CAP_BASE.length - 1}" step="1" value="${capList().indexOf(snapCap(st.cap))}" id="capRange" aria-label="${esc(t("Default budget cap"))}"><div class="num" style="font-weight:700" id="capVal">${eur(st.cap)}</div></div>
 			${row("r1", "Ask before any payment", "Holds, bookings and upgrades.", true, true)}
 			${row("r2", "Ask before sharing my details", "Names, passports, phone, email.", true, true)}
-			${row("r3", "Ask again if a price goes up", "Even by €1 after you approved.", true, true)}
+			${row("r3", "Ask again if a price goes up", "Even by £1 after you approved.", true, true)}
 			${row("refundable", "Prefer refundable stays", "Picks free cancellation when one fits.", st.refundable, false)}
 			${row("activities", "Draft activities for me", "Off = Otium leaves your days free.", st.activities, false)}`;
 		$("#capRange").oninput = (e) => { st.cap = capList()[+e.target.value]; $("#capVal").textContent = eur(st.cap); };
@@ -1667,11 +1667,11 @@
 	}
 
 	const STATES = [
-		["normal", "Everything goes right", "A clear request. Watch Otium plan the trip, then stop twice: before it pays, and before it shares your details.", "A long weekend in Lisbon for two, food and viewpoints, under €900"],
+		["normal", "Everything goes right", "A clear request. Watch Otium plan the trip, then stop twice: before it pays, and before it shares your details.", "A long weekend in Lisbon for two, food and viewpoints, under £900"],
 		["vague", "You don’t know where to go yet", "Otium asks one simple question instead of guessing or showing a long form.", "Somewhere warm next month"],
 		["outside", "A city Otium doesn’t cover", "It says so honestly and suggests places it can plan — it never pretends.", "A week in Tokyo for two"],
 		["overbudget", "The trip costs too much", "Otium stops at your budget cap and lets you choose how to save. It never decides with your money.", "Rome for 3 nights with my partner, museums"],
-		["soldout", "A flight sells out while booking", "Nothing is charged. Otium finds a plan B and asks again, because the price changed.", "Barcelona for 3 nights for two, beach and tapas, €1,200"],
+		["soldout", "A flight sells out while booking", "Nothing is charged. Otium finds a plan B and asks again, because the price changed.", "Barcelona for 3 nights for two, beach and tapas, £1,200"],
 		["offline", "The AI is down", "Otium switches to basic matching and tells you to double-check what it understood.", "Amsterdam for 2 nights, solo, museums"],
 	];
 	const SC_COL = { normal: "var(--lagoon)", vague: "#8C847A", outside: "#8C847A", overbudget: "var(--rose)", soldout: "var(--rose)", offline: "var(--amber)" };
@@ -1730,7 +1730,7 @@
 		normal: "Otium plans on its own, then stops twice: before it pays, and before it shares your details. Watch for the amber cards on the left.",
 		vague: "Your request names no place. Instead of guessing, Otium asks one question — pick a city from the photos.",
 		outside: "You asked for Tokyo, which Otium doesn’t cover. It says so honestly and suggests cities it can plan.",
-		overbudget: "Your budget is set to €400 — too low for Rome. Otium stops at the cap instead of going over and asks how you want to save.",
+		overbudget: "Your budget is set to £400 — too low for Rome. Otium stops at the cap instead of going over and asks how you want to save.",
 		soldout: "Approve the payment when asked: the flight will sell out during booking. Watch Otium charge nothing, find a plan B and ask again for the new price.",
 		offline: "The AI is switched off for this case. Otium falls back to simple matching and shows a warning so you double-check what it understood.",
 	};
@@ -2071,7 +2071,7 @@
 		const orgBy = {}; for (const [n] of D.origins) orgBy[prev === "en" ? n : (I.ORIGINS[prev]?.[n] || n)] = n;
 		return (v) => {
 			const x = v.trim(); if (cityBy[x]) return D.cities[cityBy[x]].name; if (orgBy[x]) return on(orgBy[x]);
-			if (/^[^\d]*(€|£|₪|CHF)[^\d]*[\d.,\s\u00a0\u202f]+$|^[\d.,\s\u00a0\u202f]+[^\d]*(€|£|₪|CHF)$/.test(x)) { const n = +x.replace(/[^\d]/g, ""); if (n) return money(n); } // money in the new format
+			if (/^[^\d]*(€|£|₪|CHF)[^\d]*[\d.,\s\u00a0\u202f]+$|^[\d.,\s\u00a0\u202f]+[^\d]*(€|£|₪|CHF)$/.test(x)) { const n = +x.replace(/[^\d]/g, ""); if (n) return money((n / PREV_RATE) * cur()[1]); } // money in the new format
 			return v;
 		};
 	}
@@ -2083,17 +2083,23 @@
 		$("#agentStatus").textContent = rs($("#agentStatus").textContent);
 		if (S._prev) S._prev[1] = rs(S._prev[1]);
 		S.log.forEach((l) => (l.text = rs(l.text)));
+		if (S.text) S.text = rs(S.text);
+		for (const x of TRIPS) if (x.s?.text) x.s.text = rs(x.s.text);
+		const ask = $("#ask"); if (ask?.value) { ask.value = rs(ask.value); fitAsk(); }
 		for (const x of TRIPS) if (x.s) { tr(x.steps); tr(x.notice); x.statusTxt = rs(x.statusTxt); x.s.log.forEach((l) => (l.text = rs(l.text))); if (x.s._prev) x.s._prev[1] = rs(x.s._prev[1]); }
 		NOTES.forEach((n) => (n.msg = rs(n.msg)));
 		BOT.msgs.forEach((m) => { if (m.local) m.text = rs(m.text); });
 	}
+	let PREV_RATE = 1;
 	function setLang(l) {
-		const prev = I.lang;
-		I.set(l); try { localStorage.setItem("otium-lang", I.lang); } catch {}
+		const prev = I.lang; PREV_RATE = cur()[1];
+		I.set(l);
+		S.settings.cap = snapCap(S.settings.cap); if (S.plan && !S.progress?.done && !S.held?.flights) S.plan.cap = snapCap(S.plan.cap); try { localStorage.setItem("otium-lang", I.lang); } catch {}
 		applyCityLang(); I.translateStatic();
 		$("#langCode").textContent = I.LANGS.find((x) => x[0] === I.lang)[2];
 		$("#originVal").textContent = on(S.origin);
 		$("#pauseBtn").textContent = t(S.paused ? "Resume" : "Pause");
+		const ap = $("#artPay"); if (ap) ap.textContent = eur(583);
 		renderExamples(); renderCats(); renderListings(); renderBudget(Boolean($("#budgetOut")?.innerHTML)); paintWhen(); if (cal) closeCal(); renderScen(); renderLog(); renderNotes(); renderCase();
 		if (prev !== I.lang) retranslateTrips(prev);
 		if (S.plan) { renderUnderstood(); renderTrip(); }
@@ -2108,7 +2114,7 @@
 	initHome(); initBudget(); initWhen(); initBot(); initAcct(); initGallery(); initMenu(); initScrollers(); initLang(); renderLog(); setLang(I.lang);
 	postit();
 	renderScen();
-	if (q.get("from") && D.origins.some(([n]) => n === q.get("from"))) { S.origin = q.get("from"); $("#originVal").textContent = S.origin; S.settings.cap = snapCap(S.settings.cap); renderListings(); renderBudget(false); }
+	if (q.get("from") && D.origins.some(([n]) => n === q.get("from"))) { S.origin = q.get("from"); $("#originVal").textContent = S.origin; renderListings(); renderBudget(false); }
 	if (q.get("state")) { const st = STATES.find((x) => x[0] === q.get("state")); if (st) { $("#ask").value = st[3]; start(st[3], false, st[0], st); } }
 	else if (q.get("q")) { $("#ask").value = q.get("q"); start(q.get("q")); }
 })();

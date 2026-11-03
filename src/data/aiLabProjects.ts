@@ -84,18 +84,19 @@ The language model only reads the request. Prices, the plan, the budget check an
 		designSystem: {
 			colors: [
 				{ name: 'Otium red', hex: '#C2344C', role: 'Brand · actions · hearts · notifications · needs you' },
+				{ name: 'Confirm green', hex: '#1E8A5A', role: 'Done · automatic · under budget · refunded' },
+				{ name: 'Calm blue', hex: '#2F6FB5', role: 'Selection · your seats · trip held' },
 				{ name: 'Ink', hex: '#222222', role: 'Type · T-Bot button · portfolio strip' },
 				{ name: 'White', hex: '#FFFFFF', role: 'Canvas — light, rounded cards, fine lines' },
 			],
 			typography: [
 				{ family: 'Plus Jakarta Sans', weights: '400 · 500 · 600 · 700', role: 'Interface · headings · body', sample: 'You decide. Otium does the legwork.' },
 				{ family: 'Heebo', weights: '400 · 500 · 700', role: 'Hebrew, right-to-left', sample: 'אתם מחליטים. Otium עושה את העבודה.' },
-				{ family: 'Fraunces', weights: 'Italic 500', role: 'Logotype only', sample: 'otium' },
 			],
 			micro: [
 				'One icon set everywhere — Lucide, thin strokes, no filled shapes',
 				'Steps tick in one by one, then fold so the timeline stays short',
-				'A budget bar with the cap marked, turning rose the moment the plan goes over',
+				'A budget bar with the cap marked: green under the cap, red the moment the plan goes over',
 				'Red dot on My trips and on T-Bot when something waits for you',
 				'Calendar range preview on hover, nights counted live',
 				'Help and T-Bot stacked bottom right, the way back to the portfolio bottom left',

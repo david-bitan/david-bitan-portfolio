@@ -8,8 +8,6 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23982427'/%3E%3Cpath d='M7 19a9 9 0 0 1 18 0' fill='none' stroke='%23FBF8F3' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
-@font-face { font-family: "Fraunces"; src: url(fonts/fraunces-latin-wght-normal.woff2) format("woff2"); font-weight: 300 800; font-display: swap; }
-@font-face { font-family: "Fraunces"; src: url(fonts/fraunces-latin-wght-italic.woff2) format("woff2"); font-weight: 300 800; font-style: italic; font-display: swap; }
 @font-face { font-family: "Heebo"; src: url(fonts/heebo-hebrew-wght-normal.woff2) format("woff2"); font-weight: 100 900; font-display: swap; unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
 @font-face { font-family: "Jakarta"; src: url(fonts/plus-jakarta-sans-latin-wght-normal.woff2) format("woff2"); font-weight: 300 800; font-display: swap; }
 
@@ -21,7 +19,7 @@
 	--r-lg: 24px; --r-md: 16px; --r-sm: 12px;
 	--shadow: 0 1px 2px rgba(29,26,23,.06), 0 8px 24px rgba(29,26,23,.06);
 	--shadow-lg: 0 2px 6px rgba(29,26,23,.06), 0 24px 60px rgba(29,26,23,.14);
-	--serif: "Fraunces", Georgia, serif;
+	--serif: var(--sans);
 	--sans: "Jakarta", "Heebo", system-ui, -apple-system, "Segoe UI", sans-serif;
 	--ease: cubic-bezier(.2,.8,.2,1);
 }
@@ -507,7 +505,7 @@ footer.foot a { color: var(--ink-2); }
 
 /* ===== v2 — Airbnb-inspired: white canvas, photo cards, fine icons, small colour touches ===== */
 :root { --canvas: #FFFFFF; --sand: #F7F7F7; --sand-2: #EBEBEB; --line: #DDDDDD; --ink: #222222; --ink-2: #6A6A6A; --ink-3: #929292; --serif: var(--sans); --r-lg: 16px; --r-md: 12px; --shadow: 0 1px 2px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.05); --shadow-lg: 0 6px 20px rgba(0,0,0,.14); --grad: #C2344C; }
-.logo b { font-family: "Fraunces", Georgia, serif; }
+.logo b { font-family: var(--sans); font-style: normal; font-weight: 800; letter-spacing: -.03em; }
 .top { background: rgba(255,255,255,.92); }
 .top.scrolled { box-shadow: 0 1px 0 var(--line); }
 h1 { font-weight: 700; letter-spacing: -.035em; }
@@ -664,6 +662,10 @@ h1 { font-weight: 700; letter-spacing: -.035em; }
 .case-banner[hidden] { display: none !important; }
 /* ===== right-to-left (Hebrew) ===== */
 [dir="rtl"] body { font-family: "Heebo", var(--sans); }
+/* sans-serif everywhere, in every language */
+body, button, input, textarea, select, h1, h2, h3, h4, .logo b, svg text { font-family: var(--sans); }
+[dir="rtl"] body, [dir="rtl"] button, [dir="rtl"] input, [dir="rtl"] textarea, [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4 { font-family: "Heebo", var(--sans); }
+[class*="italic"], em, i:not([data-i]) { font-synthesis: none; }
 [dir="rtl"] svg.i.dir, [dir="rtl"] .plan-cta svg.i, [dir="rtl"] .ba .arrow svg.i, [dir="rtl"] .pf-strip svg.i, [dir="rtl"] .case .btn svg.i, [dir="rtl"] #seeAll svg.i, [dir="rtl"] .back-link svg.i, [dir="rtl"] #newTrip svg.i, [dir="rtl"] .explore > .btn svg.i, [dir="rtl"] .ny-go svg.i, [dir="rtl"] .flight .route .line svg.i, [dir="rtl"] .pass-plane svg.i { transform: scaleX(-1); }
 [dir="rtl"] .flight .route .line svg.i { transform: translateX(50%) scaleX(-1); }
 [dir="rtl"] .step { padding: 0 34px 18px 0; }
@@ -1256,6 +1258,7 @@ body.lb-open { overflow: hidden; }
 .sum-card dt { color: var(--ink-2); } .sum-card dd { margin: 0; color: var(--ink); }
 @media (max-width: 800px) { .sum-grid { grid-template-columns: 1fr; } .sum-card dl > div { grid-template-columns: 110px minmax(0, 1fr); } }
 @media print { body * { visibility: hidden; } #summary, #summary * { visibility: visible; } #summary { position: absolute; inset: 0; } #summary .row, .top, .pf-fab, .bot-fab, .help-fab { display: none !important; } .sum-card { break-inside: avoid; box-shadow: none; } }
+[dir="rtl"] .lb-nav svg.i { transform: scaleX(-1); }
 </style>
 </head>
 <body>
@@ -1289,7 +1292,7 @@ body.lb-open { overflow: hidden; }
 			<h1>You decide.<br><span class="accent">Otium</span> does the legwork.</h1>
 			<p class="lead">Describe a short trip in your own words. Otium searches, compares and holds it.<br class="br-d"> It always asks you before it pays, shares your details or goes over budget.</p>
 			<form class="composer" id="composer" autocomplete="off">
-				<label class="seg seg-ask"><span class="seg-l">Your trip</span><textarea id="ask" rows="1" maxlength="400" placeholder="A long weekend in Lisbon for two, food and viewpoints, under €900"></textarea></label>
+				<label class="seg seg-ask"><span class="seg-l">Your trip</span><textarea id="ask" rows="1" maxlength="400" placeholder="A long weekend in Lisbon for two, food and viewpoints, under £900"></textarea></label>
 				<div class="seg seg-from from" id="fromWrap"><span class="seg-l">From</span><button type="button" id="originBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Departure city"><b id="originVal">Paris</b><i data-i="chevron-down"></i></button><ul class="from-list" id="originList" role="listbox" tabindex="-1" aria-label="Departure city"></ul></div>
 				<div class="seg seg-from seg-when" id="whenWrap"><span class="seg-l">When</span><button type="button" id="whenBtn" aria-haspopup="dialog" aria-expanded="false" aria-label="Travel dates"><b id="whenVal">Any dates</b><i data-i="chevron-down"></i></button></div>
 				<button class="send-round" type="button" id="planBtn"><i data-i="search"></i><span>Plan it</span></button>
@@ -1327,11 +1330,11 @@ body.lb-open { overflow: hidden; }
 				<span class="n">01</span><h3>It shows its plan first</h3><p>Every step, its cost and whether it needs you — before anything happens.</p>
 			</article>
 			<article>
-				<div class="art" style="--t:#FBEAED" aria-hidden="true"><div class="mini mini-ask"><b>Approve this payment?</b><strong>€583</strong><div><span class="y">Approve</span><span class="n">Not now</span></div></div></div>
+				<div class="art" style="--t:#FBEAED" aria-hidden="true"><div class="mini mini-ask"><b>Approve this payment?</b><strong id="artPay">€583</strong><div><span class="y">Approve</span><span class="n">Not now</span></div></div></div>
 				<span class="n">02</span><h3>It asks when it matters</h3><p>Searching runs on its own. Paying and sharing your details always wait for a yes.</p>
 			</article>
 			<article>
-				<div class="art" style="--t:#E4EFF7" aria-hidden="true"><div class="mini mini-undo"><div><i data-i="plane"></i><span>Aerolume · 07:10</span><span class="c"><i data-i="undo-2"></i>Cancel</span></div><div><i data-i="hotel"></i><span>Rua Nova Rooms</span><span class="c"><i data-i="undo-2"></i>Cancel</span></div><p><i data-i="check"></i>Cancelled — €327 back</p></div></div>
+				<div class="art" style="--t:#E4EFF7" aria-hidden="true"><div class="mini mini-undo"><div><i data-i="plane"></i><span>Aerolume · 07:10</span><span class="c"><i data-i="undo-2"></i>Cancel</span></div><div><i data-i="hotel"></i><span>Rua Nova Rooms</span><span class="c"><i data-i="undo-2"></i>Cancel</span></div><p><i data-i="check"></i>Cancelled — £327 back</p></div></div>
 				<span class="n">03</span><h3>Nothing is final</h3><p>Full history, undo on every action, and a budget it can’t exceed.</p>
 			</article>
 		</div>
