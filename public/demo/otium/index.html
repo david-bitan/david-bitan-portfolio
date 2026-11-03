@@ -1215,6 +1215,10 @@ body.lb-open { overflow: hidden; }
 .pass-pick { display: grid; gap: 8px; margin-bottom: 12px; } .pass-pick .chips { display: flex; flex-wrap: wrap; gap: 6px; } .pass-pick small { color: var(--ink-2); font-size: 12.5px; }
 .pass-pick .chip[aria-pressed="true"] { border-color: #2F6FB5; color: #2F6FB5; box-shadow: inset 0 0 0 1px #2F6FB5; }
 .btn-primary.btn-ok { background: var(--ok); } .btn-primary.btn-ok:hover { background: #17724A; }
+/* examples: short labels, one row with the budget shortcut */
+@media (min-width: 641px) { .examples { flex-wrap: wrap; max-width: none; } .examples .chip { flex: none; } }
+.examples .chip-budget { display: inline-flex; align-items: center; gap: 6px; border-color: #C6DBF1; background: #F3F8FD; color: #2F6FB5; font-weight: 600; }
+.examples .chip-budget svg.i { width: 14px; height: 14px; }
 </style>
 </head>
 <body>
@@ -1254,7 +1258,6 @@ body.lb-open { overflow: hidden; }
 				<button class="send-round" type="button" id="planBtn"><i data-i="search"></i><span>Plan it</span></button>
 			</form>
 			<div class="examples" id="examples" aria-label="Examples"></div>
-			<button type="button" class="budget-cta" id="budgetCta"><i data-i="compass"></i><span>Where can my budget take me?</span></button>
 			<div class="acct-hint" id="acctHint"></div>
 		</div>
 		<div class="promises">

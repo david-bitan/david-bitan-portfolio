@@ -171,7 +171,8 @@
 		"Rome for 3 nights with my partner, museums, €1,200 max",
 		"Solo weekend in Copenhagen, design and bakeries",
 	];
-	function renderExamples() { $("#examples").innerHTML = EXAMPLES.map((x, i) => `<button class="chip" type="button" title="${esc(t(x))}">${esc(t(x))}</button>${i === 1 ? '<span class="ex-br" aria-hidden="true"></span>' : ""}`).join(""); }
+	const EXAMPLE_SHORT = ["Lisbon for two", "Somewhere sunny", "Rome, 3 nights, museums", "Solo in Copenhagen"];
+	function renderExamples() { $("#examples").innerHTML = EXAMPLES.map((x, i) => `<button class="chip" type="button" data-ex="${i}" title="${esc(t(x))}">${esc(t(EXAMPLE_SHORT[i]))}</button>`).join("") + `<button type="button" class="chip chip-budget" id="budgetCta">${ic("compass")}<span>${t("Ideas for my budget")}</span></button>`; }
 	function fitAsk() {
 		const a = $("#ask"); if (!a) return; const MAX = 132;
 		if (!a.value || !a.offsetParent) { a.style.height = ""; a.style.overflowY = ""; $("#composer").classList.remove("multi"); if (!a.value || !a.offsetParent) return; } // empty or hidden: back to the CSS size
@@ -184,8 +185,9 @@
 		initOrigin();
 		renderExamples();
 		$("#examples").onclick = (e) => {
-			const b = e.target.closest(".chip"); if (!b) return;
-			$("#ask").value = b.textContent; fitAsk(); $("#ask").focus();
+			if (e.target.closest("#budgetCta")) return goBudget();
+			const b = e.target.closest("[data-ex]"); if (!b) return;
+			$("#ask").value = t(EXAMPLES[+b.dataset.ex]); fitAsk(); $("#ask").focus();
 		};
 		renderCats(); renderListings();
 		const cardClick = (e) => {
@@ -467,13 +469,14 @@
 		if (!ok.length) { const low = all[0]; box.innerHTML = `<div class="bud-empty"><p>${t("Nothing fits {x} yet. The lowest is {y}.", { x: money(raw), y: eur(low.total) })}</p><button type="button" class="btn btn-ghost btn-sm" data-budset="${Math.ceil((low.total * cur()[1]) / 50) * 50}">${t("Use {y}", { y: eur(Math.ceil((low.total * cur()[1]) / 50) * 50 / cur()[1]) })}</button></div>`; return; }
 		box.innerHTML = `<p class="bud-n">${t(ok.length === 1 ? "1 destination fits {x}" : "{n} destinations fit {x}", { n: ok.length, x: money(raw) })} · <span>${what}</span></p><div class="bud-grid">${ok.slice(0, BUD.all ? ok.length : 8).map((x) => `<button type="button" class="bud-card" data-budcity="${x.k}"><span class="ph-w">${pic(x.c.photo, x.k, x.c.name)}</span><span class="bud-b"><b>${esc(x.c.name)}</b><small>${esc(x.c.country)}</small><span class="bud-p"><strong>${eur(x.total)}</strong><em>${t("{x} left", { x: eur(Math.max(0, x.left)) })}</em></span><span class="bud-go">${t("Plan this trip")}${ICON.arrow}</span></span></button>`).join("")}</div>${ok.length > 8 && !BUD.all ? `<div class="see-all"><button type="button" class="btn btn-ghost" data-budall>${t("See all {n} destinations", { n: ok.length })}</button></div>` : ""}`;
 	}
+	function goBudget() { const head = document.querySelector(".top")?.offsetHeight || 70; window.scrollTo({ top: $("#budget").getBoundingClientRect().top + scrollY - head - 16, behavior: reduced ? "auto" : "smooth" }); setTimeout(() => $("#budAmt").focus({ preventScroll: true }), 500); }
 	function initBudget() {
 		const f = $("#budgetForm"); if (!f) return;
 		renderBudget(false);
 		$("#budGo").onclick = () => { BUD.all = false; renderBudget(true); };
 		$("#budAmt").onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); BUD.all = false; renderBudget(true); } };
 		$("#budAmt").oninput = (e) => { const d = e.target.value.replace(/[^\d]/g, "").slice(0, 6); e.target.value = d ? Number(d).toLocaleString(I.locale) : ""; };
-		$("#budgetCta")?.addEventListener("click", () => { const head = document.querySelector(".top")?.offsetHeight || 70; window.scrollTo({ top: $("#budget").getBoundingClientRect().top + scrollY - head - 16, behavior: reduced ? "auto" : "smooth" }); setTimeout(() => $("#budAmt").focus({ preventScroll: true }), 500); });
+		
 		$("#budgetOut").onclick = (e) => {
 			if (e.target.closest("[data-budall]")) { BUD.all = true; return renderBudget(true); }
 			const s2 = e.target.closest("[data-budset]"); if (s2) { $("#budAmt").value = Number(s2.dataset.budset).toLocaleString(I.locale); return renderBudget(true); }
