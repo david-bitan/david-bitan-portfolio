@@ -1290,6 +1290,46 @@ body.lb-open { overflow: hidden; }
 .seatmap .sm-rec { stroke: var(--ok); stroke-width: 2; } .lg-rec { background: #fff; border: 2px solid var(--ok); }
 .resume-n { align-items: center; flex-wrap: wrap; } .resume-n .btn { margin-inline-start: auto; }
 .saved-empty { grid-column: 1 / -1; }
+/* narrow screens: long buttons wrap instead of widening their card; budget cards stack */
+.card .row .btn, .otour .row .btn, .auto-opt { max-width: 100%; white-space: normal; text-align: start; }
+.bud-p { flex-wrap: wrap; row-gap: 4px; }
+@media (max-width: 480px) { .bud-grid { grid-template-columns: minmax(0, 1fr); } .bud-card { flex-direction: row; } .bud-card .ph-w { width: 38%; flex: none; aspect-ratio: auto; } .bud-b { min-width: 0; } }
+.docs > * { min-width: 0; max-width: 100%; } .pass { grid-template-columns: minmax(0, 1fr) 150px; } .pass-main, .pass-grid > div { min-width: 0; }
+@media (max-width: 640px) { .pass { grid-template-columns: minmax(0, 1fr); } .pass-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 360px) { #modalBox { padding-left: 14px; padding-right: 14px; } .pass-route big { font-size: 26px; } .pass-main { padding-left: 12px; padding-right: 12px; } }
+.sum-grid > *, .sum-card dl > div > * { min-width: 0; } .sum-card dd, .sum-card dt { overflow-wrap: anywhere; } .sum-v { overflow-x: clip; }
+/* seat map: free seats filled green, recommended ones darker */
+.seatmap .sm-s { fill: #CFEBDA; stroke: #6DBE92; }
+.seatmap .sm-seat.pick:hover .sm-s { fill: #A9DCBD; stroke: var(--ok); }
+.seatmap .sm-rec { fill: #7CC9A1; stroke: var(--ok); stroke-width: 1.5; }
+.lg-s { background: #CFEBDA !important; border: 1px solid #6DBE92 !important; } .lg-rec { background: #7CC9A1 !important; border: 1px solid var(--ok) !important; }
+.seatmap .sm-pend { fill: #fff; stroke: #2F6FB5; stroke-width: 2.5; stroke-dasharray: 4 3; }
+.sp-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 10px 12px; border-radius: 12px; background: #F3F8FD; border: 1px solid #C6DBF1; font-size: 13.5px; font-weight: 600; }
+.sp-confirm span { flex: 1 1 200px; }
+.names { display: grid; gap: 8px; margin: 10px 0 12px; padding: 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.names > small { color: var(--ink-2); font-size: 12.5px; margin-top: -4px; }
+.names-io { display: flex; flex-wrap: wrap; gap: 4px 12px; } .names-io .btn { color: #2F6FB5; display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+/* outbound / return as tabs */
+.legtabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); max-width: 100%; overflow: hidden; }
+.legtabs button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; padding: 9px 12px; margin-bottom: -1px; border-bottom: 2px solid transparent; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; white-space: nowrap; min-width: 0; }
+.legtabs button svg.i { width: 14px; height: 14px; }
+.legtabs button[aria-pressed="true"] { color: var(--ink); border-bottom-color: #2F6FB5; }
+.legtabs button:hover { color: var(--ink); }
+.legtabs button:nth-child(2) svg.i { transform: scaleX(-1); }
+.sp-top .legtabs { flex: 1 1 100%; }
+@media (max-width: 380px) { .legtabs button { padding: 8px 8px; font-size: 12.5px; } }
+/* while the guided tour runs, the page is look-only; the tour card keeps its buttons */
+body.touring > *:not(#tourCard):not(#toast):not(.modal):not(#scrim) { pointer-events: none; }
+body.touring #tourCard { pointer-events: auto; }
+/* video player */
+.vid-wrap { position: relative; border-radius: 12px; overflow: hidden; background: #111; aspect-ratio: 16 / 10; }
+.vid-wrap video { width: 100%; height: 100%; display: block; object-fit: contain; background: #111; }
+.vid-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; }
+.vid-row .btn { display: inline-flex; gap: 6px; align-items: center; }
+#modalBox.video { width: min(1080px, calc(100vw - 32px)); max-width: none; }
+.seat-pick, .seat-pick > *, .voucher .seatmap { min-width: 0; max-width: 100%; }
+.legtabs button { flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 400px) { .legtabs button svg.i { display: none; } .sp-legend { gap: 4px 10px; } }
 </style>
 </head>
 <body>
@@ -1322,7 +1362,7 @@ body.lb-open { overflow: hidden; }
 			<span class="badge-ai"><i data-i="sparkles"></i>Your AI travel agent</span>
 			<h1>You decide.<br><span class="accent">Otium</span> does the legwork.</h1>
 			<p class="lead">Describe a short trip in your own words. Otium searches, compares and holds it.<br class="br-d"> It always asks you before it pays, shares your details or goes over budget.</p>
-			<button type="button" class="tour-cta" data-tour="start"><i data-i="play"></i><span>Watch the 1-minute tour</span></button>
+			<button type="button" class="tour-cta" data-video><i data-i="play"></i><span>Watch the 1-minute video</span></button>
 			<form class="composer" id="composer" autocomplete="off">
 				<label class="seg seg-ask"><span class="seg-l">Your trip</span><textarea id="ask" rows="1" maxlength="400" placeholder="A long weekend in Lisbon for two, food and viewpoints, under £900"></textarea></label>
 				<div class="seg seg-from from" id="fromWrap"><span class="seg-l">From</span><button type="button" id="originBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Departure city"><b id="originVal">Paris</b><i data-i="chevron-down"></i></button><ul class="from-list" id="originList" role="listbox" tabindex="-1" aria-label="Departure city"></ul></div>

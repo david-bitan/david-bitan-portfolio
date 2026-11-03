@@ -477,6 +477,38 @@
 			renderTrip();
 		}
 	}
+	/* Names of the other travellers: typed in, or imported from a spreadsheet saved as CSV. */
+	function namesForm(p) {
+		const v = (n) => esc(p.names?.[n] || "");
+		return `<div class="names"><b>${t("Who else is travelling?")}</b><small>${t("As written in each passport. Needed to issue their tickets.")}</small>
+			${Array.from({ length: p.travelers - 1 }, (_, i) => `<label class="fld"><span>${t("Traveller {n}", { n: i + 2 })}</span><input data-tn="${i + 1}" value="${v(i + 1)}" placeholder="${esc(t("First and last name"))}" autocomplete="off"></label>`).join("")}
+			<div class="names-io"><button type="button" class="btn btn-text btn-sm" data-names="tpl">${ic("file-text")}${t("Download a template (Excel / CSV)")}</button><label class="btn btn-text btn-sm">${ic("file-text")}${t("Import a list")}<input type="file" accept=".csv,text/csv" data-names="file" hidden></label></div>
+			<p class="err names-err" hidden></p></div>`;
+	}
+	function readNames(slot, p) {
+		const ins = [...slot.querySelectorAll("[data-tn]")]; p.names = p.names || [];
+		p.names[0] = fullName() || p.names[0] || "";
+		ins.forEach((x) => (p.names[+x.dataset.tn] = x.value.trim()));
+		return ins.every((x) => x.value.trim().length >= 3);
+	}
+	document.addEventListener("click", (e) => {
+		const b = e.target.closest('[data-names="tpl"]'); if (!b || !S.plan) return;
+		const rows = [["First name", "Last name", "Passport number"], ...Array.from({ length: S.plan.travelers - 1 }, () => ["", "", ""])];
+		const blob = new Blob(["\ufeff" + rows.map((r) => r.join(";")).join("\r\n")], { type: "text/csv;charset=utf-8" });
+		const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "otium-travellers.csv"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+		toast(t("Template downloaded. Fill it in Excel, save it as CSV, then import it."));
+	});
+	document.addEventListener("change", async (e) => {
+		const f = e.target.closest('[data-names="file"]'); if (!f || !f.files[0]) return;
+		const txt = await f.files[0].text();
+		const lines = txt.replace(/^\ufeff/, "").split(/\r?\n/).map((l) => l.split(/[;,\t]/).map((c) => c.trim().replace(/^"|"$/g, ""))).filter((r) => r.some(Boolean));
+		const data = /first|name|prénom|nom/i.test(lines[0]?.join(" ") || "") ? lines.slice(1) : lines;
+		const ins = [...document.querySelectorAll("[data-tn]")];
+		data.slice(0, ins.length).forEach((r, i) => { ins[i].value = [r[0], r[1]].filter(Boolean).join(" "); });
+		toast(t("{n} names imported. Check them before sharing.", { n: Math.min(data.length, ins.length) }));
+		f.value = "";
+	});
+	const travellerName = (n) => S.plan?.names?.[n] || (n === 0 && ME.first ? fullName() : t("Traveller {n}", { n: n + 1 }));
 	function decide(slot) {
 		return new Promise((resolve) => {
 			slot.addEventListener("click", function h(e) {
@@ -767,9 +799,14 @@
 			const s = addStep("share", t("Send traveller details to {a}", { a: k.fl.airline }), "ok");
 			s.set("ask"); setStatus("waiting", t("Waiting for your OK"));
 			s.detail(t("Airlines need names and passport numbers to issue tickets."));
-			const slot = s.slot(`<div class="card ask"><h4>${t("Share your details with {a}?", { a: esc(k.fl.airline) })}</h4><ul class="what"><li><span>${t("Full names")}</span><span>${esc(fullName())}${p.travelers > 1 ? ` +${p.travelers - 1}` : ""}</span></li>${ME.assist ? `<li><span>${t("Travel assistance")}</span><span>${t((ASSIST.find((a) => a[0] === ME.assist) || ["", "None"])[1])}</span></li>` : ""}<li><span>${t("Passport numbers")}</span><span>${t("From your profile")}</span></li><li><span>${t("Phone, for delay alerts")}</span><span>${t("Optional")}</span></li></ul><div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Share and issue tickets")}</button><button class="btn btn-ghost btn-sm" data-choice="noPhone">${t("Share without phone")}</button><button class="btn btn-text btn-sm" data-choice="later">${t("I’ll do it myself")}</button></div><p class="fine">${ICON.lock}<span>${t("Shared with the airline only, for this booking. Demo — no data is entered or sent.")}</span></p></div>`);
-			const ch = await decide(slot);
-			if (id !== S.run) throw new Stale();
+			const slot = s.slot(`<div class="card ask"><h4>${t("Share your details with {a}?", { a: esc(k.fl.airline) })}</h4>${p.travelers > 1 ? namesForm(p) : ""}<ul class="what"><li><span>${t("Full names")}</span><span>${esc(fullName())}${p.travelers > 1 ? ` +${p.travelers - 1}` : ""}</span></li>${ME.assist ? `<li><span>${t("Travel assistance")}</span><span>${t((ASSIST.find((a) => a[0] === ME.assist) || ["", "None"])[1])}</span></li>` : ""}<li><span>${t("Passport numbers")}</span><span>${t("From your profile")}</span></li><li><span>${t("Phone, for delay alerts")}</span><span>${t("Optional")}</span></li></ul><div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Share and issue tickets")}</button><button class="btn btn-ghost btn-sm" data-choice="noPhone">${t("Share without phone")}</button><button class="btn btn-text btn-sm" data-choice="later">${t("I’ll do it myself")}</button></div><p class="fine">${ICON.lock}<span>${t("Shared with the airline only, for this booking. Demo — no data is entered or sent.")}</span></p></div>`);
+			let ch;
+			for (;;) {
+				ch = await decide(slot); if (id !== S.run) throw new Stale();
+				if (ch === "later" || p.travelers < 2 || readNames(slot, p)) break;
+				const er = slot.querySelector(".names-err"); if (er) { er.hidden = false; er.textContent = t("Add the name of every traveller, as written in the passport."); }
+				slot.querySelector('[data-tn]:placeholder-shown, [data-tn][value=""]')?.focus();
+			}
 			slot.innerHTML = "";
 			if (ch === "later") { s.set("skipped"); s.detail(t("You’ll add details yourself. Seats stay held for 24 h.")); log("You", t("Chose to send traveller details myself")); }
 			else {
@@ -794,10 +831,10 @@
 	}
 	async function watchPrices(id) {
 		try {
-			await beat(id, 1500);
+			await beat(id, TOUR.auto ? 6000 : 1500);
 			const w = addStep("watch", t("Keep watching your prices"), "auto");
 			w.set("working"); w.detail(t("Until check-in, Otium checks if your stay gets cheaper. It asks before changing anything."));
-			await beat(id, 16000);
+			await beat(id, TOUR.auto ? 3500 : 16000);
 			const p = S.plan, k = costs(p);
 			if (!S.held.stay || !k.st.freeCancel) { w.set("done"); w.detail(t("No better price so far. Your stay is non-refundable, so nothing to rebook.")); return; }
 			const drop = Math.max(10, Math.round(S.held.stay.amount * 0.1));
@@ -1905,7 +1942,7 @@
 	const defaultSeat = (n) => { const row0 = ME.assist === "legroom" || ME.assist === "baby" ? (seatRow0() > 10 ? 10 : seatRow0()) : seatRow0(); const order = ME.assist === "wheelchair" ? "CBADEF" : COLS; return `${row0 + Math.floor(n / 6)}${order[n % 6]}`; };
 	const seat = (n, j = 0) => S.held.seats?.[j]?.[n] || defaultSeat(n);
 	const seatKind = (letter) => ("AF".includes(letter) ? "Window seat" : "CD".includes(letter) ? "Aisle seat" : "Middle seat");
-	const SEATUI = { j: 0, n: 0, from: null };
+	const SEATUI = { j: 0, n: 0, from: null, pending: null };
 	function takenSeats(j) {
 		const L = legs(), key = (S.held.flights?.code || "") + L[j].flight, out = new Set();
 		const mine = new Set(Array.from({ length: S.plan.travelers }, (_, n) => defaultSeat(n)));
@@ -1917,7 +1954,7 @@
 		const L = legs(), j = Math.min(SEATUI.j, L.length - 1), n0 = Math.min(SEATUI.n, travelers - 1);
 		const taken = takenSeats(j), mine = Array.from({ length: travelers }, (_, n) => seat(n, j));
 		const myRow = parseInt(mine[n0], 10), span = 10;
-		if (SEATUI.from == null || SEATUI.from > myRow || SEATUI.from + span - 1 < myRow) SEATUI.from = Math.max(1, Math.min(ROWS - span + 1, myRow - 4));
+		if (SEATUI.from == null) SEATUI.from = Math.max(1, Math.min(ROWS - span + 1, myRow - 4));
 		const from = SEATUI.from, rows = Array.from({ length: span }, (_, i) => from + i);
 		const W = 24, H = 22, gx = 5, gy = 4, aisle = 18, x0 = 30, y0 = 22;
 		const cy = (i) => y0 + i * (H + gy) + (i > 2 ? aisle : 0), rx = (k) => x0 + k * (W + gx);
@@ -1927,26 +1964,27 @@
 			g += `<text x="${rx(k) + W / 2}" y="14" class="sm-l">${r}</text>`;
 			COLS.split("").forEach((c, i) => {
 				const id = `${r}${c}`, who = mine.indexOf(id), isTaken = taken.has(id);
-				const cls = who >= 0 ? (who === n0 ? "sm-on" : "sm-mine") : isTaken ? "sm-x" : recSeat(r, c) ? "sm-s sm-rec" : "sm-s";
-				const lab = who >= 0 ? t("{s}: {w}", { s: id, w: who === 0 && ME.first ? fullName() : t("Traveller {n}", { n: who + 1 }) }) : t(isTaken ? "{s}: taken" : "{s}: free", { s: id });
+				const cls = (who >= 0 ? (who === n0 ? "sm-on" : "sm-mine") : isTaken ? "sm-x" : recSeat(r, c) ? "sm-s sm-rec" : "sm-s") + (SEATUI.pending === id ? " sm-pend" : "");
+				const lab = who >= 0 ? t("{s}: {w}", { s: id, w: travellerName(who) }) : t(isTaken ? "{s}: taken" : "{s}: free", { s: id });
 				g += `<g class="sm-seat${isTaken ? "" : " pick"}" ${isTaken ? "" : `data-seat="${id}" role="button" tabindex="0"`} aria-label="${esc(lab)}"><title>${esc(lab)}</title><rect x="${rx(k)}" y="${cy(i)}" width="${W}" height="${H}" rx="5" class="${cls}"/>${who >= 0 ? `<text x="${rx(k) + W / 2}" y="${cy(i) + 15}" class="sm-t">${who + 1}</text>` : ""}</g>`;
 			});
 		});
 		const w = rx(span - 1) + W + 12, h = cy(5) + H + 8;
 		g = `<rect x="2" y="2" width="${w - 4}" height="${h - 4}" rx="14" class="sm-f"/>` + g;
 		const total = ROWS * COLS.length, used = taken.size + travelers;
-		const nm = (n) => (n === 0 && ME.first ? fullName() : t("Traveller {n}", { n: n + 1 }));
+		const nm = (n) => travellerName(n);
 		return `<div class="seat-pick">
-			<div class="sp-top">${L.length > 1 ? `<div class="chips">${L.map((l, k) => `<button type="button" class="chip" data-seat-leg="${k}" aria-pressed="${k === j}">${t(l.dir)} · ${l.from}–${l.to}</button>`).join("")}</div>` : ""}
+			<div class="sp-top">${L.length > 1 ? `<div class="legtabs" role="tablist">${L.map((l, k) => `<button type="button" role="tab" data-seat-leg="${k}" aria-pressed="${k === j}" aria-selected="${k === j}">${ic("plane")}${t(l.dir)} · ${l.from}–${l.to}</button>`).join("")}</div>` : ""}
 			<div class="sp-stats"><span><b>${total}</b> ${t("seats")}</span><span><b>${used}</b> ${t("passengers on board")}</span><span class="free"><b>${total - used}</b> ${t("free")}</span></div></div>
 			<div class="seatmap"><div class="sp-plane"><button type="button" class="icon-btn sp-pg" data-seat-pg="-1" aria-label="${esc(t("Front rows"))}"${from <= 1 ? " disabled" : ""}>${ic("chevron-left")}</button><svg viewBox="0 0 ${w} ${h}" role="group" aria-label="${esc(t("Your seats on the plane"))}">${g}</svg><button type="button" class="icon-btn sp-pg" data-seat-pg="1" aria-label="${esc(t("Back rows"))}"${from + span - 1 >= ROWS ? " disabled" : ""}>${ic("chevron-right")}</button></div>
 			<ul>${mine.map((x, n) => `<li><button type="button" class="sp-who" data-seat-trav="${n}" aria-pressed="${n === n0}"><span class="sp-n">${n + 1}</span><b>${x}</b><span>${esc(nm(n))}</span><em>${t(seatKind(x.slice(-1)))}</em></button></li>`).join("")}</ul></div>
-			<div class="sp-legend"><span><i class="lg-on"></i>${t("Your seats")}</span><span><i class="lg-s"></i>${t("Free")}</span><span><i class="lg-x"></i>${t("Taken")}</span>${ME.assist ? `<span><i class="lg-rec"></i>${t("Good for: {x}", { x: t((ASSIST.find((a) => a[0] === ME.assist) || ["", ""])[1]).toLowerCase() })}</span>` : ""}<small>${t("Pick a traveller, then tap a free seat. Tap another traveller’s seat to swap.")}</small></div>
+			${SEATUI.pending ? (() => { const other = mine.indexOf(SEATUI.pending); return `<div class="sp-confirm" role="status"><span>${other >= 0 ? t("Swap {a} and {b}?", { a: `${nm(n0)} (${mine[n0]})`, b: `${nm(other)} (${mine[other]})` }) : t("Move {w} from {a} to {b}?", { w: nm(n0), a: mine[n0], b: SEATUI.pending })}</span><button type="button" class="btn btn-primary btn-ok btn-sm" data-seat-ok>${t("Confirm the change")}</button><button type="button" class="btn btn-ghost btn-sm" data-seat-cancel>${t("Cancel")}</button></div>`; })() : ""}<div class="sp-legend"><span><i class="lg-on"></i>${t("Your seats")}</span><span><i class="lg-s"></i>${t("Free")}</span><span><i class="lg-x"></i>${t("Taken")}</span>${ME.assist ? `<span><i class="lg-rec"></i>${t("Good for: {x}", { x: t((ASSIST.find((a) => a[0] === ME.assist) || ["", ""])[1]).toLowerCase() })}</span>` : ""}<small>${t("Pick a traveller, then tap a free seat. Tap another traveller’s seat to swap.")}</small></div>
 		</div>`;
 	}
 	function refreshSeats() {
 		document.querySelectorAll(".seat-pick").forEach((el) => { el.outerHTML = seatMap(S.plan.travelers); });
-		const pb = $("#passBox"); if (pb && pb.dataset.n != null) pb.innerHTML = passHtml(legs()[+pb.dataset.j], +pb.dataset.n);
+		const pb = $("#passBox");
+		if (pb) { pb.dataset.n = SEATUI.n; pb.dataset.j = SEATUI.j; pb.innerHTML = passHtml(legs()[SEATUI.j], SEATUI.n); document.querySelectorAll("#modalBox [data-pt]").forEach((x) => x.setAttribute("aria-pressed", String(+x.dataset.pt === SEATUI.n))); document.querySelectorAll("#modalBox [data-pl]").forEach((x) => { x.setAttribute("aria-pressed", String(+x.dataset.pl === SEATUI.j)); x.setAttribute("aria-selected", String(+x.dataset.pl === SEATUI.j)); }); }
 	}
 	function moveSeat(id) {
 		const j = SEATUI.j, n = SEATUI.n, tr = S.plan.travelers;
@@ -1962,12 +2000,14 @@
 	document.addEventListener("click", (e) => {
 		if (!S.plan || !e.target.closest(".seat-pick")) return;
 		const lg = e.target.closest("[data-seat-leg]"), tv = e.target.closest("[data-seat-trav]"), pg = e.target.closest("[data-seat-pg]"), st = e.target.closest("[data-seat]");
-		if (lg) { SEATUI.j = +lg.dataset.seatLeg; SEATUI.from = null; return refreshSeats(); }
-		if (tv) { SEATUI.n = +tv.dataset.seatTrav; SEATUI.from = null; return refreshSeats(); }
+		if (e.target.closest("[data-seat-ok]")) { const id = SEATUI.pending; SEATUI.pending = null; return id && moveSeat(id); }
+		if (e.target.closest("[data-seat-cancel]")) { SEATUI.pending = null; return refreshSeats(); }
+		if (lg) { SEATUI.j = +lg.dataset.seatLeg; SEATUI.from = null; SEATUI.pending = null; return refreshSeats(); }
+		if (tv) { SEATUI.n = +tv.dataset.seatTrav; SEATUI.from = null; SEATUI.pending = null; return refreshSeats(); }
 		if (pg) { SEATUI.from = Math.max(1, Math.min(ROWS - 9, SEATUI.from + 10 * +pg.dataset.seatPg)); return refreshSeats(); }
-		if (st) return moveSeat(st.dataset.seat);
+		if (st) { SEATUI.pending = SEATUI.pending === st.dataset.seat ? null : st.dataset.seat; return refreshSeats(); }
 	});
-	document.addEventListener("keydown", (e) => { const st = e.target.closest?.(".seat-pick [data-seat]"); if (st && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); moveSeat(st.dataset.seat); } });
+	document.addEventListener("keydown", (e) => { const st = e.target.closest?.(".seat-pick [data-seat]"); if (st && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); SEATUI.pending = st.dataset.seat; refreshSeats(); } });
 
 	function bars(seed) {
 		let h = 0; for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
@@ -1979,22 +2019,22 @@
 		return `<div class="pass"><div class="pass-main">
 			<div class="pass-top"><span class="al">${l.airline[0]}</span><b>${esc(l.airline)}</b><span class="pass-dir">${t(l.dir)} · ${t("E-ticket")}</span></div>
 			<div class="pass-route"><div><big>${l.from}</big><small>${esc(l.fromN)}</small><em>${l.dep}</em></div><div class="pass-plane">${ICON.plane}<small>${l.flight}</small></div><div><big>${l.to}</big><small>${esc(l.toN)}</small><em>${l.arr}</em></div></div>
-			<dl class="pass-grid"><div><dt>${t("Passenger")}</dt><dd>${n === 0 && ME.first ? esc(fullName()) : t("Traveller {n}", { n: n + 1 })}</dd></div><div><dt>${t("Date")}</dt><dd>${fmtDay(l.date)}</dd></div><div><dt>${t("Boarding")}</dt><dd>${l.board}</dd></div><div><dt>${t("Gate")}</dt><dd>${l.gate}</dd></div><div><dt>${t("Seat")}</dt><dd>${seat(n, l.dir === "Return" ? 1 : 0)}</dd></div><div><dt>${t("Cabin")}</dt><dd>${t(l.cabin)}</dd></div><div><dt>${t("Bags")}</dt><dd>${t(l.bags)}</dd></div><div><dt>${t("Booking")}</dt><dd>${l.code}</dd></div></dl>
+			<dl class="pass-grid"><div><dt>${t("Passenger")}</dt><dd>${esc(travellerName(n))}</dd></div><div><dt>${t("Date")}</dt><dd>${fmtDay(l.date)}</dd></div><div><dt>${t("Boarding")}</dt><dd>${l.board}</dd></div><div><dt>${t("Gate")}</dt><dd>${l.gate}</dd></div><div><dt>${t("Seat")}</dt><dd>${seat(n, l.dir === "Return" ? 1 : 0)}</dd></div><div><dt>${t("Cabin")}</dt><dd>${t(l.cabin)}</dd></div><div><dt>${t("Bags")}</dt><dd>${t(l.bags)}</dd></div><div><dt>${t("Booking")}</dt><dd>${l.code}</dd></div></dl>
 		</div><div class="pass-stub"><svg viewBox="0 0 ${x} 56" preserveAspectRatio="none" aria-hidden="true">${b}</svg><b>${l.code}</b><small>${t("DEMO · NOT VALID FOR TRAVEL")}</small></div></div>`;
 	}
 	function openDocs() {
 		const p = S.plan; const L = legs(); const k = costs(p); const d = tripDates(p.nights);
 		modal(`<h3 id="modalTitle">${t("Your travel documents")}</h3><p>${P(p.travelers, "1 traveller", "{n} travellers")} · ${t("{n} flights each", { n: L.length })}${S.held.stay ? t(" · 1 hotel voucher") : ""}${t(". The PDF has every pass, one page per traveller.")}</p>
-			<div class="docs"><div class="pass-pick"><div class="chips" role="group" aria-label="${esc(t("Traveller"))}">${Array.from({ length: p.travelers }, (_, n) => `<button type="button" class="chip" data-pt="${n}" aria-pressed="${n === 0}">${esc(n === 0 && ME.first ? fullName() : t("Traveller {n}", { n: n + 1 }))}</button>`).join("")}</div><div class="chips" role="group" aria-label="${esc(t("Flight"))}">${L.map((l, j) => `<button type="button" class="chip" data-pl="${j}" aria-pressed="${j === 0}">${t(l.dir)} · ${l.from}–${l.to}</button>`).join("")}</div><small>${t("{n} boarding passes in all", { n: p.travelers * L.length })}</small></div><div id="passBox" data-n="0" data-j="0">${passHtml(L[0], 0)}</div><div class="voucher"><span class="pass-dir">${t("Your seats on the plane")}</span>${seatMap(p.travelers)}</div>
+			<div class="docs"><div class="pass-pick"><div class="chips" role="group" aria-label="${esc(t("Traveller"))}">${Array.from({ length: p.travelers }, (_, n) => `<button type="button" class="chip" data-pt="${n}" aria-pressed="${n === 0}">${esc(travellerName(n))}</button>`).join("")}</div><div class="legtabs" role="tablist" aria-label="${esc(t("Flight"))}">${L.map((l, j) => `<button type="button" role="tab" data-pl="${j}" aria-pressed="${j === 0}" aria-selected="${j === 0}">${ic("plane")}${t(l.dir)} · ${l.from}–${l.to}</button>`).join("")}</div><small>${t("{n} boarding passes in all", { n: p.travelers * L.length })}</small></div><div id="passBox" data-n="0" data-j="0">${passHtml(L[0], 0)}</div><div class="voucher"><span class="pass-dir">${t("Your seats on the plane")}</span>${seatMap(p.travelers)}</div>
 			${S.held.stay ? `<div class="voucher"><div><span class="pass-dir">${t("Hotel voucher")}</span><b>${esc(k.st.name)}</b><small>${esc(k.st.area)}, ${D.cities[p.city].name} · ${ICON.star} ${k.st.rating}</small></div><dl class="pass-grid"><div><dt>${t("Check-in")}</dt><dd>${fmtDay(d.out)} · 15:00</dd></div><div><dt>${t("Check-out")}</dt><dd>${fmtDay(d.back)} · 11:00</dd></div><div><dt>${t("Guests")}</dt><dd>${p.travelers}</dd></div><div><dt>${t("Booking")}</dt><dd>${S.held.stay.code}</dd></div></dl></div>` : ""}</div>
 			<div class="row"><button class="btn btn-ghost btn-sm" data-m="cancel">${t("Close")}</button><button class="btn btn-ghost btn-sm" data-m="inv">${ICON.receipt} ${t("Download invoice")}</button><button class="btn btn-primary btn-ok btn-sm" data-m="pdf">${ICON.ticket} ${t("Download PDF")}</button></div>`, (r) => { if (r === "pdf") downloadPdf(); if (r === "inv") downloadInvoice(); });
 		$("#modalBox").classList.add("wide");
 		const pick = { n: 0, j: 0 };
 		$("#modalBox").querySelector(".pass-pick").onclick = (e) => {
 			const a = e.target.closest("[data-pt]"), b = e.target.closest("[data-pl]"); if (!a && !b) return;
-			if (a) pick.n = +a.dataset.pt; if (b) pick.j = +b.dataset.pl;
+			if (a) pick.n = +a.dataset.pt; if (b) pick.j = +b.dataset.pl; SEATUI.n = pick.n; SEATUI.j = pick.j; SEATUI.from = null; SEATUI.pending = null; document.querySelectorAll("#modalBox .seat-pick").forEach((el) => { el.outerHTML = seatMap(S.plan.travelers); });
 			$("#modalBox").querySelectorAll("[data-pt]").forEach((x) => x.setAttribute("aria-pressed", String(+x.dataset.pt === pick.n)));
-			$("#modalBox").querySelectorAll("[data-pl]").forEach((x) => x.setAttribute("aria-pressed", String(+x.dataset.pl === pick.j)));
+			$("#modalBox").querySelectorAll("[data-pl]").forEach((x) => { x.setAttribute("aria-pressed", String(+x.dataset.pl === pick.j)); x.setAttribute("aria-selected", String(+x.dataset.pl === pick.j)); });
 			$("#passBox").dataset.n = pick.n; $("#passBox").dataset.j = pick.j; $("#passBox").innerHTML = passHtml(L[pick.j], pick.n);
 		};
 	}
@@ -2017,7 +2057,7 @@
 			doc.setFontSize(11); doc.text(l.dep, 22, y + 41); doc.text(l.arr, 112, y + 41);
 			doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...grey); doc.text(l.fromN, 22, y + 46); doc.text(l.toN, 112, y + 46);
 			doc.setDrawColor(...grey); doc.setLineDashPattern([1, 1], 0); doc.line(52, y + 30, 106, y + 30); doc.setLineDashPattern([], 0); doc.text(l.flight, 79, y + 27, { align: "center" });
-			const f = [["PASSENGER", n === 0 && ME.first ? fullName() : `Traveller ${n + 1}`], ["DATE", fmtDay(l.date)], ["BOARDING", l.board], ["GATE", l.gate], ["SEAT", seat(n, l.dir === "Return" ? 1 : 0)], ["CABIN", l.cabin], ["BAGS", l.bags], ["BOOKING", l.code]];
+			const f = [["PASSENGER", S.plan.names?.[n] || (n === 0 && ME.first ? fullName() : `Traveller ${n + 1}`)], ["DATE", fmtDay(l.date)], ["BOARDING", l.board], ["GATE", l.gate], ["SEAT", seat(n, l.dir === "Return" ? 1 : 0)], ["CABIN", l.cabin], ["BAGS", l.bags], ["BOOKING", l.code]];
 			f.forEach(([a, b], i) => { const x = 22 + (i % 4) * 34, yy = y + 58 + Math.floor(i / 4) * 14; doc.setFontSize(7); doc.setTextColor(...grey); doc.text(a, x, yy); doc.setFontSize(10); doc.setTextColor(...ink); doc.setFont("helvetica", "bold"); doc.text(String(b), x, yy + 5); doc.setFont("helvetica", "normal"); });
 			doc.setDrawColor(...line); doc.setLineDashPattern([2, 2], 0); doc.line(160, y + 16, 160, y + 90); doc.setLineDashPattern([], 0);
 			let bx = 165; doc.setFillColor(...ink); bars(l.code + l.flight + n).forEach((w, i) => { if (!(i % 2)) doc.rect(bx, y + 22, w * 0.28, 44, "F"); bx += (w + 1) * 0.28; });
@@ -2091,7 +2131,7 @@
 		const p = S.plan, h = S.held, k = costs(p), L = legs(), d = tripDates(p.nights), c = en ? EN_CITIES[p.city] : D.cities[p.city];
 		const T = (x, v) => (en ? x.replace(/\{(\w+)\}/g, (_, q) => v?.[q] ?? "") : t(x, v));
 		const day = (x) => (en ? x.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }) : fmtDay(x));
-		const who = (n) => (n === 0 && ME.first ? fullName() : T("Traveller {n}", { n: n + 1 }));
+		const who = (n) => S.plan.names?.[n] || (n === 0 && ME.first ? fullName() : T("Traveller {n}", { n: n + 1 }));
 		const st = k.st, stEn = en ? EN_CITIES[p.city].stays.find((x) => x.id === st.id) || st : st;
 		const sec = [];
 		sec.push({ title: T("Overview"), rows: [[T("Destination"), `${c.name}, ${c.country}`], [T("Dates"), `${day(d.out)} – ${day(d.back)} · ${en ? `${p.nights} night${p.nights > 1 ? "s" : ""}` : P(p.nights, "1 night", "{n} nights")}`], [T("Travellers"), Array.from({ length: p.travelers }, (_, n) => who(n)).join(", ")], [T("From"), en ? S.origin : on(S.origin)], [T("Status"), T(h.flights || h.stay ? "Held · simulated, nothing charged" : "Draft · nothing booked")], ...(ME.assist ? [[T("Travel assistance"), T((ASSIST.find((a) => a[0] === ME.assist) || ["", "None"])[1]) + " · " + T("requested with the airline (simulated)")]] : []), ...(S.progress.coOk ? [[T("Also approved by"), S.progress.coOk]] : [])] });
@@ -2153,23 +2193,24 @@
 		el.innerHTML = `<div class="ot-top"><span class="ot-n">${t("Guided tour")} · ${i + 1}/${TOUR_STEPS.length}</span><button type="button" class="btn btn-text btn-sm" data-tour="skip">${t("End the tour")}</button></div><b>${t(h)}</b><p>${t(b)}</p><div class="ot-bar"><i style="width:${((i + 1) / TOUR_STEPS.length) * 100}%"></i></div>${actions ? `<div class="row">${actions}</div>` : ""}`;
 		el.hidden = false; requestAnimationFrame(() => el.classList.add("on"));
 	}
-	const tourHL = (sel) => { document.querySelectorAll(".tour-hl").forEach((x) => x.classList.remove("tour-hl")); const e = sel && document.querySelector(sel); if (e) { e.classList.add("tour-hl"); const head = document.querySelector(".top")?.offsetHeight || 70; const r = e.getBoundingClientRect(); if (r.top < head || r.bottom > innerHeight - 180) window.scrollTo({ top: r.top + scrollY - head - 24, behavior: reduced ? "auto" : "smooth" }); } };
+	const tourHL = (sel) => { document.querySelectorAll(".tour-hl").forEach((x) => x.classList.remove("tour-hl")); const e = sel && document.querySelector(sel); if (e) { e.classList.add("tour-hl"); e.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" }); } };
 	function endTour(silent) {
-		TOUR.on = false; clearInterval(TOUR.timer); tourHL(null);
+		TOUR.on = false; clearInterval(TOUR.timer); tourHL(null); document.body.classList.remove("touring");
 		const el = $("#tourCard"); if (el) { el.classList.remove("on"); setTimeout(() => (el.hidden = true), 250); }
 		if (!silent) toast(t("Tour ended. Everything stays — plan your own trip whenever you like."));
 	}
-	async function startTour() {
-		if (TOUR.on) return; TOUR.on = true; TOUR.i = 0;
+	async function startTour(auto) {
+		if (TOUR.on) return; TOUR.on = true; TOUR.i = 0; TOUR.auto = auto === true; document.body.classList.add("touring");
 		if (!ME.signedIn) { Object.assign(ME, { signedIn: true, email: "alex.martin@otium.example", first: "Alex", last: "Martin", phone: "+44 20 7946 0000", dob: "14/03/1990", passport: "X1234567", street: "12 Harbour Lane", city: "London", zip: "N1 7GU", country: "GB", card: { brand: "Visa", last4: "4242", exp: "12/29", name: "Alex Martin" } }); profileChanged(); }
 		show("home"); window.scrollTo({ top: 0, behavior: "auto" }); tourCard(0); tourHL(".composer");
 		const q = t(EXAMPLES[0]), a = $("#ask"); a.value = "";
-		if (reduced) a.value = q; else for (let k = 1; k <= q.length && TOUR.on; k += 2) { a.value = q.slice(0, k); fitAsk(); await new Promise((r) => setTimeout(r, 28)); }
+		if (TOUR.auto) await new Promise((r) => setTimeout(r, 2600));
+		if (reduced) a.value = q; else for (let k = 1; k <= q.length && TOUR.on; k += TOUR.auto ? 1 : 2) { a.value = q.slice(0, k); fitAsk(); await new Promise((r) => setTimeout(r, TOUR.auto ? 45 : 28)); }
 		if (!TOUR.on) return;
-		a.value = q; fitAsk(); await new Promise((r) => setTimeout(r, 500)); if (!TOUR.on) return;
+		a.value = q; fitAsk(); await new Promise((r) => setTimeout(r, TOUR.auto ? 1400 : 500)); if (!TOUR.on) return;
 		start(q, false, "normal", null);
 		let shown = 0;
-		const go = (i, sel, actions) => { if (shown === i + 1) return; shown = i + 1; tourCard(i, actions); setTimeout(() => tourHL(sel), 150); };
+		const go = (i, sel, actions) => { if (shown === i + 1) return; shown = i + 1; tourCard(i, actions); setTimeout(() => tourHL(sel), 150); if (TOUR.auto && actions && actions.includes('data-tour="yes"')) setTimeout(() => document.querySelector('#tourCard [data-tour="yes"]')?.click(), 5200); };
 		TOUR.timer = setInterval(() => {
 			if (!TOUR.on) return;
 			if ($("#trip").hidden) return;
@@ -2181,13 +2222,22 @@
 			else if (shown < 2 && $("#step-flights")) go(1, "#steps");
 		}, 350);
 	}
+	function openVideo() {
+		modal(`<h3 id="modalTitle">${t("Otium in one minute")}</h3><p>${t("A real run of the demo: the agent plans, stops twice for your OK, books, then keeps watching prices.")}</p>
+			<div class="vid-wrap"><video id="tourVideo" src="media/otium-tour.mp4" poster="media/otium-tour-poster.jpg" controls autoplay muted playsinline preload="metadata" aria-label="${esc(t("Otium in one minute"))}"></video></div>
+			<div class="vid-row"><button type="button" class="btn btn-text btn-sm" data-tour="start">${ic("play")}${t("Or try it step by step")}</button><div class="row"><button type="button" class="btn btn-ghost btn-sm" id="vidFull">${ic("images")}${t("Full screen")}</button><button class="btn btn-primary btn-sm" data-m="cancel">${t("Close")}</button></div></div>`, () => { const v = $("#tourVideo"); v?.pause(); });
+		$("#modalBox").classList.add("wide", "video");
+		$("#vidFull").onclick = () => { const v = $("#tourVideo"); (v.requestFullscreen || v.webkitEnterFullscreen || v.webkitRequestFullscreen)?.call(v); };
+		$("#modalBox [data-tour=\"start\"]").addEventListener("click", () => closeModal("cancel"));
+	}
+	document.addEventListener("click", (e) => { if (e.target.closest("[data-video]")) openVideo(); });
 	document.addEventListener("click", (e) => {
 		const b = e.target.closest("[data-tour]"); if (!b) return;
 		const a = b.dataset.tour;
 		if (a === "start") return startTour();
 		if (a === "skip") return endTour();
 		if (a === "own") { endTour(true); show("home"); $("#ask").value = ""; $("#ask").focus(); return; }
-		if (a === "yes") { const c = document.querySelector(".tour-hl [data-choice=\"yes\"]"); c?.click(); }
+		if (a === "yes") { const demo = ["Sam Martin", "Noa Martin", "Leo Martin", "Mia Martin"]; document.querySelectorAll(".tour-hl [data-tn]").forEach((x, i) => { if (!x.value.trim()) x.value = demo[i % demo.length]; }); const c = document.querySelector(".tour-hl [data-choice=\"yes\"]"); c?.click(); }
 	});
 
 	function postit() {
@@ -2272,7 +2322,8 @@
 	postit();
 	renderScen();
 	if (q.get("from") && D.origins.some(([n]) => n === q.get("from"))) { S.origin = q.get("from"); $("#originVal").textContent = S.origin; renderListings(); renderBudget(false); }
-	if (q.get("tour")) setTimeout(startTour, 600);
+	if (q.get("tour")) setTimeout(() => startTour(q.get("tour") === "auto"), 600);
+	if (q.get("video")) setTimeout(openVideo, 500);
 	if (q.get("state")) { const st = STATES.find((x) => x[0] === q.get("state")); if (st) { $("#ask").value = st[3]; start(st[3], false, st[0], st); } }
 	else if (q.get("q")) { $("#ask").value = q.get("q"); start(q.get("q")); }
 })();
