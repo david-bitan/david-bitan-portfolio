@@ -1330,6 +1330,74 @@ body.touring #tourCard { pointer-events: auto; }
 .seat-pick, .seat-pick > *, .voucher .seatmap { min-width: 0; max-width: 100%; }
 .legtabs button { flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; }
 @media (max-width: 400px) { .legtabs button svg.i { display: none; } .sp-legend { gap: 4px 10px; } }
+/* ===== v4.9 — micro-animations (state changes, appear / disappear, what needs you) ===== */
+:root { --spring: cubic-bezier(.34, 1.56, .64, 1); }
+/* flat colours only (no gradients) */
+.card.ask { background: var(--surface); }
+.done-banner { background: var(--surface); }
+.orb, .agent[data-status="waiting"] .orb { background: var(--lagoon); }
+.agent[data-status="paused"] .orb { background: #8C847A; }
+.ph { background: var(--c2, #8E7A62); }
+@keyframes mi-in { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes mi-pop { 0% { transform: scale(.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes mi-attn { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(194,52,76,.45); } 50% { transform: scale(1.12); box-shadow: 0 0 0 7px rgba(194,52,76,0); } }
+@keyframes mi-attn-b { 0%, 100% { box-shadow: 0 0 0 0 rgba(47,111,181,.5); } 50% { box-shadow: 0 0 0 8px rgba(47,111,181,0); } }
+@keyframes mi-blink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@keyframes mi-shake { 0%, 100% { transform: none; } 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
+@keyframes mi-wiggle { 0%, 88%, 100% { transform: rotate(0); } 91% { transform: rotate(-14deg); } 94% { transform: rotate(12deg); } 97% { transform: rotate(-6deg); } }
+@keyframes mi-dash { to { stroke-dashoffset: -14; } }
+@keyframes mi-seat { 0%, 100% { fill: #fff; } 50% { fill: #CFE0F4; } }
+.mi-in { animation: mi-in .38s var(--ease) both; }
+.rv { opacity: 0; transform: translateY(14px); transition: opacity .55s var(--ease), transform .55s var(--ease); }
+.rv.rv-on { opacity: 1; transform: none; }
+/* buttons: lift on hover, press on click, icon nudges */
+.btn, .chip, .icon-btn, .hdr-btn, .cats button, .dd-btn, .send-round { transition: transform .18s var(--ease), box-shadow .18s var(--ease), background-color .18s, border-color .18s, color .18s; }
+.btn:not(:disabled):hover, .send-round:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(29,26,23,.12); }
+.btn-text:not(:disabled):hover { box-shadow: none; }
+.btn:not(:disabled):active, .chip:active, .icon-btn:active, .hdr-btn:active, .send-round:active, .cats button:active { transform: scale(.96); transition-duration: .08s; }
+.chip:hover { transform: translateY(-1px); }
+.btn svg.i, .chip svg.i, .send-round svg { transition: transform .22s var(--spring); }
+.btn:not(:disabled):hover svg.i, .chip:hover svg.i, .send-round:hover svg { transform: translateX(2px) scale(1.08); }
+[dir="rtl"] .btn:not(:disabled):hover svg.i, [dir="rtl"] .chip:hover svg.i, [dir="rtl"] .send-round:hover svg { transform: translateX(-2px) scale(1.08); }
+.icon-btn svg, .hdr-btn svg { transition: transform .25s var(--spring); }
+.icon-btn:hover svg, .hdr-btn:hover svg { transform: scale(1.12); }
+.cats button svg { transition: transform .25s var(--spring); } .cats button:hover svg { transform: translateY(-2px); }
+.cats button[aria-pressed="true"] svg { animation: mi-pop .35s var(--spring); }
+/* toggles, hearts, tabs: the change is visible */
+.card-l .heart[aria-pressed="true"] svg, .heart[aria-pressed="true"] svg { animation: mi-pop .4s var(--spring); }
+[role="tab"][aria-selected="true"], [data-pt][aria-pressed="true"], [data-pl][aria-pressed="true"] { animation: mi-pop .3s var(--spring); }
+.switch input:checked + span::after { animation: mi-pop .3s var(--spring); }
+/* steps: a step that finishes pops its check */
+.step[data-s="done"] .ic { animation: mi-pop .4s var(--spring); }
+/* WHERE IT WAITS FOR YOU: the icon blinks */
+.step[data-s="ask"] .ic, .step[data-s="blocked"] .ic { animation: mi-attn 1.4s ease-in-out infinite; }
+.card.ask { animation: mi-in .4s var(--ease) both; }
+.card.ask .ask-ic, .card.ask h3 svg.i, .card.ask .t svg.i { animation: mi-blink 1.4s ease-in-out infinite; }
+.icon-btn.has-dot .dot, .hdr-btn.has-dot .dot { animation: mi-blink 1.4s ease-in-out infinite; }
+.icon-btn.has-dot svg { animation: mi-wiggle 5s ease-in-out infinite; transform-origin: 50% 10%; }
+[aria-invalid="true"] { animation: mi-shake .4s ease-in-out; border-color: var(--lagoon) !important; }
+.err, .fld-err { animation: mi-in .3s var(--ease) both; }
+/* seat map: the seat you picked blinks, the confirm bar slides in and glows twice, its button calls you */
+.seatmap .sm-pend { animation: mi-seat 1s ease-in-out infinite, mi-dash .8s linear infinite; }
+.sp-confirm { animation: mi-in .35s var(--ease) both, mi-attn-b 1s ease-out .35s 2; }
+.sp-confirm [data-seat-ok] { animation: mi-attn-b 1.4s ease-out .6s infinite; }
+.seatmap .sm-seat.pick rect { transition: fill .15s, stroke .15s; }
+.seatmap .sm-on { animation: mi-pop .35s var(--spring); transform-box: fill-box; transform-origin: center; }
+/* modals and drawers fade + slide; toasts already slide */
+.modal .box > *:not(.seat-pick) { animation: mi-in .35s var(--ease) both; }
+.modal .box > *:nth-child(2) { animation-delay: .04s; } .modal .box > *:nth-child(3) { animation-delay: .08s; } .modal .box > *:nth-child(n+4) { animation-delay: .12s; }
+.drawer[aria-hidden="false"] .drawer-b > * { animation: mi-in .35s var(--ease) both; }
+.drawer[aria-hidden="false"] .drawer-b > *:nth-child(2) { animation-delay: .05s; } .drawer[aria-hidden="false"] .drawer-b > *:nth-child(n+3) { animation-delay: .1s; }
+.dd-list.on li, .from-list li { animation: mi-in .22s var(--ease) both; }
+.dd-list.on li:nth-child(2) { animation-delay: .02s; } .dd-list.on li:nth-child(3) { animation-delay: .04s; } .dd-list.on li:nth-child(n+4) { animation-delay: .06s; }
+/* no inner scroll in dialogs: the dialog grows, the page behind it scrolls */
+.modal { overflow-y: auto; overscroll-behavior: contain; align-items: safe center; }
+.modal .box.wide { max-height: none; overflow: visible; }
+.done-banner .check { animation: mi-pop .5s var(--spring) .1s both; }
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+	.rv { opacity: 1; transform: none; }
+}
 </style>
 </head>
 <body>

@@ -398,6 +398,7 @@
 		"Back to my trip": ["Retour à mon voyage", "Volver a mi viaje", "Torna al mio viaggio", "חזרה לטיול שלי"],
 		"Print": ["Imprimer", "Imprimir", "Stampa", "הדפסה"],
 		"Downloaded the trip summary (PDF)": ["Récapitulatif téléchargé (PDF)", "Resumen descargado (PDF)", "Riepilogo scaricato (PDF)", "הסיכום הורד (PDF)"],
+		"Otium — Trips planned for you, decided by you": ["Otium — Des voyages préparés pour vous, décidés par vous", "Otium — Viajes preparados para ti, decididos por ti", "Otium — Viaggi preparati per te, decisi da te", "Otium — טיולים שמתוכננים בשבילך, בהחלטה שלך"],
 		"Guided tour": ["Visite guidée", "Visita guiada", "Tour guidato", "סיור מודרך"],
 		"End the tour": ["Arrêter la visite", "Terminar la visita", "Termina il tour", "סיום הסיור"],
 		"Describe a trip in your own words": ["Décrivez un voyage avec vos mots", "Describe un viaje con tus palabras", "Descrivi un viaggio a parole tue", "תארו טיול במילים שלכם"],
@@ -1059,11 +1060,18 @@
 		const core = str.trim(); if (!core) return str;
 		const lead = str.slice(0, str.indexOf(core)), tail = str.slice(str.indexOf(core) + core.length);
 		const { exact, tpl } = rxFor(from);
-		const conv = (v) => { const k = exact.get(v.trim()); return k ? t(k) : mapVal(v); };
+		const conv = (v) => { // a captured value may carry a token for a chip (<b>, <span>): map only the text around it
+			if (v.includes("\u0001")) return v.split(/(\u0001\d+\u0001)/).map((p, i) => (i % 2 || !p.trim() ? p : p.replace(p.trim(), conv(p.trim())))).join("");
+			const k = exact.get(v.trim()); return k ? t(k) : mapVal(v);
+		};
 		let out = null; const e = exact.get(core);
 		if (e) out = t(e);
 		else for (const x of tpl) { const m = core.match(x.re); if (m) { const vars = {}; x.names.forEach((n, i) => (vars[n] = conv(m[i + 1]))); out = t(x.en, vars); break; } }
 		if (out == null) { const v = mapVal(core); if (v !== core) out = v; }
+		if (out == null) { // several sentences written one after the other: translate each
+			const parts = core.split(/(?<=[.!?])\s+(?=\S)/);
+			if (parts.length > 1) { const tr = parts.map((p) => retext(p, from, mapVal)); if (tr.some((x, i) => x !== parts[i])) out = tr.map((x) => x.trim()).join(" "); }
+		}
 		return out == null ? str : lead + out + tail;
 	}
 	const escH = (x) => String(x).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

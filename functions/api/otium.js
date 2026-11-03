@@ -24,7 +24,7 @@ Fields:
 - "asked_place": the place the user typed, as written, or null.
 - "nights": integer 1-28 or null. "a weekend" = 2, "long weekend" = 3, "a week" = 7, "two weeks" = 14, "a month" = 28.
 - "travelers": integer 1-50 or null. "couple", "my partner and I", "for two" = 2. "solo", "alone" = 1.
-- "budget": total budget in euros as an integer, or null. Convert "$" or "£" roughly to euros.
+- "budget": the total budget number exactly as the user wrote it, as an integer, or null. Do NOT convert currencies (the page does it).
 - "interests": up to 3 short lowercase words (e.g. "food", "museums", "beach", "nightlife", "nature", "design").
 - "pace": "slow", "balanced" or "packed", default "balanced".
 - "note": one short sentence (max 18 words) restating what you understood, addressed to the user ("You want..."), written in the language named in the LANGUAGE line.

@@ -388,17 +388,22 @@
 		let travelers = null;
 		if (/\b(solo|alone|by myself|just me|seul|seule|sola|da solo|da sola)\b|לבד/.test(s)) travelers = 1;
 		else if (/\b(for two|couple|partner|wife|husband|girlfriend|boyfriend|the two of us|2 people|two people|pour deux|à deux|para dos|en pareja|per due|in coppia|conjoint|pareja)\b|לשניים|זוג/.test(s)) travelers = 2;
-		else if ((m = s.match(/(\d|three|four|five|six) (people|of us|adults|friends)/)) || (m = s.match(/for (\d|three|four|five|six)\b(?!\s*(nights?|days?|weeks?))/))) travelers = NUM[m[1]] || +m[1];
+		else if ((m = s.match(/(\d+|three|four|five|six|trois|quatre|cinq|tres|cuatro|cinco|seis|tre|quattro|cinque|sei)\s+(people|of us|adults|friends|travell?ers|personnes|adultes|amis|voyageurs|personas|adultos|amigos|viajeros|persone|adulti|amici|viaggiatori)/)) || (m = s.match(/(\d+)\s*(אנשים|נוסעים|מבוגרים|חברים)/)) || (m = s.match(/(?:pour|para|per)\s+(\d+|trois|quatre|cinq|tres|cuatro|cinco|tre|quattro|cinque)\b(?!\s*(nuits?|jours?|noches|días|dias|notti|giorni|semaines?))/)) || (m = s.match(/for (\d|three|four|five|six)\b(?!\s*(nights?|days?|weeks?))/))) travelers = NUM[m[1]] || +m[1];
 		else if (/family/.test(s)) travelers = 4;
 		let budget = null;
-		if ((m = s.match(/[€$£₪]\s?(\d[\d,.\s]*)/)) || (m = s.match(/(\d[\d,.]*)\s?(€|eur|euros?|\$|usd|dollars?|£|₪|nis|ils|ש״ח|שקל)/)) || (m = s.match(/(?:under|max|budget(?: of)?|up to|moins de|menos de|sotto i?|עד)\s+(\d[\d,.]*)/))) budget = parseInt(m[1].replace(/[,.\s]/g, ""), 10) || null;
+		if ((m = s.match(/[€$£₪]\s?(\d[\d,.\s]*)/)) || (m = s.match(/(\d[\d,.]*)\s?(€|eur|euros?|\$|usd|dollars?|£|₪|nis|ils|ש״ח|שקל)/)) || (m = s.match(/(?:under|max|budget(?: of)?|up to|moins de|menos de|sotto i?|עד)\s+(\d[\d,.]*)/))) budget = parseInt(m[1].replace(/[,.\s]/g, ""), 10) || null; if (budget) { const sym = (m[0].match(/€|eur|£|₪|nis|ils|ש״ח|שקל|\$|usd|dollar/) || [])[0]; const RATE = { "€": 1, eur: 1, "£": 0.86, "₪": 3.9, nis: 3.9, ils: 3.9, "ש״ח": 3.9, "שקל": 3.9, $: 1.08, usd: 1.08, dollar: 1.08 }; if (sym && RATE[sym]) budget = Math.round((budget / RATE[sym]) * cur()[1]); } // typed in another currency → page currency
 		const KW = { food: ["food", "gastronomie", "comida", "cibo", "אוכל"], museums: ["museum", "musée", "museo", "musei", "מוזיאון"], beach: ["beach", "plage", "playa", "spiaggia", "mare", "חוף"], nightlife: ["nightlife", "vie nocturne", "vida nocturna", "vita notturna", "חיי לילה"], design: ["design", "diseño", "עיצוב"], viewpoints: ["viewpoint", "belvédère", "mirador", "belvedere", "תצפית"], history: ["history", "histoire", "historia", "storia", "היסטוריה"], bakeries: ["bakeries", "boulangerie", "panader", "panetteri", "מאפי"], art: [" art", "arte", "אמנות"] };
 		const interests = Object.keys(KW).filter((k) => KW[k].some((w) => s.includes(w))).slice(0, 3);
 		const pace = /\b(relax|slow|chill|lazy)\b/.test(s) ? "slow" : /\b(packed|see everything|busy)\b/.test(s) ? "packed" : "balanced";
 		const cabin = /\bbusiness\b/.test(s) ? "business" : /\bpremium\b/.test(s) ? "premium" : null;
 		const bags = /\b(checked bag|suitcase|luggage|hold bag)\b/.test(s);
 		const time = /\bmorning (flight|departure)\b/.test(s) ? "morning" : /\bevening (flight|departure)\b/.test(s) ? "evening" : null;
-		return { city, askedPlace, nights, travelers, budget, interests, pace, cabin, bags, time, note: "" };
+		let month = null; // "in May", "en mai", "a maggio", "במאי", "next month"…
+		const MON = [["january","janvier","enero","gennaio","ינואר"],["february","février","fevrier","febrero","febbraio","פברואר"],["march","mars","marzo","מרץ","מרס"],["april","avril","abril","aprile","אפריל"],["may","mai","mayo","maggio","מאי"],["june","juin","junio","giugno","יוני"],["july","juillet","julio","luglio","יולי"],["august","août","aout","agosto","אוגוסט"],["september","septembre","septiembre","settembre","ספטמבר"],["october","octobre","octubre","ottobre","אוקטובר"],["november","novembre","noviembre","נובמבר"],["december","décembre","decembre","diciembre","dicembre","דצמבר"]];
+		const wb = (w) => new RegExp(`(^|[^a-zà-ÿ\u05d0-\u05ea])[בל]?${w}($|[^a-zà-ÿ\u05d0-\u05ea])`);
+		MON.forEach((names, i) => { if (month == null && names.some((w) => (w === "may" ? /\b(in|early|late|mid|during|this|next|of)[\s-]+may\b/.test(s) : w === "mai" ? /\b(en|début|debut|fin|mi|courant|de)[\s-]+mai\b|^mai\b/.test(s) || I.lang === "fr" && wb(w).test(s) : wb(w).test(s)))) month = i; });
+		if (month == null && /next month|le mois prochain|mois prochain|el (próximo|proximo) mes|il mese prossimo|mese prossimo|בחודש הבא/.test(s)) month = (new Date().getMonth() + 1) % 12;
+		return { city, askedPlace, nights, travelers, budget, interests, pace, cabin, bags, time, month, note: "" };
 	}
 	async function understand(text) {
 		if (S.scenario === "offline") return { intent: localParse(text), ai: false };
@@ -416,8 +421,8 @@
 			let j; try { j = await ask(15000); } catch (e) { if (e.name === "AbortError") throw e; console.warn("Otium AI, first try:", e.message); j = await ask(10000); }
 			// Belt and braces: the model may miss a number that is plainly in the text.
 			const loc = localParse(text); const i = j.intent;
-			for (const k of ["nights", "travelers", "budget"]) if (i[k] == null && loc[k] != null) i[k] = loc[k];
-			Object.assign(i, { cabin: loc.cabin, bags: loc.bags, time: loc.time });
+			for (const k of ["nights", "travelers", "budget"]) if (i[k] == null && loc[k] != null) i[k] = loc[k]; if (loc.budget != null) i.budget = loc.budget; // the number as typed, in the page currency: the model may convert it
+			Object.assign(i, { cabin: loc.cabin, bags: loc.bags, time: loc.time, month: loc.month });
 			if (!i.city && loc.city) { i.city = loc.city; i.askedPlace = loc.askedPlace; }
 			return { intent: i, ai: true };
 		} catch (e) { console.warn("Otium AI unavailable, basic matching used:", e.message); return { intent: localParse(text), ai: false }; }
@@ -612,7 +617,11 @@
 				cap: intent.budget != null ? fromLocal(intent.budget) : S.settings.cap, flight: 0, stay: null, assumed, interests: intent.interests || [], pace: intent.pace || "balanced", prefs: { ...DEFAULT_PREFS, cabin: intent.cabin || "economy", bags: intent.bags ? 1 : 0, time: intent.time || "any" },
 			};
 			if (S.when) { S.plan.out = S.when.out; S.plan.nights = S.when.nights; assumed.nights = false; }
-			else S.plan.out = iso(tripDates(S.plan.nights, null).out);
+			else if (intent.month != null) { // a month was asked for: the second Friday of it, this year or next
+				const now = new Date(); now.setHours(12, 0, 0, 0); let y = now.getFullYear(); const mk = (yy) => { const d = new Date(yy, intent.month, 1, 12); d.setDate(1 + ((5 - d.getDay() + 7) % 7) + 7); return d; };
+				let d = mk(y); if (d < addDays(now, 7)) d = mk(y + 1);
+				S.plan.out = iso(d);
+			} else S.plan.out = iso(tripDates(S.plan.nights, null).out);
 			s.set("done");
 			s.detail(esc(intent.note || t("You want {n} nights in {city} for {t}.", { n: S.plan.nights, city: D.cities[S.plan.city].name, t: S.plan.travelers })));
 			renderUnderstood();
@@ -805,6 +814,7 @@
 				ch = await decide(slot); if (id !== S.run) throw new Stale();
 				if (ch === "later" || p.travelers < 2 || readNames(slot, p)) break;
 				const er = slot.querySelector(".names-err"); if (er) { er.hidden = false; er.textContent = t("Add the name of every traveller, as written in the passport."); }
+				slot.querySelectorAll("[data-tn]").forEach((x) => { const bad = !x.value.trim(); x.removeAttribute("aria-invalid"); if (bad) { void x.offsetWidth; x.setAttribute("aria-invalid", "true"); x.addEventListener("input", () => x.removeAttribute("aria-invalid"), { once: true }); } }); // the empty fields shake and turn red
 				slot.querySelector('[data-tn]:placeholder-shown, [data-tn][value=""]')?.focus();
 			}
 			slot.innerHTML = "";
@@ -1983,6 +1993,7 @@
 	}
 	function refreshSeats() {
 		document.querySelectorAll(".seat-pick").forEach((el) => { el.outerHTML = seatMap(S.plan.travelers); });
+		if (SEATUI.pending) requestAnimationFrame(() => document.querySelector("#modalBox .sp-confirm")?.scrollIntoView({ block: "nearest", behavior: reduced ? "auto" : "smooth" })); // the confirm bar is where the eye goes next
 		const pb = $("#passBox");
 		if (pb) { pb.dataset.n = SEATUI.n; pb.dataset.j = SEATUI.j; pb.innerHTML = passHtml(legs()[SEATUI.j], SEATUI.n); document.querySelectorAll("#modalBox [data-pt]").forEach((x) => x.setAttribute("aria-pressed", String(+x.dataset.pt === SEATUI.n))); document.querySelectorAll("#modalBox [data-pl]").forEach((x) => { x.setAttribute("aria-pressed", String(+x.dataset.pl === SEATUI.j)); x.setAttribute("aria-selected", String(+x.dataset.pl === SEATUI.j)); }); }
 	}
@@ -2275,7 +2286,7 @@
 		const mv = valMapper(prev);
 		const tr = (root) => root && I.retranslate(root, prev, mv);
 		const rs = (x) => (typeof x === "string" ? I.retext(x, prev, mv) : x);
-		tr($("#steps")); tr($("#notice"));
+		tr($("#steps")); tr($("#notice")); tr($("#toast")); tr($("#tourCard"));
 		$("#agentStatus").textContent = rs($("#agentStatus").textContent);
 		if (S._prev) S._prev[1] = rs(S._prev[1]);
 		S.log.forEach((l) => (l.text = rs(l.text)));
@@ -2307,7 +2318,7 @@
 		if (prev !== I.lang) retranslateTrips(prev);
 		if (S.plan) { renderUnderstood(); renderTrip(); }
 		renderTripsNav(); renderLog(); renderNotes(); botLabels(); renderBot(); renderAcct(); renderMenu(); if (!$("#profile").hidden) renderProfile();
-		fixNames();
+		fixNames(); document.title = t("Otium — Trips planned for you, decided by you");
 	}
 
 	/* ---------------- boot ---------------- */
@@ -2326,4 +2337,36 @@
 	if (q.get("video")) setTimeout(openVideo, 500);
 	if (q.get("state")) { const st = STATES.find((x) => x[0] === q.get("state")); if (st) { $("#ask").value = st[3]; start(st[3], false, st[0], st); } }
 	else if (q.get("q")) { $("#ask").value = q.get("q"); start(q.get("q")); }
+})();
+
+/* v4.9 — micro-animations. Whatever newly appears fades and slides in; a re-render of the same thing does not replay.
+ * Sections of the home page reveal as they scroll into view. Off when the visitor asks for reduced motion. */
+(() => {
+	if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+	const SEL = ".card, .sp-confirm, .done-banner, .pass, .err, .fld-err, .notice, .bud-card, .card-l, .setting, .row > .btn, .bot-log > *, .note-i, .trip-i, .alt, .toggle-alts";
+	const sig = (e) => `${e.tagName}|${e.getAttribute("class") || ""}|${e.id}|${(e.textContent || "").trim().slice(0, 48)}`;
+	let booted = false; setTimeout(() => (booted = true), 1200);
+	new MutationObserver((muts) => {
+		if (!booted) return;
+		const gone = new Set();
+		for (const m of muts) m.removedNodes.forEach((n) => { if (n.nodeType !== 1) return; gone.add(sig(n)); n.querySelectorAll?.(SEL).forEach((x) => gone.add(sig(x))); });
+		let k = 0;
+		for (const m of muts) m.addedNodes.forEach((n) => {
+			if (n.nodeType !== 1 || !n.isConnected) return;
+			const list = n.matches?.(SEL) ? [n] : [...(n.querySelectorAll?.(SEL) || [])];
+			for (const el of list) {
+				if (gone.has(sig(el)) || k > 10) continue;
+				el.style.animationDelay = `${Math.min(k++, 8) * 45}ms`; el.classList.add("mi-in");
+				el.addEventListener("animationend", () => { el.classList.remove("mi-in"); el.style.animationDelay = ""; }, { once: true });
+			}
+		});
+	}).observe(document.body, { childList: true, subtree: true });
+	if (!("IntersectionObserver" in window)) return;
+	const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("rv-on"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
+	const reveal = () => document.querySelectorAll("#home .section-h, #home .how > *, #home .promise, #home .card-l, #home .bud-card, #home .tile").forEach((el, i) => {
+		if (el.dataset.rv) return; el.dataset.rv = "1";
+		const r = el.getBoundingClientRect(); if (r.top < innerHeight) return; // already on screen: no flash
+		el.classList.add("rv"); el.style.transitionDelay = `${(i % 4) * 60}ms`; io.observe(el);
+	});
+	reveal(); new MutationObserver(reveal).observe(document.querySelector("#home") || document.body, { childList: true, subtree: true });
 })();
