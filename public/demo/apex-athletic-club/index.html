@@ -78,7 +78,8 @@
 	a { color: inherit; text-decoration: none; }
 	button { font: inherit; color: inherit; background: transparent; border: 0; cursor: pointer; }
 
-	/* Reveal pre-hide via class on html — set inline in <head> before
+	/* Reveal pre-hide via class on html — set inline in <head>
+	<link rel="preload" as="image" href="/demo/apex-athletic-club/media/hero-poster.jpg" fetchpriority="high"> before
 	   paint, then flipped by the JS scroll observer. `:not(.is-in)` scopes
 	   the pre-hide so the same selector self-releases when the observer
 	   adds `.is-in`, avoiding a specificity fight with the reveal rule. */
@@ -396,15 +397,16 @@
 		background: linear-gradient(180deg, #0F0F18 0%, #06060A 100%);
 	}
 	/* Hero background, back to front:
-	   1. the photo (fallback while the video loads, and for reduced motion)
-	   2. the graded video loop (media/hero-*.mp4), fades in once playing
+	   1. the video's own first frame (media/hero-poster.jpg): shown at once, and kept for reduced motion
+	   2. the graded video loop (media/hero-*.mp4): starts on that same frame, so there is no visible switch
 	   3. ::before: grey pixel grid for texture
 	   4. ::after: dark veil so the headline always reads
 	   To go back to the photo only: delete the <video> in the hero. */
 	.hero-media {
 		position: absolute;
 		inset: 0;
-		background-image: url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=2000&q=80");
+		background-image: url("/demo/apex-athletic-club/media/hero-poster.jpg");
+		background-color: #06060A;
 		background-size: cover;
 		background-position: center;
 		z-index: 0;
@@ -415,10 +417,7 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		opacity: 0;
-		transition: opacity 900ms ease;
 	}
-	.hero-video.is-playing { opacity: 1; }
 	.hero-media::before {
 		content: "";
 		position: absolute;
