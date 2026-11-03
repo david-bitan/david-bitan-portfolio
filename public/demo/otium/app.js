@@ -1487,10 +1487,24 @@
 
 	/* ---------------- trip history (read-only receipt) + cancelling bookings ---------------- */
 	function renderLog() {
-		$("#log").innerHTML = S.log.length ? S.log.map((l) => `<li class="${l.target ? "jump" : ""}" ${l.target ? `data-target="${l.target}" tabindex="0" title="${t("Show this step")}"` : ""}><time>${l.t}</time><div><span class="by">${l.by === "You" ? t("You") : "Otium"}</span><span class="${l.undone ? "undone" : ""}">${esc(l.text)}</span></div><span></span></li>`).join("") : `<li class="empty" style="display:block">${t("Nothing yet.")}</li>`;
+		$("#log").innerHTML = S.log.length ? S.log.map((l) => `<li class="${l.target ? "jump" : ""}" ${l.target ? `data-target="${l.target}" tabindex="0" title="${t("Show this step")}"` : ""}><time>${l.t}</time><div><span class="by">${l.by === "You" ? t("You") : "Otium"}</span><span class="${l.undone ? "undone" : ""}">${esc(l.text)}</span></div><span class="nb"><button type="button" data-logdel="${l.id}" aria-label="${esc(t("Delete"))}" title="${esc(t("Delete"))}">${ic("trash-2")}</button></span></li>`).join("") : `<li class="empty" style="display:block">${t("Nothing yet.")}</li>`;
 		const hb = $("#openHistory"); if (hb) hb.lastChild.textContent = t("Trip history ({n})", { n: S.log.length });
+		const cl = $("#clearLog"); if (cl) cl.disabled = !S.log.length;
 	}
 	$("#openHistory").onclick = () => openDrawer("logDrawer");
+	// History: delete one line or everything, always with an undo.
+	$("#log").addEventListener("click", (e) => {
+		const d = e.target.closest("[data-logdel]"); if (!d) return;
+		e.stopImmediatePropagation();
+		const i = S.log.findIndex((l) => l.id === d.dataset.logdel); if (i < 0) return;
+		const [gone] = S.log.splice(i, 1); renderLog();
+		toast(t("Removed from the history"), t("Undo"), () => { S.log.splice(Math.min(i, S.log.length), 0, gone); renderLog(); });
+	});
+	$("#clearLog").onclick = () => {
+		if (!S.log.length) return;
+		const kept = S.log.splice(0); renderLog();
+		toast(t("History cleared"), t("Undo"), () => { S.log.unshift(...kept); renderLog(); });
+	};
 	$("#log").addEventListener("click", (e) => {
 		const li = e.target.closest("li[data-target]"); if (!li) return;
 		const step = $(`#step-${li.dataset.target}`); if (!step || $("#trip").hidden) return;

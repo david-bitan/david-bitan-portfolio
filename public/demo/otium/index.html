@@ -1163,6 +1163,10 @@ body.lb-open { overflow: hidden; }
 .auth-sw { border: 0; background: none; padding: 0; font: inherit; color: #2F6FB5; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
 /* gallery sits over the page: see-through backdrop */
 .lb { background: rgba(18, 17, 16, .84); -webkit-backdrop-filter: blur(6px) saturate(1.1); backdrop-filter: blur(6px) saturate(1.1); }
+/* trip history: square rows, per-line delete */
+.log li, .log li.jump { border-radius: 0; }
+.log li .nb button { width: 28px; height: 28px; }
+#logDrawer .drawer-h h2, #notesDrawer .drawer-h h2 { font-size: 21px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 </style>
 </head>
 <body>
@@ -1310,7 +1314,7 @@ body.lb-open { overflow: hidden; }
 	<div class="drawer-b"><ul class="menu-list" id="menuList"></ul></div>
 </aside>
 <aside class="drawer" id="logDrawer" aria-label="Activity" aria-hidden="true">
-	<div class="drawer-h"><h2>Trip history</h2><button class="icon-btn" data-close aria-label="Close"><i data-i="x"></i></button></div>
+	<div class="drawer-h"><h2>Trip history</h2><div style="display:flex;gap:8px;align-items:center"><button class="btn btn-ghost btn-sm" id="clearLog" type="button">Clear all</button><button class="icon-btn" data-close aria-label="Close"><i data-i="x"></i></button></div></div>
 	<div class="drawer-b"><p style="margin:0 0 10px;font-size:13px;color:var(--ink-2)">A receipt of what Otium did and what you decided, newest first. Tap a line to jump to that step.</p><ul class="log" id="log"></ul></div>
 </aside>
 <aside class="drawer" id="notesDrawer" aria-label="Notifications" aria-hidden="true">
