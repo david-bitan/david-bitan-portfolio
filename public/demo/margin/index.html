@@ -185,6 +185,8 @@ footer { border-top: 1px solid var(--line); color: var(--ink-3); font-size: 13.5
 footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 
 
+.resume { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 18px; font-size: 14.5px; color: var(--ink-2); }
+.resume > .i { width: 16px; height: 16px; color: var(--ink-3); }
 /* home: role, comparison, annotated example, steps */
 .role { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 12px; padding: 10px 14px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); font-size: 15px; color: var(--ink-2); max-width: 600px; }
 .role b { color: var(--ink); font-weight: 600; }
@@ -276,6 +278,7 @@ footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-c
 					<button class="go" type="submit" aria-label="Ask" disabled><span data-ic="arrow-up"></span></button>
 				</form>
 				<ul class="examples" id="examples"></ul>
+				<div class="resume" id="resume" hidden><span data-ic="history"></span><span data-n></span><button type="button" class="btn btn-text btn-sm" data-resume>See them</button><button type="button" class="btn btn-text btn-sm" data-forget>Clear</button></div>
 			</div>
 
 			<section class="block" aria-labelledby="whyH">

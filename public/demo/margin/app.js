@@ -69,7 +69,7 @@
 		const kept = [], removed = [];
 		for (const s of sentences) {
 			const cites = [...new Set((s.cite || []).filter((id) => allowed.includes(id) && P[id]))];
-			const text = String(s.text || "").trim();
+			let text = String(s.text || "").trim(); if (text && !/[.!?…:”"]$/.test(text)) text += "."; // the model often drops the final full stop
 			if (!text) continue;
 			if (!cites.length) { removed.push({ text, why: "it had no source" }); continue; }
 			const srcNums = new Set(cites.flatMap((id) => { const d = DOC[P[id].doc]; return [...nums(P[id].text), ...nums(d.title), d.updated.slice(0, 4)]; })); // the passage, its document's title and year
@@ -89,7 +89,7 @@
 	async function ask(question) {
 		question = question.trim().replace(/\s+/g, " "); if (!question) return;
 		const turn = { id: Date.now().toString(36), q: question, pending: true, step: 0 };
-		THREAD.push(turn); show("ask"); renderThread(); scrollToTurn(turn);
+		THREAD.push(turn); SHOW_THREAD = true; show("ask"); renderThread(); scrollToTurn(turn);
 		const tick = async (n) => { turn.step = n; renderTurn(turn); await wait(reduced ? 0 : 380); };
 		await tick(1);
 		const { hits, coverage } = search(question);
@@ -167,10 +167,13 @@
 		if (!el) { el = document.createElement("article"); el.className = "turn"; el.id = "t-" + t.id; $("#thread").append(el); }
 		el.innerHTML = turnHtml(t);
 	}
+	let SHOW_THREAD = false; // the home page always comes first; earlier questions are one click away
 	function renderThread() {
-		const has = THREAD.length > 0;
-		$("#homeIntro").hidden = has; $("#thread").hidden = !has; $("#dock").hidden = !has;
-		$("#thread").innerHTML = ""; THREAD.forEach(renderTurn);
+		const on = SHOW_THREAD && THREAD.length > 0;
+		$("#homeIntro").hidden = on; $("#thread").hidden = !on; $("#dock").hidden = !on;
+		$("#thread").innerHTML = ""; if (on) THREAD.forEach(renderTurn);
+		const n = THREAD.filter((x) => !x.pending).length, r = $("#resume");
+		if (r) { r.hidden = on || !n; r.querySelector("[data-n]").textContent = n === 1 ? "You asked 1 question earlier." : `You asked ${n} questions earlier.`; }
 	}
 	const scrollToTurn = (t) => requestAnimationFrame(() => document.getElementById("t-" + t.id)?.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" }));
 
@@ -249,7 +252,9 @@
 
 	document.addEventListener("click", (e) => {
 		const ex = e.target.closest("[data-ex]"); if (ex) return ask(ex.dataset.ex);
-		const go = e.target.closest("[data-go]"); if (go) { show(go.dataset.go); if (go.dataset.go === "ask") scrollTo(0, 0); return; }
+		const go = e.target.closest("[data-go]"); if (go) { if (go.dataset.go === "ask" && !THREAD.some((x) => x.pending)) { SHOW_THREAD = false; renderThread(); } show(go.dataset.go); if (go.dataset.go === "ask") scrollTo(0, 0); return; }
+		if (e.target.closest("[data-resume]")) { SHOW_THREAD = true; show("ask"); renderThread(); requestAnimationFrame(() => { const last = $("#thread").lastElementChild; last?.scrollIntoView({ block: "start" }); }); return; }
+		if (e.target.closest("[data-forget]")) { const before = THREAD.slice(); THREAD = []; save(); renderThread(); toast("Earlier questions cleared.", "Undo", () => { THREAD = before; save(); renderThread(); }); return; }
 		const op = e.target.closest("[data-open]"); if (op) return openDoc(op.dataset.open, op.dataset.pass);
 		if (e.target.closest("[data-back]")) { show("ask"); requestAnimationFrame(() => scrollTo(0, lastView.scroll)); return; }
 		const c = e.target.closest(".cite");
@@ -266,8 +271,8 @@
 		if (a.dataset.act === "flag" && t) { t.flagged = true; save(); toast("Thanks — People Ops will review this answer.", "Undo", () => { t.flagged = false; save(); }); }
 	});
 	$("#clearAll").addEventListener("click", () => {
-		const before = THREAD.slice(); THREAD = []; save(); renderThread(); scrollTo(0, 0);
-		toast("Conversation cleared.", "Undo", () => { THREAD = before; save(); renderThread(); });
+		const before = THREAD.slice(); THREAD = []; SHOW_THREAD = false; save(); renderThread(); scrollTo(0, 0);
+		toast("Conversation cleared.", "Undo", () => { THREAD = before; SHOW_THREAD = true; save(); renderThread(); });
 	});
 
 	/* ---------------- the annotated example on the home page (static, nothing is asked) ---------------- */
