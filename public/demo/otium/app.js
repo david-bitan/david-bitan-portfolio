@@ -879,7 +879,7 @@
 				<div class="cal-ms">${calMonth(cal.month)}${two ? calMonth(m2) : ""}</div>
 				<button type="button" class="cal-nav next" data-cal="next" aria-label="${esc(t("Next month"))}" ${canNext ? "" : "disabled"}>${ic("chevron-right", "dir")}</button>
 			</div>
-			<div class="cal-quick"><span>${t("Stay for")}</span>${QUICK_NIGHTS.map((n) => `<button type="button" class="chip" data-n="${n}" aria-pressed="false">${P(n, "1 night", "{n} nights")}</button>`).join("")}<button type="button" class="chip cal-custom" data-n="" aria-pressed="true" hidden></button></div>
+			
 			<div class="cal-foot"><div class="cal-sum" aria-live="polite"></div><div class="row">${cal.onClear ? `<button type="button" class="btn btn-text btn-sm" data-cal="clear">${t("Clear dates")}</button>` : ""}<button type="button" class="btn btn-ghost btn-sm" data-cal="cancel">${t("Cancel")}</button><button type="button" class="btn btn-primary btn-sm" data-cal="apply">${t("Apply dates")}</button></div></div>`;
 		markCal();
 	}
