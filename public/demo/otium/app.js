@@ -15,7 +15,16 @@
 		}
 	}
 	const $ = (s, r = document) => r.querySelector(s);
-	const eur = (n) => new Intl.NumberFormat(I.locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(Math.round(n));
+	/* Prices live in euros internally and are shown in the departure city's currency (demo rates, rounded). */
+	const CUR_BY_ORIGIN = { London: ["GBP", 0.86, 1], "Tel Aviv": ["ILS", 3.9, 4], Geneva: ["CHF", 0.94, 1] };
+	const cur = () => CUR_BY_ORIGIN[S.origin] || ["EUR", 1, 1];
+	const money = (local) => new Intl.NumberFormat(I.locale, { style: "currency", currency: cur()[0], currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(Math.round(local));
+	const eur = (n) => money(n * cur()[1]);
+	const fromLocal = (x) => x / cur()[1];
+	const roundLocal = (e, step = 50, up = false) => fromLocal((up ? Math.ceil : Math.round)((e * cur()[1]) / step) * step);
+	const CAP_BASE = [300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1500, 2000, 2500, 3000, 4000, 5000, 7500, 10000];
+	const capList = () => CAP_BASE.map((v) => fromLocal(v * cur()[2]));
+	const snapCap = (e) => capList().reduce((a, b) => (Math.abs(b - e) < Math.abs(a - e) ? b : a));
 	const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 	// The model lives on the published site. Opened anywhere else (a preview file), Otium calls the live endpoint.
 	const API = /(^|\.)david-bitan-portfolio\.pages\.dev$/.test(location.hostname) || /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? "/api/otium" : "https://david-bitan-portfolio.pages.dev/api/otium";
@@ -212,7 +221,8 @@
 		};
 		const pick = (n) => {
 			S.origin = n; $("#originVal").textContent = on(n); open(false); btn.focus();
-			renderListings();
+			S.settings.cap = snapCap(S.settings.cap); if (S.plan && !S.progress?.done) S.plan.cap = snapCap(S.plan.cap);
+			renderListings(); if (!$("#rules")?.closest("[hidden]")) try { renderRules?.(); } catch {}
 		};
 		btn.onclick = (e) => { e.stopPropagation(); open(!list.classList.contains("on")); };
 		list.onclick = (e) => { const li = e.target.closest("li"); if (li) pick(li.dataset.o); };
@@ -476,7 +486,7 @@
 			const assumed = { nights: intent.nights == null, travelers: intent.travelers == null, cap: intent.budget == null };
 			S.plan = {
 				city: intent.city, nights: intent.nights ?? 3, travelers: intent.travelers ?? 2,
-				cap: intent.budget ?? S.settings.cap, flight: 0, stay: null, assumed, interests: intent.interests || [], pace: intent.pace || "balanced", prefs: { ...DEFAULT_PREFS, cabin: intent.cabin || "economy", bags: intent.bags ? 1 : 0, time: intent.time || "any" },
+				cap: intent.budget != null ? fromLocal(intent.budget) : S.settings.cap, flight: 0, stay: null, assumed, interests: intent.interests || [], pace: intent.pace || "balanced", prefs: { ...DEFAULT_PREFS, cabin: intent.cabin || "economy", bags: intent.bags ? 1 : 0, time: intent.time || "any" },
 			};
 			if (S.when) { S.plan.out = S.when.out; S.plan.nights = S.when.nights; assumed.nights = false; }
 			else S.plan.out = iso(tripDates(S.plan.nights, null).out);
@@ -544,7 +554,7 @@
 				if (p.nights > 1) choices.push(["night", t("One night less"), t("{a} nights instead of {b}", { a: p.nights - 1, b: p.nights }), -(k.st.nightly + TICKETS_PP_DAY * p.travelers * (S.settings.activities ? 1 : 0))]);
 				if (k.fl.kind === "Direct" && p.flight !== 2) { const o = flightOptions(p.city, S.origin, p.travelers)[2]; choices.push(["flight:2", t("Take the {d} flight with a stop", { d: o.dep }), t("{a} · longer journey", { a: o.airline }), o.price - k.flights]); }
 				if (p.prefs.cabin !== "economy") { const eco = flightOptions(p.city, S.origin, p.travelers, { ...p.prefs, cabin: "economy" })[p.flight]; choices.unshift(["cabin", t("Fly economy instead"), t("{c} → Economy", { c: t(CABINS[p.prefs.cabin][0]) }), eco.price - k.flights]); }
-				const raise = Math.ceil(k.total / 50) * 50;
+				const raise = roundLocal(k.total, 50, true);
 				choices.push(["cap", t("Raise my cap to {x}", { x: eur(raise) }), t("Keep the plan as it is"), 0]);
 				renderTrip();
 				const slot = s.slot(`<div class="card warn"><h4>${t("Over budget by {x}", { x: eur(k.total - p.cap) })}</h4><p>${t("Pick one — I won’t choose for you when it’s your money.")} <button class="linkish" data-help>${t("Or ask a person")}</button></p><div class="opts">${choices.map(([v, t, sm, d]) => `<button class="opt" data-choice="${v}"><span>${esc(t)}<small>${esc(sm)}</small></span>${d ? `<span class="diff down num">${d < 0 ? "−" : "+"}${eur(Math.abs(d))}</span>` : ""}</button>`).join("")}</div></div>`);
@@ -616,7 +626,7 @@
 					log("You", t("Declined the {x} payment", { x: eur(k.hold) }));
 					const n = await decide(slot);
 					if (id !== S.run) throw new Stale();
-					if (n === "cheaper") { p.cap = Math.max(200, Math.round((costs(p).total * 0.8) / 50) * 50); p.assumed.cap = false; log("You", t("Asked for cheaper — cap set to {x}", { x: eur(p.cap) })); renderUnderstood(); restartFrom("stay"); return; }
+					if (n === "cheaper") { p.cap = Math.max(fromLocal(200 * cur()[2]), roundLocal(costs(p).total * 0.8)); p.assumed.cap = false; log("You", t("Asked for cheaper — cap set to {x}", { x: eur(p.cap) })); renderUnderstood(); restartFrom("stay"); return; }
 					slot.innerHTML = ""; setStatus("working", t("Working on it…")); continue;
 				}
 				approvedAmount = k.hold;
@@ -734,7 +744,7 @@
 		const box = $("#understood"); box.hidden = false;
 		const fact = (key, vals, cur, label) => dd("k", key, vals, cur, t(label), p.assumed[key] ? "assumed" : "");
 		const pref = (key, vals, label) => dd("p", key, vals, p.prefs[key], t(label), "pref");
-		const caps = [...new Set([300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1500, 2000, 2500, 3000, 4000, 5000, 7500, 10000, p.cap])].sort((a, b) => a - b);
+		const caps = [...new Set([...capList(), p.cap])].sort((a, b) => a - b);
 		box.innerHTML = `<div class="lbl"><span>${t("WHAT I UNDERSTOOD")}</span><span ${S.aiUsed ? "" : `title="${esc(t("Smart reading is offline right now, so Otium used basic matching. Check the details below — you can change any of them."))}"`}>${t(S.aiUsed ? "Read by AI" : "Basic matching")}</span></div>
 			<p>${esc(S.text)}</p>
 			<div class="facts">
@@ -1514,13 +1524,13 @@
 		const st = S.settings;
 		const row = (id, title, small, isOn, locked) => `<div class="setting"><div><b>${t(title)}</b><small>${t(small)}</small>${locked ? `<span class="lock">${ICON.lock}${t("Always on in Otium")}</span>` : ""}</div><label class="switch"><input type="checkbox" id="${id}"${isOn ? " checked" : ""}${locked ? " disabled" : ""} aria-label="${esc(t(title))}"><span></span></label></div>`;
 		$("#rules").innerHTML = `<p style="margin:0 0 6px;font-size:13px;color:var(--ink-2)">${t("Searching and comparing are automatic. Anything that spends money or shares your details waits for you.")}</p>
-			<div class="setting" style="display:block"><b>${t("Default budget cap")}</b><small>${t("Used when you don’t give one. Otium stops instead of going over.")}</small><input class="range" type="range" min="300" max="3000" step="50" value="${st.cap}" id="capRange" aria-label="${esc(t("Default budget cap"))}"><div class="num" style="font-weight:700" id="capVal">${eur(st.cap)}</div></div>
+			<div class="setting" style="display:block"><b>${t("Default budget cap")}</b><small>${t("Used when you don’t give one. Otium stops instead of going over.")}</small><input class="range" type="range" min="0" max="${CAP_BASE.length - 1}" step="1" value="${capList().indexOf(snapCap(st.cap))}" id="capRange" aria-label="${esc(t("Default budget cap"))}"><div class="num" style="font-weight:700" id="capVal">${eur(st.cap)}</div></div>
 			${row("r1", "Ask before any payment", "Holds, bookings and upgrades.", true, true)}
 			${row("r2", "Ask before sharing my details", "Names, passports, phone, email.", true, true)}
 			${row("r3", "Ask again if a price goes up", "Even by €1 after you approved.", true, true)}
 			${row("refundable", "Prefer refundable stays", "Picks free cancellation when one fits.", st.refundable, false)}
 			${row("activities", "Draft activities for me", "Off = Otium leaves your days free.", st.activities, false)}`;
-		$("#capRange").oninput = (e) => { st.cap = +e.target.value; $("#capVal").textContent = eur(st.cap); };
+		$("#capRange").oninput = (e) => { st.cap = capList()[+e.target.value]; $("#capVal").textContent = eur(st.cap); };
 		$("#refundable").onchange = (e) => { st.refundable = e.target.checked; log("You", t(st.refundable ? "Turned on “{x}”" : "Turned off “{x}”", { x: t("Prefer refundable stays") })); };
 		$("#activities").onchange = (e) => { st.activities = e.target.checked; log("You", t(st.activities ? "Turned on “{x}”" : "Turned off “{x}”", { x: t("Draft activities for me") })); if (S.plan && S.progress.days === "ready") renderTrip(); };
 	}
@@ -1810,7 +1820,7 @@
 		const k = costs(p), L = legs(), d = tripDates(p.nights), city = D.cities[p.city].name;
 		const doc = new lib.jsPDF({ unit: "mm", format: "a4" });
 		const ink = [34, 34, 34], grey = [106, 106, 106], red = [194, 52, 76], green = [30, 138, 90], line = [221, 221, 221];
-		const money = (n) => "EUR " + Number(n).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+		const money = (n) => cur()[0] + " " + Number(n * cur()[1]).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 		const today = new Date(), iso = (x) => x.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 		const no = `OT-${today.getFullYear()}-${(h.flights || h.stay).code}`;
 		doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(...red); doc.text("otium", 15, 22);
@@ -1869,7 +1879,7 @@
 		const orgBy = {}; for (const [n] of D.origins) orgBy[prev === "en" ? n : (I.ORIGINS[prev]?.[n] || n)] = n;
 		return (v) => {
 			const x = v.trim(); if (cityBy[x]) return D.cities[cityBy[x]].name; if (orgBy[x]) return on(orgBy[x]);
-			if (/^[^\d]*€[^\d]*[\d.,\s\u00a0\u202f]+$|^[\d.,\s\u00a0\u202f]+[^\d]*€$/.test(x)) { const n = +x.replace(/[^\d]/g, ""); if (n) return eur(n); } // money in the new format
+			if (/^[^\d]*(€|£|₪|CHF)[^\d]*[\d.,\s\u00a0\u202f]+$|^[\d.,\s\u00a0\u202f]+[^\d]*(€|£|₪|CHF)$/.test(x)) { const n = +x.replace(/[^\d]/g, ""); if (n) return money(n); } // money in the new format
 			return v;
 		};
 	}
@@ -1906,7 +1916,7 @@
 	initHome(); initWhen(); initBot(); initAcct(); initGallery(); initMenu(); initScrollers(); initLang(); renderLog(); setLang(I.lang);
 	postit();
 	renderScen();
-	if (q.get("from") && D.origins.some(([n]) => n === q.get("from"))) { S.origin = q.get("from"); $("#originVal").textContent = S.origin; }
+	if (q.get("from") && D.origins.some(([n]) => n === q.get("from"))) { S.origin = q.get("from"); $("#originVal").textContent = S.origin; S.settings.cap = snapCap(S.settings.cap); renderListings(); }
 	if (q.get("state")) { const st = STATES.find((x) => x[0] === q.get("state")); if (st) { $("#ask").value = st[3]; start(st[3], false, st[0], st); } }
 	else if (q.get("q")) { $("#ask").value = q.get("q"); start(q.get("q")); }
 })();
