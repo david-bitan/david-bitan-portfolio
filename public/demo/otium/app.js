@@ -1070,7 +1070,7 @@
 	const profWaiters = [];
 	const profileReady = () => new Promise((r) => profWaiters.push(r));
 	function profileChanged() {
-		saveMe();
+		saveMe(); if (ME.signedIn) keepAccount();
 		renderAcct();
 		if (!$("#profile").hidden) renderProfile();
 		if (readyToPay() && profWaiters.length) { profWaiters.splice(0).forEach((r) => r("ready")); }
@@ -1085,29 +1085,50 @@
 		b.setAttribute("aria-label", ME.signedIn ? t(done ? "My profile" : "My profile — details missing") : t("Sign in"));
 		const h = $("#acctHint"); if (!h) return;
 		h.hidden = done;
-		h.innerHTML = done ? "" : `${ic(ME.signedIn ? "credit-card" : "user")}<span>${t(ME.signedIn ? "Finish your profile so Otium can pay the moment you approve." : "Sign in once — Otium fills in your details and card when it books.")}</span><button type="button" class="btn btn-ghost btn-sm" data-acct>${t(ME.signedIn ? "Complete my profile" : "Sign in")}</button>`;
+		h.innerHTML = done ? "" : `${ic(ME.signedIn ? "credit-card" : "user")}<span>${t(ME.signedIn ? "Finish your profile so Otium can pay the moment you approve." : "Create an account or sign in: Otium will fill in your details for you.")}</span>${ME.signedIn ? `<button type="button" class="btn btn-ghost btn-sm" data-acct>${t("Complete my profile")}</button>` : `<button type="button" class="btn btn-primary btn-sm" data-signup>${t("Sign up")}</button><button type="button" class="btn btn-ghost btn-sm" data-acct>${t("Sign in")}</button>`}`;
 	}
 	function goAccount() { if (ME.signedIn) show("profile"); else openSignIn(); }
-	function openSignIn(then) {
-		modal(`<h3 id="modalTitle">${t("Sign in to Otium")}</h3><p>${t("Your details and card are filled in for you when Otium books.")}</p>
-			<div class="flds"><label class="fld"><span>${t("Email")}</span><input id="siEmail" type="email" autocomplete="off" spellcheck="false"></label>
-			<label class="fld"><span>${t("Password")}</span><input id="siPass" type="password" autocomplete="off"></label></div>
+	/* Accounts (demo): kept in this browser only, keyed by email. No password is stored or checked. */
+	const BLANK_ME = { first: "", last: "", phone: "", dob: "", passport: "", street: "", city: "", zip: "", country: "", card: null };
+	const accounts = () => { try { return JSON.parse(localStorage.getItem("otium-accounts") || "{}"); } catch { return {}; } };
+	const keepAccount = () => { if (!ME.email) return; try { const all = accounts(); const { signedIn, ...rest } = ME; all[ME.email.toLowerCase()] = rest; localStorage.setItem("otium-accounts", JSON.stringify(all)); } catch {} };
+	function openSignIn(then, mode = "in") {
+		const up = mode === "up";
+		modal(`<h3 id="modalTitle">${t(up ? "Create your Otium account" : "Sign in to Otium")}</h3><p>${t("Your details and card are filled in for you when Otium books.")}</p>
+			<div class="auth-tabs" role="tablist"><button type="button" role="tab" data-auth="in" aria-selected="${!up}">${t("I have an account")}</button><button type="button" role="tab" data-auth="up" aria-selected="${up}">${t("I’m new here")}</button></div>
+			<div class="flds">${up ? `<div class="fld-row"><label class="fld"><span>${t("First name")}</span><input id="siFirst" autocomplete="off"></label><label class="fld"><span>${t("Last name")}</span><input id="siLast" autocomplete="off"></label></div>` : ""}<label class="fld"><span>${t("Email")}</span><input id="siEmail" type="email" autocomplete="off" spellcheck="false"></label>
+			<label class="fld"><span>${t(up ? "Choose a password" : "Password")}</span><input id="siPass" type="password" autocomplete="off"></label></div>
 			<p class="err" id="siErr" hidden></p>
-			<p class="fine">${ICON.info}<span>${t("Demo: any email and password work. Nothing is checked or sent; you stay signed in on this browser until you sign out.")}</span></p>
-			<div class="row"><button class="btn btn-text btn-sm" data-m="cancel">${t("Cancel")}</button><button class="btn btn-ghost btn-sm" id="siDemo" type="button">${t("Use a demo account")}</button><button class="btn btn-primary btn-sm" id="siGo" type="button">${t("Sign in")}</button></div>`, () => {});
-		const go = (demo) => {
-			const em = demo ? "alex.martin@otium.example" : $("#siEmail").value.trim();
-			if (!demo && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em) || !$("#siPass").value)) { const e = $("#siErr"); e.hidden = false; e.textContent = t("Enter an email and a password."); return; }
-			if (demo) Object.assign(ME, { first: "Alex", last: "Martin", phone: "+44 20 7946 0000", dob: "14/03/1990", passport: "X1234567", street: "12 Harbour Lane", city: "London", zip: "N1 7GU", country: "GB", card: { brand: "Visa", last4: "4242", exp: "12/29", name: "Alex Martin" } });
-			else if (ME.email !== em) Object.assign(ME, { first: "", last: "", phone: "", dob: "", passport: "", street: "", city: "", zip: "", country: "", card: null });
+			<p class="fine">${ICON.info}<span>${t("Demo: passwords aren’t checked and nothing is sent. Your account stays in this browser, signed in until you sign out.")}</span></p>
+			<div class="row"><button class="btn btn-text btn-sm" data-m="cancel">${t("Cancel")}</button><button class="btn btn-ghost btn-sm" id="siDemo" type="button">${t("Use a demo account")}</button><button class="btn btn-primary btn-sm" id="siGo" type="button">${t(up ? "Create my account" : "Sign in")}</button></div>`, () => {});
+		const err = (m, link) => { const e = $("#siErr"); e.hidden = false; e.innerHTML = `${esc(t(m))}${link ? ` <button type="button" class="btn-text auth-sw" data-auth="${link[0]}">${t(link[1])}</button>` : ""}`; };
+		const done = (em, msg) => {
 			ME.signedIn = true; ME.email = em;
-			closeModal("ok"); log("You", t("Signed in")); toast(t("Signed in as {x}", { x: em }));
-			profileChanged(); (then || (() => { if (!readyToPay()) show("profile"); }))();
+			closeModal("ok"); log("You", t(msg)); toast(t(msg === "Created an account" ? "Account created. Welcome, {x}!" : "Signed in as {x}", { x: ME.first || em }));
+			keepAccount(); profileChanged(); (then || (() => { if (!readyToPay()) show("profile"); }))();
 		};
+		const go = (demo) => {
+			if (demo) { Object.assign(ME, { first: "Alex", last: "Martin", phone: "+44 20 7946 0000", dob: "14/03/1990", passport: "X1234567", street: "12 Harbour Lane", city: "London", zip: "N1 7GU", country: "GB", card: { brand: "Visa", last4: "4242", exp: "12/29", name: "Alex Martin" } }); return done("alex.martin@otium.example", "Signed in"); }
+			const em = $("#siEmail").value.trim(), key = em.toLowerCase();
+			if (up && (!$("#siFirst").value.trim() || !$("#siLast").value.trim())) return err("Enter your first and last name.");
+			if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em) || !$("#siPass").value) return err("Enter an email and a password.");
+			const known = accounts()[key];
+			if (up) {
+				if (known) return err("An account already uses this email.", ["in", "Sign in instead"]);
+				Object.assign(ME, BLANK_ME, { first: $("#siFirst").value.trim(), last: $("#siLast").value.trim() });
+				return done(em, "Created an account");
+			}
+			if (!known) return err("No account with this email yet.", ["up", "Create one"]);
+			Object.assign(ME, BLANK_ME, known); return done(em, "Signed in");
+		};
+		const box = $("#modalBox");
+		box.querySelectorAll("[data-auth]").forEach((x) => (x.onclick = null));
+		box.onclick = (e) => { const sw = e.target.closest("[data-auth]"); if (sw && sw.dataset.auth !== mode) { const em = $("#siEmail")?.value; openSignIn(then, sw.dataset.auth); if (em) $("#siEmail").value = em; } };
 		$("#siGo").onclick = () => go(false); $("#siDemo").onclick = () => go(true);
-		$("#siPass").onkeydown = $("#siEmail").onkeydown = (e) => { if (e.key === "Enter") go(false); };
-		setTimeout(() => $("#siEmail")?.focus(), 50);
+		box.querySelectorAll("input").forEach((x) => (x.onkeydown = (e) => { if (e.key === "Enter") go(false); }));
+		setTimeout(() => (up ? $("#siFirst") : $("#siEmail"))?.focus(), 50);
 	}
+	const openSignUp = (then) => openSignIn(then, "up");
 	const fld = (id, label, val, extra = "") => `<label class="fld"><span>${t(label)}</span><input id="${id}" value="${esc(val || "")}" autocomplete="off" ${extra}></label>`;
 	let gateTrip = null; // the trip that stopped to ask for details
 	function waitingTrip() { const tr = TRIPS.find((x) => x.id === gateTrip); return tr && tripData(tr)?.plan ? tripData(tr) : null; }
@@ -1181,9 +1202,10 @@
 	function initAcct() {
 		$("#acctBtn").onclick = goAccount;
 		document.addEventListener("click", (e) => {
+			if (e.target.closest("[data-signup]")) return openSignUp();
 			if (e.target.closest("[data-acct]")) return goAccount();
 			if (e.target.closest("[data-backtrip]")) return backToWaiting();
-			if (e.target.closest("[data-signout]")) { ME.signedIn = false; log("You", t("Signed out")); profileChanged(); show("home"); toast(t("Signed out. Your details stay on this account.")); return; }
+			if (e.target.closest("[data-signout]")) { keepAccount(); ME.signedIn = false; Object.assign(ME, BLANK_ME, { email: "" }); log("You", t("Signed out")); profileChanged(); show("home"); toast(t("Signed out. Your details stay on this account.")); return; }
 			const sv = e.target.closest("[data-save]"); if (sv) return saveSection(sv.dataset.save);
 			const cd = e.target.closest("[data-card]"); if (cd) { if (cd.dataset.card === "remove") { ME.card = null; log("You", t("Removed the payment card")); } else ME.card = null; profileChanged(); if (cd.dataset.card === "replace") setTimeout(() => $("#cNum")?.focus(), 50); }
 		});
