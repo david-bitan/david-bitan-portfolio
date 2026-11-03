@@ -44,6 +44,7 @@
 	const avgLen = CORPUS.reduce((a, c) => a + c.t.length, 0) / CORPUS.length;
 	const DF = {}; for (const c of CORPUS) for (const w of new Set(c.t)) DF[w] = (DF[w] || 0) + 1;
 	function search(q) {
+		q = String(q).replace(/\b(days?|time) off\b/gi, "annual leave days").replace(/\bvacation days?\b/gi, "annual leave days"); // everyday words → the handbook's words
 		const qt = [...new Set(toks(q))]; const N = CORPUS.length;
 		const scored = CORPUS.map(({ p, t }) => {
 			let s = 0;
