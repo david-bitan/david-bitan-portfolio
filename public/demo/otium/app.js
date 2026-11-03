@@ -596,7 +596,7 @@
 			await beat(id, 500);
 			if (PRESET) { Object.assign(intent, PRESET); PRESET = null; }
 			S.aiUsed = ai; S.intent = intent;
-			s.sub(t(ai ? "Matched it against 30 destinations (Llama 3.3)" : "Matched it against 30 destinations (basic matching)"));
+			s.sub(t(ai ? "Matched it against 32 destinations (Llama 3.3)" : "Matched it against 32 destinations (basic matching)"));
 			if (S.scenario === "overbudget") intent.budget = 400;
 
 			if (intent.city === "other" || !intent.city) {
@@ -604,7 +604,7 @@
 				const other = intent.city === "other";
 				s.detail(other ? t("{place} isn’t covered in this demo yet.", { place: esc(intent.askedPlace || t("That place")) }) : t("One thing I need before I start."));
 				setStatus("waiting", t("Waiting for you"));
-				const slot = s.slot(`<div class="card ask"><h4>${t(other ? "Pick one of these instead?" : "Where would you like to go?")}</h4><p>${t(other ? "Otium plans 30 cities for now. I won’t guess on your behalf." : "Pick a city — I’ll keep the rest of what you said.")}</p><div class="city-pick">${Object.keys(D.cities).slice(0, 8).map((k) => `<button data-choice="${k}">${pic(thumbOf(D.cities[k].photo), k)}<span>${D.cities[k].name}</span></button>`).join("")}</div></div>`);
+				const slot = s.slot(`<div class="card ask"><h4>${t(other ? "Pick one of these instead?" : "Where would you like to go?")}</h4><p>${t(other ? "Otium plans 32 cities for now. I won’t guess on your behalf." : "Pick a city — I’ll keep the rest of what you said.")}</p><div class="city-pick">${Object.keys(D.cities).slice(0, 8).map((k) => `<button data-choice="${k}">${pic(thumbOf(D.cities[k].photo), k)}<span>${D.cities[k].name}</span></button>`).join("")}</div></div>`);
 				const city = await decide(slot);
 				if (id !== S.run) throw new Stale();
 				intent.city = city; slot.innerHTML = "";
@@ -2337,36 +2337,4 @@
 	if (q.get("video")) setTimeout(openVideo, 500);
 	if (q.get("state")) { const st = STATES.find((x) => x[0] === q.get("state")); if (st) { $("#ask").value = st[3]; start(st[3], false, st[0], st); } }
 	else if (q.get("q")) { $("#ask").value = q.get("q"); start(q.get("q")); }
-})();
-
-/* v4.9 — micro-animations. Whatever newly appears fades and slides in; a re-render of the same thing does not replay.
- * Sections of the home page reveal as they scroll into view. Off when the visitor asks for reduced motion. */
-(() => {
-	if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-	const SEL = ".card, .sp-confirm, .done-banner, .pass, .err, .fld-err, .notice, .bud-card, .card-l, .setting, .row > .btn, .bot-log > *, .note-i, .trip-i, .alt, .toggle-alts";
-	const sig = (e) => `${e.tagName}|${e.getAttribute("class") || ""}|${e.id}|${(e.textContent || "").trim().slice(0, 48)}`;
-	let booted = false; setTimeout(() => (booted = true), 1200);
-	new MutationObserver((muts) => {
-		if (!booted) return;
-		const gone = new Set();
-		for (const m of muts) m.removedNodes.forEach((n) => { if (n.nodeType !== 1) return; gone.add(sig(n)); n.querySelectorAll?.(SEL).forEach((x) => gone.add(sig(x))); });
-		let k = 0;
-		for (const m of muts) m.addedNodes.forEach((n) => {
-			if (n.nodeType !== 1 || !n.isConnected) return;
-			const list = n.matches?.(SEL) ? [n] : [...(n.querySelectorAll?.(SEL) || [])];
-			for (const el of list) {
-				if (gone.has(sig(el)) || k > 10) continue;
-				el.style.animationDelay = `${Math.min(k++, 8) * 45}ms`; el.classList.add("mi-in");
-				el.addEventListener("animationend", () => { el.classList.remove("mi-in"); el.style.animationDelay = ""; }, { once: true });
-			}
-		});
-	}).observe(document.body, { childList: true, subtree: true });
-	if (!("IntersectionObserver" in window)) return;
-	const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("rv-on"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
-	const reveal = () => document.querySelectorAll("#home .section-h, #home .how > *, #home .promise, #home .card-l, #home .bud-card, #home .tile").forEach((el, i) => {
-		if (el.dataset.rv) return; el.dataset.rv = "1";
-		const r = el.getBoundingClientRect(); if (r.top < innerHeight) return; // already on screen: no flash
-		el.classList.add("rv"); el.style.transitionDelay = `${(i % 4) * 60}ms`; io.observe(el);
-	});
-	reveal(); new MutationObserver(reveal).observe(document.querySelector("#home") || document.body, { childList: true, subtree: true });
 })();
