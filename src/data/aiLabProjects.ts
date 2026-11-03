@@ -141,8 +141,8 @@ The language model only reads the request. Prices, the plan, the budget check an
 			'/lab-assets/otium/my-trips.webp',
 		],
 		mobileGallery: [
-			'/lab-assets/otium/m-home.webp',
 			'/lab-assets/otium/m-approve.webp',
+			'/lab-assets/otium/m-plan.webp',
 			'/lab-assets/otium/m-seats.webp',
 			'/lab-assets/otium/m-summary.webp',
 		],
