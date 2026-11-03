@@ -222,7 +222,7 @@
 		const pick = (n) => {
 			S.origin = n; $("#originVal").textContent = on(n); open(false); btn.focus();
 			S.settings.cap = snapCap(S.settings.cap); if (S.plan && !S.progress?.done) S.plan.cap = snapCap(S.plan.cap);
-			renderListings(); if (!$("#rules")?.closest("[hidden]")) try { renderRules?.(); } catch {}
+			renderListings(); renderBudget(Boolean($("#budgetOut")?.innerHTML)); if (!$("#rules")?.closest("[hidden]")) try { renderRules?.(); } catch {}
 		};
 		btn.onclick = (e) => { e.stopPropagation(); open(!list.classList.contains("on")); };
 		list.onclick = (e) => { const li = e.target.closest("li"); if (li) pick(li.dataset.o); };
@@ -443,6 +443,47 @@
 		renderLog();
 	}
 
+	/* Budget explorer (home): every destination whose cheapest plan fits a total budget. */
+	let PRESET = null; const BUD = { nights: 3, travelers: 2 };
+	function budgetTrips(budgetLocal) {
+		const cap = fromLocal(budgetLocal);
+		return Object.keys(D.cities).map((k) => {
+			const c = D.cities[k]; const fl = bestFlight(flightOptions(k, S.origin, BUD.travelers, DEFAULT_PREFS));
+			const st = [...c.stays].sort((a, b) => a.nightly - b.nightly)[0];
+			const tickets = S.settings.activities ? TICKETS_PP_DAY * BUD.travelers * (BUD.nights + 1) : 0;
+			const total = fl.price + st.nightly * BUD.nights + tickets;
+			return { k, c, total, left: cap - total };
+		}).sort((a, b) => a.total - b.total).map((x) => ({ ...x, fits: x.total <= cap }));
+	}
+	function renderBudget(show) {
+		const box = $("#budgetOut"); if (!box) return;
+		$("#budCur").textContent = money(0).replace(/[\d\s.,\u00a0\u202f]/g, "");
+		$("#budDD").innerHTML = dd("b", "nights", [2, 3, 4, 5, 7].map((n) => [n, P(n, "1 night", "{n} nights")]), BUD.nights, t("Nights")) + dd("b", "travelers", [1, 2, 3, 4].map((n) => [n, P(n, "1 traveller", "{n} travellers")]), BUD.travelers, t("Travellers"));
+		const raw = +String($("#budAmt").value).replace(/[^\d]/g, "");
+		if (!show) return;
+		if (!raw) { box.innerHTML = `<p class="err">${t("Enter a budget.")}</p>`; return; }
+		const all = budgetTrips(raw), ok = all.filter((x) => x.fits);
+		const what = t(S.settings.activities ? "Flights, stay and activities" : "Flights and stay");
+		if (!ok.length) { const low = all[0]; box.innerHTML = `<div class="bud-empty"><p>${t("Nothing fits {x} yet. The lowest is {y}.", { x: money(raw), y: eur(low.total) })}</p><button type="button" class="btn btn-ghost btn-sm" data-budset="${Math.ceil((low.total * cur()[1]) / 50) * 50}">${t("Use {y}", { y: eur(Math.ceil((low.total * cur()[1]) / 50) * 50 / cur()[1]) })}</button></div>`; return; }
+		box.innerHTML = `<p class="bud-n">${t(ok.length === 1 ? "1 destination fits {x}" : "{n} destinations fit {x}", { n: ok.length, x: money(raw) })} · <span>${what}</span></p><div class="bud-grid">${ok.slice(0, BUD.all ? ok.length : 8).map((x) => `<button type="button" class="bud-card" data-budcity="${x.k}"><span class="ph-w">${pic(x.c.photo, x.k, x.c.name)}</span><span class="bud-b"><b>${esc(x.c.name)}</b><small>${esc(x.c.country)}</small><span class="bud-p"><strong>${eur(x.total)}</strong><em>${t("{x} left", { x: eur(Math.max(0, x.left)) })}</em></span><span class="bud-go">${t("Plan this trip")}${ICON.arrow}</span></span></button>`).join("")}</div>${ok.length > 8 && !BUD.all ? `<div class="see-all"><button type="button" class="btn btn-ghost" data-budall>${t("See all {n} destinations", { n: ok.length })}</button></div>` : ""}`;
+	}
+	function initBudget() {
+		const f = $("#budgetForm"); if (!f) return;
+		renderBudget(false);
+		$("#budGo").onclick = () => { BUD.all = false; renderBudget(true); };
+		$("#budAmt").onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); BUD.all = false; renderBudget(true); } };
+		$("#budAmt").oninput = (e) => { const d = e.target.value.replace(/[^\d]/g, "").slice(0, 6); e.target.value = d ? Number(d).toLocaleString(I.locale) : ""; };
+		$("#budgetCta")?.addEventListener("click", () => { const head = document.querySelector(".top")?.offsetHeight || 70; window.scrollTo({ top: $("#budget").getBoundingClientRect().top + scrollY - head - 16, behavior: reduced ? "auto" : "smooth" }); setTimeout(() => $("#budAmt").focus({ preventScroll: true }), 500); });
+		$("#budgetOut").onclick = (e) => {
+			if (e.target.closest("[data-budall]")) { BUD.all = true; return renderBudget(true); }
+			const s2 = e.target.closest("[data-budset]"); if (s2) { $("#budAmt").value = Number(s2.dataset.budset).toLocaleString(I.locale); return renderBudget(true); }
+			const c = e.target.closest("[data-budcity]"); if (!c) return;
+			const raw = +String($("#budAmt").value).replace(/[^\d]/g, ""); const city = D.cities[c.dataset.budcity];
+			PRESET = { city: c.dataset.budcity, nights: BUD.nights, travelers: BUD.travelers, budget: raw };
+			const q = t("{city}, {n} nights for {t}, budget {x}", { city: city.name, n: BUD.nights, t: BUD.travelers, x: money(raw) });
+			$("#ask").value = q; start(q, false, "normal", null);
+		};
+	}
 	async function start(text, sameTrip = false, scenario, kase) {
 		if (!sameTrip || !activeTrip) { newTripRecord(); S.log = []; S.status = "idle"; S.case = null; S.scenario = "normal"; }
 		if (scenario !== undefined) { S.scenario = scenario; S.case = kase; }
@@ -467,6 +508,7 @@
 			s.sub(t("Reading your words"));
 			const { intent, ai } = await understand(S.text);
 			await beat(id, 500);
+			if (PRESET) { Object.assign(intent, PRESET); PRESET = null; }
 			S.aiUsed = ai; S.intent = intent;
 			s.sub(t(ai ? "Matched it against 30 destinations (Llama 3.3)" : "Matched it against 30 destinations (basic matching)"));
 			if (S.scenario === "overbudget") intent.budget = 400;
@@ -763,6 +805,7 @@
 			${Object.values(p.assumed).some(Boolean) ? `<div class="legend">${t("Dashed = I assumed it. Tap any value to change it — I’ll re-plan.")}</div>` : ""}`;
 	}
 	function pickFact(kind, key, raw, label) {
+		if (kind === "b") { BUD[key] = +raw; renderBudget(Boolean($("#budgetOut").innerHTML)); return; }
 		if (kind === "u") { ME[key] = raw; const b = document.querySelector('.dd[data-kind="u"][data-key="' + key + '"] .dd-btn span'); if (b) b.textContent = label; return; }
 		const p = S.plan; if (!p) return;
 		if (kind === "p") {
@@ -1399,7 +1442,7 @@
 		</div>
 		<div class="panel block">
 			<div class="block-h"><h3>${t("Flights")}</h3><span class="state ${S.held.flights ? "held" : S.progress.pendingHold ? "pending" : ""}">${S.held.flights ? `${t("Held · {c}", { c: S.held.flights.code })} <button class="linkish" data-cancel="flights">${t("Cancel")}</button>` : t(S.progress.pendingHold ? "Waiting for your OK" : fl ? "Not held yet" : "Searching…")}</span></div>
-			${fl ? flightRow(fl[p.flight], c) + altFlights(fl) : '<div class="skeleton"></div>'}
+			${fl ? flightRow(fl[p.flight], c) + (S.held.flights ? `<div class="seat-h">${ic("plane")}<b>${t("Your seats on the plane")}</b></div>${seatMap(p.travelers)}` : "") + altFlights(fl) : '<div class="skeleton"></div>'}
 		</div>
 		<div class="panel block">
 			<div class="block-h"><h3>${t("Stay")}</h3><span class="state ${S.held.stay ? "held" : S.progress.pendingHold ? "pending" : ""}">${S.held.stay ? `${t("Held · {c}", { c: S.held.stay.code })} <button class="linkish" data-cancel="stay">${t("Cancel")}</button>` : t(S.progress.pendingHold ? "Waiting for your OK" : p.stay && S.progress.stay === "ready" ? "Not held yet" : "Searching…")}</span></div>
@@ -1462,7 +1505,7 @@
 
 	function doneBanner(k) {
 		const h = S.held;
-		return `<div class="panel done-banner"><div class="check">${ICON.check}</div><div><h3>${t("Your trip is held.")}</h3><p>${h.flights || h.stay ? t("{x} held", { x: eur((h.flights?.amount || 0) + (h.stay?.amount || 0)) }) : t("Nothing held")}${t(" · simulated, nothing charged.")}</p><div class="codes">${h.flights ? `${t("Flight")} <b>${h.flights.code}</b>` : t("Flight released")} · ${h.stay ? `${t("Stay")} <b>${h.stay.code}</b>` : t("Stay released")}</div></div><div class="row">${h.flights && h.data ? `<button class="btn btn-primary btn-sm" id="docs">${ICON.ticket} ${t("Tickets & voucher")}</button>` : h.flights ? `<span class="tag">${t("Tickets: send traveller details first")}</span>` : ""}${h.flights || h.stay ? `<button class="btn btn-ghost btn-sm" id="invoice">${ICON.receipt} ${t("Invoice")}</button>` : ""}<button class="btn btn-ghost btn-sm" id="ics">${ICON.cal} ${t("Add to calendar")}</button>${h.flights || h.stay ? `<button class="btn btn-text btn-sm" data-cancel="all">${t("Cancel all bookings")}</button>` : ""}<button class="btn btn-text btn-sm" data-help>${t("Need help?")}</button></div></div>`;
+		return `<div class="panel done-banner"><div class="check">${ICON.check}</div><div><h3>${t("Your trip is held.")}</h3><p>${h.flights || h.stay ? t("{x} held", { x: eur((h.flights?.amount || 0) + (h.stay?.amount || 0)) }) : t("Nothing held")}${t(" · simulated, nothing charged.")}</p><div class="codes">${h.flights ? `${t("Flight")} <b>${h.flights.code}</b>` : t("Flight released")} · ${h.stay ? `${t("Stay")} <b>${h.stay.code}</b>` : t("Stay released")}</div></div><div class="row">${h.flights && h.data ? `<button class="btn btn-primary btn-ok btn-sm" id="docs">${ICON.ticket} ${t("Tickets & voucher")}</button>` : h.flights ? `<span class="tag">${t("Tickets: send traveller details first")}</span>` : ""}${h.flights || h.stay ? `<button class="btn btn-ghost btn-sm" id="invoice">${ICON.receipt} ${t("Invoice")}</button>` : ""}<button class="btn btn-ghost btn-sm" id="ics">${ICON.cal} ${t("Add to calendar")}</button>${h.flights || h.stay ? `<button class="btn btn-text btn-sm" data-cancel="all">${t("Cancel all bookings")}</button>` : ""}<button class="btn btn-text btn-sm" data-help>${t("Need help?")}</button></div></div>`;
 	}
 	$("#tripCanvas").addEventListener("click", (e) => {
 		const p = S.plan; if (!p) return;
@@ -1756,7 +1799,26 @@
 			{ dir: "Return", from: c.code, fromN: c.name, to: oc, toN: S.origin, date: d.back, dep: retDep, arr: add(retDep, k.fl.hours), board: board(retDep), flight: no(401 + k.fl.i * 37), gate: "A" + (4 + k.fl.i) },
 		].map((l) => ({ ...l, cabin: k.fl.cabin, bags: k.fl.bags ? "Cabin + hold" : "Cabin only", airline: k.fl.airline, aircraft: k.fl.aircraft, code: S.held.flights.code }));
 	}
-	const seat = (n) => `${{ Business: 2, "Premium economy": 8 }[costs(S.plan).fl.cabin] || 14}${"ACDFBE"[n % 6]}`;
+	const seat = (n) => `${{ Business: 2, "Premium economy": 8 }[costs(S.plan).fl.cabin] || 14}${"ABCDEF"[n % 6]}`;
+	const seatKind = (letter) => ("AF".includes(letter) ? "Window seat" : "CD".includes(letter) ? "Aisle seat" : "Middle seat");
+	/* Seat map: three rows around the travellers' row, 3-3 cabin, their seats in blue. */
+	function seatMap(travelers) {
+		const seats = Array.from({ length: Math.min(travelers, 6) }, (_, n) => seat(n));
+		const row = parseInt(seats[0], 10), taken = new Set(seats.map((x) => x.replace(/\d+/, "")));
+		const W = 22, H = 20, gap = 4, aisle = 22, x0 = 40, y0 = 26;
+		const colX = (i) => x0 + i * (W + gap) + (i > 2 ? aisle : 0);
+		let g = "";
+		"ABCDEF".split("").forEach((L, i) => { g += `<text x="${colX(i) + W / 2}" y="16" class="sm-l">${L}</text>`; });
+		[row - 1, row, row + 1].forEach((r, j) => {
+			const y = y0 + j * (H + 8);
+			g += `<text x="24" y="${y + 14}" class="sm-r">${r}</text>`;
+			"ABCDEF".split("").forEach((L, i) => { const on = r === row && taken.has(L); g += `<rect x="${colX(i)}" y="${y}" width="${W}" height="${H}" rx="5" class="${on ? "sm-on" : "sm-s"}"/>${on ? `<text x="${colX(i) + W / 2}" y="${y + 14}" class="sm-t">${L}</text>` : ""}`; });
+		});
+		const w = colX(5) + W + 14, h = y0 + 3 * (H + 8) + 2;
+		g = `<rect x="2" y="2" width="${w - 4}" height="${h - 4}" rx="16" class="sm-f"/><line x1="8" y1="${y0}" x2="8" y2="${h - 12}" class="sm-w"/><line x1="${w - 8}" y1="${y0}" x2="${w - 8}" y2="${h - 12}" class="sm-w"/>` + g;
+		const who = (n) => (n === 0 && ME.first ? fullName() : t("Traveller {n}", { n: n + 1 }));
+		return `<div class="seatmap"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(t("Your seats on the plane"))}">${g}</svg><ul>${seats.map((x, n) => `<li><b>${x}</b><span>${esc(who(n))}</span><em>${t(seatKind(x.slice(-1)))}</em></li>`).join("")}</ul></div>`;
+	}
 	function bars(seed) {
 		let h = 0; for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
 		const out = []; for (let i = 0; i < 46; i++) { h = (h * 1103515245 + 12345) >>> 0; out.push(1 + (h >> 16) % 3); }
@@ -1773,10 +1835,18 @@
 	function openDocs() {
 		const p = S.plan; const L = legs(); const k = costs(p); const d = tripDates(p.nights);
 		modal(`<h3 id="modalTitle">${t("Your travel documents")}</h3><p>${P(p.travelers, "1 traveller", "{n} travellers")} · ${t("{n} flights each", { n: L.length })}${S.held.stay ? t(" · 1 hotel voucher") : ""}${t(". The PDF has every pass, one page per traveller.")}</p>
-			<div class="docs">${passHtml(L[0], 0)}
+			<div class="docs"><div class="pass-pick"><div class="chips" role="group" aria-label="${esc(t("Traveller"))}">${Array.from({ length: p.travelers }, (_, n) => `<button type="button" class="chip" data-pt="${n}" aria-pressed="${n === 0}">${esc(n === 0 && ME.first ? fullName() : t("Traveller {n}", { n: n + 1 }))}</button>`).join("")}</div><div class="chips" role="group" aria-label="${esc(t("Flight"))}">${L.map((l, j) => `<button type="button" class="chip" data-pl="${j}" aria-pressed="${j === 0}">${t(l.dir)} · ${l.from}–${l.to}</button>`).join("")}</div><small>${t("{n} boarding passes in all", { n: p.travelers * L.length })}</small></div><div id="passBox">${passHtml(L[0], 0)}</div><div class="voucher"><span class="pass-dir">${t("Your seats on the plane")}</span>${seatMap(p.travelers)}</div>
 			${S.held.stay ? `<div class="voucher"><div><span class="pass-dir">${t("Hotel voucher")}</span><b>${esc(k.st.name)}</b><small>${esc(k.st.area)}, ${D.cities[p.city].name} · ${ICON.star} ${k.st.rating}</small></div><dl class="pass-grid"><div><dt>${t("Check-in")}</dt><dd>${fmtDay(d.out)} · 15:00</dd></div><div><dt>${t("Check-out")}</dt><dd>${fmtDay(d.back)} · 11:00</dd></div><div><dt>${t("Guests")}</dt><dd>${p.travelers}</dd></div><div><dt>${t("Booking")}</dt><dd>${S.held.stay.code}</dd></div></dl></div>` : ""}</div>
-			<div class="row"><button class="btn btn-ghost btn-sm" data-m="cancel">${t("Close")}</button><button class="btn btn-ghost btn-sm" data-m="inv">${ICON.receipt} ${t("Download invoice")}</button><button class="btn btn-primary btn-sm" data-m="pdf">${ICON.ticket} ${t("Download PDF")}</button></div>`, (r) => { if (r === "pdf") downloadPdf(); if (r === "inv") downloadInvoice(); });
+			<div class="row"><button class="btn btn-ghost btn-sm" data-m="cancel">${t("Close")}</button><button class="btn btn-ghost btn-sm" data-m="inv">${ICON.receipt} ${t("Download invoice")}</button><button class="btn btn-primary btn-ok btn-sm" data-m="pdf">${ICON.ticket} ${t("Download PDF")}</button></div>`, (r) => { if (r === "pdf") downloadPdf(); if (r === "inv") downloadInvoice(); });
 		$("#modalBox").classList.add("wide");
+		const pick = { n: 0, j: 0 };
+		$("#modalBox").querySelector(".pass-pick").onclick = (e) => {
+			const a = e.target.closest("[data-pt]"), b = e.target.closest("[data-pl]"); if (!a && !b) return;
+			if (a) pick.n = +a.dataset.pt; if (b) pick.j = +b.dataset.pl;
+			$("#modalBox").querySelectorAll("[data-pt]").forEach((x) => x.setAttribute("aria-pressed", String(+x.dataset.pt === pick.n)));
+			$("#modalBox").querySelectorAll("[data-pl]").forEach((x) => x.setAttribute("aria-pressed", String(+x.dataset.pl === pick.j)));
+			$("#passBox").innerHTML = passHtml(L[pick.j], pick.n);
+		};
 	}
 	function loadPdf() {
 		if (window.jspdf) return Promise.resolve(window.jspdf);
@@ -1797,7 +1867,7 @@
 			doc.setFontSize(11); doc.text(l.dep, 22, y + 41); doc.text(l.arr, 112, y + 41);
 			doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...grey); doc.text(l.fromN, 22, y + 46); doc.text(l.toN, 112, y + 46);
 			doc.setDrawColor(...grey); doc.setLineDashPattern([1, 1], 0); doc.line(52, y + 30, 106, y + 30); doc.setLineDashPattern([], 0); doc.text(l.flight, 79, y + 27, { align: "center" });
-			const f = [["PASSENGER", `Traveller ${n + 1}`], ["DATE", fmtDay(l.date)], ["BOARDING", l.board], ["GATE", l.gate], ["SEAT", seat(n)], ["CABIN", l.cabin], ["BAGS", l.bags], ["BOOKING", l.code]];
+			const f = [["PASSENGER", n === 0 && ME.first ? fullName() : `Traveller ${n + 1}`], ["DATE", fmtDay(l.date)], ["BOARDING", l.board], ["GATE", l.gate], ["SEAT", seat(n)], ["CABIN", l.cabin], ["BAGS", l.bags], ["BOOKING", l.code]];
 			f.forEach(([a, b], i) => { const x = 22 + (i % 4) * 34, yy = y + 58 + Math.floor(i / 4) * 14; doc.setFontSize(7); doc.setTextColor(...grey); doc.text(a, x, yy); doc.setFontSize(10); doc.setTextColor(...ink); doc.setFont("helvetica", "bold"); doc.text(String(b), x, yy + 5); doc.setFont("helvetica", "normal"); });
 			doc.setDrawColor(...line); doc.setLineDashPattern([2, 2], 0); doc.line(160, y + 16, 160, y + 90); doc.setLineDashPattern([], 0);
 			let bx = 165; doc.setFillColor(...ink); bars(l.code + l.flight + n).forEach((w, i) => { if (!(i % 2)) doc.rect(bx, y + 22, w * 0.28, 44, "F"); bx += (w + 1) * 0.28; });
@@ -1916,7 +1986,7 @@
 		$("#langCode").textContent = I.LANGS.find((x) => x[0] === I.lang)[2];
 		$("#originVal").textContent = on(S.origin);
 		$("#pauseBtn").textContent = t(S.paused ? "Resume" : "Pause");
-		renderExamples(); renderCats(); renderListings(); paintWhen(); if (cal) closeCal(); renderScen(); renderLog(); renderNotes(); renderCase();
+		renderExamples(); renderCats(); renderListings(); renderBudget(Boolean($("#budgetOut")?.innerHTML)); paintWhen(); if (cal) closeCal(); renderScen(); renderLog(); renderNotes(); renderCase();
 		if (prev !== I.lang) retranslateTrips(prev);
 		if (S.plan) { renderUnderstood(); renderTrip(); }
 		renderTripsNav(); renderLog(); renderNotes(); botLabels(); renderBot(); renderAcct(); renderMenu(); if (!$("#profile").hidden) renderProfile();
@@ -1927,10 +1997,10 @@
 	let startLang = "en"; try { startLang = localStorage.getItem("otium-lang") || "en"; } catch {}
 	if (q.get("lang")) startLang = q.get("lang");
 	I.set(startLang); applyCityLang();
-	initHome(); initWhen(); initBot(); initAcct(); initGallery(); initMenu(); initScrollers(); initLang(); renderLog(); setLang(I.lang);
+	initHome(); initBudget(); initWhen(); initBot(); initAcct(); initGallery(); initMenu(); initScrollers(); initLang(); renderLog(); setLang(I.lang);
 	postit();
 	renderScen();
-	if (q.get("from") && D.origins.some(([n]) => n === q.get("from"))) { S.origin = q.get("from"); $("#originVal").textContent = S.origin; S.settings.cap = snapCap(S.settings.cap); renderListings(); }
+	if (q.get("from") && D.origins.some(([n]) => n === q.get("from"))) { S.origin = q.get("from"); $("#originVal").textContent = S.origin; S.settings.cap = snapCap(S.settings.cap); renderListings(); renderBudget(false); }
 	if (q.get("state")) { const st = STATES.find((x) => x[0] === q.get("state")); if (st) { $("#ask").value = st[3]; start(st[3], false, st[0], st); } }
 	else if (q.get("q")) { $("#ask").value = q.get("q"); start(q.get("q")); }
 })();

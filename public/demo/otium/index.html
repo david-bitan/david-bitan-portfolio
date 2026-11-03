@@ -1167,6 +1167,54 @@ body.lb-open { overflow: hidden; }
 .log li, .log li.jump { border-radius: 0; }
 .log li .nb button { width: 28px; height: 28px; }
 #logDrawer .drawer-h h2, #notesDrawer .drawer-h h2 { font-size: 21px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* budget explorer */
+.budget-cta { display: inline-flex; align-items: center; gap: 8px; margin: 14px auto 0; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 8px 16px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.budget-cta:hover { border-color: var(--ink-3); }
+.budget-cta svg.i { width: 16px; height: 16px; color: #2F6FB5; }
+.hero2 .budget-cta { display: flex; width: max-content; }
+.bud-lead { margin: -8px 0 18px; color: var(--ink-2); font-size: 15px; }
+.bud-form { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.bud-amt { display: grid; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.bud-in { display: flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 12px; padding: 0 12px; height: 44px; background: var(--surface); }
+.bud-in:focus-within { border-color: var(--ink-3); }
+.bud-in b { color: var(--ink-2); font-weight: 600; }
+.bud-in input { border: 0; outline: 0; font: inherit; font-size: 16px; font-weight: 600; color: var(--ink); width: 9ch; background: none; }
+.bud-dd { display: flex; gap: 10px; flex-wrap: wrap; }
+.bud-dd .dd { border: 1px solid var(--line); border-radius: 12px; }
+.bud-dd .dd-btn { height: 42px; padding: 0 12px; }
+#budGo { height: 44px; margin-inline-start: auto; }
+#budgetOut .err { margin-top: 12px; }
+.bud-n { margin: 18px 0 12px; font-weight: 700; } .bud-n span { color: var(--ink-2); font-weight: 500; }
+.bud-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.bud-card { display: flex; flex-direction: column; text-align: start; padding: 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--surface); font: inherit; color: var(--ink); cursor: pointer; }
+.bud-card:hover { border-color: var(--ink-3); }
+.bud-card .ph-w { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden; background: var(--sand); }
+.bud-card .ph-w img, .bud-card .ph-w .ph { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.bud-b { display: grid; gap: 2px; padding: 12px 14px 14px; }
+.bud-b b { font-size: 15px; } .bud-b small { color: var(--ink-2); font-size: 12.5px; }
+.bud-p { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 6px; }
+.bud-p strong { font-size: 17px; } .bud-p em { font-style: normal; font-size: 12px; font-weight: 700; color: var(--ok); background: var(--ok-soft); border-radius: 6px; padding: 1px 6px; white-space: nowrap; }
+.bud-go { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; color: var(--lagoon); font-weight: 600; font-size: 13.5px; } .bud-go svg.i { width: 14px; height: 14px; }
+[dir="rtl"] .bud-go svg.i { transform: scaleX(-1); }
+.bud-empty { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 14px; padding: 14px 16px; border-radius: 12px; background: var(--sand); } .bud-empty p { margin: 0; }
+@media (max-width: 1000px) { .bud-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .bud-form { flex-direction: column; align-items: stretch; } .bud-in input { width: 100%; } #budGo { margin: 0; justify-content: center; } .bud-dd .dd { flex: 1; } .bud-grid { gap: 10px; } }
+/* seat map */
+.seat-h { display: flex; align-items: center; gap: 8px; margin: 14px 0 8px; font-size: 13.5px; } .seat-h svg.i { width: 15px; height: 15px; color: var(--ink-2); }
+.seatmap { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; }
+.seatmap svg { width: 210px; max-width: 100%; height: auto; flex: none; }
+.seatmap .sm-f { fill: var(--sand); stroke: var(--line); }
+.seatmap .sm-w { stroke: #9CC3E6; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 6 6; }
+.seatmap .sm-s { fill: #fff; stroke: #D5D0C8; }
+.seatmap .sm-on { fill: #2F6FB5; }
+.seatmap .sm-t { fill: #fff; font: 700 11px var(--sans); text-anchor: middle; }
+.seatmap .sm-l, .seatmap .sm-r { fill: var(--ink-3); font: 600 10px var(--sans); text-anchor: middle; }
+.seatmap ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+.seatmap li { display: flex; align-items: baseline; gap: 8px; } .seatmap li b { font-variant-numeric: tabular-nums; min-width: 3ch; } .seatmap li em { font-style: normal; color: #2F6FB5; font-weight: 600; font-size: 12px; }
+.voucher .seatmap { margin-top: 10px; }
+.pass-pick { display: grid; gap: 8px; margin-bottom: 12px; } .pass-pick .chips { display: flex; flex-wrap: wrap; gap: 6px; } .pass-pick small { color: var(--ink-2); font-size: 12.5px; }
+.pass-pick .chip[aria-pressed="true"] { border-color: #2F6FB5; color: #2F6FB5; box-shadow: inset 0 0 0 1px #2F6FB5; }
+.btn-primary.btn-ok { background: var(--ok); } .btn-primary.btn-ok:hover { background: #17724A; }
 </style>
 </head>
 <body>
@@ -1206,6 +1254,7 @@ body.lb-open { overflow: hidden; }
 				<button class="send-round" type="button" id="planBtn"><i data-i="search"></i><span>Plan it</span></button>
 			</form>
 			<div class="examples" id="examples" aria-label="Examples"></div>
+			<button type="button" class="budget-cta" id="budgetCta"><i data-i="compass"></i><span>Where can my budget take me?</span></button>
 			<div class="acct-hint" id="acctHint"></div>
 		</div>
 		<div class="promises">
@@ -1217,6 +1266,17 @@ body.lb-open { overflow: hidden; }
 		<div class="cats" id="cats" role="toolbar" aria-label="Filter destinations"></div>
 		<div class="listings" id="mosaic"></div>
 		<div class="see-all" id="seeAll"></div>
+
+		<section class="budget" id="budget" aria-labelledby="budgetTitle">
+			<div class="section-h"><div><span class="eyebrow">Budget explorer</span><h2 id="budgetTitle">Where can your budget take you?</h2></div></div>
+			<p class="bud-lead">Enter what you want to spend in total. Otium shows every destination that fits, flights and stay included.</p>
+			<div class="bud-form" id="budgetForm">
+				<label class="bud-amt"><span>Your budget</span><span class="bud-in"><b id="budCur">€</b><input id="budAmt" inputmode="numeric" autocomplete="off" placeholder="900" aria-label="Your budget"></span></label>
+				<div class="bud-dd" id="budDD"></div>
+				<button type="button" class="btn btn-primary" id="budGo"><i data-i="search"></i>Show destinations</button>
+			</div>
+			<div id="budgetOut" aria-live="polite"></div>
+		</section>
 
 		<div class="section-h">
 			<div><span class="eyebrow">How Otium works</span><h2>An agent you can see thinking.</h2></div>
