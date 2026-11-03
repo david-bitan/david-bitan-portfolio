@@ -184,6 +184,52 @@ h1 mark { background: linear-gradient(transparent 60%, var(--marker) 60%); color
 footer { border-top: 1px solid var(--line); color: var(--ink-3); font-size: 13.5px; }
 footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 
+
+/* home: role, comparison, annotated example, steps */
+.role { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 12px; padding: 10px 14px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); font-size: 15px; color: var(--ink-2); max-width: 600px; }
+.role b { color: var(--ink); font-weight: 600; }
+.role .i { margin-top: 2px; }
+.block { padding: 56px 0; border-top: 1px solid var(--line); }
+.block h2 { font: 700 clamp(26px, 3.4vw, 38px)/1.1 var(--sans); letter-spacing: -.03em; margin: 12px 0 28px; max-width: 760px; text-wrap: balance; }
+.compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.cmp { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+.cmp-bad { background: transparent; border-style: dashed; }
+.cmp-h { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-weight: 600; }
+.cmp-q { margin: 0; font: 500 13px var(--mono); color: var(--ink-3); }
+.cmp-a { margin: 0; font-size: 19px; line-height: 1.5; }
+.cmp-bad .cmp-a { color: var(--ink-2); }
+.cmp-src { display: flex; gap: 10px; padding: 8px; border-radius: var(--r-md); background: var(--paper); font-size: 14.5px; }
+.cmp-src > div { padding: 2px 4px; }
+.cmp-src b { display: block; font-size: 13.5px; margin-bottom: 2px; }
+.cmp-src q { color: var(--ink-2); quotes: "“" "”"; }
+.cmp-src mark { background: var(--marker); color: var(--ink); border-radius: 2px; }
+.cmp-f { margin: auto 0 0; display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: var(--ink-2); }
+.cmp-f .i { width: 16px; height: 16px; margin-top: 3px; color: var(--ink-3); }
+.cmp-f.ok .i { color: var(--ok); }
+.annot { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 40px; align-items: start; }
+.annot-demo { display: flex; flex-direction: column; gap: 20px; }
+.ex-turn { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; }
+.ex-turn .q-acts, .ex-turn .acts, .ex-turn .src-foot .btn-text { display: none; }
+.ex-turn .q h2 { font-size: 22px; }
+.ex-turn .ans { font-size: 17px; }
+.ex-turn .src { background: var(--paper); }
+.ex-turn .src blockquote { background: var(--surface); }
+.tag { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #fff; font: 500 12.5px/1 var(--mono); flex: none; }
+.ex-turn .src, .ex-turn .removed, .nf-mini { position: relative; }
+.ex-turn .src > .tag, .ex-turn .removed > .tag, .nf-mini > .tag { position: absolute; top: -11px; left: -11px; }
+.nf-mini { padding: 18px 22px; }
+.legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 22px; }
+.legend li { display: flex; gap: 12px; }
+.legend b { display: block; margin: 2px 0 4px; }
+.legend p { margin: 0; color: var(--ink-2); font-size: 15px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.steps li { border-top: 2px solid var(--ink); padding-top: 14px; }
+.steps b { display: block; font-size: 17px; margin-bottom: 4px; }
+.steps span { color: var(--ink-2); font-size: 15px; }
+.steps .n { font: 500 12px var(--mono); color: var(--ink-3); display: block; margin-bottom: 8px; }
+.try { display: flex; flex-wrap: wrap; gap: 10px; margin: 36px 0 0; }
+@media (max-width: 1000px) { .annot { grid-template-columns: minmax(0, 1fr); gap: 28px; } .legend { order: -1; } .ex-turn { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 760px) { .compare, .steps { grid-template-columns: minmax(0, 1fr); } .block { padding: 44px 0; } .cmp-a { font-size: 17.5px; } .ex-turn, .cmp { padding: 18px; } }
 @media (max-width: 900px) {
 	.turn { grid-template-columns: minmax(0, 1fr); gap: 20px; }
 	.docs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -212,7 +258,7 @@ footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-c
 	<button class="logo" type="button" data-go="ask" aria-label="Margin — home"><b>Marg<i>i</i>n</b><small>for Halden</small></button>
 	<nav class="nav" aria-label="Main">
 		<button type="button" data-go="ask" aria-current="page"><span data-ic="search"></span>Ask</button>
-		<button type="button" data-go="handbook"><span data-ic="book-open"></span><span class="lbl-long">Handbook</span><span class="sr">Handbook</span></button>
+		<button type="button" data-go="handbook"><span data-ic="book-open"></span><span class="lbl-long">Handbook</span></button>
 	</nav>
 </div></header>
 
@@ -220,9 +266,10 @@ footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-c
 	<section class="view" id="ask">
 		<div class="wrap" id="homeIntro">
 			<div class="hero">
-				<span class="eyebrow">Halden handbook assistant</span>
-				<h1>Ask the handbook. See <mark>where</mark> every answer comes from.</h1>
-				<p class="lead">Margin answers only from Halden’s own documents. Every sentence points to its source, numbers are checked by code, and when the handbook doesn’t say, it tells you who to ask.</p>
+				<span class="eyebrow">AI Lab · Concept</span>
+				<h1>An AI assistant that <mark>shows its proof</mark>.</h1>
+				<p class="lead">Margin answers the everyday questions of people working at Halden — time off, remote work, expenses — using only the company handbook. Every sentence points to the exact line it came from, so you can check it yourself.</p>
+				<div class="role"><span data-ic="user"></span><span><b>You’re Alex, a designer who joined Halden last week.</b> Ask anything about your new job.</span></div>
 				<form class="ask" id="askForm" autocomplete="off">
 					<label class="sr" for="q">Your question</label>
 					<textarea id="q" rows="1" maxlength="300" placeholder="Ask about time off, remote work, expenses…"></textarea>
@@ -230,11 +277,53 @@ footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-c
 				</form>
 				<ul class="examples" id="examples"></ul>
 			</div>
-			<ul class="promises">
-				<li><span class="n">01</span><b>Every sentence has a source</b><span>Click a number to see the exact passage, highlighted in the original document.</span></li>
-				<li><span class="n">02</span><b>Numbers are checked by code</b><span>If the AI writes a figure its source doesn’t contain, the sentence is removed — and you’re told.</span></li>
-				<li><span class="n">03</span><b>It says when it doesn’t know</b><span>No answer in the handbook means no guess: you get the right person to ask instead.</span></li>
-			</ul>
+
+			<section class="block" aria-labelledby="whyH">
+				<span class="eyebrow">The problem</span>
+				<h2 id="whyH">AI assistants sound sure — even when they’re wrong.</h2>
+				<div class="compare">
+					<div class="cmp cmp-bad">
+						<div class="cmp-h"><span>A typical AI chatbot</span><span class="badge none">No source</span></div>
+						<p class="cmp-q">How many days off do I get?</p>
+						<p class="cmp-a">You get 30 days of paid holiday a year, plus your birthday off.</p>
+						<p class="cmp-f"><span data-ic="triangle-alert"></span>Sounds right. But where does it come from? You can’t check — and here, both facts are made up.</p>
+					</div>
+					<div class="cmp cmp-good">
+						<div class="cmp-h"><span>Margin</span><span class="badge ok"><span data-ic="shield-check"></span>Checked</span></div>
+						<p class="cmp-q">How many days off do I get?</p>
+						<p class="cmp-a"><span class="s hl">You get 27 days of paid annual leave per year, on top of public holidays.</span><span class="cite hl">1</span></p>
+						<div class="cmp-src"><span class="src-n">1</span><div><b>Time off · Annual leave</b><q>Everyone at Halden gets <mark>27 days of paid annual leave</mark> per calendar year, on top of public holidays.</q></div></div>
+						<p class="cmp-f ok"><span data-ic="circle-check"></span>The number links to the line it came from. You can check it in one click.</p>
+					</div>
+				</div>
+			</section>
+
+			<section class="block" aria-labelledby="exH">
+				<span class="eyebrow">See it work</span>
+				<h2 id="exH">One answer, three safeguards.</h2>
+				<div class="annot">
+					<div class="annot-demo">
+						<article class="turn ex-turn" id="t-example"></article>
+						<div class="nf nf-mini"><span class="tag">3</span><p class="cmp-q" style="margin:0 0 10px">Can I expense a gym membership?</p><span class="badge none"><span data-ic="search-x"></span>Not in the handbook</span><p style="margin:10px 0 12px">The handbook doesn’t cover this, so I won’t guess.</p><button type="button" class="btn btn-ink btn-sm" data-act="human"><span data-ic="mail"></span>Ask People Ops</button></div>
+					</div>
+					<ol class="legend">
+						<li><span class="tag">1</span><div><b>Every sentence shows its source</b><p>The small number after a sentence opens the exact line of the handbook it comes from. Hover it: the sentence and its source light up together.</p></div></li>
+						<li><span class="tag">2</span><div><b>Made-up facts are removed</b><p>Here the AI also wrote “60 days”. That number isn’t in the handbook, so the code removed the sentence — and shows you what it removed.</p></div></li>
+						<li><span class="tag">3</span><div><b>No answer, no guess</b><p>Ask something the handbook doesn’t cover and Margin says so plainly, then hands you to a person.</p></div></li>
+					</ol>
+				</div>
+			</section>
+
+			<section class="block" aria-labelledby="howH">
+				<span class="eyebrow">How it works</span>
+				<h2 id="howH">The AI writes. The code checks.</h2>
+				<ol class="steps">
+					<li><span class="n">01</span><b>Find</b><span>Code searches the 9 handbook documents and picks the few lines that match your question.</span></li>
+					<li><span class="n">02</span><b>Write</b><span>The AI (Llama 3.3) writes a short answer from those lines only, tagging each sentence with the line it used.</span></li>
+					<li><span class="n">03</span><b>Check</b><span>Code checks every tag and every number against the handbook. Anything unsupported is removed before you see it.</span></li>
+				</ol>
+				<p class="try"><button type="button" class="btn btn-ink" data-focus-ask><span data-ic="search"></span>Try it — ask a question</button><button type="button" class="btn" data-go="handbook"><span data-ic="book-open"></span>See the handbook it reads</button></p>
+			</section>
 		</div>
 		<div class="wrap thread" id="thread" hidden></div>
 		<div class="wrap dock" id="dock" hidden>

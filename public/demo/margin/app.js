@@ -270,6 +270,18 @@
 		toast("Conversation cleared.", "Undo", () => { THREAD = before; save(); renderThread(); });
 	});
 
+	/* ---------------- the annotated example on the home page (static, nothing is asked) ---------------- */
+	function renderExample() {
+		const box = $("#t-example"); if (!box) return;
+		box.innerHTML = turnHtml({ id: "example", q: "Can I work from Spain for a month?", status: "answered", mode: "ai", read: 5, sources: ["P9"],
+			sentences: [{ text: "You can work from another country for up to 30 days per year.", cite: ["P9"] }, { text: "Ask People Ops at least 3 weeks before, because some countries need a permit even for short stays.", cite: ["P9"] }],
+			removed: [{ text: "Spain is fine for up to 60 days because it is in the EU.", why: "its number (60) is not in the source" }] });
+		box.querySelector(".src")?.insertAdjacentHTML("afterbegin", '<span class="tag" aria-hidden="true">1</span>');
+		box.querySelector(".removed")?.insertAdjacentHTML("afterbegin", '<span class="tag" aria-hidden="true">2</span>');
+	}
+	renderExample();
+	document.addEventListener("click", (e) => { if (e.target.closest("[data-focus-ask]")) { const q = $("#q"); q.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" }); setTimeout(() => q.focus({ preventScroll: true }), reduced ? 0 : 450); } });
+
 	/* ---------------- boot ---------------- */
 	renderThread();
 	const qs = new URLSearchParams(location.search);

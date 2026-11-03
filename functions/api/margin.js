@@ -21,8 +21,23 @@ Rules:
 - Passages with status "superseded" are older versions. Base the answer on "current" passages; you may add one sentence saying what changed, citing both.
 - 1 to 4 short sentences. Address the employee as "you". No markdown.`;
 
-function bad(status, msg) {
-	return new Response(JSON.stringify({ error: msg }), { status, headers: { "content-type": "application/json", ...CORS } });
+function bad(status, msg, detail) {
+	return new Response(JSON.stringify(detail ? { error: msg, detail } : { error: msg }), { status, headers: { "content-type": "application/json", ...CORS } });
+}
+
+// The model may answer with an object, with JSON text, with JSON inside ``` fences, or with a cut-off JSON.
+function parse(raw) {
+	if (raw && typeof raw === "object") return raw;
+	const txt = String(raw ?? "").replace(/```(?:json)?/gi, "");
+	const start = txt.indexOf("{"); if (start < 0) return null;
+	const body = txt.slice(start);
+	try { return JSON.parse(body.slice(0, body.lastIndexOf("}") + 1)); } catch {}
+	// cut-off answer: keep the complete sentences
+	const items = [...body.matchAll(/\{\s*"text"\s*:\s*"((?:[^"\\]|\\.)*)"\s*,\s*"cite"\s*:\s*\[([^\]]*)\]\s*\}/g)]
+		.map((m) => ({ text: JSON.parse(`"${m[1]}"`), cite: [...m[2].matchAll(/"(P\d+)"/g)].map((x) => x[1]) }));
+	if (items.length) return { found: true, answer: items };
+	if (/"found"\s*:\s*false/.test(body)) return { found: false, answer: [] };
+	return null;
 }
 
 export async function onRequestPost({ request, env }) {
@@ -35,26 +50,27 @@ export async function onRequestPost({ request, env }) {
 		.map((p) => ({ id: p.id, doc: String(p.doc || "").slice(0, 60), section: String(p.section || "").slice(0, 60), updated: String(p.updated || "").slice(0, 10), status: p.status === "superseded" ? "superseded" : "current", text: p.text.slice(0, 600) }));
 	if (!question || !passages.length) return bad(400, "empty_request");
 	const ids = passages.map((p) => p.id);
+	let stage = "run", raw = null;
 	try {
 		const out = await env.AI.run(MODEL, {
 			messages: [
 				{ role: "system", content: SYSTEM },
 				{ role: "user", content: `PASSAGES:\n${JSON.stringify(passages)}\n\nQUESTION: ${question}` },
 			],
-			max_tokens: 420,
+			max_tokens: 700,
 			temperature: 0.1,
 		});
-		const raw = out?.response;
-		let obj = raw && typeof raw === "object" ? raw : null;
-		if (!obj) { const m = String(raw ?? "").match(/\{[\s\S]*\}/); if (!m) return bad(502, "unparsable"); obj = JSON.parse(m[0]); }
+		stage = "parse"; raw = out?.response;
+		const obj = parse(raw);
+		if (!obj) return bad(502, "unparsable", String(typeof raw === "string" ? raw : JSON.stringify(raw)).slice(0, 300));
 		const answer = (Array.isArray(obj.answer) ? obj.answer : []).slice(0, 5)
 			.map((s) => ({ text: String(s?.text || "").replace(/[*#`]/g, "").trim().slice(0, 400), cite: (Array.isArray(s?.cite) ? s.cite : [s?.cite]).map(String).filter((id) => ids.includes(id)) }))
 			.filter((s) => s.text);
 		return new Response(JSON.stringify({ found: obj.found !== false && answer.length > 0, answer, model: MODEL }), {
 			headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS },
 		});
-	} catch {
-		return bad(502, "model_error");
+	} catch (e) {
+		return bad(502, "model_error", `${stage}: ${String(e?.message || e).slice(0, 200)}`);
 	}
 }
 
