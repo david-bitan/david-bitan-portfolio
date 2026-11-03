@@ -12,7 +12,7 @@
  */
 const MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-allow-headers": "content-type" };
-const LANG = { en: "English", fr: "French", he: "Hebrew" };
+const LANG = { en: "English", fr: "French", es: "Spanish", pt: "Portuguese", de: "German", it: "Italian", ru: "Russian", tr: "Turkish", id: "Indonesian", he: "Hebrew" };
 
 const BASE = `You help people understand a document they received (a handbook, a contract, a letter). You only use the PASSAGES given, each with an id like "c4".
 Rules:
@@ -112,7 +112,7 @@ export async function onRequestPost({ request, env }) {
 		const passages = (Array.isArray(body?.passages) ? body.passages : []).slice(0, 80)
 			.filter((p) => p && /^c\d{1,4}$/.test(p.id) && typeof p.text === "string")
 			.map((p) => ({ id: p.id, page: Number.isFinite(+p.page) && p.page ? +p.page : undefined, doc: typeof p.doc === "string" ? p.doc.slice(0, 80) : undefined, text: p.text.slice(0, 900) }));
-		let total = 0; const kept = passages.filter((p) => (total += p.text.length) <= 14000);
+		let total = 0; const kept = passages.filter((p) => (total += p.text.length) <= 24000);
 		const question = typeof body?.question === "string" ? body.question.trim().slice(0, 300) : "";
 		if (!kept.length || (mode === "ask" && !question)) return bad(400, "empty_request");
 		const ids = kept.map((p) => p.id);

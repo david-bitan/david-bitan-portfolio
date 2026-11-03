@@ -13,7 +13,7 @@
 	document.querySelectorAll("[data-ic]").forEach((el) => (el.outerHTML = ic(el.dataset.ic, el.className)));
 	if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "vendor/pdf.worker.min.js";
 
-	const MAX_PAGES = 60, MAX_MB = 20, MAX_FILES = 5, WHOLE = 12000;
+	const MAX_PAGES = 60, MAX_MB = 20, MAX_FILES = 5, WHOLE = 22000;
 	const S = { docs: [], loading: 0, out: null, report: null, turns: [], speaking: null, seq: 0, cseq: 0, open: new Set() };
 	const chunk = (id) => { for (const d of S.docs) { const c = d.chunks.find((x) => x.id === id); if (c) return c; } return null; };
 	const docOf = (c) => S.docs.find((d) => d.fid === c.fid);
@@ -27,25 +27,29 @@
 		I.translateStatic(); $("#langCode").textContent = I.LANGS.find((x) => x[0] === I.lang)[2];
 		if (!S.outChosen) S.out = I.lang;
 		renderFiles(); renderOut(); renderTries(); renderReport(); renderThread();
+		$("#langCode").textContent = I.LANGS.find((x) => x[0] === I.lang)[2];
 	}
 	function initLang() {
-		const btn = $("#langBtn"), list = $("#langList");
-		const paint = () => (list.innerHTML = I.LANGS.map(([k, name, code]) => `<li role="option" tabindex="-1" data-l="${k}" aria-selected="${k === I.lang}" lang="${k}">${name}<small>${code}</small></li>`).join(""));
+		dropdown($("#langBtn"), $("#langList"), () => I.lang, (l) => setLang(l));
+		dropdown($("#outBtn"), $("#outList"), () => S.out, (l) => { S.out = l; S.outChosen = true; renderOut(); });
+	}
+	function renderOut() { if (!S.out) S.out = I.lang; $("#outName").textContent = I.LANGS.find((x) => x[0] === S.out)[1]; }
+	/* one custom list-box for both language menus (no native <select>) */
+	function dropdown(btn, list, current, onPick) {
+		const paint = () => (list.innerHTML = I.LANGS.map(([k, name, code]) => `<li role="option" tabindex="-1" data-l="${k}" aria-selected="${k === current()}" lang="${k}">${name}<small>${code}</small></li>`).join(""));
 		const open = (on) => { list.hidden = !on; btn.setAttribute("aria-expanded", String(on)); if (on) { paint(); (list.querySelector('[aria-selected="true"]') || list.firstElementChild).focus(); } };
-		btn.onclick = (e) => { e.stopPropagation(); open(list.hidden); };
-		list.onclick = (e) => { const li = e.target.closest("li"); if (!li) return; open(false); setLang(li.dataset.l); btn.focus(); };
-		list.onkeydown = (e) => {
+		btn.addEventListener("click", (e) => { e.stopPropagation(); open(list.hidden); });
+		list.addEventListener("click", (e) => { const li = e.target.closest("li"); if (!li) return; open(false); onPick(li.dataset.l); btn.focus(); });
+		list.addEventListener("keydown", (e) => {
 			const items = [...list.children], i = items.indexOf(document.activeElement);
 			if (e.key === "Escape") { open(false); btn.focus(); }
 			else if (e.key === "ArrowDown") { e.preventDefault(); items[(i + 1) % items.length].focus(); }
 			else if (e.key === "ArrowUp") { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+			else if (e.key === "Home") { e.preventDefault(); items[0].focus(); } else if (e.key === "End") { e.preventDefault(); items[items.length - 1].focus(); }
 			else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); document.activeElement.click(); }
-		};
-		document.addEventListener("click", (e) => { if (!e.target.closest("#langWrap")) open(false); });
-	}
-	function renderOut() {
-		if (!S.out) S.out = I.lang;
-		$("#outLang").innerHTML = I.LANGS.map(([k, name]) => `<button type="button" data-out="${k}" aria-pressed="${S.out === k}" lang="${k}">${name}</button>`).join("");
+			else if (e.key.length === 1) { const n = items.find((x) => x.textContent.toLowerCase().startsWith(e.key.toLowerCase())); n?.focus(); }
+		});
+		document.addEventListener("click", (e) => { if (!list.hidden && !e.target.closest("#" + list.parentElement.id)) open(false); });
 	}
 
 	/* ---------------- sources: files, links, pasted text ---------------- */
@@ -119,7 +123,7 @@
 		}).join("");
 		const has = S.docs.length > 0;
 		$("#sample").hidden = has;
-		$("#intro").hidden = has && Boolean(S.report);
+		$("#analyse").disabled = !ready().length || S.loading > 0;
 		$("#drop").classList.toggle("compact", has);
 		$("#drop").hidden = S.docs.length >= MAX_FILES;
 		$("#dropTitle").hidden = has;
@@ -175,14 +179,18 @@
 		const paras = [...box.querySelectorAll("p, h1, h2, h3, h4, h5, h6, li, td")].filter((el) => el.textContent.trim() && !(el.tagName === "TD" && el.querySelector("p")) && !(el.tagName === "LI" && el.querySelector("p"))).map((el) => el.textContent.replace(/\s+/g, " ").trim());
 		const d = textDoc(paras, "docx"); return d;
 	}
-	const LANG_NAME = { en: "English", fr: "French", he: "Hebrew", other: "another language" };
+	const LANG_NAME = { en: "English", fr: "French", es: "Spanish", pt: "Portuguese", de: "German", it: "Italian", ru: "Russian", tr: "Turkish", id: "Indonesian", he: "Hebrew", other: "another language" };
+	const STOPW = {
+		en: "the and you is for with are your of to not this that will", fr: "le la les des est vous une pour dans avec pas du qui que", es: "el los las del es usted una para con por que se como sus",
+		pt: "o os as do da é você uma para com não que pelo seus", de: "der die das und ist sie nicht mit für den von zu ein eine", it: "il lo gli della è per con non che una sono del alla",
+		tr: "ve bir bu için ile da de olarak veya gibi olan değil", id: "dan yang di untuk dengan ini itu tidak dari pada anda akan",
+	};
 	function detectLang(txt) {
-		const s = txt.slice(0, 6000); const he = (s.match(/[֐-׿]/g) || []).length, lat = (s.match(/[a-zA-Z]/g) || []).length;
-		if (he > lat * 0.6) return "he";
-		const w = s.toLowerCase().split(/[^a-zàâçéèêëîïôûùüÿœ']+/);
-		const fr = w.filter((x) => ["le", "la", "les", "des", "est", "vous", "une", "pour", "dans", "avec", "pas", "du"].includes(x)).length;
-		const en = w.filter((x) => ["the", "and", "you", "is", "for", "with", "are", "your", "of", "to", "not"].includes(x)).length;
-		return fr > en ? "fr" : en > 0 ? "en" : "other";
+		const s = txt.slice(0, 6000), he = (s.match(/[\u0590-\u05FF]/g) || []).length, cy = (s.match(/[\u0400-\u04FF]/g) || []).length, lat = (s.match(/[a-zA-Z]/g) || []).length;
+		if (he > lat * 0.6) return "he"; if (cy > lat * 0.6) return "ru";
+		const w = s.toLowerCase().split(/[^\p{L}]+/u); let best = "other", top = 0;
+		for (const [k, list] of Object.entries(STOPW)) { const set = new Set(list.split(" ")); const n = w.filter((x) => set.has(x)).length; if (n > top) { top = n; best = k; } }
+		return top > 2 ? best : "other";
 	}
 	async function pageCanvas(d, p, scale = 2) {
 		const key = p + "@" + scale; if (d.canvases[key]) return d.canvases[key];
@@ -242,7 +250,7 @@
 
 	/* ---------------- the report: starts by itself ---------------- */
 	let reportTimer;
-	function scheduleReport() { clearTimeout(reportTimer); reportTimer = setTimeout(() => { if (!S.loading && ready().length) makeReport(); }, 500); }
+	function scheduleReport() { clearTimeout(reportTimer); reportTimer = setTimeout(() => { if (S.page === 2 && !S.loading && ready().length) makeReport(); }, 500); }
 	const GROUPS = [["short", "In short"], ["favour", "In your favour", "fav"], ["against", "Could work against you", "aga"], ["watch", "Watch out for", "wat"], ["facts", "Key dates and numbers", "fac"]];
 	async function makeReport() {
 		const sig = ready().map((d) => d.fid).join(",") + "|" + S.out;
@@ -264,6 +272,12 @@
 		renderAll();
 	}
 	const renderAll = () => { renderReport(); renderThread(); renderFiles(); };
+	function go(n) {
+		S.page = n; $("#p1").hidden = n !== 1; $("#p2").hidden = n !== 2;
+		if (n === 2) $("#s2files").textContent = ready().map((d) => d.name).join(" · ");
+		scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+		const h = n === 1 ? $("#p1 h1") : $("#report h2") || $("#back2"); if (h) { if (h.tagName !== "BUTTON") h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }
+	}
 	function renderReport() {
 		const box = $("#report"), r = S.report;
 		if (!r || !S.docs.length) { box.innerHTML = ""; $("#qa").hidden = true; return; }
@@ -326,7 +340,7 @@
 	}
 
 	/* ---------------- follow-up questions (they also see the report) ---------------- */
-	const TRIES = ["How many days off do I get?", "What happens if I leave?", "Can I expense a gym membership?"];
+	const TRIES = ["Can I work for a competitor after I leave?", "What happens if I resign in the first year?", "Who owns what I create at home?"];
 	function renderTries() { $("#tries").innerHTML = S.docs.some((d) => d.sample) && !S.turns.length ? `<span>${t("Try:")}</span>${TRIES.map((q) => `<button type="button" class="chip" data-try="${esc(q)}">${esc(t(q))}</button>`).join("")}` : ""; }
 	function reportText() { const r = S.report; if (!r || r.pending || r.failed) return ""; return GROUPS.map(([k, lbl]) => (r.groups[k].length ? `${lbl}: ${r.groups[k].map((x) => x.text).join(" ")}` : "")).filter(Boolean).join("\n"); }
 	async function ask(q) {
@@ -423,7 +437,17 @@
 	drop.addEventListener("drop", (e) => { if (e.dataTransfer?.files?.length) addFiles(e.dataTransfer.files); });
 	addEventListener("dragover", (e) => e.preventDefault()); addEventListener("drop", (e) => { e.preventDefault(); if (e.dataTransfer?.files?.length && !e.target.closest("#drop")) addFiles(e.dataTransfer.files); });
 	$("#fileIn").addEventListener("change", (e) => { if (e.target.files?.length) addFiles(e.target.files); e.target.value = ""; });
-	$("#openSample").addEventListener("click", async () => { const l = I.lang === "he" ? "he" : "en", r = await fetch(`samples/halden-handbook-${l}.pdf`); addFiles([new File([await r.blob()], `halden-handbook-${l}.pdf`, { type: "application/pdf" })], true); });
+	$("#openSample").addEventListener("click", async () => { const r = await fetch("samples/brevholt-kelmarion-employment-contract.pdf"); addFiles([new File([await r.blob()], "brevholt-kelmarion-employment-contract.pdf", { type: "application/pdf" })], true); });
+	$("#analyse").onclick = () => { go(2); makeReport(); };
+	$("#legalBtn").onclick = () => { // privacy & terms, in the reader's language
+		const opener = document.activeElement, scrim = document.createElement("div"), v = document.createElement("div");
+		scrim.className = "scrim"; v.className = "viewer"; v.setAttribute("role", "dialog"); v.setAttribute("aria-modal", "true"); v.setAttribute("aria-labelledby", "lgH");
+		v.innerHTML = `<div class="legal"><h3 id="lgH">${t("Privacy & terms")}</h3>${["Files and pasted text are read in your browser. A link is fetched once by our server, only to read the page.", "To write the summary and the answers, only the passages needed are sent to Cloudflare Workers AI, which runs Llama 3.3 (Meta). Cloudflare states that it does not use this content to train AI models, and Margin stores nothing.", "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong — always check the highlighted source.", "Portfolio demo: please don’t add very personal or confidential documents."].map((k) => `<p>${esc(t(k))}</p>`).join("")}<p>Built with Llama · <a class="lnk" href="THIRD-PARTY-NOTICES.txt">${t("Licences")}</a></p><div class="row"><button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></div></div>`;
+		const close = () => { scrim.remove(); v.remove(); document.removeEventListener("keydown", key); opener?.focus(); }, key = (e) => { if (e.key === "Escape") close(); };
+		v.addEventListener("click", (e) => { if (e.target === v || e.target.closest("[data-close]")) close(); });
+		document.addEventListener("keydown", key); document.body.append(scrim, v); v.querySelector("[data-close]").focus();
+	};
+	$("#back2").onclick = () => go(1);
 	$("#urlIn").addEventListener("input", (e) => ($("#urlGo").disabled = !e.target.value.trim()));
 	$("#urlForm").addEventListener("submit", (e) => { e.preventDefault(); const v = $("#urlIn").value.trim(); if (!v) return; $("#urlIn").value = ""; $("#urlGo").disabled = true; addLink(/^https?:\/\//i.test(v) ? v : "https://" + v); });
 	const pasteOpen = (on) => { $("#pasteBox").hidden = !on; $("#pasteBtn").setAttribute("aria-expanded", String(on)); if (on) $("#pasteIn").focus(); };
@@ -431,8 +455,7 @@
 	$("#pasteCancel").onclick = () => { pasteOpen(false); $("#pasteBtn").focus(); };
 	$("#pasteIn").addEventListener("input", (e) => ($("#pasteOk").disabled = e.target.value.trim().split(/\s+/).length < 30));
 	$("#pasteOk").onclick = () => { const v = $("#pasteIn").value; $("#pasteIn").value = ""; $("#pasteOk").disabled = true; pasteOpen(false); addText(v); };
-	$("#home").onclick = () => scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
-	$("#outLang").addEventListener("click", (e) => { const b = e.target.closest("[data-out]"); if (!b) return; S.out = b.dataset.out; S.outChosen = true; renderOut(); if (S.report) scheduleReport(); });
+	$("#home").onclick = () => go(1);
 	const ta = $("#q"), goBtn = $("#askForm .go");
 	const fit = () => { ta.style.height = "auto"; ta.style.height = Math.min(ta.scrollHeight, 160) + "px"; goBtn.disabled = !ta.value.trim(); };
 	ta.addEventListener("input", fit);
@@ -464,7 +487,7 @@
 	});
 
 	/* ---------------- boot ---------------- */
-	initLang(); setLang(I.lang);
+	S.page = 1; initLang(); setLang(I.lang);
 	window.MARGIN_DEBUG = S;
 	if (new URLSearchParams(location.search).get("sample")) $("#openSample").click();
 })();
