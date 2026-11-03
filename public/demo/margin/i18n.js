@@ -75,6 +75,15 @@ window.MARGIN_I18N = (() => {
 		"Margin is a fictional product designed and built by David Bitan for his AI Lab. Halden and its handbook are invented.": ["Margin est un produit fictif conçu et développé par David Bitan pour son AI Lab. Halden et son règlement sont inventés.", "Margin הוא מוצר בדוי שעוצב ונבנה על ידי דוד ביטן עבור ה־AI Lab שלו. הלדן והמדריך שלה בדויים."],
 		"Portfolio": ["Portfolio", "תיק עבודות"],
 		"Your question…": ["Votre question…", "השאלה שלכם…"],
+		"Your files": ["Vos fichiers", "הקבצים שלך"],
+		"Continue": ["Continuer", "המשך"],
+		"Drop one or more PDF or Word files here": ["Déposez un ou plusieurs fichiers PDF ou Word ici", "גררו לכאן קובץ PDF או Word אחד או יותר"],
+		"Choose files": ["Choisir des fichiers", "בחירת קבצים"],
+		"Add another file": ["Ajouter un autre fichier", "הוספת קובץ נוסף"],
+		"Add a file": ["Ajouter un fichier", "הוספת קובץ"],
+		"Try again": ["Réessayer", "לנסות שוב"],
+		"The AI’s answer came back incomplete this time. Please try again.": ["La réponse de l’IA est arrivée incomplète cette fois. Réessayez.", "התשובה של ה־AI הגיעה חלקית הפעם. נסו שוב."],
+		"The AI wrote points I couldn’t match to the document, so I didn’t show them. Please try again.": ["L’IA a écrit des points que je n’ai pas pu relier au document, donc je ne les montre pas. Réessayez.", "ה־AI כתב נקודות שלא הצלחתי לקשר למסמך, ולכן לא הצגתי אותן. נסו שוב."],
 		"Working on it…": ["Je m’en occupe…", "עובד על זה…"],
 	};
 	const IDX = { fr: 0, he: 1 };

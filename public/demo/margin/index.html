@@ -231,6 +231,35 @@ footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-c
 	.nav-row .btn-ink { flex: 1; }
 	.v-doc { padding: 18px; }
 }
+
+/* v0.6: file list, step 2 head, option panels */
+.files { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.files:empty { display: none; }
+.frow { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 8px; }
+.frow .file-ic { width: 44px; height: 44px; }
+.frow > div { flex: 1; min-width: 0; }
+.frow b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15.5px; }
+.frow small { display: flex; flex-wrap: wrap; gap: 4px 10px; color: var(--ink-3); font-size: 13.5px; }
+.frow small .w { color: var(--warn); }
+.frow .ok-ic { color: var(--ok); display: inline-flex; }
+.frow.busy-row small { color: var(--ink-2); }
+.drop.compact { padding: 18px; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.drop.compact > .i:first-child { display: none; }
+.drop.compact .btn-ink { background: var(--surface); color: var(--ink); border-color: var(--line-2); }
+.drop.compact b { font-size: 15.5px; margin: 0; }
+.drop.compact .or, .drop.compact small { display: none; }
+.s2-top { display: flex; align-items: center; gap: 12px; margin: 22px 0 0; flex-wrap: wrap; }
+.s2-files { color: var(--ink-3); font-size: 14px; min-width: 0; overflow-wrap: anywhere; }
+.s2-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin: 18px 0 18px; }
+.s2-head h2 { margin: 0; }
+.out { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.out .seg { min-width: 260px; }
+.tool[aria-expanded="true"], .tool.on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.tool.on .ti, .tool[aria-expanded="true"] .ti { background: var(--marker); }
+.panel { margin-top: 14px; }
+.saved { color: var(--ink-3); font-size: 13.5px; margin: 18px 0 0; }
+.retry { margin-top: 12px; }
+@media (max-width: 640px) { .out .seg { min-width: 0; flex: 1; } .out { width: 100%; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
 </style>
 </head>
@@ -247,25 +276,24 @@ footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-c
 
 <main class="wrap">
 	<ol class="steps" id="steps">
-		<li data-step="1"><span class="n">1</span><span class="lbl" data-t="Add">Add</span></li>
-		<li data-step="2"><span class="n">2</span><span class="lbl" data-t="Check">Check</span></li>
-		<li data-step="3"><span class="n">3</span><span class="lbl" data-t="Understand">Understand</span></li>
+		<li data-step="1"><span class="n">1</span><span class="lbl" data-t="Your files">Your files</span></li>
+		<li data-step="2"><span class="n">2</span><span class="lbl" data-t="Understand">Understand</span></li>
 	</ol>
 
 	<section id="s1">
 		<h1 data-t="Understand any document — and see where it says it.">Understand any document — and see where it says it.</h1>
 		<p class="lead" data-t="Add a PDF or a Word file. Ask a question, get the essentials, or have it explained simply — every answer shows the exact passage it comes from, highlighted in your document.">Add a PDF or a Word file.</p>
+		<ul class="files" id="files" aria-live="polite"></ul>
 		<label class="drop" id="drop" for="fileIn">
 			<span data-ic="file-up"></span>
-			<b class="hide-m" data-t="Drop a PDF or Word file here">Drop a PDF or Word file here</b>
+			<b class="hide-m" id="dropTitle" data-t="Drop one or more PDF or Word files here">Drop one or more PDF or Word files here</b>
 			<span class="or hide-m" data-t="or">or</span>
-			<span class="btn btn-ink" aria-hidden="true"><span data-ic="file-text"></span><span data-t="Choose a file">Choose a file</span></span>
+			<span class="btn btn-ink" id="dropBtn" aria-hidden="true"><span data-ic="file-text"></span><span data-t="Choose files">Choose files</span></span>
 			<small data-t="PDF or Word (.docx) · up to 60 pages · 20 MB">PDF or Word (.docx) · up to 60 pages · 20 MB</small>
-			<input type="file" id="fileIn" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+			<input type="file" id="fileIn" multiple accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
 		</label>
-		<div id="fileBox" hidden></div>
 		<div class="err" id="err1" role="alert" hidden></div>
-		<div class="sample">
+		<div class="sample" id="sample">
 			<span class="i-big"><span data-ic="clipboard-list"></span></span>
 			<b data-t="No document at hand?">No document at hand?</b>
 			<p data-t="You probably don’t have your company’s handbook with you. Download the one from Halden, a made-up design studio, then drop it above.">You probably don’t have your company’s handbook with you.</p>
@@ -276,33 +304,25 @@ footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-c
 			</div>
 		</div>
 		<p class="privacy"><span data-ic="lock"></span><span data-t="Your file is read in this browser. Only the passages needed for an answer are sent to the AI, and nothing is kept: close the page and it’s gone. Demo — avoid very personal documents.">Your file is read in this browser.</span></p>
-		<div class="nav-row"><span></span><button type="button" class="btn btn-ink" id="next1" disabled><span data-t="Next">Next</span><span data-ic="arrow-right" class="flip-ic"></span></button></div>
+		<div class="nav-row"><span></span><button type="button" class="btn btn-ink" id="next1" disabled><span data-t="Continue">Continue</span><span data-ic="arrow-right" class="flip-ic"></span></button></div>
 	</section>
 
 	<section id="s2" hidden>
-		<h2 data-t="Here’s what I read">Here’s what I read</h2>
-		<div class="check">
-			<div id="preview"></div>
-			<div class="facts">
-				<ul id="facts"></ul>
-				<div id="notes"></div>
-				<span class="seg-l" id="outL" data-t="Answer me in">Answer me in</span>
-				<div class="seg" id="outLang" role="group" aria-labelledby="outL"></div>
-				<p class="hint" data-t="The document can stay in its language: answers come in yours, and you can translate any passage.">The document can stay in its language.</p>
-			</div>
+		<div class="s2-top">
+			<button type="button" class="btn btn-sm" id="back2"><span data-ic="arrow-left" class="flip-ic"></span><span data-t="Back">Back</span></button>
+			<span class="s2-files" id="s2files"></span>
 		</div>
-		<div class="nav-row"><button type="button" class="btn" id="back2"><span data-ic="arrow-left" class="flip-ic"></span><span data-t="Back">Back</span></button><button type="button" class="btn btn-ink" id="next2"><span data-t="Next">Next</span><span data-ic="arrow-right" class="flip-ic"></span></button></div>
-	</section>
-
-	<section id="s3" hidden>
-		<h2 data-t="What would you like to do?">What would you like to do?</h2>
-		<div class="tools">
-			<button type="button" class="tool" data-tool="summary"><span class="ti"><span data-ic="list-checks"></span></span><b data-t="Summarize the essentials">Summarize the essentials</b><span data-t="In your favour, your obligations, what to watch">In your favour, your obligations, what to watch</span></button>
-			<button type="button" class="tool" data-tool="ask"><span class="ti"><span data-ic="message-square-text"></span></span><b data-t="Ask a question">Ask a question</b><span data-t="Anything about this document">Anything about this document</span></button>
-			<button type="button" class="tool" data-tool="simple"><span class="ti"><span data-ic="wand-sparkles"></span></span><b data-t="Explain simply">Explain simply</b><span data-t="The main points in everyday words">The main points in everyday words</span></button>
+		<div class="s2-head">
+			<h2 data-t="What would you like to do?">What would you like to do?</h2>
+			<div class="out"><span class="seg-l" id="outL" data-t="Answer me in">Answer me in</span><div class="seg" id="outLang" role="group" aria-labelledby="outL"></div></div>
+		</div>
+		<div class="tools" role="group">
+			<button type="button" class="tool" data-tool="summary" aria-expanded="false"><span class="ti"><span data-ic="list-checks"></span></span><b data-t="Summarize the essentials">Summarize the essentials</b><span data-t="In your favour, your obligations, what to watch">In your favour, your obligations, what to watch</span></button>
+			<button type="button" class="tool" data-tool="ask" aria-expanded="false" aria-controls="askPanel"><span class="ti"><span data-ic="message-square-text"></span></span><b data-t="Ask a question">Ask a question</b><span data-t="Anything about this document">Anything about this document</span></button>
+			<button type="button" class="tool" data-tool="simple" aria-expanded="false"><span class="ti"><span data-ic="wand-sparkles"></span></span><b data-t="Explain simply">Explain simply</b><span data-t="The main points in everyday words">The main points in everyday words</span></button>
 			<button type="button" class="tool" data-tool="listen" id="listenTool"><span class="ti"><span data-ic="volume-2"></span></span><b id="listenLbl" data-t="Listen">Listen</b><span data-t="Read the last answer aloud">Read the last answer aloud</span></button>
 		</div>
-		<div class="askbar">
+		<div class="panel" id="askPanel" hidden>
 			<form class="ask" id="askForm" autocomplete="off">
 				<label class="sr" for="q" data-t="Your question about the document">Your question about the document</label>
 				<textarea id="q" rows="1" maxlength="300" data-t-ph="Your question…"></textarea>
@@ -310,7 +330,7 @@ footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-c
 			</form>
 			<div class="tries" id="tries"></div>
 		</div>
-		<div class="bar3"><button type="button" class="btn btn-text btn-sm" id="back3"><span data-ic="arrow-left" class="flip-ic"></span><span data-t="Change document">Change document</span></button><span data-t="Nothing is saved: closing the page forgets the document.">Nothing is saved.</span></div>
+		<p class="saved" data-t="Nothing is saved: closing the page forgets the document.">Nothing is saved.</p>
 		<div class="results" id="results" aria-live="polite"></div>
 	</section>
 </main>

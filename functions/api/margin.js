@@ -21,21 +21,21 @@ Rules:
 - Keep numbers, amounts, dates and durations exactly as in the passage, written with digits.
 - Short, plain sentences. Address the reader as "you". No markdown.
 - Write in the OUTPUT LANGUAGE, even if the document is in another language.
-Reply with ONE JSON object and nothing else.`;
+Reply with ONE JSON object and nothing else. The JSON keys stay in English exactly as shown, whatever the output language.`;
 
 const MODES = {
 	ask: { tokens: 600, prompt: `${BASE}
 Task: answer the QUESTION.
 Format: {"found": true|false, "answer": [{"text": "one sentence", "cite": ["c1"]}]}
 If the passages do not answer it, reply {"found": false, "answer": []}. If they answer part of it, answer only that part. 1 to 4 sentences.` },
-	summary: { tokens: 1100, prompt: `${BASE}
+	summary: { tokens: 1600, prompt: `${BASE}
 Task: pick out what matters most for the reader, in three groups:
 - "favour": rights, benefits and protections in the reader's favour;
 - "obligations": what the reader must do;
 - "watch": deadlines, limits, costs, penalties or conditions that could go against the reader.
 Format: {"favour": [{"text": "...", "cite": ["c1"]}], "obligations": [...], "watch": [...]}
-2 to 5 items per group, the most important first. An empty group is fine.` },
-	simple: { tokens: 1000, prompt: `${BASE}
+2 to 4 items per group, the most important first, each under 30 words. An empty group is fine.` },
+	simple: { tokens: 1400, prompt: `${BASE}
 Task: explain the main points of the document in everyday words, for someone who finds this kind of text hard to read. Replace jargon with simple words.
 Format: {"points": [{"text": "one simple sentence", "cite": ["c1"]}]}
 4 to 8 points, in the order of the document.` },
@@ -53,12 +53,27 @@ function parse(raw) {
 	const start = txt.indexOf("{"); if (start < 0) return null;
 	const body = txt.slice(start);
 	try { return JSON.parse(body.slice(0, body.lastIndexOf("}") + 1)); } catch {}
+	const fixed = repair(body); if (fixed) return fixed;
 	const items = [...body.matchAll(/\{\s*"text"\s*:\s*"((?:[^"\\]|\\.)*)"\s*,\s*"cite"\s*:\s*\[([^\]]*)\]\s*\}/g)]
 		.map((m) => ({ text: JSON.parse(`"${m[1]}"`), cite: [...m[2].matchAll(/"(c\d+)"/g)].map((x) => x[1]) }));
 	if (items.length) return { found: true, answer: items, points: items };
 	if (/"found"\s*:\s*false/.test(body)) return { found: false, answer: [] };
 	return null;
 }
+// A cut-off answer: keep everything up to the last complete item, then close the open brackets.
+function repair(body) {
+	for (let end = body.lastIndexOf("}"); end > 0; end = body.lastIndexOf("}", end - 1)) {
+		let s = body.slice(0, end + 1), stack = [], str = false, escp = false;
+		for (const ch of s) { if (escp) { escp = false; continue; } if (ch === "\\") { escp = true; continue; } if (ch === '"') { str = !str; continue; } if (str) continue; if (ch === "{" || ch === "[") stack.push(ch); else if (ch === "}" || ch === "]") stack.pop(); }
+		if (str) continue;
+		s += stack.reverse().map((c) => (c === "{" ? "}" : "]")).join("");
+		try { return JSON.parse(s); } catch {}
+	}
+	return null;
+}
+// The model sometimes translates the keys: accept the usual variants.
+const ALIAS = { favour: ["favour", "favor", "in_your_favour", "faveur", "en_votre_faveur", "pour_vous", "לטובתך", "benefits", "rights"], obligations: ["obligations", "obligation", "vos_obligations", "devoirs", "חובות", "duties"], watch: ["watch", "watch_out", "a_surveiller", "à_surveiller", "surveiller", "attention", "risques", "שימו_לב", "שים_לב", "risks"] };
+const pick = (obj, key) => { const norm = (k) => String(k).toLowerCase().replace(/[\s-]+/g, "_"); for (const [k, v] of Object.entries(obj || {})) if (ALIAS[key].includes(norm(k))) return v; return obj?.[key]; };
 const clean = (arr, ids) => (Array.isArray(arr) ? arr : []).slice(0, 8)
 	.map((s) => ({ text: String(s?.text || "").replace(/[*#`]/g, "").trim().slice(0, 500), cite: (Array.isArray(s?.cite) ? s.cite : [s?.cite]).map(String).filter((id) => ids.includes(id)) }))
 	.filter((s) => s.text);
@@ -97,7 +112,7 @@ export async function onRequestPost({ request, env }) {
 		stage = "parse";
 		const obj = parse(r?.response);
 		if (!obj) return bad(502, "unparsable", String(typeof r?.response === "string" ? r.response : JSON.stringify(r?.response)).slice(0, 300));
-		if (mode === "summary") return ok({ favour: clean(obj.favour, ids), obligations: clean(obj.obligations, ids), watch: clean(obj.watch, ids) });
+		if (mode === "summary") { const src = obj.summary && typeof obj.summary === "object" ? obj.summary : obj; return ok({ favour: clean(pick(src, "favour"), ids), obligations: clean(pick(src, "obligations"), ids), watch: clean(pick(src, "watch"), ids), ...(["favour", "obligations", "watch"].every((k) => !(pick(src, k) || []).length) ? { debug: String(typeof r?.response === "string" ? r.response : JSON.stringify(r?.response)).slice(0, 300) } : {}) }); }
 		if (mode === "simple") return ok({ points: clean(obj.points || obj.answer, ids) });
 		const answer = clean(obj.answer, ids);
 		return ok({ found: obj.found !== false && answer.length > 0, answer });
