@@ -23,6 +23,7 @@
 	const eur = (n) => money(n * cur()[1]);
 	const fromLocal = (x) => x / cur()[1];
 	const roundLocal = (e, step = 50, up = false) => fromLocal((up ? Math.ceil : Math.round)((e * cur()[1]) / step) * step);
+	const AUTO_STEPS = [100, 200, 300, 500, 800, 1200];
 	const CAP_BASE = [300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1500, 2000, 2500, 3000, 4000, 5000, 7500, 10000];
 	const capList = () => CAP_BASE.map((v) => fromLocal(v * cur()[2]));
 	const snapCap = (e) => capList().reduce((a, b) => (Math.abs(b - e) < Math.abs(a - e) ? b : a));
@@ -44,7 +45,7 @@
 	/* ---------------- state ---------------- */
 	const S = {
 		origin: "Paris", text: "", scenario: "normal", run: 0, paused: false, resume: null,
-		settings: { cap: 1000, refundable: true, activities: true },
+		settings: { cap: 1000, refundable: true, activities: true, autonomy: "default", autoLimit: 300 },
 		intent: null, plan: null, progress: {}, held: {}, log: [], status: "idle", aiUsed: false,
 	};
 	let RUN = 0; // every agent run gets a unique id, so parked trips never collide
@@ -55,6 +56,34 @@
 	 * trip is opened again. Nothing is ever replaced or lost. */
 	const TRIP_KEYS = ["text", "scenario", "run", "paused", "resume", "intent", "plan", "progress", "held", "log", "status", "aiUsed", "case", "origin", "_prev", "curStep", "when"];
 	const TRIPS = []; let activeTrip = null, tripSeq = 0;
+	/* My trips survive a refresh: state + rendered steps are kept in this browser. A trip that was
+	 * mid-way picks up from its last step when opened. */
+	const fragHtml = (f) => { const d = document.createElement("div"); if (f) d.append(f.cloneNode(true)); return d.innerHTML; };
+	const htmlFrag = (h) => { const t2 = document.createElement("template"); t2.innerHTML = h || ""; return t2.content; };
+	function saveTrips() {
+		try {
+			const out = TRIPS.map((tr) => {
+				const act = tr === activeTrip, st = {};
+				for (const k of TRIP_KEYS) if (k !== "resume") st[k] = act ? S[k] : tr.s?.[k];
+				return { id: tr.id, at: tr.at, s: st, statusTxt: act ? $("#agentStatus").textContent : tr.statusTxt, steps: act ? $("#steps").innerHTML : fragHtml(tr.steps), notice: act ? $("#notice").innerHTML : fragHtml(tr.notice) };
+			}).filter((x) => x.s.text || x.s.plan);
+			localStorage.setItem("otium-trips", JSON.stringify({ seq: tripSeq, trips: out }));
+		} catch {}
+	}
+	function loadTrips() {
+		try {
+			const d = JSON.parse(localStorage.getItem("otium-trips") || "null"); if (!d?.trips?.length) return;
+			tripSeq = d.seq || d.trips.length;
+			for (const x of d.trips) TRIPS.push({ id: x.id, at: x.at, s: { ...x.s, resume: null, paused: false }, statusTxt: x.statusTxt, steps: htmlFrag(x.steps), notice: htmlFrag(x.notice), edit: null, alts: [], restored: true });
+		} catch {}
+	}
+	function resumeTrip() {
+		const order = ["read", "flights", "stay", "days", "budget", "hold", "share", "done", "watch"];
+		const key = order.includes(S.curStep) ? S.curStep : "read";
+		order.slice(order.indexOf(key)).forEach((k) => $(`#step-${k}`)?.remove());
+		S.run = ++RUN; S.paused = false; $("#notice").innerHTML = ""; renderTrip();
+		flow(S.run, key).catch((e) => { if (!(e instanceof Stale)) { console.error(e); failSafe(); } });
+	}
 	const tripData = (tr) => (tr === activeTrip ? S : tr.s);
 	function withTrip(d, fn) { // pricing reads S.origin / S.plan: borrow them briefly for a parked trip
 		const keep = [S.origin, S.plan]; S.origin = d.origin; S.plan = d.plan;
@@ -97,6 +126,7 @@
 			renderTrip(); renderLog(); renderCase();
 			setStatus(S.status, tr.statusTxt);
 			const w = tr.wake; tr.wake = null; w?.();
+			if (tr.restored) { tr.restored = false; if (!S.progress?.done && S.plan && (S.status === "waiting" || S.status === "working")) { $("#notice").innerHTML = `<div class="notice resume-n">${ICON.info}<span>${t("You left while Otium was on this step. Nothing was paid or sent in the meantime.")}</span><button type="button" class="btn btn-primary btn-sm" id="resumeTrip">${t("Pick up where it stopped")}</button></div>`; $("#resumeTrip").onclick = resumeTrip; setStatus("idle", t("Paused — pick up when you’re ready")); } }
 		}
 		show("trip");
 	}
@@ -160,6 +190,7 @@
 	}
 
 	/* ---------------- media ---------------- */
+	const thumbOf = (src) => String(src).replace(/^media\/([a-z]+)\.jpg$/, "media/t/$1.webp"); // light card images; galleries keep the full photo
 	function pic(src, key, alt = "") {
 		const [c1, c2] = SWATCH[key] || ["#C9B79C", "#8E7A62"];
 		return `<div class="ph" style="--c1:${c1};--c2:${c2}"></div><img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" onerror="this.remove()">`;
@@ -193,7 +224,7 @@
 		renderCats(); renderListings();
 		const cardClick = (e) => {
 			const h = e.target.closest(".heart");
-			if (h) { const on = h.getAttribute("aria-pressed") !== "true"; h.setAttribute("aria-pressed", on); saved[on ? "add" : "delete"](h.dataset.city); keepSaved(); toast(on ? t("{city} saved to your wishlist", { city: D.cities[h.dataset.city].name }) : t("Removed from your wishlist")); return; }
+			if (h) { const on = h.getAttribute("aria-pressed") !== "true"; h.setAttribute("aria-pressed", on); saved[on ? "add" : "delete"](h.dataset.city); keepSaved(); if (activeCat === "saved") renderListings(); renderCats(); toast(on ? t("{city} saved to your wishlist", { city: D.cities[h.dataset.city].name }) : t("Removed from your wishlist")); return; }
 			const card = e.target.closest(".card-l"); if (!card) return;
 			const cat = CATS.find((c) => c[0] === activeCat);
 			const q = t("A long weekend in {city} for two", { city: D.cities[card.dataset.city].name }) + (cat && cat[0] !== "all" ? `, ${t(cat[3])}` : "");
@@ -245,20 +276,21 @@
 		["beach", "Beach", ic("tree-palm"), "beach time"],
 		["design", "Design", ic("building-2"), "design and architecture"],
 		["night", "Nightlife", ic("moon"), "nightlife"],
+		["saved", "Favourites", ic("heart"), ""],
 	];
 	const CITY_CATS = { telaviv: ["beach", "food", "night", "design"], jerusalem: ["culture", "food"], lisbon: ["food", "culture", "night"], rome: ["food", "culture"], barcelona: ["beach", "food", "night", "design"], amsterdam: ["culture", "design", "night"], athens: ["culture", "beach"], copenhagen: ["design", "food"], porto: ["food", "culture"], seville: ["culture", "food", "night"], valencia: ["beach", "food", "design"], granada: ["culture"], palma: ["beach", "food"], florence: ["culture", "food", "design"], venice: ["culture", "design"], naples: ["food", "culture", "beach"], palermo: ["food", "culture", "beach"], nice: ["beach", "food", "culture"], valletta: ["culture", "beach", "food"], santorini: ["beach", "design"], prague: ["culture", "night", "food"], budapest: ["culture", "night"], krakow: ["culture", "food"], dubrovnik: ["beach", "culture"], split: ["beach", "culture", "night"], istanbul: ["food", "culture", "night"], marrakech: ["food", "culture", "design"], reykjavik: ["culture", "design"], edinburgh: ["culture", "night"], stockholm: ["design", "culture"], tallinn: ["culture", "design"], bruges: ["culture", "food"] };
 	const POPULAR = { lisbon: "Most planned", barcelona: "Trending" };
 	let activeCat = "all"; const saved = new Set((() => { try { return JSON.parse(localStorage.getItem("otium-saved") || "[]"); } catch { return []; } })());
 	const keepSaved = () => { try { localStorage.setItem("otium-saved", JSON.stringify([...saved])); } catch {} };
 	function renderCats() {
-		$("#cats").innerHTML = CATS.map(([k, label, icon]) => `<button type="button" data-cat="${k}" aria-pressed="${k === activeCat}">${icon}${t(label)}</button>`).join("");
+		$("#cats").innerHTML = CATS.map(([k, label, icon]) => `<button type="button" data-cat="${k}" aria-pressed="${k === activeCat}">${icon}${t(label)}${k === "saved" && saved.size ? ` (${saved.size})` : ""}</button>`).join("");
 	}
 	let sortBy = "price";
-	function cityKeys() { return Object.keys(D.cities).filter((k) => activeCat === "all" || CITY_CATS[k].includes(activeCat)); }
+	function cityKeys() { return Object.keys(D.cities).filter((k) => activeCat === "all" || (activeCat === "saved" ? saved.has(k) : CITY_CATS[k].includes(activeCat))); }
 	function cardHtml(k, n) {
 			const c = D.cities[k]; const f = flightOptions(k, S.origin, 1, DEFAULT_PREFS)[0]; const rating = Math.max(...c.stays.map((s) => s.rating));
-			return `<div class="card-l" role="button" tabindex="0" data-city="${k}" style="animation-delay:${n * 50}ms" aria-label="${esc(t("Plan a trip to {city}", { city: c.name }))}">
-				<div class="photo">${pic(c.photo, k, c.name)}<button type="button" class="pics-btn" data-citypics="${k}" aria-label="${esc(t("See {n} photos of {city}", { n: galN(k), city: c.name }))}">${ic("images")}<span>${galN(k)}</span></button>${POPULAR[k] ? `<span class="pop">${t(POPULAR[k])}</span>` : ""}<button class="heart" type="button" data-city="${k}" aria-pressed="${saved.has(k)}" aria-label="${esc(t("Save {city}", { city: c.name }))}">${ic("heart")}</button></div>
+			return `<div class="card-l" role="button" tabindex="0" data-city="${k}" style="animation-delay:${n * 50}ms">
+				<div class="photo">${pic(thumbOf(c.photo), k, c.name)}<button type="button" class="pics-btn" data-citypics="${k}" aria-label="${esc(t("See {n} photos of {city}", { n: galN(k), city: c.name }))}">${ic("images")}<span>${galN(k)}</span></button>${POPULAR[k] ? `<span class="pop">${t(POPULAR[k])}</span>` : ""}<button class="heart" type="button" data-city="${k}" aria-pressed="${saved.has(k)}" aria-label="${esc(t("Save {city}", { city: c.name }))}">${ic("heart")}</button></div>
 				<div class="row1">${c.name}, ${c.country}<span>${ICON.star}${rating.toFixed(1)}</span></div>
 				<div class="sub2">${esc(c.tagline)}</div>
 				<div class="sub2">${t("{h} direct from {o}", { h: f.hours, o: esc(on(S.origin)) })}</div>
@@ -282,7 +314,7 @@
 		const pick = (FEATURED[activeCat] || []).filter((k) => keys.includes(k));
 		const shown = pick.length ? pick : keys.slice(0, 8);
 		const m = $("#mosaic"); m.dataset.n = shown.length;
-		m.innerHTML = shown.map(cardHtml).join("");
+		m.innerHTML = shown.length ? shown.map(cardHtml).join("") : `<div class="tempty saved-empty">${ic("heart")}<h3>${t("No favourites yet")}</h3><p>${t("Tap the heart on any destination to keep it here. Favourites stay in this browser.")}</p></div>`;
 		$("#seeAll").innerHTML = `<button type="button" class="btn btn-ghost" data-go="explore">${t("See all {n} destinations", { n: keys.length })} ${ICON.arrow}</button>`;
 		renderExplore();
 	}
@@ -422,7 +454,7 @@
 			sub(t) { const x = document.createElement("li"); x.textContent = t; li.querySelector(".sub").append(x); },
 			detail(t) { li.querySelector(".d").innerHTML = t; },
 			set(s) { li.dataset.s = s;
-				if (s === "done" && li.querySelector(".sub li") && !li.querySelector(".peek")) { li.classList.add("folded"); const n = li.querySelectorAll(".sub li").length; li.querySelector(".t").insertAdjacentHTML("beforeend", `<button class="peek" type="button" aria-expanded="false">${P(n, "1 detail", "{n} details")} ${ICON.down}</button>`); } const rb = li.querySelector(".risk.ok"); if (rb) rb.textContent = t(s === "done" ? "Approved by you" : s === "skipped" ? "Declined" : "Needs your OK"); li.querySelector(".ic").innerHTML = { done: ICON.check, working: ICON.spin, ask: ICON.hand, blocked: ICON.x, skipped: ICON.dot }[s]; },
+				if (s === "done" && li.querySelector(".sub li") && !li.querySelector(".peek")) { li.classList.add("folded"); const n = li.querySelectorAll(".sub li").length; li.querySelector(".t").insertAdjacentHTML("beforeend", `<button class="peek" type="button" aria-expanded="false">${P(n, "1 detail", "{n} details")} ${ICON.down}</button>`); } const rb = li.querySelector(".risk.ok"); if (rb) rb.textContent = t(s === "done" ? (li.dataset.auto ? "Approved by your limit" : "Approved by you") : s === "skipped" ? "Declined" : "Needs your OK"); li.querySelector(".ic").innerHTML = { done: ICON.check, working: ICON.spin, ask: ICON.hand, blocked: ICON.x, skipped: ICON.dot }[s]; },
 			slot(html) { const sl = li.querySelector(".slot"); sl.innerHTML = html; scrollAgent(sl); return sl; },
 		};
 	}
@@ -430,6 +462,20 @@
 		const body = $("#agentBody");
 		if (getComputedStyle($("#agent")).position !== "sticky") return;
 		requestAnimationFrame(() => body.scrollTo({ top: body.scrollTop + node.getBoundingClientRect().top - body.getBoundingClientRect().top - 24, behavior: reduced ? "auto" : "smooth" }));
+	}
+	/* "Ask me before every choice": the traveller confirms the flight and the stay too. */
+	async function confirmChoice(id, s, kind) {
+		const p = S.plan, c = D.cities[p.city];
+		for (let tries = 0; ; tries++) {
+			const f = flightOptions(p.city, S.origin, p.travelers)[p.flight], st = c.stays.find((x) => x.id === p.stay);
+			s.set("ask"); setStatus("waiting", t("Waiting for your OK"));
+			const what = kind === "flight" ? `${esc(f.airline)} · ${f.dep} · ${eur(f.price)}` : `${esc(st.name)} · ${eur(st.nightly)} / ${t("night")}`;
+			const slot = s.slot(`<div class="card ask"><h4>${t(kind === "flight" ? "Use this flight?" : "Use this stay?")}</h4><p>${what}</p><p class="fine">${ICON.info}<span>${t("You asked Otium to check every choice with you (Permissions).")}</span></p><div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Yes, use it")}</button><button class="btn btn-ghost btn-sm" data-choice="other">${t("Show me another")}</button></div></div>`);
+			const ch = await decide(slot); if (id !== S.run) throw new Stale(); slot.innerHTML = "";
+			if (ch === "yes") { s.set("done"); setStatus("working", t("Planning…")); log("You", t(kind === "flight" ? "Approved the flight choice" : "Approved the stay choice")); return; }
+			if (kind === "flight") p.flight = (p.flight + 1) % 3; else { const i = c.stays.findIndex((x) => x.id === p.stay); p.stay = c.stays[(i + 1) % c.stays.length].id; }
+			renderTrip();
+		}
 	}
 	function decide(slot) {
 		return new Promise((resolve) => {
@@ -467,7 +513,7 @@
 		const all = budgetTrips(raw), ok = all.filter((x) => x.fits);
 		const what = t(S.settings.activities ? "Flights, stay and activities" : "Flights and stay");
 		if (!ok.length) { const low = all[0]; box.innerHTML = `<div class="bud-empty"><p>${t("Nothing fits {x} yet. The lowest is {y}.", { x: money(raw), y: eur(low.total) })}</p><button type="button" class="btn btn-ghost btn-sm" data-budset="${Math.ceil((low.total * cur()[1]) / 50) * 50}">${t("Use {y}", { y: eur(Math.ceil((low.total * cur()[1]) / 50) * 50 / cur()[1]) })}</button></div>`; return; }
-		box.innerHTML = `<p class="bud-n">${t(ok.length === 1 ? "1 destination fits {x}" : "{n} destinations fit {x}", { n: ok.length, x: money(raw) })} · <span>${what}</span></p><div class="bud-grid">${ok.slice(0, BUD.all ? ok.length : 8).map((x) => `<button type="button" class="bud-card" data-budcity="${x.k}"><span class="ph-w">${pic(x.c.photo, x.k, x.c.name)}</span><span class="bud-b"><b>${esc(x.c.name)}</b><small>${esc(x.c.country)}</small><span class="bud-p"><strong>${eur(x.total)}</strong><em>${t("{x} left", { x: eur(Math.max(0, x.left)) })}</em></span><span class="bud-go">${t("Plan this trip")}${ICON.arrow}</span></span></button>`).join("")}</div>${ok.length > 8 && !BUD.all ? `<div class="see-all"><button type="button" class="btn btn-ghost" data-budall>${t("See all {n} destinations", { n: ok.length })}</button></div>` : ""}`;
+		box.innerHTML = `<p class="bud-n">${t(ok.length === 1 ? "1 destination fits {x}" : "{n} destinations fit {x}", { n: ok.length, x: money(raw) })} · <span>${what}</span></p><div class="bud-grid">${ok.slice(0, BUD.all ? ok.length : 8).map((x) => `<button type="button" class="bud-card" data-budcity="${x.k}"><span class="ph-w">${pic(thumbOf(x.c.photo), x.k, x.c.name)}</span><span class="bud-b"><b>${esc(x.c.name)}</b><small>${esc(x.c.country)}</small><span class="bud-p"><strong>${eur(x.total)}</strong><em>${t("{x} left", { x: eur(Math.max(0, x.left)) })}</em></span><span class="bud-go">${t("Plan this trip")}${ICON.arrow}</span></span></button>`).join("")}</div>${ok.length > 8 && !BUD.all ? `<div class="see-all"><button type="button" class="btn btn-ghost" data-budall>${t("See all {n} destinations", { n: ok.length })}</button></div>` : ""}`;
 	}
 	function goBudget() { const head = document.querySelector(".top")?.offsetHeight || 70; window.scrollTo({ top: $("#budget").getBoundingClientRect().top + scrollY - head - 16, behavior: reduced ? "auto" : "smooth" }); setTimeout(() => $("#budAmt").focus({ preventScroll: true }), 500); }
 	function initBudget() {
@@ -501,7 +547,7 @@
 	}
 
 	async function flow(id, fromStep = "read") {
-		const order = ["read", "flights", "stay", "days", "budget", "hold", "share", "done"];
+		const order = ["read", "flights", "stay", "days", "budget", "hold", "share", "done", "watch"];
 		const at = (k) => order.indexOf(k) >= order.indexOf(fromStep);
 
 		/* 1 — read */
@@ -521,7 +567,7 @@
 				const other = intent.city === "other";
 				s.detail(other ? t("{place} isn’t covered in this demo yet.", { place: esc(intent.askedPlace || t("That place")) }) : t("One thing I need before I start."));
 				setStatus("waiting", t("Waiting for you"));
-				const slot = s.slot(`<div class="card ask"><h4>${t(other ? "Pick one of these instead?" : "Where would you like to go?")}</h4><p>${t(other ? "Otium plans 30 cities for now. I won’t guess on your behalf." : "Pick a city — I’ll keep the rest of what you said.")}</p><div class="city-pick">${Object.keys(D.cities).slice(0, 8).map((k) => `<button data-choice="${k}">${pic(D.cities[k].photo, k)}<span>${D.cities[k].name}</span></button>`).join("")}</div></div>`);
+				const slot = s.slot(`<div class="card ask"><h4>${t(other ? "Pick one of these instead?" : "Where would you like to go?")}</h4><p>${t(other ? "Otium plans 30 cities for now. I won’t guess on your behalf." : "Pick a city — I’ll keep the rest of what you said.")}</p><div class="city-pick">${Object.keys(D.cities).slice(0, 8).map((k) => `<button data-choice="${k}">${pic(thumbOf(D.cities[k].photo), k)}<span>${D.cities[k].name}</span></button>`).join("")}</div></div>`);
 				const city = await decide(slot);
 				if (id !== S.run) throw new Stale();
 				intent.city = city; slot.innerHTML = "";
@@ -556,6 +602,7 @@
 			s.set("done"); s.detail(t("Picked {a}, {d} — {cabin}, {kind}, cheapest that matches your filters. Two other options kept.", { a: esc(opts[p.flight].airline), d: opts[p.flight].dep, cabin: t(opts[p.flight].cabin).toLowerCase(), kind: t(opts[p.flight].kind).toLowerCase() }));
 			S.progress.flights = "ready"; renderTrip();
 			log("Otium", t("Compared 3 flights, picked {a} {d}", { a: opts[p.flight].airline, d: opts[p.flight].dep }));
+			if (S.settings.autonomy === "all") await confirmChoice(id, s, "flight");
 		}
 
 		/* 3 — stay */
@@ -571,6 +618,7 @@
 			s.set("done"); s.detail(t("{name} in {area} — best rated that fits your cap.", { name: esc(st.name), area: esc(st.area) }));
 			S.progress.stay = "ready"; renderTrip();
 			log("Otium", t("Picked {name}, {price}/night", { name: st.name, price: eur(st.nightly) }));
+			if (S.settings.autonomy === "all") await confirmChoice(id, s, "stay");
 		}
 
 		/* 4 — days */
@@ -655,13 +703,20 @@
 						<li><span>${esc(k.fl.airline)} · ${k.fl.dep} · ${P(p.travelers, "1 seat", "{n} seats")}</span><span class="num">${eur(k.flights)}</span></li>
 						<li><span>${esc(k.st.name)} · ${P(p.nights, "1 night", "{n} nights")}</span><span class="num">${eur(k.stay)}</span></li>
 						<li><span>${fmtDay(dates.out)} → ${fmtDay(dates.back)}</span><span>${t(k.st.freeCancel ? "Free cancellation" : "Stay non-refundable")}</span></li>
-						<li><span>${t("Paid with")}</span><span>${esc(cardLabel())}</span></li>
+						<li><span>${t("Paid with")}</span><span>${esc(cardLabel())}</span></li>${S.progress.coOk ? `<li class="co-ok"><span>${ICON.check} ${t("{n} approved", { n: esc(S.progress.coOk) })}</span><span>${t("Your OK is the last one")}</span></li>` : ""}
 					</ul>
-					<div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Approve {x}", { x: eur(k.hold) })}</button><button class="btn btn-ghost btn-sm" data-choice="edit">${t("Change something")}</button><button class="btn btn-text btn-sm" data-choice="no">${t("Not now")}</button></div>
+					<div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Approve {x}", { x: eur(k.hold) })}</button><button class="btn btn-ghost btn-sm" data-choice="edit">${t("Change something")}</button>${p.travelers > 1 && !S.progress.coOk ? `<button class="btn btn-ghost btn-sm" data-choice="co">${ic("user")}${t("Ask a co-traveller too")}</button>` : ""}<button class="btn btn-text btn-sm" data-choice="no">${t("Not now")}</button></div>
 					<p class="fine">${ICON.lock}<span>${t("Simulated payment — nothing is charged in this demo. Tickets for activities ({x}) are not part of this payment.", { x: eur(k.tickets) })}</span></p>
 				</div>`);
-				const ch = await decide(slot);
+				const auto = S.settings.autonomy === "limit" && !reprice && k.hold <= S.settings.autoLimit && !S.progress.coWait;
+				const ch = auto ? ($("#step-hold") && ($("#step-hold").dataset.auto = "1"), S.progress.autoPaid = true, slot.innerHTML = "", s.detail(t("Approved automatically: under your {x} limit (your setting). You can cancel it from this page.", { x: eur(S.settings.autoLimit) })), log("Otium", t("Auto-approved {x} — under your limit", { x: eur(k.hold) })), "yes") : await decide(slot);
 				if (id !== S.run) throw new Stale();
+				if (ch === "co") {
+					const name = await new Promise((r) => modal(`<h3 id="modalTitle">${t("Who else should approve?")}</h3><p>${t("They get a link to this payment. Otium waits for both of you. Demo: nothing is sent.")}</p><div class="flds two"><label class="fld"><span>${t("Name")}</span><input id="coName" autocomplete="off"></label><label class="fld"><span>${t("Email")}</span><input id="coMail" type="email" autocomplete="off"></label></div><div class="row"><button class="btn btn-text btn-sm" data-m="cancel">${t("Cancel")}</button><button class="btn btn-primary btn-sm" data-m="ok">${t("Ask them")}</button></div>`, (res) => r(res === "ok" ? ($("#coName")?.value.trim() || t("Your travel partner")) : null)));
+					if (id !== S.run) throw new Stale();
+					if (name) { slot.innerHTML = `<div class="card"><h4>${t("Waiting for {n}…", { n: esc(name) })}</h4><p>${t("Sent to {n} for approval (simulated).", { n: esc(name) })}</p></div>`; log("You", t("Asked {n} to approve the payment too", { n: name })); await beat(id, 3500); S.progress.coOk = name; log("Otium", t("{n} approved the payment", { n: name })); toast(t("{n} approved. Your OK is the last one.", { n: name })); }
+					slot.innerHTML = ""; continue;
+				}
 				if (ch === "edit") { slot.innerHTML = ""; s.detail(t("Change the flight or stay, then confirm.")); S.progress.editing = true; S.progress.editPicked = false; S.progress.pendingHold = false; renderTrip(); document.querySelector("#tripCanvas .toggle-alts")?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" }); await waitEdit(); if (id !== S.run) throw new Stale(); S.progress.editing = false; log("You", t("Edited the plan")); restartFrom("budget"); return; }
 				if (ch === "no") {
 					slot.innerHTML = `<div class="card"><h4>${t("Nothing booked.")}</h4><p>${t("Your plan is saved as a draft. Prices may change.")}</p><div class="row"><button class="btn btn-ghost btn-sm" data-choice="again">${t("Review it again")}</button><button class="btn btn-text btn-sm" data-choice="cheaper">${t("Find something cheaper")}</button></div></div>`;
@@ -699,7 +754,7 @@
 				S.held.stay = { name: k.st.name, amount: k.stay, refundable: k.st.freeCancel, code: code() };
 				log("Otium", t("Held {a} for {x}", { a: `${k.fl.airline} ${k.fl.dep}`, x: eur(k.flights) }), "flights");
 				log("Otium", t("Held {a} for {x}", { a: k.st.name, x: eur(k.stay) }), "stay");
-				s.set("done"); s.detail(t("{x} held. ", { x: eur(k.hold) }) + t(k.st.freeCancel ? "Free cancellation on the stay." : "The stay is non-refundable."));
+				s.set("done"); s.detail((S.progress.autoPaid ? t("Approved automatically: under your {x} limit (your setting). You can cancel it from this page.", { x: eur(S.settings.autoLimit) }) + " " : "") + t("{x} held. ", { x: eur(k.hold) }) + t(k.st.freeCancel ? "Free cancellation on the stay." : "The stay is non-refundable."));
 				S.progress.pendingHold = false; renderTrip();
 				break;
 			}
@@ -712,7 +767,7 @@
 			const s = addStep("share", t("Send traveller details to {a}", { a: k.fl.airline }), "ok");
 			s.set("ask"); setStatus("waiting", t("Waiting for your OK"));
 			s.detail(t("Airlines need names and passport numbers to issue tickets."));
-			const slot = s.slot(`<div class="card ask"><h4>${t("Share your details with {a}?", { a: esc(k.fl.airline) })}</h4><ul class="what"><li><span>${t("Full names")}</span><span>${esc(fullName())}${p.travelers > 1 ? ` +${p.travelers - 1}` : ""}</span></li><li><span>${t("Passport numbers")}</span><span>${t("From your profile")}</span></li><li><span>${t("Phone, for delay alerts")}</span><span>${t("Optional")}</span></li></ul><div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Share and issue tickets")}</button><button class="btn btn-ghost btn-sm" data-choice="noPhone">${t("Share without phone")}</button><button class="btn btn-text btn-sm" data-choice="later">${t("I’ll do it myself")}</button></div><p class="fine">${ICON.lock}<span>${t("Shared with the airline only, for this booking. Demo — no data is entered or sent.")}</span></p></div>`);
+			const slot = s.slot(`<div class="card ask"><h4>${t("Share your details with {a}?", { a: esc(k.fl.airline) })}</h4><ul class="what"><li><span>${t("Full names")}</span><span>${esc(fullName())}${p.travelers > 1 ? ` +${p.travelers - 1}` : ""}</span></li>${ME.assist ? `<li><span>${t("Travel assistance")}</span><span>${t((ASSIST.find((a) => a[0] === ME.assist) || ["", "None"])[1])}</span></li>` : ""}<li><span>${t("Passport numbers")}</span><span>${t("From your profile")}</span></li><li><span>${t("Phone, for delay alerts")}</span><span>${t("Optional")}</span></li></ul><div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Share and issue tickets")}</button><button class="btn btn-ghost btn-sm" data-choice="noPhone">${t("Share without phone")}</button><button class="btn btn-text btn-sm" data-choice="later">${t("I’ll do it myself")}</button></div><p class="fine">${ICON.lock}<span>${t("Shared with the airline only, for this booking. Demo — no data is entered or sent.")}</span></p></div>`);
 			const ch = await decide(slot);
 			if (id !== S.run) throw new Stale();
 			slot.innerHTML = "";
@@ -734,10 +789,32 @@
 		setStatus("done", t("Done — nothing else needs you"));
 		S.progress.done = true; renderTrip();
 		showDone();
+		watchPrices(id);
 		toast(t("Your trip is held. You can still cancel anything from this page."));
 	}
+	async function watchPrices(id) {
+		try {
+			await beat(id, 1500);
+			const w = addStep("watch", t("Keep watching your prices"), "auto");
+			w.set("working"); w.detail(t("Until check-in, Otium checks if your stay gets cheaper. It asks before changing anything."));
+			await beat(id, 16000);
+			const p = S.plan, k = costs(p);
+			if (!S.held.stay || !k.st.freeCancel) { w.set("done"); w.detail(t("No better price so far. Your stay is non-refundable, so nothing to rebook.")); return; }
+			const drop = Math.max(10, Math.round(S.held.stay.amount * 0.1));
+			note(t("{x} cheaper: your stay dropped in price.", { x: eur(drop) }));
+			w.set("ask"); setStatus("waiting", t("Waiting for your OK"));
+			const slot = w.slot(`<div class="card ask"><h4>${t("Your stay is {x} cheaper now. Rebook at the new price?", { x: eur(drop) })}</h4><ul class="what"><li><span>${esc(k.st.name)}</span><span class="num">${eur(S.held.stay.amount)} → ${eur(S.held.stay.amount - drop)}</span></li><li><span>${t("Same room, same dates")}</span><span>${t("Free cancellation")}</span></li></ul><div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Rebook and save {x}", { x: eur(drop) })}</button><button class="btn btn-ghost btn-sm" data-choice="no">${t("Keep my booking")}</button></div></div>`);
+			const ch = await decide(slot); if (id !== S.run) return; slot.innerHTML = "";
+			if (ch === "yes") {
+				const before = { ...S.held.stay }; S.held.stay.amount -= drop; S.held.stay.code = code();
+				w.set("done"); w.detail(t("Rebooked at the lower price. You saved {x}.", { x: eur(drop) })); log("You", t("Rebooked the stay — saved {x}", { x: eur(drop) }), "stay");
+				renderTrip(); toast(t("Rebooked — you saved {x}.", { x: eur(drop) }), t("Undo"), () => { S.held.stay = before; renderTrip(); w.detail(t("Back to your original booking.")); });
+			} else { w.set("skipped"); w.detail(t("Kept your booking. Otium keeps watching.")); log("You", t("Kept the original stay price")); }
+			setStatus("done", t("Done — nothing else needs you"));
+		} catch {}
+	}
 	function restartFrom(stepKey) {
-		const order = ["read", "flights", "stay", "days", "budget", "hold", "share", "done"];
+		const order = ["read", "flights", "stay", "days", "budget", "hold", "share", "done", "watch"];
 		order.slice(order.indexOf(stepKey)).forEach((k) => $(`#step-${k}`)?.remove());
 		S.run = ++RUN; S.paused = false; S.held = {};
 		Object.assign(S.progress, { done: false, pendingHold: false, editing: false });
@@ -809,7 +886,7 @@
 	}
 	function pickFact(kind, key, raw, label) {
 		if (kind === "b") { BUD[key] = +raw; renderBudget(Boolean($("#budgetOut").innerHTML)); return; }
-		if (kind === "u") { ME[key] = raw; const b = document.querySelector('.dd[data-kind="u"][data-key="' + key + '"] .dd-btn span'); if (b) b.textContent = label; return; }
+		if (kind === "u") { ME[key] = raw; if (key === "assist") { saveMe(); keepAccount(); toast(t(raw ? "Saved. Otium will request this with the airline." : "Saved")); } const b = document.querySelector('.dd[data-kind="u"][data-key="' + key + '"] .dd-btn span'); if (b) b.textContent = label; return; }
 		const p = S.plan; if (!p) return;
 		if (kind === "p") {
 			const v = key === "bags" ? +raw : raw; if (p.prefs[key] === v) return;
@@ -1109,9 +1186,10 @@
 	/* ---------------- account & profile (demo: kept in this tab only, nothing is sent) ----------------
 	 * Paying and issuing tickets need the traveller's details and a card. If something is missing,
 	 * the agent stops on a card that says what, links to the profile, and resumes on its own once it's done. */
-	const ME = { signedIn: false, email: "", first: "", last: "", phone: "", dob: "", passport: "", street: "", city: "", zip: "", country: "", card: null };
+	const ME = { signedIn: false, assist: "", email: "", first: "", last: "", phone: "", dob: "", passport: "", street: "", city: "", zip: "", country: "", card: null };
 	try { const keep = JSON.parse(localStorage.getItem("otium-me") || "null"); if (keep && typeof keep === "object") Object.keys(ME).forEach((k) => { if (k in keep) ME[k] = keep[k]; }); } catch {}
 	const saveMe = () => { try { localStorage.setItem("otium-me", JSON.stringify(ME)); } catch {} };
+	const ASSIST = [["", "None"], ["wheelchair", "Wheelchair assistance"], ["legroom", "Extra legroom"], ["baby", "Travelling with a baby"]];
 	const COUNTRIES = ["FR", "GB", "IL", "DE", "ES", "IT", "PT", "NL", "BE", "CH", "AT", "IE", "GR", "DK", "US", "CA"];
 	const countryName = (c) => { try { return new Intl.DisplayNames([I.locale], { type: "region" }).of(c); } catch { return c; } };
 	const profileParts = () => ({
@@ -1201,7 +1279,7 @@
 				${wt ? `<div class="pwait">${ICON.hand}<span>${readyToPay() ? t("All set. Your {city} trip can go on.", { city: D.cities[wt.plan.city].name }) : t("Your {city} trip is waiting for these details.", { city: D.cities[wt.plan.city].name })}</span>${readyToPay() ? `<button class="btn btn-primary btn-sm" type="button" data-backtrip>${t("Back to your trip")}</button>` : ""}</div>` : ""}</div>
 			<div class="pgrid">
 				<section class="pcard" data-sec="personal"><h3>${ic("user")}${t("Traveller details")}</h3><p class="psub">${t("As written in your passport. Used for tickets.")}</p>
-					<div class="flds two">${fld("pFirst", "First name", ME.first)}${fld("pLast", "Last name", ME.last)}${fld("pEmail", "Email", ME.email, 'type="email"')}${fld("pPhone", "Phone", ME.phone, 'type="tel" dir="ltr"')}${fld("pDob", "Date of birth", ME.dob, 'placeholder="DD/MM/YYYY" inputmode="numeric" dir="ltr"')}${fld("pPass", "Passport number", ME.passport, 'dir="ltr"')}</div>
+					<div class="flds two">${fld("pFirst", "First name", ME.first)}${fld("pLast", "Last name", ME.last)}${fld("pEmail", "Email", ME.email, 'type="email"')}${fld("pPhone", "Phone", ME.phone, 'type="tel" dir="ltr"')}${fld("pDob", "Date of birth", ME.dob, 'placeholder="DD/MM/YYYY" inputmode="numeric" dir="ltr"')}${fld("pPass", "Passport number", ME.passport, 'dir="ltr"')}<div class="fld"><span>${t("Travel assistance")}</span>${dd("u", "assist", ASSIST.map(([v, l]) => [v, t(l)]), ME.assist, t("Travel assistance"), "pdd")}</div></div>
 					<p class="err" hidden></p><div class="row"><button class="btn btn-primary btn-sm" type="button" data-save="personal">${t("Save")}</button></div></section>
 				<section class="pcard" data-sec="address"><h3>${ic("map-pin")}${t("Billing address")}</h3><p class="psub">${t("Must match your card.")}</p>
 					<div class="flds two">${fld("pStreet", "Street and number", ME.street)}${fld("pCity", "City", ME.city)}${fld("pZip", "Postcode", ME.zip, 'dir="ltr"')}<div class="fld"><span>${t("Country")}</span>${country}</div></div>
@@ -1447,11 +1525,11 @@
 		</div>
 		<div class="panel block">
 			<div class="block-h"><h3>${t("Flights")}</h3><span class="state ${S.held.flights ? "held" : S.progress.pendingHold ? "pending" : ""}">${S.held.flights ? `${t("Held · {c}", { c: S.held.flights.code })} <button class="linkish" data-cancel="flights">${t("Cancel")}</button>` : t(S.progress.pendingHold ? "Waiting for your OK" : fl ? "Not held yet" : "Searching…")}</span></div>
-			${fl ? flightRow(fl[p.flight], c) + (S.held.flights ? `<div class="seat-h">${ic("plane")}<b>${t("Your seats on the plane")}</b></div>${seatMap(p.travelers)}` : "") + altFlights(fl) : '<div class="skeleton"></div>'}
+			${fl ? flightRow(fl[p.flight], c) + whyFlight(fl, p) + (S.held.flights && S.held.data ? `<button type="button" class="btn btn-text btn-sm seat-link" id="docsSeats">${ic("plane")}${t("Choose your seats")}</button>` : "") + altFlights(fl) : '<div class="skeleton"></div>'}
 		</div>
 		<div class="panel block">
 			<div class="block-h"><h3>${t("Stay")}</h3><span class="state ${S.held.stay ? "held" : S.progress.pendingHold ? "pending" : ""}">${S.held.stay ? `${t("Held · {c}", { c: S.held.stay.code })} <button class="linkish" data-cancel="stay">${t("Cancel")}</button>` : t(S.progress.pendingHold ? "Waiting for your OK" : p.stay && S.progress.stay === "ready" ? "Not held yet" : "Searching…")}</span></div>
-			${p.stay && S.progress.stay === "ready" ? stayRow(c.stays.find((x) => x.id === p.stay), p) + altStays(c, p) : '<div class="skeleton"></div>'}
+			${p.stay && S.progress.stay === "ready" ? stayRow(c.stays.find((x) => x.id === p.stay), p) + whyStay(c, p) + altStays(c, p) : '<div class="skeleton"></div>'}
 		</div>
 		<div class="panel block">
 			<div class="block-h"><h3>${t("Your days")}</h3><span class="state">${t(S.settings.activities ? "Draft · nothing bought" : "Free days")}</span></div>
@@ -1474,6 +1552,14 @@
 		SLOTS.forEach(([a, b], j) => { if (i === 0 && j === 0) return; if (a >= from && b <= until) out.push([`${hhmm(a)} – ${hhmm(b)}`, acts[j]]); });
 		if (i === p.nights) out.push([hhmm(until), t("Head to the airport")]);
 		return out;
+	}
+	function whyFlight(fl, p) {
+		const f = fl[p.flight], others = fl.filter((x) => x.i !== f.i).map((x) => `${esc(x.airline)} ${x.dep} · ${eur(x.price)}${x.fits ? "" : ` (${t("misses a filter")})`}`).join(" · ");
+		return `<details class="why"><summary>${ic("info")}${t("Why this flight?")}</summary><p>${t("Cheapest of {n} flights that match your filters ({f}).", { n: fl.length, f: [t(p.prefs.stops === "direct" ? "Direct only" : "Any stops"), t(p.prefs.cabin === "economy" ? "Economy" : p.prefs.cabin === "business" ? "Business" : "Premium economy")].join(", ") })} ${t("Also compared: {x}.", { x: others })}</p></details>`;
+	}
+	function whyStay(c, p) {
+		const st = c.stays.find((x) => x.id === p.stay), others = c.stays.filter((x) => x.id !== st.id).map((x) => `${esc(x.name)} · ${ICON.star} ${x.rating} · ${eur(x.nightly)}`).join(" · ");
+		return `<details class="why"><summary>${ic("info")}${t("Why this stay?")}</summary><p>${t("Best rated stay that keeps the whole trip under your cap.")} ${S.settings.refundable ? t("Refundable stays come first (your setting).") : ""} ${t("Also compared: {x}.", { x: others })}</p></details>`;
 	}
 	function flightRow(f, c) {
 		return `<div class="flight"><div class="al">${f.airline[0]}</div><div><div class="route">${esc(on(S.origin))} <span class="line">${ICON.plane}</span> ${c.name}</div><small>${esc(f.airline)} · ${t("departs {d}", { d: f.dep })} · ${t(f.kind)} · ${f.hours}</small><div class="tags"><span class="tag g">${t(f.cabin)}</span><span class="tag">${f.aircraft}</span><span class="tag">${t(f.bags ? "Cabin + checked bag" : "Cabin bag only")}</span></div></div><div class="price num">${eur(f.price)}<small>${t("{x} / person, return", { x: eur(f.pp) })}</small></div></div>${airportInfo(f)}`;
@@ -1530,6 +1616,7 @@
 		if (e.target.closest("#editDone")) { editResolve?.(); editResolve = null; return; }
 		if (e.target.closest("#ics")) return downloadIcs();
 		if (e.target.closest("#docs")) return openDocs();
+		if (e.target.closest("#docsSeats")) { openDocs(); setTimeout(() => $("#modalBox .seat-pick")?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" }), 250); return; }
 		if (e.target.closest("#invoice")) return downloadInvoice();
 		if (e.target.closest("#summaryBtn")) return show("summary");
 	});
@@ -1588,12 +1675,17 @@
 		const row = (id, title, small, isOn, locked) => `<div class="setting"><div><b>${t(title)}</b><small>${t(small)}</small>${locked ? `<span class="lock">${ICON.lock}${t("Always on in Otium")}</span>` : ""}</div><label class="switch"><input type="checkbox" id="${id}"${isOn ? " checked" : ""}${locked ? " disabled" : ""} aria-label="${esc(t(title))}"><span></span></label></div>`;
 		$("#rules").innerHTML = `<p style="margin:0 0 6px;font-size:13px;color:var(--ink-2)">${t("Searching and comparing are automatic. Anything that spends money or shares your details waits for you.")}</p>
 			<div class="setting" style="display:block"><b>${t("Default budget cap")}</b><small>${t("Used when you don’t give one. Otium stops instead of going over.")}</small><input class="range" type="range" min="0" max="${CAP_BASE.length - 1}" step="1" value="${capList().indexOf(snapCap(st.cap))}" id="capRange" aria-label="${esc(t("Default budget cap"))}"><div class="num" style="font-weight:700" id="capVal">${eur(st.cap)}</div></div>
-			${row("r1", "Ask before any payment", "Holds, bookings and upgrades.", true, true)}
+			<div class="setting" style="display:block"><b>${t("How much can Otium do on its own?")}</b><small>${t("Sharing your details always waits for you.")}</small>
+				<div class="auto-opts" role="radiogroup" aria-label="${esc(t("How much can Otium do on its own?"))}">${[["all", "Ask me before every choice", "Flights and stay too, not only payments."], ["default", "Ask before payments and my details", "Recommended. Searching and comparing run alone."], ["limit", "Pay alone up to a limit", "Small payments go through; bigger ones wait."]].map(([v, a, b]) => `<button type="button" role="radio" class="auto-opt" data-auto="${v}" aria-checked="${st.autonomy === v}"><b>${t(a)}</b><small>${t(b)}</small></button>`).join("")}</div>
+				${st.autonomy === "limit" ? `<div class="auto-lim"><span>${t("Limit")}</span><input class="range" type="range" min="0" max="${AUTO_STEPS.length - 1}" step="1" value="${Math.max(0, AUTO_STEPS.map((v) => fromLocal(v * cur()[2])).findIndex((v) => Math.abs(v - st.autoLimit) < 1))}" id="autoRange" aria-label="${esc(t("Limit"))}"><b class="num" id="autoVal">${eur(st.autoLimit)}</b></div>` : ""}</div>
+			${row("r1", st.autonomy === "limit" ? "Ask before payments over the limit" : "Ask before any payment", "Holds, bookings and upgrades.", true, true)}
 			${row("r2", "Ask before sharing my details", "Names, passports, phone, email.", true, true)}
 			${row("r3", "Ask again if a price goes up", "Even by £1 after you approved.", true, true)}
 			${row("refundable", "Prefer refundable stays", "Picks free cancellation when one fits.", st.refundable, false)}
 			${row("activities", "Draft activities for me", "Off = Otium leaves your days free.", st.activities, false)}`;
 		$("#capRange").oninput = (e) => { st.cap = capList()[+e.target.value]; $("#capVal").textContent = eur(st.cap); };
+		$("#rules").querySelectorAll("[data-auto]").forEach((b) => (b.onclick = () => { if (st.autonomy === b.dataset.auto) return; const was = st.autonomy; st.autonomy = b.dataset.auto; if (st.autonomy === "limit") st.autoLimit = fromLocal(AUTO_STEPS[2] * cur()[2]); log("You", t("Changed autonomy to “{x}”", { x: b.querySelector("b").textContent })); renderRules(); toast(t("Saved. Applies from the next step."), t("Undo"), () => { st.autonomy = was; renderRules(); }); }));
+		const ar = $("#autoRange"); if (ar) ar.oninput = (e) => { st.autoLimit = fromLocal(AUTO_STEPS[+e.target.value] * cur()[2]); $("#autoVal").textContent = eur(st.autoLimit); };
 		$("#refundable").onchange = (e) => { st.refundable = e.target.checked; log("You", t(st.refundable ? "Turned on “{x}”" : "Turned off “{x}”", { x: t("Prefer refundable stays") })); };
 		$("#activities").onchange = (e) => { st.activities = e.target.checked; log("You", t(st.activities ? "Turned on “{x}”" : "Turned off “{x}”", { x: t("Draft activities for me") })); if (S.plan && S.progress.days === "ready") renderTrip(); };
 	}
@@ -1810,7 +1902,7 @@
 	 * can be moved to any free seat, or swapped with each other. Choices are kept per flight (outbound / return). */
 	const ROWS = 30, COLS = "ABCDEF";
 	const seatRow0 = () => ({ Business: 2, "Premium economy": 8 }[costs(S.plan).fl.cabin] || 14);
-	const defaultSeat = (n) => `${seatRow0() + Math.floor(n / 6)}${COLS[n % 6]}`;
+	const defaultSeat = (n) => { const row0 = ME.assist === "legroom" || ME.assist === "baby" ? (seatRow0() > 10 ? 10 : seatRow0()) : seatRow0(); const order = ME.assist === "wheelchair" ? "CBADEF" : COLS; return `${row0 + Math.floor(n / 6)}${order[n % 6]}`; };
 	const seat = (n, j = 0) => S.held.seats?.[j]?.[n] || defaultSeat(n);
 	const seatKind = (letter) => ("AF".includes(letter) ? "Window seat" : "CD".includes(letter) ? "Aisle seat" : "Middle seat");
 	const SEATUI = { j: 0, n: 0, from: null };
@@ -1820,6 +1912,7 @@
 		for (let r = 1; r <= ROWS; r++) for (const c of COLS) { const id = `${r}${c}`; let h = hashN(key + ":" + id); h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995) >>> 0; h ^= h >>> 15; if (!mine.has(id) && h % 100 < 64) out.add(id); }
 		return out;
 	}
+	const recSeat = (r, c) => (ME.assist === "wheelchair" ? "CD".includes(c) : ME.assist === "legroom" ? r === 1 || r === 10 || r === 11 : ME.assist === "baby" ? r === 1 || r === 10 : false);
 	function seatMap(travelers) {
 		const L = legs(), j = Math.min(SEATUI.j, L.length - 1), n0 = Math.min(SEATUI.n, travelers - 1);
 		const taken = takenSeats(j), mine = Array.from({ length: travelers }, (_, n) => seat(n, j));
@@ -1834,7 +1927,7 @@
 			g += `<text x="${rx(k) + W / 2}" y="14" class="sm-l">${r}</text>`;
 			COLS.split("").forEach((c, i) => {
 				const id = `${r}${c}`, who = mine.indexOf(id), isTaken = taken.has(id);
-				const cls = who >= 0 ? (who === n0 ? "sm-on" : "sm-mine") : isTaken ? "sm-x" : "sm-s";
+				const cls = who >= 0 ? (who === n0 ? "sm-on" : "sm-mine") : isTaken ? "sm-x" : recSeat(r, c) ? "sm-s sm-rec" : "sm-s";
 				const lab = who >= 0 ? t("{s}: {w}", { s: id, w: who === 0 && ME.first ? fullName() : t("Traveller {n}", { n: who + 1 }) }) : t(isTaken ? "{s}: taken" : "{s}: free", { s: id });
 				g += `<g class="sm-seat${isTaken ? "" : " pick"}" ${isTaken ? "" : `data-seat="${id}" role="button" tabindex="0"`} aria-label="${esc(lab)}"><title>${esc(lab)}</title><rect x="${rx(k)}" y="${cy(i)}" width="${W}" height="${H}" rx="5" class="${cls}"/>${who >= 0 ? `<text x="${rx(k) + W / 2}" y="${cy(i) + 15}" class="sm-t">${who + 1}</text>` : ""}</g>`;
 			});
@@ -1848,7 +1941,7 @@
 			<div class="sp-stats"><span><b>${total}</b> ${t("seats")}</span><span><b>${used}</b> ${t("passengers on board")}</span><span class="free"><b>${total - used}</b> ${t("free")}</span></div></div>
 			<div class="seatmap"><div class="sp-plane"><button type="button" class="icon-btn sp-pg" data-seat-pg="-1" aria-label="${esc(t("Front rows"))}"${from <= 1 ? " disabled" : ""}>${ic("chevron-left")}</button><svg viewBox="0 0 ${w} ${h}" role="group" aria-label="${esc(t("Your seats on the plane"))}">${g}</svg><button type="button" class="icon-btn sp-pg" data-seat-pg="1" aria-label="${esc(t("Back rows"))}"${from + span - 1 >= ROWS ? " disabled" : ""}>${ic("chevron-right")}</button></div>
 			<ul>${mine.map((x, n) => `<li><button type="button" class="sp-who" data-seat-trav="${n}" aria-pressed="${n === n0}"><span class="sp-n">${n + 1}</span><b>${x}</b><span>${esc(nm(n))}</span><em>${t(seatKind(x.slice(-1)))}</em></button></li>`).join("")}</ul></div>
-			<div class="sp-legend"><span><i class="lg-on"></i>${t("Your seats")}</span><span><i class="lg-s"></i>${t("Free")}</span><span><i class="lg-x"></i>${t("Taken")}</span><small>${t("Pick a traveller, then tap a free seat. Tap another traveller’s seat to swap.")}</small></div>
+			<div class="sp-legend"><span><i class="lg-on"></i>${t("Your seats")}</span><span><i class="lg-s"></i>${t("Free")}</span><span><i class="lg-x"></i>${t("Taken")}</span>${ME.assist ? `<span><i class="lg-rec"></i>${t("Good for: {x}", { x: t((ASSIST.find((a) => a[0] === ME.assist) || ["", ""])[1]).toLowerCase() })}</span>` : ""}<small>${t("Pick a traveller, then tap a free seat. Tap another traveller’s seat to swap.")}</small></div>
 		</div>`;
 	}
 	function refreshSeats() {
@@ -2001,7 +2094,7 @@
 		const who = (n) => (n === 0 && ME.first ? fullName() : T("Traveller {n}", { n: n + 1 }));
 		const st = k.st, stEn = en ? EN_CITIES[p.city].stays.find((x) => x.id === st.id) || st : st;
 		const sec = [];
-		sec.push({ title: T("Overview"), rows: [[T("Destination"), `${c.name}, ${c.country}`], [T("Dates"), `${day(d.out)} – ${day(d.back)} · ${en ? `${p.nights} night${p.nights > 1 ? "s" : ""}` : P(p.nights, "1 night", "{n} nights")}`], [T("Travellers"), Array.from({ length: p.travelers }, (_, n) => who(n)).join(", ")], [T("From"), en ? S.origin : on(S.origin)], [T("Status"), T(h.flights || h.stay ? "Held · simulated, nothing charged" : "Draft · nothing booked")]] });
+		sec.push({ title: T("Overview"), rows: [[T("Destination"), `${c.name}, ${c.country}`], [T("Dates"), `${day(d.out)} – ${day(d.back)} · ${en ? `${p.nights} night${p.nights > 1 ? "s" : ""}` : P(p.nights, "1 night", "{n} nights")}`], [T("Travellers"), Array.from({ length: p.travelers }, (_, n) => who(n)).join(", ")], [T("From"), en ? S.origin : on(S.origin)], [T("Status"), T(h.flights || h.stay ? "Held · simulated, nothing charged" : "Draft · nothing booked")], ...(ME.assist ? [[T("Travel assistance"), T((ASSIST.find((a) => a[0] === ME.assist) || ["", "None"])[1]) + " · " + T("requested with the airline (simulated)")]] : []), ...(S.progress.coOk ? [[T("Also approved by"), S.progress.coOk]] : [])] });
 		if (h.flights) L.forEach((l, j) => {
 			const [hh, mm] = l.dep.split(":").map(Number), at = (m) => `${String(Math.floor(((m + 1440) % 1440) / 60)).padStart(2, "0")}:${String((m + 1440) % 60).padStart(2, "0")}`;
 			sec.push({ title: `${T(l.dir === "Return" ? "Return flight" : "Outbound flight")} · ${l.from} ${en ? "to" : "→"} ${l.to}`, rows: [[T("Date"), day(l.date)], [T("Flight"), `${k.fl.airline} ${l.flight} · ${T(k.fl.cabin)}`], [T("Departs"), `${l.dep} · ${l.fromN}`], [T("Arrives"), `${l.arr} · ${l.toN}`], [T("Be there by"), at(hh * 60 + mm - 120)], [T("Check-in closes"), at(hh * 60 + mm - 45)], [T("Boarding"), `${l.board} · ${T("Gate")} ${l.gate}`], [T("Bags"), T(k.fl.bags ? "Cabin + checked bag" : "Cabin bag only")], [T("Booking"), h.flights.code], ...Array.from({ length: p.travelers }, (_, n) => [T("Seat"), `${seat(n, j)} · ${who(n)} · ${T(seatKind(seat(n, j).slice(-1)))}`])] });
@@ -2043,6 +2136,59 @@
 		doc.save(`otium-${S.plan.city}-summary.pdf`);
 		log("You", t("Downloaded the trip summary (PDF)"));
 	}
+
+	/* ---------------- guided tour: the whole idea in about a minute ---------------- */
+	const TOUR = { on: false, i: 0, timer: null };
+	const TOUR_STEPS = [
+		["Describe a trip in your own words", "Otium reads the request with AI and shows what it understood — anything it assumed is dashed, so you can change it."],
+		["It searches on its own", "Flights, a stay and your days are compared automatically. Each step says “Automatic” or “Needs you”, and tells you why it chose."],
+		["It stops before paying", "Spending money always waits for you. Change something and No are as visible as Yes. You can also ask a co-traveller to approve."],
+		["It asks again before sharing your details", "Names and passports go to the airline only after a second, separate OK — paying and sharing personal data are different consents."],
+		["Booked — and still in your hands", "Tickets, invoice, seats and a full summary are ready. Every booking can be cancelled from this page, and the history keeps a receipt of every action."],
+		["It keeps working for you", "After booking, Otium watches prices. If your stay gets cheaper, it comes back and asks before rebooking. You set how much it can do alone in Permissions."],
+	];
+	function tourCard(i, actions = "") {
+		let el = $("#tourCard"); if (!el) { el = document.createElement("div"); el.id = "tourCard"; el.className = "otour"; el.setAttribute("role", "dialog"); el.setAttribute("aria-live", "polite"); document.body.append(el); }
+		const [h, b] = TOUR_STEPS[i];
+		el.innerHTML = `<div class="ot-top"><span class="ot-n">${t("Guided tour")} · ${i + 1}/${TOUR_STEPS.length}</span><button type="button" class="btn btn-text btn-sm" data-tour="skip">${t("End the tour")}</button></div><b>${t(h)}</b><p>${t(b)}</p><div class="ot-bar"><i style="width:${((i + 1) / TOUR_STEPS.length) * 100}%"></i></div>${actions ? `<div class="row">${actions}</div>` : ""}`;
+		el.hidden = false; requestAnimationFrame(() => el.classList.add("on"));
+	}
+	const tourHL = (sel) => { document.querySelectorAll(".tour-hl").forEach((x) => x.classList.remove("tour-hl")); const e = sel && document.querySelector(sel); if (e) { e.classList.add("tour-hl"); const head = document.querySelector(".top")?.offsetHeight || 70; const r = e.getBoundingClientRect(); if (r.top < head || r.bottom > innerHeight - 180) window.scrollTo({ top: r.top + scrollY - head - 24, behavior: reduced ? "auto" : "smooth" }); } };
+	function endTour(silent) {
+		TOUR.on = false; clearInterval(TOUR.timer); tourHL(null);
+		const el = $("#tourCard"); if (el) { el.classList.remove("on"); setTimeout(() => (el.hidden = true), 250); }
+		if (!silent) toast(t("Tour ended. Everything stays — plan your own trip whenever you like."));
+	}
+	async function startTour() {
+		if (TOUR.on) return; TOUR.on = true; TOUR.i = 0;
+		if (!ME.signedIn) { Object.assign(ME, { signedIn: true, email: "alex.martin@otium.example", first: "Alex", last: "Martin", phone: "+44 20 7946 0000", dob: "14/03/1990", passport: "X1234567", street: "12 Harbour Lane", city: "London", zip: "N1 7GU", country: "GB", card: { brand: "Visa", last4: "4242", exp: "12/29", name: "Alex Martin" } }); profileChanged(); }
+		show("home"); window.scrollTo({ top: 0, behavior: "auto" }); tourCard(0); tourHL(".composer");
+		const q = t(EXAMPLES[0]), a = $("#ask"); a.value = "";
+		if (reduced) a.value = q; else for (let k = 1; k <= q.length && TOUR.on; k += 2) { a.value = q.slice(0, k); fitAsk(); await new Promise((r) => setTimeout(r, 28)); }
+		if (!TOUR.on) return;
+		a.value = q; fitAsk(); await new Promise((r) => setTimeout(r, 500)); if (!TOUR.on) return;
+		start(q, false, "normal", null);
+		let shown = 0;
+		const go = (i, sel, actions) => { if (shown === i + 1) return; shown = i + 1; tourCard(i, actions); setTimeout(() => tourHL(sel), 150); };
+		TOUR.timer = setInterval(() => {
+			if (!TOUR.on) return;
+			if ($("#trip").hidden) return;
+			const hold = $("#step-hold .card.ask"), share = $("#step-share .card.ask"), done = $("#tripCanvas .done-banner"), watch = $("#step-watch");
+			if (watch && shown >= 5) go(5, "#step-watch", `<button type="button" class="btn btn-primary btn-sm" data-tour="own">${t("Plan your own trip")}</button><a class="btn btn-ghost btn-sm" href="/lab/otium">${t("Read the case study")}</a>`);
+			else if (done) go(4, "#tripCanvas .done-banner");
+			else if (share) go(3, "#step-share .card.ask", `<button type="button" class="btn btn-primary btn-ok btn-sm" data-tour="yes">${t("Share for me")}</button>`);
+			else if (hold) go(2, "#step-hold .card.ask", `<button type="button" class="btn btn-primary btn-ok btn-sm" data-tour="yes">${t("Approve for me")}</button>`);
+			else if (shown < 2 && $("#step-flights")) go(1, "#steps");
+		}, 350);
+	}
+	document.addEventListener("click", (e) => {
+		const b = e.target.closest("[data-tour]"); if (!b) return;
+		const a = b.dataset.tour;
+		if (a === "start") return startTour();
+		if (a === "skip") return endTour();
+		if (a === "own") { endTour(true); show("home"); $("#ask").value = ""; $("#ask").focus(); return; }
+		if (a === "yes") { const c = document.querySelector(".tour-hl [data-choice=\"yes\"]"); c?.click(); }
+	});
 
 	function postit() {
 		let seen = false; try { seen = sessionStorage.getItem("otium-demo-note") === "1"; } catch {}
@@ -2090,6 +2236,13 @@
 		NOTES.forEach((n) => (n.msg = rs(n.msg)));
 		BOT.msgs.forEach((m) => { if (m.local) m.text = rs(m.text); });
 	}
+	function fixNames() {
+		const ob = $("#originBtn"), wb = $("#whenBtn"), lb = $("#langBtn");
+		if (ob) ob.setAttribute("aria-label", `${$("#originVal").textContent} — ${t("Departure city")}`);
+		if (wb) wb.setAttribute("aria-label", `${$("#whenVal").textContent} — ${t("Travel dates")}`);
+		if (lb) lb.setAttribute("aria-label", `${$("#langCode").textContent} — ${t("Language")}`);
+	}
+	function syncInert() { document.querySelectorAll(".drawer").forEach((d) => { const h = d.getAttribute("aria-hidden") === "true"; d.inert = h; }); }
 	let PREV_RATE = 1;
 	function setLang(l) {
 		const prev = I.lang; PREV_RATE = cur()[1];
@@ -2104,6 +2257,7 @@
 		if (prev !== I.lang) retranslateTrips(prev);
 		if (S.plan) { renderUnderstood(); renderTrip(); }
 		renderTripsNav(); renderLog(); renderNotes(); botLabels(); renderBot(); renderAcct(); renderMenu(); if (!$("#profile").hidden) renderProfile();
+		fixNames();
 	}
 
 	/* ---------------- boot ---------------- */
@@ -2111,10 +2265,14 @@
 	let startLang = "en"; try { startLang = localStorage.getItem("otium-lang") || "en"; } catch {}
 	if (q.get("lang")) startLang = q.get("lang");
 	I.set(startLang); applyCityLang();
+	syncInert(); document.querySelectorAll(".drawer").forEach((d) => new MutationObserver(syncInert).observe(d, { attributes: true, attributeFilter: ["aria-hidden"] }));
+	new MutationObserver(fixNames).observe(document.querySelector("#composer") || document.body, { subtree: true, characterData: true, childList: true });
+	loadTrips(); addEventListener("pagehide", saveTrips); document.addEventListener("visibilitychange", () => { if (document.hidden) saveTrips(); }); setInterval(saveTrips, 4000);
 	initHome(); initBudget(); initWhen(); initBot(); initAcct(); initGallery(); initMenu(); initScrollers(); initLang(); renderLog(); setLang(I.lang);
 	postit();
 	renderScen();
 	if (q.get("from") && D.origins.some(([n]) => n === q.get("from"))) { S.origin = q.get("from"); $("#originVal").textContent = S.origin; renderListings(); renderBudget(false); }
+	if (q.get("tour")) setTimeout(startTour, 600);
 	if (q.get("state")) { const st = STATES.find((x) => x[0] === q.get("state")); if (st) { $("#ask").value = st[3]; start(st[3], false, st[0], st); } }
 	else if (q.get("q")) { $("#ask").value = q.get("q"); start(q.get("q")); }
 })();
