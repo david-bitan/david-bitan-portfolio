@@ -24,8 +24,17 @@ Rules:
 Reply with ONE JSON object and nothing else. The JSON keys stay in English exactly as shown, whatever the output language.`;
 
 const MODES = {
+	report: { tokens: 1900, prompt: `${BASE}
+Task: help the reader understand the document at once, without them asking anything. Five groups:
+- "short": 2 to 4 very simple sentences saying what the document is and what it means for the reader, in everyday words (no jargon);
+- "favour": rights, benefits and protections in the reader's favour;
+- "against": what could work against the reader (things they lose, pay, give up, or rights the other side keeps);
+- "watch": deadlines, conditions, limits or steps the reader must not miss;
+- "facts": the key dates, amounts, durations and numbers, one per item.
+Format: {"short": [{"text": "...", "cite": ["c1"]}], "favour": [...], "against": [...], "watch": [...], "facts": [...]}
+2 to 4 items per group (facts up to 5), the most important first, each under 30 words. An empty group is fine.` },
 	ask: { tokens: 600, prompt: `${BASE}
-Task: answer the QUESTION.
+Task: answer the QUESTION. It may follow up on the SUMMARY or the EARLIER ANSWERS shown to the reader: use them to understand what the question refers to, but cite only passages.
 Format: {"found": true|false, "answer": [{"text": "one sentence", "cite": ["c1"]}]}
 If the passages do not answer it, reply {"found": false, "answer": []}. If they answer part of it, answer only that part. 1 to 4 sentences.` },
 	summary: { tokens: 1600, prompt: `${BASE}
@@ -72,7 +81,12 @@ function repair(body) {
 	return null;
 }
 // The model sometimes translates the keys: accept the usual variants.
-const ALIAS = { favour: ["favour", "favor", "in_your_favour", "faveur", "en_votre_faveur", "pour_vous", "לטובתך", "benefits", "rights"], obligations: ["obligations", "obligation", "vos_obligations", "devoirs", "חובות", "duties"], watch: ["watch", "watch_out", "a_surveiller", "à_surveiller", "surveiller", "attention", "risques", "שימו_לב", "שים_לב", "risks"] };
+const ALIAS = { short: ["short", "in_short", "en_bref", "summary", "résumé", "בקצרה"], against: ["against", "against_you", "contre_vous", "défaveur", "en_votre_défaveur", "נגדך", "נגדכם", "cons"], facts: ["facts", "key_facts", "key_dates", "chiffres", "dates", "עובדות", "מספרים"], favour: ["favour", "favor", "in_your_favour", "faveur", "en_votre_faveur", "pour_vous", "לטובתך", "benefits", "rights"], obligations: ["obligations", "obligation", "vos_obligations", "devoirs", "חובות", "duties"], watch: ["watch", "watch_out", "a_surveiller", "à_surveiller", "surveiller", "attention", "risques", "שימו_לב", "שים_לב", "risks"] };
+const context = (b) => {
+	const rep = typeof b?.report === "string" && b.report.trim() ? `\n\nSUMMARY ALREADY SHOWN TO THE READER:\n${b.report.slice(0, 2500)}` : "";
+	const h = (Array.isArray(b?.history) ? b.history : []).slice(-3).filter((x) => x && typeof x.q === "string").map((x) => `Q: ${x.q.slice(0, 300)}\nA: ${String(x.a || "").slice(0, 600)}`).join("\n");
+	return rep + (h ? `\n\nEARLIER ANSWERS:\n${h}` : "");
+};
 const pick = (obj, key) => { const norm = (k) => String(k).toLowerCase().replace(/[\s-]+/g, "_"); for (const [k, v] of Object.entries(obj || {})) if (ALIAS[key].includes(norm(k))) return v; return obj?.[key]; };
 const clean = (arr, ids) => (Array.isArray(arr) ? arr : []).slice(0, 8)
 	.map((s) => ({ text: String(s?.text || "").replace(/[*#`]/g, "").trim().slice(0, 500), cite: (Array.isArray(s?.cite) ? s.cite : [s?.cite]).map(String).filter((id) => ids.includes(id)) }))
@@ -82,6 +96,7 @@ export async function onRequestPost({ request, env }) {
 	if (!env.AI) return bad(503, "ai_not_configured");
 	let body;
 	try { body = await request.json(); } catch { return bad(400, "invalid_json"); }
+	if (body?.mode === "fetch") return fetchPage(body.url);
 	const out = LANG[body?.lang] || "English";
 	let stage = "run";
 	try {
@@ -96,7 +111,7 @@ export async function onRequestPost({ request, env }) {
 		const mode = MODES[body?.mode] ? body.mode : "ask";
 		const passages = (Array.isArray(body?.passages) ? body.passages : []).slice(0, 80)
 			.filter((p) => p && /^c\d{1,4}$/.test(p.id) && typeof p.text === "string")
-			.map((p) => ({ id: p.id, page: Number.isFinite(+p.page) && p.page ? +p.page : undefined, text: p.text.slice(0, 900) }));
+			.map((p) => ({ id: p.id, page: Number.isFinite(+p.page) && p.page ? +p.page : undefined, doc: typeof p.doc === "string" ? p.doc.slice(0, 80) : undefined, text: p.text.slice(0, 900) }));
 		let total = 0; const kept = passages.filter((p) => (total += p.text.length) <= 14000);
 		const question = typeof body?.question === "string" ? body.question.trim().slice(0, 300) : "";
 		if (!kept.length || (mode === "ask" && !question)) return bad(400, "empty_request");
@@ -104,7 +119,7 @@ export async function onRequestPost({ request, env }) {
 		const r = await env.AI.run(MODEL, {
 			messages: [
 				{ role: "system", content: `${MODES[mode].prompt}\nOUTPUT LANGUAGE: ${out}` },
-				{ role: "user", content: `PASSAGES:\n${kept.map((p) => `[${p.id}${p.page ? `, page ${p.page}` : ""}] ${p.text}`).join("\n")}${mode === "ask" ? `\n\nQUESTION: ${question}` : ""}` },
+				{ role: "user", content: `PASSAGES:\n${kept.map((p) => `[${p.id}${p.doc ? `, ${p.doc}` : ""}${p.page ? `, page ${p.page}` : ""}] ${p.text}`).join("\n")}${mode === "ask" ? `${context(body)}\n\nQUESTION: ${question}` : ""}` },
 			],
 			max_tokens: MODES[mode].tokens,
 			temperature: 0.1,
@@ -112,6 +127,7 @@ export async function onRequestPost({ request, env }) {
 		stage = "parse";
 		const obj = parse(r?.response);
 		if (!obj) return bad(502, "unparsable", String(typeof r?.response === "string" ? r.response : JSON.stringify(r?.response)).slice(0, 300));
+		if (mode === "report") { const keys = ["short", "favour", "against", "watch", "facts"], out = {}; for (const k of keys) out[k] = clean(pick(obj, k), ids); if (keys.every((k) => !out[k].length)) out.debug = String(typeof r?.response === "string" ? r.response : JSON.stringify(r?.response)).slice(0, 300); return ok(out); }
 		if (mode === "summary") { const src = obj.summary && typeof obj.summary === "object" ? obj.summary : obj; return ok({ favour: clean(pick(src, "favour"), ids), obligations: clean(pick(src, "obligations"), ids), watch: clean(pick(src, "watch"), ids), ...(["favour", "obligations", "watch"].every((k) => !(pick(src, k) || []).length) ? { debug: String(typeof r?.response === "string" ? r.response : JSON.stringify(r?.response)).slice(0, 300) } : {}) }); }
 		if (mode === "simple") return ok({ points: clean(obj.points || obj.answer, ids) });
 		const answer = clean(obj.answer, ids);
@@ -119,6 +135,33 @@ export async function onRequestPost({ request, env }) {
 	} catch (e) {
 		return bad(502, "model_error", `${stage}: ${String(e?.message || e).slice(0, 200)}`);
 	}
+}
+
+/* A link: read the page server-side (the browser can't read other sites), return its text as paragraphs.
+ * Guards: http(s) only, standard ports, no local or private hosts, 2 MB max, 8 s max. PDFs are passed through. */
+const PRIVATE = /^(localhost|.*\.local|.*\.internal|.*\.localhost)$|^(0|10|127)\.|^169\.254\.|^172\.(1[6-9]|2\d|3[01])\.|^192\.168\.|^\[?(::1|f[cd][0-9a-f]{2}:|fe80:)/i;
+async function fetchPage(raw) {
+	let u; try { u = new URL(String(raw || "")); } catch { return bad(400, "bad_url"); }
+	if (!/^https?:$/.test(u.protocol) || (u.port && !["80", "443"].includes(u.port)) || PRIVATE.test(u.hostname) || u.username || u.password) return bad(400, "bad_url");
+	const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
+	try {
+		const r = await fetch(u.href, { redirect: "follow", signal: ctl.signal, headers: { "user-agent": "Mozilla/5.0 (compatible; MarginDemo/1.0; portfolio demo)", accept: "text/html,application/pdf;q=0.9,text/plain;q=0.8" } });
+		if (!r.ok) return bad(502, "fetch_failed", String(r.status));
+		const type = r.headers.get("content-type") || "", len = +(r.headers.get("content-length") || 0);
+		if (len > 2_000_000 * 5) return bad(413, "too_large");
+		if (type.includes("pdf")) { const buf = await r.arrayBuffer(); if (buf.byteLength > 10_000_000) return bad(413, "too_large"); return new Response(buf, { headers: { "content-type": "application/pdf", ...CORS } }); }
+		let html = await r.text(); if (html.length > 2_000_000) html = html.slice(0, 2_000_000);
+		const title = (html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "").replace(/\s+/g, " ").trim().slice(0, 120);
+		const main = html.match(/<(main|article)[\s>][\s\S]*?<\/\1>/i)?.[0] || html;
+		const txt = main
+			.replace(/<(script|style|noscript|svg|nav|header|footer|form|iframe|template)[\s\S]*?<\/\1>/gi, " ")
+			.replace(/<(br|\/p|\/div|\/li|\/h\d|\/tr|\/section|\/article|li|h\d)[^>]*>/gi, "\n")
+			.replace(/<[^>]+>/g, " ")
+			.replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;|&rsquo;/g, "’").replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n));
+		const paragraphs = txt.split(/\n+/).map((s) => s.replace(/\s+/g, " ").trim()).filter((s) => s.length > 1).slice(0, 1500);
+		let total = 0; const kept = paragraphs.filter((p) => (total += p.length) <= 60000);
+		return new Response(JSON.stringify({ title, paragraphs: kept }), { headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS } });
+	} catch { return bad(502, "fetch_failed"); } finally { clearTimeout(to); }
 }
 
 // GET /api/margin → health check.

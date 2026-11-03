@@ -260,6 +260,56 @@ footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-c
 .saved { color: var(--ink-3); font-size: 13.5px; margin: 18px 0 0; }
 .retry { margin-top: 12px; }
 @media (max-width: 640px) { .out .seg { min-width: 0; flex: 1; } .out { width: 100%; } }
+
+/* v0.7: single screen */
+#intro h1 { margin-top: 36px; }
+.inbox { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
+#intro:not([hidden]) + .inbox { margin-top: 0; }
+.ask textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.alt { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.url { flex: 1 1 420px; display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); padding: 6px 6px 6px 14px; min-width: 0; }
+.url:focus-within { border-color: var(--ink); }
+.url > .i { color: var(--ink-3); }
+.url input { flex: 1; min-width: 0; border: 0; outline: none; background: none; font: 400 16px var(--sans); padding: 8px 4px; color: var(--ink); }
+.url .btn:disabled { opacity: .5; cursor: default; }
+.paste { flex: 1 1 100%; background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); padding: 8px; }
+.paste textarea { width: 100%; border: 0; outline: none; resize: vertical; font: 400 15px/1.5 var(--sans); padding: 8px 10px; background: none; min-height: 140px; }
+.paste .row { display: flex; justify-content: flex-end; gap: 8px; }
+.inbox-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px 24px; flex-wrap: wrap; }
+.inbox-foot .privacy { margin: 0; flex: 1 1 360px; }
+.sample { margin-top: 0; }
+#report { margin-top: 28px; }
+.rep { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px; }
+.rep-h { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.rep-h h2 { margin: 0; font-size: clamp(22px, 2.6vw, 28px); }
+.rep-h .kind { display: block; font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 6px; }
+.short { font-size: 18px; line-height: 1.65; margin: 16px 0 6px; }
+.short .pt { display: inline; }
+.grid4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+.box { background: var(--paper); border-radius: var(--r-md); padding: 14px 16px; }
+.box h3 { margin: 0 0 10px; display: flex; gap: 8px; align-items: center; font-size: 16px; }
+.box h3 .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.box.fav .dot { background: var(--ok); } .box.aga .dot { background: var(--bad); } .box.wat .dot { background: var(--warn); } .box.fac .dot { background: var(--ink); }
+.box ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.box li { font-size: 15.5px; line-height: 1.5; }
+.box .empty { color: var(--ink-3); font-size: 14px; margin: 0; }
+.where { border: 0; background: none; padding: 0 2px; margin-inline-start: 6px; color: var(--ink-3); font-size: 13px; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.where:hover { color: var(--ink); }
+.where[aria-expanded="true"] { color: var(--ink); text-decoration-color: #E3C431; }
+.proof { margin-top: 8px; }
+.proof .src { background: var(--surface); }
+.rep-foot { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-top: 16px; font-size: 13.5px; color: var(--ink-2); }
+.qa { margin: 28px 0 64px; }
+.thread { display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px; }
+.turn { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px 20px; }
+.turn .q { font-weight: 700; font-size: 18px; letter-spacing: -.01em; margin: 0 0 8px; }
+.turn .a { font-size: 17px; line-height: 1.6; margin: 0; }
+.turn .t-acts { display: flex; flex-wrap: wrap; gap: 2px; margin: 8px 0 0; margin-inline-start: -10px; }
+.analysing { display: flex; flex-direction: column; gap: 10px; }
+.turn .a.busy { display: flex; gap: 8px; align-items: center; color: var(--ink-3); }
+.turn .where { font-size: 12.5px; }
+.reanalyse { margin-top: 12px; }
+@media (max-width: 760px) { .grid4 { grid-template-columns: minmax(0, 1fr); } .rep { padding: 18px; } .short { font-size: 17px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
 </style>
 </head>
@@ -275,14 +325,12 @@ footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-c
 </div></header>
 
 <main class="wrap">
-	<ol class="steps" id="steps">
-		<li data-step="1"><span class="n">1</span><span class="lbl" data-t="Your files">Your files</span></li>
-		<li data-step="2"><span class="n">2</span><span class="lbl" data-t="Understand">Understand</span></li>
-	</ol>
-
-	<section id="s1">
+	<section id="intro">
 		<h1 data-t="Understand any document — and see where it says it.">Understand any document — and see where it says it.</h1>
-		<p class="lead" data-t="Add a PDF or a Word file. Ask a question, get the essentials, or have it explained simply — every answer shows the exact passage it comes from, highlighted in your document.">Add a PDF or a Word file.</p>
+		<p class="lead" data-t="Add a file, a link or some text. You get the essentials at once — what’s in your favour, what could work against you, what to watch — and you can ask anything after.">Add a file, a link or some text.</p>
+	</section>
+
+	<section class="inbox" id="inbox">
 		<ul class="files" id="files" aria-live="polite"></ul>
 		<label class="drop" id="drop" for="fileIn">
 			<span data-ic="file-up"></span>
@@ -292,6 +340,20 @@ footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-c
 			<small data-t="PDF or Word (.docx) · up to 60 pages · 20 MB">PDF or Word (.docx) · up to 60 pages · 20 MB</small>
 			<input type="file" id="fileIn" multiple accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
 		</label>
+		<div class="alt" id="alt">
+			<form class="url" id="urlForm" autocomplete="off">
+				<span data-ic="link"></span>
+				<label class="sr" for="urlIn" data-t="Paste a link">Paste a link</label>
+				<input id="urlIn" type="url" inputmode="url" data-t-ph="Or paste a link — terms of use, a contract online…" placeholder="Or paste a link">
+				<button class="btn btn-sm" type="submit" id="urlGo" disabled data-t="Read it">Read it</button>
+			</form>
+			<button type="button" class="btn btn-text btn-sm" id="pasteBtn" aria-expanded="false" aria-controls="pasteBox"><span data-ic="clipboard-paste"></span><span data-t="Or paste the text">Or paste the text</span></button>
+			<div class="paste" id="pasteBox" hidden>
+				<label class="sr" for="pasteIn" data-t="Paste the text here">Paste the text here</label>
+				<textarea id="pasteIn" rows="6" data-t-ph="Paste the text here"></textarea>
+				<div class="row"><button type="button" class="btn btn-text btn-sm" id="pasteCancel" data-t="Cancel">Cancel</button><button type="button" class="btn btn-ink btn-sm" id="pasteOk" disabled data-t="Use this text">Use this text</button></div>
+			</div>
+		</div>
 		<div class="err" id="err1" role="alert" hidden></div>
 		<div class="sample" id="sample">
 			<span class="i-big"><span data-ic="clipboard-list"></span></span>
@@ -303,35 +365,22 @@ footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-c
 				<button type="button" class="btn btn-text btn-sm" id="openSample" data-t="or open it directly">or open it directly</button>
 			</div>
 		</div>
-		<p class="privacy"><span data-ic="lock"></span><span data-t="Your file is read in this browser. Only the passages needed for an answer are sent to the AI, and nothing is kept: close the page and it’s gone. Demo — avoid very personal documents.">Your file is read in this browser.</span></p>
-		<div class="nav-row"><span></span><button type="button" class="btn btn-ink" id="next1" disabled><span data-t="Continue">Continue</span><span data-ic="arrow-right" class="flip-ic"></span></button></div>
-	</section>
-
-	<section id="s2" hidden>
-		<div class="s2-top">
-			<button type="button" class="btn btn-sm" id="back2"><span data-ic="arrow-left" class="flip-ic"></span><span data-t="Back">Back</span></button>
-			<span class="s2-files" id="s2files"></span>
-		</div>
-		<div class="s2-head">
-			<h2 data-t="What would you like to do?">What would you like to do?</h2>
+		<div class="inbox-foot">
+			<p class="privacy"><span data-ic="lock"></span><span data-t="Your file is read in this browser. Only the passages needed for an answer are sent to the AI, and nothing is kept: close the page and it’s gone. Demo — avoid very personal documents.">Your file is read in this browser.</span></p>
 			<div class="out"><span class="seg-l" id="outL" data-t="Answer me in">Answer me in</span><div class="seg" id="outLang" role="group" aria-labelledby="outL"></div></div>
 		</div>
-		<div class="tools" role="group">
-			<button type="button" class="tool" data-tool="summary" aria-expanded="false"><span class="ti"><span data-ic="list-checks"></span></span><b data-t="Summarize the essentials">Summarize the essentials</b><span data-t="In your favour, your obligations, what to watch">In your favour, your obligations, what to watch</span></button>
-			<button type="button" class="tool" data-tool="ask" aria-expanded="false" aria-controls="askPanel"><span class="ti"><span data-ic="message-square-text"></span></span><b data-t="Ask a question">Ask a question</b><span data-t="Anything about this document">Anything about this document</span></button>
-			<button type="button" class="tool" data-tool="simple" aria-expanded="false"><span class="ti"><span data-ic="wand-sparkles"></span></span><b data-t="Explain simply">Explain simply</b><span data-t="The main points in everyday words">The main points in everyday words</span></button>
-			<button type="button" class="tool" data-tool="listen" id="listenTool"><span class="ti"><span data-ic="volume-2"></span></span><b id="listenLbl" data-t="Listen">Listen</b><span data-t="Read the last answer aloud">Read the last answer aloud</span></button>
-		</div>
-		<div class="panel" id="askPanel" hidden>
-			<form class="ask" id="askForm" autocomplete="off">
-				<label class="sr" for="q" data-t="Your question about the document">Your question about the document</label>
-				<textarea id="q" rows="1" maxlength="300" data-t-ph="Your question…"></textarea>
-				<button class="go" type="submit" disabled><span data-t="Ask">Ask</span><span data-ic="arrow-right" class="flip-ic"></span></button>
-			</form>
-			<div class="tries" id="tries"></div>
-		</div>
-		<p class="saved" data-t="Nothing is saved: closing the page forgets the document.">Nothing is saved.</p>
-		<div class="results" id="results" aria-live="polite"></div>
+	</section>
+
+	<section id="report" aria-live="polite"></section>
+
+	<section class="qa" id="qa" hidden>
+		<div class="thread" id="thread"></div>
+		<form class="ask" id="askForm" autocomplete="off">
+			<label class="sr" for="q" data-t="A question about this document?">A question about this document?</label>
+			<textarea id="q" rows="1" maxlength="300" data-t-ph="A question about this document?"></textarea>
+			<button class="go" type="submit" disabled><span data-t="Ask">Ask</span><span data-ic="arrow-right" class="flip-ic"></span></button>
+		</form>
+		<div class="tries" id="tries"></div>
 	</section>
 </main>
 
