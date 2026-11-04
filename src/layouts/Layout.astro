@@ -88,12 +88,9 @@ const personJsonLd = {
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={ogImageUrl} />
 
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap"
-			rel="stylesheet"
-		/>
+		<!-- Manrope, self-hosted (OFL): no request to Google Fonts (GDPR) -->
+		<link rel="preload" href="/fonts/manrope/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+		<link href="/fonts/manrope/fonts.css" rel="stylesheet" />
 		<title>{title}</title>
 
 		<script type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
