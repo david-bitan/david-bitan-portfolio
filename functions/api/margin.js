@@ -24,15 +24,15 @@ Rules:
 Reply with ONE JSON object and nothing else. The JSON keys stay in English exactly as shown, whatever the output language.`;
 
 const MODES = {
-	report: { tokens: 1900, prompt: `${BASE}
+	report: { tokens: 2300, prompt: `${BASE}
 Task: help the reader understand the document at once, without them asking anything. Five groups:
 - "short": 2 to 4 very simple sentences saying what the document is and what it means for the reader, in everyday words (no jargon);
 - "favour": rights, benefits and protections in the reader's favour;
-- "against": what could work against the reader (things they lose, pay, give up, or rights the other side keeps);
-- "watch": deadlines, conditions, limits or steps the reader must not miss;
-- "facts": the key dates, amounts, durations and numbers, one per item.
-Format: {"short": [{"text": "...", "cite": ["c1"]}], "favour": [...], "against": [...], "watch": [...], "facts": [...]}
-2 to 4 items per group (facts up to 5), the most important first, each under 30 words. An empty group is fine.` },
+- "against": what could work against the reader (things they lose, pay, give up, or rights the other side keeps). Prefer concrete, costly or unusual clauses (penalties, fines, deductions, unpaid extra work, one-sided changes, monitoring, restrictions after leaving) over generic ones, and give the amount when there is one;
+- "watch": deadlines, conditions, limits or steps the reader must not miss, with the exact delay or date;
+- "facts": the key dates, amounts, durations and numbers. Each item has "value" (the number as in the document, with its unit, for example "€68,000" or "2 months") and "text" (one plain sentence saying what this number means for the reader, for example "Your yearly salary before tax, paid in 12 monthly parts.").
+Format: {"short": [{"text": "...", "cite": ["c1"]}], "favour": [...], "against": [...], "watch": [...], "facts": [{"value": "...", "text": "...", "cite": ["c2"]}]}
+2 to 4 items per group (facts up to 5), the most important first, each under 30 words. An empty group is fine. Each item must cite the passage that contains its numbers.` },
 	ask: { tokens: 600, prompt: `${BASE}
 Task: answer the QUESTION. It may follow up on the SUMMARY or the EARLIER ANSWERS shown to the reader: use them to understand what the question refers to, but cite only passages.
 Format: {"found": true|false, "answer": [{"text": "one sentence", "cite": ["c1"]}]}
@@ -89,14 +89,45 @@ const context = (b) => {
 };
 const pick = (obj, key) => { const norm = (k) => String(k).toLowerCase().replace(/[\s-]+/g, "_"); for (const [k, v] of Object.entries(obj || {})) if (ALIAS[key].includes(norm(k))) return v; return obj?.[key]; };
 const clean = (arr, ids) => (Array.isArray(arr) ? arr : []).slice(0, 8)
-	.map((s) => ({ text: String(s?.text || "").replace(/[*#`]/g, "").trim().slice(0, 500), cite: (Array.isArray(s?.cite) ? s.cite : [s?.cite]).map(String).filter((id) => ids.includes(id)) }))
+	.map((s) => ({ ...(s?.value ? { value: String(s.value).replace(/[*#`]/g, "").trim().slice(0, 60) } : {}), text: String(s?.text || "").replace(/[*#`]/g, "").trim().slice(0, 500), cite: (Array.isArray(s?.cite) ? s.cite : [s?.cite]).map(String).filter((id) => ids.includes(id)) }))
 	.filter((s) => s.text);
+
+/* Daily budget. Workers AI gives this account 10,000 free "neurons" a day, shared by every demo (Margin, Otium, APEX Coach)
+ * and reset at 00:00 UTC. Margin keeps itself under MARGIN_BUDGET, counted in a KV namespace bound as MARGIN_KV.
+ * Without that binding, Margin still works; it just can't show what's left. */
+const MARGIN_BUDGET = 6000;
+const COST = { report: 500, ask: 300, summary: 450, simple: 400, translate: 80, transcribe: 60 };
+const RATE_IN = 26668 / 1e6, RATE_OUT = 204805 / 1e6, WHISPER_PER_MIN = 46.63;
+const dayKey = () => "used:" + new Date().toISOString().slice(0, 10);
+function nextReset() { const d = new Date(); d.setUTCHours(24, 0, 0, 0); return d.toISOString(); }
+async function quota(env) {
+	if (!env.MARGIN_KV) return null;
+	let used = 0; try { used = +(await env.MARGIN_KV.get(dayKey())) || 0; } catch {}
+	return { used: Math.round(used), limit: MARGIN_BUDGET, reset: nextReset() };
+}
+async function spend(env, n) {
+	if (!env.MARGIN_KV || !(n > 0)) return;
+	try { const k = dayKey(), used = +(await env.MARGIN_KV.get(k)) || 0; await env.MARGIN_KV.put(k, String(Math.round(used + n)), { expirationTtl: 172800 }); } catch {}
+}
+const neurons = (r, promptChars) => { const u = r?.usage || {}; const pin = +u.prompt_tokens || promptChars / 3.5, pout = +u.completion_tokens || String(r?.response ?? "").length / 3.5; return pin * RATE_IN + pout * RATE_OUT; };
 
 export async function onRequestPost({ request, env }) {
 	if (!env.AI) return bad(503, "ai_not_configured");
 	let body;
 	try { body = await request.json(); } catch { return bad(400, "invalid_json"); }
 	if (body?.mode === "fetch") return fetchPage(body.url);
+	const q = await quota(env), cost = COST[body?.mode] || COST.ask;
+	if (q && q.used + cost > q.limit) return new Response(JSON.stringify({ error: "daily_limit", quota: q }), { status: 429, headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS } });
+	const meter = { n: 0 };
+	const res = await handle(body, env, meter);
+	if (!q) return res;
+	await spend(env, meter.n);
+	let j = {}; try { j = await res.clone().json(); } catch { return res; }
+	j.quota = { ...q, used: Math.min(q.limit, Math.round(q.used + meter.n)) };
+	return new Response(JSON.stringify(j), { status: res.status, headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS } });
+}
+async function handle(body, env, meter) {
+	if (body?.mode === "transcribe") return transcribe(env, body.audio, meter);
 	const out = LANG[body?.lang] || "English";
 	let stage = "run";
 	try {
@@ -106,6 +137,7 @@ export async function onRequestPost({ request, env }) {
 				{ role: "system", content: `Translate the user's text into ${out}. Keep numbers, amounts, dates and names exactly. Reply with the translation only, nothing else.` },
 				{ role: "user", content: text },
 			], max_tokens: 700, temperature: 0.1 });
+			meter.n += neurons(r, text.length + 200);
 			return ok({ translation: String(r?.response ?? "").trim().slice(0, 2500) });
 		}
 		const mode = MODES[body?.mode] ? body.mode : "ask";
@@ -119,11 +151,12 @@ export async function onRequestPost({ request, env }) {
 		const r = await env.AI.run(MODEL, {
 			messages: [
 				{ role: "system", content: `${MODES[mode].prompt}\nOUTPUT LANGUAGE: ${out}` },
-				{ role: "user", content: `PASSAGES:\n${kept.map((p) => `[${p.id}${p.doc ? `, ${p.doc}` : ""}${p.page ? `, page ${p.page}` : ""}] ${p.text}`).join("\n")}${mode === "ask" ? `${context(body)}\n\nQUESTION: ${question}` : ""}` },
+				{ role: "user", content: `PASSAGES:\n${kept.map((p) => `[${p.id}${p.doc ? `, ${p.doc}` : ""}${p.page ? `, page ${p.page}` : ""}] ${p.text}`).join("\n")}${mode === "ask" ? `${context(body)}\n\nQUESTION: ${question}` : ""}\n\nWrite every \"text\" in ${out}, even if the question or the document is in another language.` },
 			],
 			max_tokens: MODES[mode].tokens,
 			temperature: 0.1,
 		});
+		meter.n += neurons(r, total + 2500);
 		stage = "parse";
 		const obj = parse(r?.response);
 		if (!obj) return bad(502, "unparsable", String(typeof r?.response === "string" ? r.response : JSON.stringify(r?.response)).slice(0, 300));
@@ -165,12 +198,26 @@ async function fetchPage(raw) {
 }
 
 // GET /api/margin → health check.
-export function onRequestGet({ env }) {
-	return new Response(JSON.stringify({ ok: true, ai: Boolean(env.AI), model: MODEL }), { headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS } });
+export async function onRequestGet({ env }) {
+	return new Response(JSON.stringify({ ok: true, ai: Boolean(env.AI), model: MODEL, quota: await quota(env) }), { headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS } });
 }
 export function onRequestOptions() {
 	return new Response(null, { status: 204, headers: { ...CORS, "access-control-max-age": "86400" } });
 }
 export function onRequest() {
 	return bad(405, "method_not_allowed");
+}
+
+/* Voice → text: a short WAV recorded in the reader's browser, read once by Whisper (OpenAI, MIT licence) on Workers AI. Nothing is kept. */
+const WHISPER = "@cf/openai/whisper-large-v3-turbo";
+async function transcribe(env, audio, meter) {
+	if (typeof audio !== "string" || audio.length < 1000) return bad(400, "empty_audio");
+	if (audio.length > 3500000) return bad(413, "audio_too_long");
+	try {
+		const r = await env.AI.run(WHISPER, { audio });
+		meter.n += Math.max(0.1, (audio.length * 0.75) / 32000 / 60) * WHISPER_PER_MIN;
+		return ok({ text: String(r?.text ?? "").replace(/\s+/g, " ").trim().slice(0, 600), model: WHISPER });
+	} catch (e) {
+		return bad(502, "transcribe_error", String(e?.message || e).slice(0, 200));
+	}
 }

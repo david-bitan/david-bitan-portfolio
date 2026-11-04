@@ -257,8 +257,8 @@ window.MARGIN_I18N = (() => {
 	  "id": "Terjemahan mesin — yang berlaku adalah teks asli yang ditandai.",
 	  "he": "תרגום אוטומטי — המקור המסומן הוא הקובע."
 	 },
-	 "Margin is a fictional product designed and built by David Bitan for his AI Lab. Brevholt Kelmarion and its handbook are invented.": {
-	  "fr": "Margin est un produit fictif conçu et développé par David Bitan pour son AI Lab. Brevholt Kelmarion et son règlement sont inventés.",
+	 "Margin is a fictional product designed and built by David Bitan for his AI Lab. Brevholt Kelmarion and its documents are invented.": {
+	  "fr": "Margin est un produit fictif conçu et développé par David Bitan pour son AI Lab. Brevholt Kelmarion et ses documents sont inventés.",
 	  "es": "Margin es un producto ficticio diseñado y creado por David Bitan para su AI Lab. Brevholt Kelmarion y sus documentos son inventados.",
 	  "pt": "Margin é um produto fictício criado e desenvolvido por David Bitan para o seu AI Lab. A Brevholt Kelmarion e os seus documentos são inventados.",
 	  "de": "Margin ist ein fiktives Produkt, gestaltet und gebaut von David Bitan für sein AI Lab. Brevholt Kelmarion und seine Dokumente sind erfunden.",
@@ -378,8 +378,8 @@ window.MARGIN_I18N = (() => {
 	  "id": "Portofolio",
 	  "he": "תיק עבודות"
 	 },
-	 "Portfolio demo · Margin is a concept by David Bitan. Brevholt Kelmarion and its handbook are invented.": {
-	  "fr": "Démo de portfolio · Margin est un concept de David Bitan. Brevholt Kelmarion et son règlement sont inventés.",
+	 "Portfolio demo · Margin is a concept by David Bitan. Brevholt Kelmarion and its documents are invented.": {
+	  "fr": "Démo de portfolio · Margin est un concept de David Bitan. Brevholt Kelmarion et ses documents sont inventés.",
 	  "es": "Demo de portafolio · Margin es un concepto de David Bitan. Brevholt Kelmarion y sus documentos son inventados.",
 	  "pt": "Demo de portfólio · Margin é um conceito de David Bitan. A Brevholt Kelmarion e os seus documentos são inventados.",
 	  "de": "Portfolio-Demo · Margin ist ein Konzept von David Bitan. Brevholt Kelmarion und seine Dokumente sind erfunden.",
@@ -1224,6 +1224,248 @@ window.MARGIN_I18N = (() => {
 	  "tr": "Portfolyo demosu: lütfen çok kişisel veya gizli belgeler eklemeyin.",
 	  "id": "Demo portofolio: mohon jangan menambahkan dokumen yang sangat pribadi atau rahasia.",
 	  "he": "הדגמה מתיק עבודות: נא לא להוסיף מסמכים אישיים מאוד או חסויים."
+	 },
+	 "Drop one or more files here": {
+	  "fr": "Déposez un ou plusieurs fichiers ici",
+	  "es": "Suelta aquí uno o varios archivos",
+	  "pt": "Solte aqui um ou mais arquivos",
+	  "de": "Eine oder mehrere Dateien hier ablegen",
+	  "it": "Trascina qui uno o più file",
+	  "ru": "Перетащите сюда один или несколько файлов",
+	  "tr": "Bir veya birkaç dosyayı buraya bırakın",
+	  "id": "Letakkan satu atau beberapa file di sini",
+	  "he": "גררו לכאן קובץ אחד או יותר"
+	 },
+	 "PDF, Word, Excel, text or a photo (PNG, JPEG) · up to 60 pages · 20 MB": {
+	  "fr": "PDF, Word, Excel, texte ou photo (PNG, JPEG) · jusqu’à 60 pages · 20 Mo",
+	  "es": "PDF, Word, Excel, texto o una foto (PNG, JPEG) · hasta 60 páginas · 20 MB",
+	  "pt": "PDF, Word, Excel, texto ou uma foto (PNG, JPEG) · até 60 páginas · 20 MB",
+	  "de": "PDF, Word, Excel, Text oder ein Foto (PNG, JPEG) · bis 60 Seiten · 20 MB",
+	  "it": "PDF, Word, Excel, testo o una foto (PNG, JPEG) · fino a 60 pagine · 20 MB",
+	  "ru": "PDF, Word, Excel, текст или фото (PNG, JPEG) · до 60 страниц · 20 МБ",
+	  "tr": "PDF, Word, Excel, metin veya fotoğraf (PNG, JPEG) · en fazla 60 sayfa · 20 MB",
+	  "id": "PDF, Word, Excel, teks, atau foto (PNG, JPEG) · hingga 60 halaman · 20 MB",
+	  "he": "PDF,‏ Word,‏ Excel, טקסט או תמונה (PNG,‏ JPEG) · עד 60 עמודים · 20MB"
+	 },
+	 "This file type isn’t supported. Use a PDF, Word, Excel, text, PNG or JPEG file.": {
+	  "fr": "Ce type de fichier n’est pas pris en charge. Utilisez un fichier PDF, Word, Excel, texte, PNG ou JPEG.",
+	  "es": "Este tipo de archivo no es compatible. Usa un archivo PDF, Word, Excel, de texto, PNG o JPEG.",
+	  "pt": "Este tipo de arquivo não é compatível. Use um arquivo PDF, Word, Excel, de texto, PNG ou JPEG.",
+	  "de": "Dieser Dateityp wird nicht unterstützt. Verwenden Sie eine PDF-, Word-, Excel-, Text-, PNG- oder JPEG-Datei.",
+	  "it": "Questo tipo di file non è supportato. Usa un file PDF, Word, Excel, di testo, PNG o JPEG.",
+	  "ru": "Этот тип файла не поддерживается. Используйте PDF, Word, Excel, текстовый файл, PNG или JPEG.",
+	  "tr": "Bu dosya türü desteklenmiyor. PDF, Word, Excel, metin, PNG veya JPEG dosyası kullanın.",
+	  "id": "Jenis file ini tidak didukung. Gunakan file PDF, Word, Excel, teks, PNG, atau JPEG.",
+	  "he": "סוג הקובץ הזה אינו נתמך. השתמשו בקובץ PDF,‏ Word,‏ Excel, טקסט, PNG או JPEG."
+	 },
+	 "Image": {
+	  "fr": "Image",
+	  "es": "Imagen",
+	  "pt": "Imagem",
+	  "de": "Bild",
+	  "it": "Immagine",
+	  "ru": "Изображение",
+	  "tr": "Görsel",
+	  "id": "Gambar",
+	  "he": "תמונה"
+	 },
+	 "I could read almost no text in this image. Try a sharper, straight photo.": {
+	  "fr": "Je n’ai presque pas pu lire de texte dans cette image. Essayez une photo plus nette et bien droite.",
+	  "es": "Casi no pude leer texto en esta imagen. Prueba con una foto más nítida y recta.",
+	  "pt": "Quase não consegui ler texto nesta imagem. Tente uma foto mais nítida e reta.",
+	  "de": "Ich konnte in diesem Bild kaum Text lesen. Versuchen Sie ein schärferes, gerades Foto.",
+	  "it": "Non sono riuscito a leggere quasi nessun testo in questa immagine. Prova una foto più nitida e dritta.",
+	  "ru": "Мне почти не удалось прочитать текст на этом изображении. Попробуйте более чёткое и ровное фото.",
+	  "tr": "Bu görselde neredeyse hiç metin okuyamadım. Daha net ve düz bir fotoğraf deneyin.",
+	  "id": "Saya hampir tidak bisa membaca teks di gambar ini. Coba foto yang lebih tajam dan lurus.",
+	  "he": "כמעט לא הצלחתי לקרוא טקסט בתמונה הזו. נסו תמונה חדה וישרה יותר."
+	 },
+	 "Reading the text in the image…": {
+	  "fr": "Lecture du texte de l’image…",
+	  "es": "Leyendo el texto de la imagen…",
+	  "pt": "Lendo o texto da imagem…",
+	  "de": "Text im Bild wird gelesen…",
+	  "it": "Lettura del testo nell’immagine…",
+	  "ru": "Читаю текст на изображении…",
+	  "tr": "Görseldeki metin okunuyor…",
+	  "id": "Membaca teks di gambar…",
+	  "he": "קורא את הטקסט שבתמונה…"
+	 },
+	 "Speak your question": {
+	  "fr": "Dire votre question",
+	  "es": "Di tu pregunta",
+	  "pt": "Diga sua pergunta",
+	  "de": "Frage sprechen",
+	  "it": "Di’ la tua domanda",
+	  "ru": "Задать вопрос голосом",
+	  "tr": "Sorunuzu söyleyin",
+	  "id": "Ucapkan pertanyaan Anda",
+	  "he": "אמרו את השאלה בקול"
+	 },
+	 "Done": {
+	  "fr": "Terminé",
+	  "es": "Listo",
+	  "pt": "Concluído",
+	  "de": "Fertig",
+	  "it": "Fatto",
+	  "ru": "Готово",
+	  "tr": "Tamam",
+	  "id": "Selesai",
+	  "he": "סיום"
+	 },
+	 "Microphone access was refused. You can allow it in your browser settings.": {
+	  "fr": "L’accès au micro a été refusé. Vous pouvez l’autoriser dans les réglages du navigateur.",
+	  "es": "Se denegó el acceso al micrófono. Puedes permitirlo en los ajustes del navegador.",
+	  "pt": "O acesso ao microfone foi recusado. Você pode permiti-lo nas configurações do navegador.",
+	  "de": "Der Zugriff auf das Mikrofon wurde verweigert. Sie können ihn in den Browsereinstellungen erlauben.",
+	  "it": "L’accesso al microfono è stato negato. Puoi consentirlo nelle impostazioni del browser.",
+	  "ru": "Доступ к микрофону запрещён. Его можно разрешить в настройках браузера.",
+	  "tr": "Mikrofon erişimi reddedildi. Tarayıcı ayarlarından izin verebilirsiniz.",
+	  "id": "Akses mikrofon ditolak. Anda bisa mengizinkannya di pengaturan browser.",
+	  "he": "הגישה למיקרופון נדחתה. אפשר לאשר אותה בהגדרות הדפדפן."
+	 },
+	 "Your microphone isn’t available in this browser.": {
+	  "fr": "Votre micro n’est pas disponible dans ce navigateur.",
+	  "es": "Tu micrófono no está disponible en este navegador.",
+	  "pt": "Seu microfone não está disponível neste navegador.",
+	  "de": "Ihr Mikrofon ist in diesem Browser nicht verfügbar.",
+	  "it": "Il microfono non è disponibile in questo browser.",
+	  "ru": "Микрофон недоступен в этом браузере.",
+	  "tr": "Mikrofonunuz bu tarayıcıda kullanılamıyor.",
+	  "id": "Mikrofon Anda tidak tersedia di browser ini.",
+	  "he": "המיקרופון אינו זמין בדפדפן הזה."
+	 },
+	 "I didn’t hear anything, so I stopped the microphone. Tap it again to speak.": {
+	  "fr": "Je n’ai rien entendu, j’ai donc arrêté le micro. Appuyez à nouveau dessus pour parler.",
+	  "es": "No oí nada, así que apagué el micrófono. Tócalo de nuevo para hablar.",
+	  "pt": "Não ouvi nada, então desliguei o microfone. Toque nele de novo para falar.",
+	  "de": "Ich habe nichts gehört und das Mikrofon gestoppt. Tippen Sie erneut darauf, um zu sprechen.",
+	  "it": "Non ho sentito nulla, quindi ho spento il microfono. Toccalo di nuovo per parlare.",
+	  "ru": "Я ничего не услышал и выключил микрофон. Нажмите на него ещё раз, чтобы говорить.",
+	  "tr": "Hiçbir şey duymadım, bu yüzden mikrofonu durdurdum. Konuşmak için ona tekrar dokunun.",
+	  "id": "Saya tidak mendengar apa pun, jadi mikrofon saya hentikan. Ketuk lagi untuk berbicara.",
+	  "he": "לא שמעתי כלום, ולכן עצרתי את המיקרופון. הקישו עליו שוב כדי לדבר."
+	 },
+	 "Turning your voice into text…": {
+	  "fr": "Transcription de votre voix…",
+	  "es": "Convirtiendo tu voz en texto…",
+	  "pt": "Transformando sua voz em texto…",
+	  "de": "Ihre Stimme wird in Text umgewandelt…",
+	  "it": "Trasformo la tua voce in testo…",
+	  "ru": "Превращаю ваш голос в текст…",
+	  "tr": "Sesiniz metne dönüştürülüyor…",
+	  "id": "Mengubah suara Anda menjadi teks…",
+	  "he": "הופך את הקול שלכם לטקסט…"
+	 },
+	 "I couldn’t turn your voice into text. Please try again.": {
+	  "fr": "Je n’ai pas réussi à transcrire votre voix. Réessayez.",
+	  "es": "No pude convertir tu voz en texto. Inténtalo de nuevo.",
+	  "pt": "Não consegui transformar sua voz em texto. Tente de novo.",
+	  "de": "Ich konnte Ihre Stimme nicht in Text umwandeln. Bitte versuchen Sie es erneut.",
+	  "it": "Non sono riuscito a trasformare la tua voce in testo. Riprova.",
+	  "ru": "Не удалось превратить голос в текст. Попробуйте ещё раз.",
+	  "tr": "Sesinizi metne dönüştüremedim. Lütfen tekrar deneyin.",
+	  "id": "Saya tidak bisa mengubah suara Anda menjadi teks. Silakan coba lagi.",
+	  "he": "לא הצלחתי להפוך את הקול לטקסט. נסו שוב."
+	 },
+	 "This demo has used all of today’s free AI. It comes back at {time}.": {
+	  "fr": "Cette démo a utilisé toute l’IA gratuite du jour. Elle revient à {time}.",
+	  "es": "Esta demo ha usado toda la IA gratuita de hoy. Vuelve a las {time}.",
+	  "pt": "Esta demo usou toda a IA gratuita de hoje. Ela volta às {time}.",
+	  "de": "Diese Demo hat die kostenlose KI für heute aufgebraucht. Sie ist um {time} wieder da.",
+	  "it": "Questa demo ha esaurito l’IA gratuita di oggi. Torna alle {time}.",
+	  "ru": "Эта демоверсия израсходовала весь бесплатный ИИ на сегодня. Он снова будет доступен в {time}.",
+	  "tr": "Bu demo bugünkü ücretsiz yapay zekânın tamamını kullandı. Saat {time}’de geri gelir.",
+	  "id": "Demo ini sudah memakai semua AI gratis hari ini. AI tersedia lagi pukul {time}.",
+	  "he": "ההדגמה ניצלה את כל ה־AI החינמי של היום. הוא יחזור בשעה {time}."
+	 },
+	 "Free demo: almost used up for today (about {n} analyses left). It comes back at {time}.": {
+	  "fr": "Démo gratuite : presque épuisée pour aujourd’hui (environ {n} analyses restantes). Elle revient à {time}.",
+	  "es": "Demo gratuita: casi agotada por hoy (quedan unos {n} análisis). Vuelve a las {time}.",
+	  "pt": "Demo gratuita: quase esgotada por hoje (restam cerca de {n} análises). Ela volta às {time}.",
+	  "de": "Kostenlose Demo: für heute fast aufgebraucht (noch etwa {n} Analysen). Um {time} geht es wieder weiter.",
+	  "it": "Demo gratuita: quasi esaurita per oggi (restano circa {n} analisi). Torna alle {time}.",
+	  "ru": "Бесплатная демоверсия почти исчерпана на сегодня (осталось около {n} анализов). Снова доступна в {time}.",
+	  "tr": "Ücretsiz demo: bugünlük neredeyse bitti (yaklaşık {n} analiz kaldı). Saat {time}’de yenilenir.",
+	  "id": "Demo gratis: hampir habis untuk hari ini (tersisa sekitar {n} analisis). Tersedia lagi pukul {time}.",
+	  "he": "הדגמה חינמית: כמעט נגמרה להיום (נותרו בערך {n} ניתוחים). היא תחזור בשעה {time}."
+	 },
+	 "Free demo: about {n} analyses left today, for all visitors.": {
+	  "fr": "Démo gratuite : environ {n} analyses restantes aujourd’hui, pour tous les visiteurs.",
+	  "es": "Demo gratuita: quedan unos {n} análisis hoy, para todos los visitantes.",
+	  "pt": "Demo gratuita: restam cerca de {n} análises hoje, para todos os visitantes.",
+	  "de": "Kostenlose Demo: heute noch etwa {n} Analysen, für alle Besucher zusammen.",
+	  "it": "Demo gratuita: restano circa {n} analisi oggi, per tutti i visitatori.",
+	  "ru": "Бесплатная демоверсия: сегодня осталось около {n} анализов на всех посетителей.",
+	  "tr": "Ücretsiz demo: bugün tüm ziyaretçiler için yaklaşık {n} analiz kaldı.",
+	  "id": "Demo gratis: tersisa sekitar {n} analisis hari ini, untuk semua pengunjung.",
+	  "he": "הדגמה חינמית: נותרו היום בערך {n} ניתוחים, לכל המבקרים יחד."
+	 },
+	 "Why a limit?": {
+	  "fr": "Pourquoi une limite ?",
+	  "es": "¿Por qué un límite?",
+	  "pt": "Por que um limite?",
+	  "de": "Warum ein Limit?",
+	  "it": "Perché un limite?",
+	  "ru": "Почему есть лимит?",
+	  "tr": "Neden bir sınır var?",
+	  "id": "Mengapa ada batas?",
+	  "he": "למה יש מגבלה?"
+	 },
+	 "Margin is a free demo. It runs on Cloudflare’s free AI allowance, shared by every visitor, which renews each day.": {
+	  "fr": "Margin est une démo gratuite. Elle fonctionne grâce au quota d’IA gratuit de Cloudflare, partagé par tous les visiteurs et renouvelé chaque jour.",
+	  "es": "Margin es una demo gratuita. Funciona con la cuota de IA gratuita de Cloudflare, compartida por todos los visitantes y renovada cada día.",
+	  "pt": "O Margin é uma demo gratuita. Funciona com a cota de IA gratuita da Cloudflare, compartilhada por todos os visitantes e renovada todos os dias.",
+	  "de": "Margin ist eine kostenlose Demo. Sie läuft mit dem kostenlosen KI-Kontingent von Cloudflare, das sich alle Besucher teilen und das sich täglich erneuert.",
+	  "it": "Margin è una demo gratuita. Funziona con la quota di IA gratuita di Cloudflare, condivisa da tutti i visitatori e rinnovata ogni giorno.",
+	  "ru": "Margin — бесплатная демоверсия. Она работает на бесплатной квоте ИИ от Cloudflare, общей для всех посетителей и обновляемой каждый день.",
+	  "tr": "Margin ücretsiz bir demodur. Tüm ziyaretçilerin paylaştığı ve her gün yenilenen Cloudflare ücretsiz yapay zekâ kotasıyla çalışır.",
+	  "id": "Margin adalah demo gratis. Demo ini berjalan dengan kuota AI gratis dari Cloudflare, yang dipakai bersama semua pengunjung dan diperbarui setiap hari.",
+	  "he": "Margin היא הדגמה חינמית. היא פועלת על מכסת ה־AI החינמית של Cloudflare, המשותפת לכל המבקרים ומתחדשת בכל יום."
+	 },
+	 "Here are the passages that match best, word for word.": {
+	  "fr": "Voici les passages qui correspondent le mieux, mot pour mot.",
+	  "es": "Estos son los pasajes que mejor coinciden, palabra por palabra.",
+	  "pt": "Aqui estão os trechos que mais correspondem, palavra por palavra.",
+	  "de": "Hier sind die passendsten Stellen, Wort für Wort.",
+	  "it": "Ecco i passaggi più pertinenti, parola per parola.",
+	  "ru": "Вот самые подходящие фрагменты, слово в слово.",
+	  "tr": "İşte en iyi eşleşen bölümler, kelimesi kelimesine.",
+	  "id": "Berikut bagian yang paling cocok, kata demi kata.",
+	  "he": "הנה הקטעים המתאימים ביותר, מילה במילה."
+	 },
+	 "Files, photos and pasted text are read in your browser. A link is fetched once by our server, only to read the page.": {
+	  "fr": "Les fichiers, photos et textes collés sont lus dans votre navigateur. Un lien est récupéré une seule fois par notre serveur, uniquement pour lire la page.",
+	  "es": "Los archivos, las fotos y el texto pegado se leen en tu navegador. Un enlace lo descarga una sola vez nuestro servidor, solo para leer la página.",
+	  "pt": "Arquivos, fotos e texto colado são lidos no seu navegador. Um link é buscado uma única vez pelo nosso servidor, só para ler a página.",
+	  "de": "Dateien, Fotos und eingefügter Text werden in Ihrem Browser gelesen. Ein Link wird einmal von unserem Server abgerufen, nur um die Seite zu lesen.",
+	  "it": "File, foto e testo incollato vengono letti nel tuo browser. Un link viene recuperato una sola volta dal nostro server, solo per leggere la pagina.",
+	  "ru": "Файлы, фото и вставленный текст читаются в вашем браузере. Ссылку наш сервер открывает один раз, только чтобы прочитать страницу.",
+	  "tr": "Dosyalar, fotoğraflar ve yapıştırılan metin tarayıcınızda okunur. Bir bağlantı, yalnızca sayfayı okumak için sunucumuz tarafından bir kez alınır.",
+	  "id": "File, foto, dan teks yang ditempel dibaca di browser Anda. Tautan diambil sekali oleh server kami, hanya untuk membaca halamannya.",
+	  "he": "קבצים, תמונות וטקסט מודבק נקראים בדפדפן שלכם. קישור נטען פעם אחת על ידי השרת שלנו, רק כדי לקרוא את הדף."
+	 },
+	 "When you speak a question, the recording is sent once to Cloudflare Workers AI (Whisper, by OpenAI) to turn it into text, and isn’t kept.": {
+	  "fr": "Quand vous dites une question à voix haute, l’enregistrement est envoyé une seule fois à Cloudflare Workers AI (Whisper, d’OpenAI) pour être transcrit, puis il n’est pas conservé.",
+	  "es": "Cuando dices una pregunta en voz alta, la grabación se envía una sola vez a Cloudflare Workers AI (Whisper, de OpenAI) para convertirla en texto, y no se guarda.",
+	  "pt": "Quando você diz uma pergunta em voz alta, a gravação é enviada uma única vez ao Cloudflare Workers AI (Whisper, da OpenAI) para virar texto, e não é guardada.",
+	  "de": "Wenn Sie eine Frage sprechen, wird die Aufnahme einmal an Cloudflare Workers AI (Whisper von OpenAI) gesendet, um sie in Text umzuwandeln, und nicht gespeichert.",
+	  "it": "Quando dici una domanda a voce, la registrazione viene inviata una sola volta a Cloudflare Workers AI (Whisper, di OpenAI) per trasformarla in testo, e non viene conservata.",
+	  "ru": "Когда вы задаёте вопрос голосом, запись один раз отправляется в Cloudflare Workers AI (Whisper от OpenAI), чтобы превратить её в текст, и не сохраняется.",
+	  "tr": "Bir soruyu sesli sorduğunuzda kayıt, metne dönüştürülmek için Cloudflare Workers AI’ye (OpenAI’nin Whisper’ı) bir kez gönderilir ve saklanmaz.",
+	  "id": "Saat Anda mengucapkan pertanyaan, rekamannya dikirim sekali ke Cloudflare Workers AI (Whisper, buatan OpenAI) untuk diubah menjadi teks, lalu tidak disimpan.",
+	  "he": "כשאתם אומרים שאלה בקול, ההקלטה נשלחת פעם אחת ל־Cloudflare Workers AI ‏(Whisper של OpenAI) כדי להפוך אותה לטקסט, ואינה נשמרת."
+	 },
+	 "This free demo shares a daily AI allowance between all visitors. When it runs out, it comes back the next day.": {
+	  "fr": "Cette démo gratuite partage un quota d’IA quotidien entre tous les visiteurs. Quand il est épuisé, il revient le lendemain.",
+	  "es": "Esta demo gratuita comparte una cuota diaria de IA entre todos los visitantes. Cuando se agota, vuelve al día siguiente.",
+	  "pt": "Esta demo gratuita divide uma cota diária de IA entre todos os visitantes. Quando acaba, ela volta no dia seguinte.",
+	  "de": "Diese kostenlose Demo teilt ein tägliches KI-Kontingent unter allen Besuchern. Ist es aufgebraucht, gibt es am nächsten Tag ein neues.",
+	  "it": "Questa demo gratuita condivide una quota giornaliera di IA tra tutti i visitatori. Quando si esaurisce, torna il giorno dopo.",
+	  "ru": "Эта бесплатная демоверсия делит дневную квоту ИИ между всеми посетителями. Когда она заканчивается, она возвращается на следующий день.",
+	  "tr": "Bu ücretsiz demo, günlük yapay zekâ kotasını tüm ziyaretçiler arasında paylaştırır. Kota bittiğinde ertesi gün yenilenir.",
+	  "id": "Demo gratis ini membagi kuota AI harian ke semua pengunjung. Jika habis, kuota tersedia lagi keesokan harinya.",
+	  "he": "ההדגמה החינמית הזו מחלקת מכסת AI יומית בין כל המבקרים. כשהיא נגמרת, היא חוזרת למחרת."
 	 }
 	};
 	let lang = "en";

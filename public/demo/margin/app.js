@@ -17,6 +17,7 @@
 	const S = { docs: [], loading: 0, out: null, report: null, turns: [], speaking: null, seq: 0, cseq: 0, open: new Set() };
 	const chunk = (id) => { for (const d of S.docs) { const c = d.chunks.find((x) => x.id === id); if (c) return c; } return null; };
 	const docOf = (c) => S.docs.find((d) => d.fid === c.fid);
+	const visual = (d) => d.type === "pdf" || d.type === "image";
 	const ready = () => S.docs.filter((d) => !d.loading && d.words >= 30);
 
 	/* ---------------- language ---------------- */
@@ -25,16 +26,15 @@
 	function setLang(l) {
 		I.set(l); try { localStorage.setItem("margin-lang", I.lang); } catch {}
 		I.translateStatic(); $("#langCode").textContent = I.LANGS.find((x) => x[0] === I.lang)[2];
-		if (!S.outChosen) S.out = I.lang;
-		renderFiles(); renderOut(); renderTries(); renderReport(); renderThread();
-		$("#langCode").textContent = I.LANGS.find((x) => x[0] === I.lang)[2];
+		S.out = I.lang;
+		$("#langName").textContent = I.LANGS.find((x) => x[0] === I.lang)[1];
+		renderFiles(); renderTries(); renderReport(); renderThread(); if (S.quota) renderQuota();
+		if (S.page === 2 && S.report && !S.report.cleared && S.report.lang !== I.lang) makeReport(true); // the report follows the language
 	}
 	function initLang() {
 		dropdown($("#langBtn"), $("#langList"), () => I.lang, (l) => setLang(l));
-		dropdown($("#outBtn"), $("#outList"), () => S.out, (l) => { S.out = l; S.outChosen = true; renderOut(); });
 	}
-	function renderOut() { if (!S.out) S.out = I.lang; $("#outName").textContent = I.LANGS.find((x) => x[0] === S.out)[1]; }
-	/* one custom list-box for both language menus (no native <select>) */
+	/* one language menu for the page and the answers (custom list-box, no native <select>) */
 	function dropdown(btn, list, current, onPick) {
 		const paint = () => (list.innerHTML = I.LANGS.map(([k, name, code]) => `<li role="option" tabindex="-1" data-l="${k}" aria-selected="${k === current()}" lang="${k}">${name}<small>${code}</small></li>`).join(""));
 		const open = (on) => { list.hidden = !on; btn.setAttribute("aria-expanded", String(on)); if (on) { paint(); (list.querySelector('[aria-selected="true"]') || list.firstElementChild).focus(); } };
@@ -59,7 +59,7 @@
 		S.docs.push(row); S.loading++; renderFiles();
 		return (async () => {
 			try {
-				const doc = await loader();
+				const doc = await loader(row);
 				Object.assign(doc, { fid, name: doc.title || name, ...extra });
 				doc.chunks.forEach((c) => { c.fid = fid; c.id = "c" + ++S.cseq; });
 				doc.lang = detectLang(doc.chunks.map((c) => c.text).join(" "));
@@ -75,11 +75,17 @@
 	function addFiles(list, isSample) {
 		$("#err1").hidden = true;
 		for (const file of [...list].slice(0, Math.max(0, MAX_FILES - S.docs.length))) {
-			const name = file.name || "document", ext = name.toLowerCase().split(".").pop();
-			if (!["pdf", "docx"].includes(ext)) { showErr(`${name} — ${t("This file type isn’t supported yet. Use a PDF or a Word (.docx) file.")}`); continue; }
+			const name = file.name || "document", ext = name.toLowerCase().split(".").pop(), kind = KINDS[ext] || (/^image\/(png|jpeg)$/.test(file.type) ? "image" : null);
+			if (!kind) { showErr(`${name} — ${t("This file type isn’t supported. Use a PDF, Word, Excel, text, PNG or JPEG file.")}`); continue; }
 			if (file.size > MAX_MB * 1048576) { showErr(`${name} — ${t("This file is larger than 20 MB.")}`); continue; }
 			if (S.docs.some((d) => d.name === name && d.size === file.size)) continue;
-			addSource(name, async () => { const buf = await file.arrayBuffer(); return ext === "pdf" ? readPdf(buf) : readDocx(buf); }, { size: file.size, sample: Boolean(isSample) });
+			addSource(name, async (row) => {
+				if (kind === "image") return readImage(file, row);
+				if (kind === "text") return textDoc(splitParas(await file.text()), "txt");
+				if (kind === "csv") return sheetDoc([{ name: "", rows: parseCsv(await file.text()) }], "csv");
+				const buf = await file.arrayBuffer();
+				return kind === "pdf" ? readPdf(buf) : kind === "docx" ? readDocx(buf) : readXlsx(buf);
+			}, { size: file.size, sample: Boolean(isSample) });
 		}
 	}
 	function addLink(url) {
@@ -95,9 +101,9 @@
 	}
 	function addText(txt) {
 		$("#err1").hidden = true;
-		const paras = txt.replace(/\r/g, "").split(/\n\s*\n|\n(?=[A-Z0-9֐-׿•\-–])/).map((s) => s.replace(/\s+/g, " ").trim()).filter(Boolean);
-		addSource(t("Pasted text"), async () => textDoc(paras, "text"));
+		addSource(t("Pasted text"), async () => textDoc(splitParas(txt), "text"));
 	}
+	const splitParas = (txt) => txt.replace(/\r/g, "").split(/\n\s*\n|\n(?=[A-Z0-9֐-׿•\-–#*])/).map((s) => s.replace(/^[#>*\-\s]+/, "").replace(/\s+/g, " ").trim()).filter(Boolean);
 	/* plain paragraphs (a web page, pasted text) → passages; a short line joins the paragraph after it */
 	function textDoc(paras, type) {
 		const chunks = []; let pending = [];
@@ -114,16 +120,17 @@
 	function showErr(msg) { const err = $("#err1"); const prev = err.hidden ? "" : err.querySelector("span")?.innerHTML + "<br>"; err.innerHTML = `${ic("circle-alert")}<span>${prev || ""}${esc(msg)}</span>`; err.hidden = false; }
 
 	function renderFiles() {
-		const NAMES = { pdf: "PDF", docx: "Word", web: t("Web page"), text: t("Text") };
+		const NAMES = { pdf: "PDF", docx: "Word", xlsx: "Excel", csv: "CSV", txt: t("Text"), image: t("Image"), web: t("Web page"), text: t("Text") };
+		const ICON = { web: "link", text: "clipboard-paste", image: "image", xlsx: "file-spreadsheet", csv: "file-spreadsheet" };
 		$("#files").innerHTML = S.docs.map((d) => {
-			if (d.loading) return `<li class="frow busy-row"><span class="file-ic">${ic("file-text")}</span><div><b>${esc(d.name)}</b><small>${ic("loader-circle", "spin")}${t("Reading your document…")}</small></div></li>`;
+			if (d.loading) return `<li class="frow busy-row"><span class="file-ic">${ic("file-text")}</span><div><b>${esc(d.name)}</b><small>${ic("loader-circle", "spin")}${d.note ? esc(d.note) : t("Reading your document…")}</small></div></li>`;
 			const bits = [NAMES[d.type], d.pages ? (d.pages === 1 ? t("1 page") : t("{n} pages", { n: d.pages })) : null, t("{n} words", { n: d.words.toLocaleString(I.lang) }), t(LANG_NAME[d.lang])].filter(Boolean);
-			const warn = d.words < 30 ? `<span class="w">${t("I found almost no text. This may be a scan or a photo inside a PDF — I can’t read those yet.")}</span>` : d.pages > MAX_PAGES ? `<span class="w">${t("This document is long: I’ll read its first {n} pages.", { n: MAX_PAGES })}</span>` : "";
-			return `<li class="frow" data-fid="${d.fid}"><span class="file-ic">${ic(d.type === "web" ? "link" : d.type === "text" ? "clipboard-paste" : "file-text")}</span><div><b>${esc(d.name)}</b><small><span>${bits.map(esc).join(" · ")}</span>${warn}</small></div>${d.words >= 30 ? `<span class="ok-ic">${ic("circle-check")}</span>` : ""}<button type="button" class="btn btn-text btn-sm" data-rm="${d.fid}" aria-label="${esc(t("Remove"))} ${esc(d.name)}">${ic("x")}<span class="hide-m">${t("Remove")}</span></button></li>`;
+			const warn = d.words < 30 ? `<span class="w">${t(d.type === "image" ? "I could read almost no text in this image. Try a sharper, straight photo." : "I found almost no text. This may be a scan or a photo inside a PDF — I can’t read those yet.")}</span>` : d.pages > MAX_PAGES ? `<span class="w">${t("This document is long: I’ll read its first {n} pages.", { n: MAX_PAGES })}</span>` : "";
+			return `<li class="frow" data-fid="${d.fid}"><span class="file-ic">${ic(ICON[d.type] || "file-text")}</span><div><b>${esc(d.name)}</b><small><span>${bits.map(esc).join(" · ")}</span>${warn}</small></div>${d.words >= 30 ? `<span class="ok-ic">${ic("circle-check")}</span>` : ""}<button type="button" class="btn btn-text btn-sm" data-rm="${d.fid}" aria-label="${esc(t("Remove"))} ${esc(d.name)}">${ic("x")}<span class="hide-m">${t("Remove")}</span></button></li>`;
 		}).join("");
 		const has = S.docs.length > 0;
 		$("#sample").hidden = has;
-		$("#analyse").disabled = !ready().length || S.loading > 0;
+		$("#analyse").disabled = !ready().length || S.loading > 0 || quotaOut();
 		$("#drop").classList.toggle("compact", has);
 		$("#drop").hidden = S.docs.length >= MAX_FILES;
 		$("#dropTitle").hidden = has;
@@ -179,6 +186,77 @@
 		const paras = [...box.querySelectorAll("p, h1, h2, h3, h4, h5, h6, li, td")].filter((el) => el.textContent.trim() && !(el.tagName === "TD" && el.querySelector("p")) && !(el.tagName === "LI" && el.querySelector("p"))).map((el) => el.textContent.replace(/\s+/g, " ").trim());
 		const d = textDoc(paras, "docx"); return d;
 	}
+	const KINDS = { pdf: "pdf", docx: "docx", xlsx: "xlsx", csv: "csv", txt: "text", md: "text", text: "text", png: "image", jpg: "image", jpeg: "image" };
+	/* Excel (.xlsx): a zip of XML files, opened with fflate (MIT); each row becomes one line "A | B | C" */
+	function readXlsx(buf) {
+		const z = fflate.unzipSync(new Uint8Array(buf)), td = new TextDecoder(), xml = (n) => (z[n] ? new DOMParser().parseFromString(td.decode(z[n]), "application/xml") : null);
+		const tags = (doc, tag) => (doc ? [...doc.getElementsByTagNameNS("*", tag)] : []);
+		const shared = tags(xml("xl/sharedStrings.xml"), "si").map((si) => tags(si, "t").map((x) => x.textContent).join(""));
+		const rels = Object.fromEntries(tags(xml("xl/_rels/workbook.xml.rels"), "Relationship").map((r) => [r.getAttribute("Id"), r.getAttribute("Target")]));
+		const sheets = tags(xml("xl/workbook.xml"), "sheet").map((sh) => {
+			const target = rels[sh.getAttribute("r:id") || sh.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id")] || "";
+			const path = target.startsWith("/") ? target.slice(1) : "xl/" + target.replace(/^\.\//, "");
+			const rows = tags(xml(path), "row").map((row) => tags(row, "c").map((c) => {
+				const tp = c.getAttribute("t"), v = tags(c, "v")[0]?.textContent ?? "";
+				return tp === "s" ? shared[+v] ?? "" : tp === "inlineStr" ? tags(c, "t").map((x) => x.textContent).join("") : tp === "b" ? (v === "1" ? "TRUE" : "FALSE") : v;
+			}).map((x) => String(x).trim()));
+			return { name: sh.getAttribute("name") || "", rows };
+		});
+		return sheetDoc(sheets, "xlsx");
+	}
+	function parseCsv(txt) {
+		const first = txt.split(/\r?\n/, 1)[0] || "", sep = [";", "\t", ","].map((c) => [c, first.split(c).length]).sort((a, b) => b[1] - a[1])[0][0];
+		const rows = []; let row = [], cell = "", q = false;
+		for (let i = 0; i < txt.length; i++) {
+			const ch = txt[i];
+			if (q) { if (ch === '"' && txt[i + 1] === '"') { cell += '"'; i++; } else if (ch === '"') q = false; else cell += ch; }
+			else if (ch === '"') q = true; else if (ch === sep) { row.push(cell.trim()); cell = ""; }
+			else if (ch === "\n") { row.push(cell.trim()); rows.push(row); row = []; cell = ""; } else if (ch !== "\r") cell += ch;
+		}
+		if (cell || row.length) { row.push(cell.trim()); rows.push(row); }
+		return rows;
+	}
+	/* table rows → passages of about 600 characters, each starting with its sheet name */
+	function sheetDoc(sheets, type) {
+		const chunks = [];
+		for (const sh of sheets) {
+			let buf = [];
+			const flush = () => { if (buf.length) { const text = (sh.name && sheets.length > 1 ? sh.name + ": " : "") + buf.join(" ; "); chunks.push({ page: null, parts: [text], text }); buf = []; } };
+			for (const r of sh.rows) { const l = r.filter(Boolean).join(" | "); if (!l) continue; if (buf.join(" ; ").length + l.length > 600) flush(); buf.push(l.slice(0, 800)); }
+			flush();
+		}
+		return { type, pages: null, chunks };
+	}
+	/* PNG or JPEG: the text is read in this browser by Tesseract (Apache-2.0); each paragraph keeps its place on the image */
+	const OCR_LANG = { en: "eng", fr: "fra", es: "spa", pt: "por", de: "deu", it: "ita", ru: "rus", tr: "tur", id: "ind", he: "heb" };
+	let ocr = null;
+	async function ocrWorker(row) {
+		const langs = [...new Set(["eng", OCR_LANG[I.lang] || "eng"])].join("+");
+		if (ocr && ocr.langs === langs) return ocr.w;
+		if (ocr) { ocr.w.terminate(); ocr = null; }
+		const w = await Tesseract.createWorker(langs, 1, {
+			workerPath: "vendor/tesseract/worker.min.js", corePath: "vendor/tesseract/core", langPath: "vendor/tesseract/lang", gzip: true, workerBlobURL: false,
+			logger: (m) => { if (ocr?.row && m.progress != null) { ocr.row.note = `${t("Reading the text in the image…")} ${Math.round(m.progress * 100)} %`; renderFiles(); } },
+		});
+		ocr = { w, langs, row }; return w;
+	}
+	async function readImage(file, row) {
+		row.note = t("Reading the text in the image…"); renderFiles();
+		const bmp = await createImageBitmap(file), k0 = Math.min(1, 2400 / Math.max(bmp.width, bmp.height));
+		const img = document.createElement("canvas"); img.width = Math.round(bmp.width * k0); img.height = Math.round(bmp.height * k0);
+		img.getContext("2d").drawImage(bmp, 0, 0, img.width, img.height); bmp.close?.();
+		await loadScript("vendor/tesseract/tesseract.min.js");
+		const w = await ocrWorker(row); ocr.row = row;
+		const { data } = await w.recognize(img);
+		const k = img.width / 700, chunks = [];
+		for (const p of data.paragraphs || []) {
+			let lines = []; const push = () => { const text = lines.map((l) => l.text.trim()).join(" ").replace(/\s+/g, " ").trim(); if (text.length > 2) chunks.push({ page: 1, text, rects: lines.map((l) => ({ x: l.bbox.x0 / k, y: l.bbox.y0 / k, w: (l.bbox.x1 - l.bbox.x0) / k, h: (l.bbox.y1 - l.bbox.y0) / k })) }); lines = []; };
+			for (const l of p.lines || []) { if (l.confidence < 30 || !l.text.trim()) continue; lines.push(l); if (lines.reduce((a, x) => a + x.text.length, 0) > 650) push(); }
+			push();
+		}
+		const xs = chunks.flatMap((c) => c.rects), W = img.width / k, H = img.height / k;
+		return { type: "image", img, pages: 1, read: 1, pageInfo: [{ w: W, h: H, left: xs.length ? Math.min(...xs.map((r) => r.x)) : 0, right: xs.length ? Math.max(...xs.map((r) => r.x + r.w)) : W }], chunks, canvases: {} };
+	}
 	const LANG_NAME = { en: "English", fr: "French", es: "Spanish", pt: "Portuguese", de: "German", it: "Italian", ru: "Russian", tr: "Turkish", id: "Indonesian", he: "Hebrew", other: "another language" };
 	const STOPW = {
 		en: "the and you is for with are your of to not this that will", fr: "le la les des est vous une pour dans avec pas du qui que", es: "el los las del es usted una para con por que se como sus",
@@ -194,6 +272,7 @@
 	}
 	async function pageCanvas(d, p, scale = 2) {
 		const key = p + "@" + scale; if (d.canvases[key]) return d.canvases[key];
+		if (d.img) { const c = document.createElement("canvas"), info = d.pageInfo[0]; c.width = Math.round(info.w * scale); c.height = Math.round(info.h * scale); c.getContext("2d").drawImage(d.img, 0, 0, c.width, c.height); return (d.canvases[key] = c); }
 		const page = await d.pdf.getPage(p), vp = page.getViewport({ scale }), c = document.createElement("canvas");
 		c.width = Math.ceil(vp.width); c.height = Math.ceil(vp.height);
 		await page.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
@@ -224,7 +303,9 @@
 		const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), ms);
 		try {
 			const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: ctl.signal });
-			const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.detail || j.error || "HTTP " + r.status);
+			const j = await r.json().catch(() => ({})); if (j.quota) { S.quota = j.quota; renderQuota(); }
+			if (r.status === 429 && j.error === "daily_limit") { const e = new Error("daily_limit"); e.limit = true; throw e; }
+			if (!r.ok) throw new Error(j.detail || j.error || "HTTP " + r.status);
 			return j;
 		} finally { clearTimeout(to); }
 	}
@@ -238,12 +319,13 @@
 		const byId = Object.fromEntries(chunks.map((c) => [c.id, c])), kept = [], removed = [];
 		for (const it of items || []) {
 			let text = String(it?.text || "").replace(/[*#`]/g, "").trim(); if (!text) continue;
+			const value = String(it?.value || "").replace(/[*#`]/g, "").trim().slice(0, 60);
 			if (!/[.!?…:”"״)]$/.test(text)) text += ".";
 			const cites = [...new Set((Array.isArray(it.cite) ? it.cite : [it.cite]).map(String).filter((id) => byId[id]))];
 			if (!cites.length) { removed.push({ text, why: "src" }); continue; }
 			const allowed = new Set(cites.flatMap((id) => [...srcNums(byId[id])]));
-			if (nums(text).some((n) => !allowed.has(n) && !allowed.has(String(Math.round(+n))))) { removed.push({ text, why: "num" }); continue; }
-			kept.push({ text, cite: cites, key: Math.random().toString(36).slice(2, 8) });
+			if (nums(value + " " + text).some((n) => !allowed.has(n) && !allowed.has(String(Math.round(+n))))) { removed.push({ text, why: "num" }); continue; }
+			kept.push({ ...(value ? { value } : {}), text, cite: cites, key: Math.random().toString(36).slice(2, 8) });
 		}
 		return { kept, removed };
 	}
@@ -252,19 +334,21 @@
 	let reportTimer;
 	function scheduleReport() { clearTimeout(reportTimer); reportTimer = setTimeout(() => { if (S.page === 2 && !S.loading && ready().length) makeReport(); }, 500); }
 	const GROUPS = [["short", "In short"], ["favour", "In your favour", "fav"], ["against", "Could work against you", "aga"], ["watch", "Watch out for", "wat"], ["facts", "Key dates and numbers", "fac"]];
-	async function makeReport() {
+	async function makeReport(keepTurns) {
 		const sig = ready().map((d) => d.fid).join(",") + "|" + S.out;
 		if (S.report && S.report.sig === sig && !S.report.failed) return;
 		const r = { sig, pending: true, step: 1, lang: S.out, id: "rep" + Date.now() };
-		S.report = r; S.turns = []; S.open.clear(); renderReport(); renderThread(); renderFiles();
+		const same = keepTurns || (S.report && S.report.sig.split("|")[0] === sig.split("|")[0]);
+		S.report = r; if (!same) S.turns = []; S.open.clear(); renderReport(); renderThread(); renderFiles();
 		const tick = async (n) => { if (S.report !== r) return; r.step = n; renderReport(); await wait(reduced ? 0 : 350); };
 		const chunks = importantChunks(); await tick(2);
 		let j = null;
-		try { j = await callApi({ mode: "report", lang: r.lang, passages: pass(chunks) }); } catch (e) { console.warn("Margin AI:", e.message); }
+		let lim = false;
+		try { j = await callApi({ mode: "report", lang: r.lang, passages: pass(chunks) }); } catch (e) { lim = Boolean(e.limit); console.warn("Margin AI:", e.message); }
 		if (S.report !== r) return;
 		await tick(3);
 		r.pending = false; r.model = j?.model || null;
-		if (!j) { r.failed = "offline"; return renderAll(); }
+		if (!j) { r.failed = lim ? "limit" : "offline"; return renderAll(); }
 		r.groups = {}; let all = [], rem = [];
 		for (const [k] of GROUPS) { const v = verify(j[k], chunks); r.groups[k] = v.kept; all = all.concat(v.kept); rem = rem.concat(v.removed); }
 		r.removed = rem; r.count = all.length;
@@ -290,8 +374,8 @@
 		}
 		if (r.cleared) { box.innerHTML = `<div class="rep"><p style="margin:0 0 12px;color:var(--ink-2)">${t("Analysis cleared.")}</p><button type="button" class="btn btn-sm" data-act="reanalyse">${ic("refresh-cw")}${t("Analyse again")}</button></div>`; $("#qa").hidden = true; return; }
 		if (r.failed) {
-			const msg = r.failed === "offline" ? "The AI can’t be reached right now, and this needs it. Please try again in a moment." : r.failed === "empty" ? "The AI’s answer came back incomplete this time. Please try again." : "The AI wrote points I couldn’t match to the document, so I didn’t show them. Please try again.";
-			box.innerHTML = `<div class="rep"><div class="rep-h"><div><span class="kind">${esc(names)}</span><h2>${title}</h2></div></div><div class="err">${ic("circle-alert")}<span>${t(msg)}</span></div><button type="button" class="btn btn-sm reanalyse" data-act="reanalyse">${ic("refresh-cw")}${t("Try again")}</button></div>`;
+			const msg = r.failed === "limit" ? limitMsg() : r.failed === "offline" ? "The AI can’t be reached right now, and this needs it. Please try again in a moment." : r.failed === "empty" ? "The AI’s answer came back incomplete this time. Please try again." : "The AI wrote points I couldn’t match to the document, so I didn’t show them. Please try again.";
+			box.innerHTML = `<div class="rep"><div class="rep-h"><div><span class="kind">${esc(names)}</span><h2>${title}</h2></div></div><div class="err">${ic("circle-alert")}<span>${r.failed === "limit" ? esc(msg) : t(msg)}</span></div>${r.failed === "limit" ? "" : `<button type="button" class="btn btn-sm reanalyse" data-act="reanalyse">${ic("refresh-cw")}${t("Try again")}</button>`}</div>`;
 			$("#qa").hidden = false; renderTries(); return;
 		}
 		const item = (it) => `<li>${pointHtml(it)}</li>`;
@@ -306,14 +390,14 @@
 	/* a point, with a quiet "Where it says it" that opens the highlighted passage underneath */
 	function pointHtml(it, owner = "report") {
 		const open = S.open.has(it.key);
-		return `<span>${esc(it.quote ? `“${it.text}”` : it.text)}</span><button type="button" class="where" data-where="${it.key}" aria-expanded="${open}">${t(open ? "Hide the source" : "Where it says it")}</button>${open ? `<div class="proof">${it.cite.map((id) => srcHtml(it, id, owner)).join("")}</div>` : ""}`;
+		return `${it.value ? `<b class="fv">${esc(it.value)}</b> ` : ""}<span>${esc(it.quote ? `“${it.text}”` : it.text)}</span><button type="button" class="where" data-where="${it.key}" aria-expanded="${open}">${t(open ? "Hide the source" : "Where it says it")}</button>${open ? `<div class="proof">${it.cite.map((id) => srcHtml(it, id, owner)).join("")}</div>` : ""}`;
 	}
 	function srcHtml(it, id, owner) {
 		const c = chunk(id); if (!c) return "";
 		const d = docOf(c), where = [S.docs.length > 1 || d.type === "web" ? esc(d.name) : null, c.page ? t("Page {n}", { n: c.page }) : null].filter(Boolean).join(" · ");
 		const lang = owner === "report" ? S.report.lang : (S.turns.find((x) => x.id === owner)?.lang || S.out);
 		const tr = it.tr?.[id];
-		const snip = d.type === "pdf" ? `<canvas data-snip="${id}" role="img" aria-label="${esc(c.text.slice(0, 300))}"></canvas>` : `<div class="snip-txt" dir="auto">${textSnip(d, c)}</div>`;
+		const snip = visual(d) ? `<canvas data-snip="${id}" role="img" aria-label="${esc(c.text.slice(0, 300))}"></canvas>` : `<div class="snip-txt" dir="auto">${textSnip(d, c)}</div>`;
 		return `<article class="src" dir="${I.lang === "he" ? "rtl" : "ltr"}" lang="${I.lang}">${where ? `<div class="src-top"><span>${where}</span></div>` : ""}
 			<button type="button" class="snip" data-view="${id}" aria-label="${esc(t("See it in the document"))}">${snip}</button>
 			${tr && tr !== "…" ? `<div class="tr" lang="${lang}" dir="${lang === "he" ? "rtl" : "ltr"}">${esc(tr)}<small>${t("Machine translation — the highlighted original is what counts.")}</small></div>` : ""}
@@ -326,7 +410,7 @@
 	async function drawSnips(root) {
 		for (const cv of root.querySelectorAll("canvas[data-snip]")) {
 			if (cv.dataset.done) continue; cv.dataset.done = "1";
-			const c = chunk(cv.dataset.snip), d = c && docOf(c); if (!d || d.type !== "pdf") continue;
+			const c = chunk(cv.dataset.snip), d = c && docOf(c); if (!d || !visual(d)) continue;
 			const SC = 2, page = await pageCanvas(d, c.page, SC), info = d.pageInfo[c.page - 1];
 			const top = Math.max(0, Math.min(...c.rects.map((r) => r.y)) - 14), bot = Math.min(info.h, Math.max(...c.rects.map((r) => r.y + r.h)) + 14);
 			const left = Math.max(0, info.left - 14), right = Math.min(info.w, info.right + 14);
@@ -342,7 +426,8 @@
 	/* ---------------- follow-up questions (they also see the report) ---------------- */
 	const TRIES = ["Can I work for a competitor after I leave?", "What happens if I resign in the first year?", "Who owns what I create at home?"];
 	function renderTries() { $("#tries").innerHTML = S.docs.some((d) => d.sample) && !S.turns.length ? `<span>${t("Try:")}</span>${TRIES.map((q) => `<button type="button" class="chip" data-try="${esc(q)}">${esc(t(q))}</button>`).join("")}` : ""; }
-	function reportText() { const r = S.report; if (!r || r.pending || r.failed) return ""; return GROUPS.map(([k, lbl]) => (r.groups[k].length ? `${lbl}: ${r.groups[k].map((x) => x.text).join(" ")}` : "")).filter(Boolean).join("\n"); }
+	const line = (x) => (x.value ? `${x.value}: ${x.text}` : x.text);
+	function reportText() { const r = S.report; if (!r || r.pending || r.failed) return ""; return GROUPS.map(([k, lbl]) => (r.groups[k].length ? `${lbl}: ${r.groups[k].map(line).join(" ")}` : "")).filter(Boolean).join("\n"); }
 	async function ask(q) {
 		if (!ready().length || S.turns.some((x) => x.pending)) return;
 		const tu = { id: "t" + Date.now(), q, pending: true, lang: S.out };
@@ -350,7 +435,7 @@
 		const chunks = contextChunks(q + " " + S.turns.slice(-3, -1).map((x) => x.q).join(" "));
 		const history = S.turns.filter((x) => !x.pending && x.items).slice(-3).map((x) => ({ q: x.q, a: x.items.map((i) => i.text).join(" ") }));
 		let j = null;
-		try { j = await callApi({ mode: "ask", lang: tu.lang, question: q, passages: pass(chunks), report: reportText().slice(0, 2500), history }); } catch (e) { console.warn("Margin AI:", e.message); }
+		try { j = await callApi({ mode: "ask", lang: tu.lang, question: q, passages: pass(chunks), report: reportText().slice(0, 2500), history }); } catch (e) { tu.limit = Boolean(e.limit); console.warn("Margin AI:", e.message); }
 		tu.pending = false;
 		if (!j) { const h = bm25(q), best = h.slice(0, 2).filter((x, i) => !i || x.s > 0.7 * h[0].s).map((x) => x.c); if (best.length) { tu.status = "quoted"; tu.items = best.map((c) => ({ text: c.text, cite: [c.id], quote: true, key: Math.random().toString(36).slice(2, 8) })); } else tu.status = "notfound"; }
 		else { const v = verify(j.answer, chunks); tu.items = v.kept; tu.removed = v.removed; tu.status = v.kept.length ? "answered" : "notfound"; }
@@ -362,7 +447,7 @@
 			let body;
 			if (tu.pending) body = `<p class="a busy">${ic("loader-circle", "spin")} ${t("Working on it…")}</p>`;
 			else if (tu.status === "notfound") body = `<p class="a"><span class="badge none">${ic("search-x")}${t("I found nothing about this in the document.")}</span></p>`;
-			else body = `<p class="a">${tu.items.map((it) => pointHtml(it, tu.id)).join(" ")}</p>${tu.status === "quoted" ? `<div class="trust"><span class="badge none">${ic("quote")}${t("Quoted directly")}</span><span>${t("The AI can’t be reached right now. Here are the passages that match best, word for word.")}</span></div>` : ""}`;
+			else body = `<p class="a">${tu.items.map((it) => pointHtml(it, tu.id)).join(" ")}</p>${tu.status === "quoted" ? `<div class="trust"><span class="badge none">${ic("quote")}${t("Quoted directly")}</span><span>${tu.limit ? esc(limitMsg()) + " " + t("Here are the passages that match best, word for word.") : t("The AI can’t be reached right now. Here are the passages that match best, word for word.")}</span></div>` : ""}`;
 			return `<article class="turn" id="${tu.id}" lang="${tu.lang}" dir="${tu.lang === "he" ? "rtl" : "ltr"}"><p class="q">${esc(tu.q)}</p>${body}${acts}</article>`;
 		}).join("");
 		drawSnips($("#thread"));
@@ -379,7 +464,7 @@
 		const key = (e) => { if (e.key === "Escape") close(); };
 		document.addEventListener("keydown", key);
 		v.addEventListener("click", (e) => { if (e.target === v || e.target.closest("[data-close]")) close(); });
-		if (d.type !== "pdf") {
+		if (!visual(d)) {
 			v.innerHTML = `<div class="v-box"><div class="v-bar"><b>${esc(d.name)}</b><span>${d.url ? `<a class="btn btn-text btn-sm" href="${esc(d.url)}" target="_blank" rel="noopener">${ic("external-link")}${esc(new URL(d.url).hostname)}</a>` : ""}<button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></span></div><div class="v-page"><div class="v-doc" dir="auto">${d.chunks.map((x) => `<p class="${x === c ? "hl" : ""}">${esc(x.text)}</p>`).join("")}</div></div></div>`;
 			v.querySelector("[data-close]").focus(); requestAnimationFrame(() => v.querySelector(".hl")?.scrollIntoView({ block: "center" }));
 			return;
@@ -398,7 +483,7 @@
 
 	/* ---------------- listen, copy ---------------- */
 	function plainOf(owner) {
-		if (owner === "report") { const r = S.report; if (!r || r.pending || r.failed) return ""; return GROUPS.map(([k, lbl]) => (r.groups[k].length ? `${t(lbl)}. ${r.groups[k].map((x) => x.text).join(" ")}` : "")).filter(Boolean).join("\n"); }
+		if (owner === "report") { const r = S.report; if (!r || r.pending || r.failed) return ""; return GROUPS.map(([k, lbl]) => (r.groups[k].length ? `${t(lbl)}. ${r.groups[k].map(line).join(" ")}` : "")).filter(Boolean).join("\n"); }
 		const tu = S.turns.find((x) => x.id === owner); return tu?.items?.length ? `${tu.q}\n${tu.items.map((x) => x.text).join(" ")}` : "";
 	}
 	function speak(owner) {
@@ -421,6 +506,92 @@
 		navigator.clipboard?.writeText(`${plainOf(owner)}\n\n${t("Sources")}:\n${src}`).then(() => toast(t("Copied, with its sources.")), () => {});
 	}
 
+	/* ---------------- free daily allowance: shown to everyone ---------------- */
+	const PER = 500; // about one report
+	const resetAt = () => (S.quota ? new Date(S.quota.reset).toLocaleTimeString(I.lang, { hour: "2-digit", minute: "2-digit" }) : "");
+	const quotaOut = () => Boolean(S.quota && S.quota.limit - S.quota.used < PER * 0.6);
+	const limitMsg = () => t("This demo has used all of today’s free AI. It comes back at {time}.", { time: resetAt() || "00:00 UTC" });
+	function renderQuota() {
+		const q = S.quota;
+		for (const el of [$("#quota1"), $("#quota2")]) {
+			if (!q) { el.hidden = true; continue; }
+			const left = Math.max(0, q.limit - q.used), n = Math.floor(left / PER), pct = Math.round((left / q.limit) * 100);
+			const cls = left < PER * 0.6 ? "out" : pct <= 25 ? "low" : "";
+			const msg = cls === "out" ? limitMsg() : cls === "low" ? t("Free demo: almost used up for today (about {n} analyses left). It comes back at {time}.", { n: Math.max(1, n), time: resetAt() }) : t("Free demo: about {n} analyses left today, for all visitors.", { n });
+			el.className = "quota " + cls; el.hidden = false;
+			el.innerHTML = `<span class="bar" role="img" aria-label="${pct} %"><i style="width:${pct}%"></i></span><span>${esc(msg)}</span><button type="button" class="lnk" data-act="whylimit">${t("Why a limit?")}</button>`;
+		}
+		$("#micBtn").disabled = quotaOut(); $("#analyse").disabled = !ready().length || S.loading > 0 || quotaOut();
+	}
+	async function loadQuota() { try { const r = await fetch(API, { cache: "no-store" }); const j = await r.json(); if (j.quota) { S.quota = j.quota; renderQuota(); } } catch {} }
+
+	/* ---------------- speak a question: record here, then Whisper writes it ---------------- */
+	const REC_MAX = 60, SILENT_GIVE_UP = 6;
+	const rec = { on: false };
+	const micOK = Boolean(navigator.mediaDevices?.getUserMedia && window.MediaRecorder && (window.AudioContext || window.webkitAudioContext));
+	if (micOK) $("#micBtn").hidden = false;
+	async function recStart() {
+		if (rec.on) return;
+		let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+		catch (e) { return toast(t(e?.name === "NotAllowedError" ? "Microphone access was refused. You can allow it in your browser settings." : "Your microphone isn’t available in this browser.")); }
+		const AC = window.AudioContext || window.webkitAudioContext, ac = new AC(), src = ac.createMediaStreamSource(stream), an = ac.createAnalyser();
+		an.fftSize = 1024; src.connect(an);
+		const mr = new MediaRecorder(stream), parts = [];
+		mr.ondataavailable = (e) => e.data.size && parts.push(e.data);
+		Object.assign(rec, { on: true, stream, ac, an, mr, parts, t0: performance.now(), heardAt: null, bars: [], floor: 0.012 });
+		mr.start(250);
+		$("#askForm").classList.add("recording"); $("#rec").hidden = false; $("#recOk").disabled = false; $("#recX").focus();
+		draw();
+	}
+	function draw() {
+		if (!rec.on) return;
+		const cv = $("#wave"), g = cv.getContext("2d"), dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+		if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+		const buf = new Float32Array(rec.an.fftSize); rec.an.getFloatTimeDomainData(buf);
+		const rms = Math.sqrt(buf.reduce((a, x) => a + x * x, 0) / buf.length), sec = (performance.now() - rec.t0) / 1000;
+		if (rms > 0.025 && rec.heardAt == null) rec.heardAt = sec;
+		rec.bars.push(Math.min(1, rms * 9)); const n = Math.floor(W / 5); while (rec.bars.length > n) rec.bars.shift();
+		g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); g.fillStyle = getComputedStyle(document.body).color;
+		rec.bars.forEach((v, i) => { const h = Math.max(2, v * (H - 4)); g.globalAlpha = 0.35 + v * 0.65; g.fillRect(W - (rec.bars.length - i) * 5, (H - h) / 2, 3, h); });
+		g.globalAlpha = 1;
+		$("#recT").textContent = `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
+		if (rec.heardAt == null && sec > SILENT_GIVE_UP) { recStop(false); return toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak.")); }
+		if (sec >= REC_MAX) return recStop(true);
+		rec.raf = requestAnimationFrame(draw);
+	}
+	async function recStop(keep) {
+		if (!rec.on) return; rec.on = false; cancelAnimationFrame(rec.raf);
+		const { mr, stream, ac, parts, heardAt } = rec;
+		const done = new Promise((r) => (mr.onstop = r)); try { mr.stop(); } catch {} await done;
+		stream.getTracks().forEach((x) => x.stop());
+		const close = () => { ac.close?.(); $("#askForm").classList.remove("recording"); $("#rec").hidden = true; fit(); ta.focus(); };
+		if (!keep || heardAt == null) { close(); return; }
+		$("#recOk").disabled = true; $("#recT").textContent = "…"; toast(t("Turning your voice into text…"));
+		try {
+			const wav = await toWav(new Blob(parts, { type: mr.mimeType || "audio/webm" }), ac, Math.max(0, heardAt - 0.4));
+			const j = await callApi({ mode: "transcribe", audio: wav }, 30000);
+			const txt = String(j.text || "").trim();
+			if (!txt) toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak."));
+			else { ta.value = (ta.value.trim() ? ta.value.trim() + " " : "") + txt; $("#toast").classList.remove("on"); }
+		} catch (e) { toast(e.limit ? limitMsg() : t("I couldn’t turn your voice into text. Please try again.")); }
+		close();
+	}
+	/* the recording → 16 kHz mono WAV, without the silence before the first word, as base64 */
+	async function toWav(blob, ac, skip) {
+		const audio = await ac.decodeAudioData(await blob.arrayBuffer());
+		const rate = 16000, start = Math.min(skip, audio.duration), len = Math.max(1, Math.ceil((audio.duration - start) * rate));
+		const off = new OfflineAudioContext(1, len, rate), node = off.createBufferSource(); node.buffer = audio; node.connect(off.destination); node.start(0, start);
+		const pcm = (await off.startRendering()).getChannelData(0), out = new DataView(new ArrayBuffer(44 + pcm.length * 2));
+		const str = (o, s) => [...s].forEach((c, i) => out.setUint8(o + i, c.charCodeAt(0)));
+		str(0, "RIFF"); out.setUint32(4, 36 + pcm.length * 2, true); str(8, "WAVEfmt "); out.setUint32(16, 16, true); out.setUint16(20, 1, true); out.setUint16(22, 1, true);
+		out.setUint32(24, rate, true); out.setUint32(28, rate * 2, true); out.setUint16(32, 2, true); out.setUint16(34, 16, true); str(36, "data"); out.setUint32(40, pcm.length * 2, true);
+		for (let i = 0; i < pcm.length; i++) out.setInt16(44 + i * 2, Math.max(-1, Math.min(1, pcm[i])) * 0x7fff, true);
+		const bytes = new Uint8Array(out.buffer); let bin = ""; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+		return btoa(bin);
+	}
+	/* Tesseract is large: it loads only when the first photo arrives */
+	const loadScript = (src) => new Promise((ok, no) => { if (document.querySelector(`script[src="${src}"]`)) return ok(); const el = document.createElement("script"); el.src = src; el.onload = ok; el.onerror = no; document.head.append(el); });
+
 	/* ---------------- toast ---------------- */
 	let toastT;
 	function toast(msg, undoLabel, undo) {
@@ -442,7 +613,7 @@
 	$("#legalBtn").onclick = () => { // privacy & terms, in the reader's language
 		const opener = document.activeElement, scrim = document.createElement("div"), v = document.createElement("div");
 		scrim.className = "scrim"; v.className = "viewer"; v.setAttribute("role", "dialog"); v.setAttribute("aria-modal", "true"); v.setAttribute("aria-labelledby", "lgH");
-		v.innerHTML = `<div class="legal"><h3 id="lgH">${t("Privacy & terms")}</h3>${["Files and pasted text are read in your browser. A link is fetched once by our server, only to read the page.", "To write the summary and the answers, only the passages needed are sent to Cloudflare Workers AI, which runs Llama 3.3 (Meta). Cloudflare states that it does not use this content to train AI models, and Margin stores nothing.", "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong — always check the highlighted source.", "Portfolio demo: please don’t add very personal or confidential documents."].map((k) => `<p>${esc(t(k))}</p>`).join("")}<p>Built with Llama · <a class="lnk" href="THIRD-PARTY-NOTICES.txt">${t("Licences")}</a></p><div class="row"><button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></div></div>`;
+		v.innerHTML = `<div class="legal"><h3 id="lgH">${t("Privacy & terms")}</h3>${["Files, photos and pasted text are read in your browser. A link is fetched once by our server, only to read the page.", "When you speak a question, the recording is sent once to Cloudflare Workers AI (Whisper, by OpenAI) to turn it into text, and isn’t kept.", "This free demo shares a daily AI allowance between all visitors. When it runs out, it comes back the next day.", "To write the summary and the answers, only the passages needed are sent to Cloudflare Workers AI, which runs Llama 3.3 (Meta). Cloudflare states that it does not use this content to train AI models, and Margin stores nothing.", "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong — always check the highlighted source.", "Portfolio demo: please don’t add very personal or confidential documents."].map((k) => `<p>${esc(t(k))}</p>`).join("")}<p>Built with Llama · <a class="lnk" href="THIRD-PARTY-NOTICES.txt">${t("Licences")}</a></p><div class="row"><button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></div></div>`;
 		const close = () => { scrim.remove(); v.remove(); document.removeEventListener("keydown", key); opener?.focus(); }, key = (e) => { if (e.key === "Escape") close(); };
 		v.addEventListener("click", (e) => { if (e.target === v || e.target.closest("[data-close]")) close(); });
 		document.addEventListener("keydown", key); document.body.append(scrim, v); v.querySelector("[data-close]").focus();
@@ -460,6 +631,10 @@
 	const fit = () => { ta.style.height = "auto"; ta.style.height = Math.min(ta.scrollHeight, 160) + "px"; goBtn.disabled = !ta.value.trim(); };
 	ta.addEventListener("input", fit);
 	ta.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#askForm").requestSubmit(); } });
+	$("#micBtn").onclick = () => recStart();
+	$("#recX").onclick = () => recStop(false);
+	$("#recOk").onclick = () => recStop(true);
+	document.addEventListener("keydown", (e) => { if (rec.on && e.key === "Escape") recStop(false); });
 	$("#askForm").addEventListener("submit", (e) => { e.preventDefault(); const v = ta.value.trim(); if (!v) return; ta.value = ""; fit(); ask(v); });
 	document.addEventListener("click", async (e) => {
 		const rm = e.target.closest("[data-rm]");
@@ -474,11 +649,12 @@
 			it.tr = it.tr || {};
 			if (it.tr[id] && it.tr[id] !== "…") { delete it.tr[id]; return again(); }
 			it.tr[id] = "…"; again();
-			try { const j = await callApi({ mode: "translate", lang: x.dataset.lang, text: chunk(id).text }); it.tr[id] = j.translation || ""; if (!it.tr[id]) delete it.tr[id]; } catch { delete it.tr[id]; toast(t("The AI can’t be reached right now, and this needs it. Please try again in a moment.")); }
+			try { const j = await callApi({ mode: "translate", lang: x.dataset.lang, text: chunk(id).text }); it.tr[id] = j.translation || ""; if (!it.tr[id]) delete it.tr[id]; } catch (e) { delete it.tr[id]; toast(e.limit ? limitMsg() : t("The AI can’t be reached right now, and this needs it. Please try again in a moment.")); }
 			return again();
 		}
 		const a = e.target.closest("[data-act]"); if (!a) return;
 		const owner = a.dataset.r;
+		if (a.dataset.act === "whylimit") return toast(t("Margin is a free demo. It runs on Cloudflare’s free AI allowance, shared by every visitor, which renews each day."));
 		if (a.dataset.act === "reanalyse") { if (S.report) { S.report.failed = "retry"; S.report.cleared = false; } return makeReport(); }
 		if (a.dataset.act === "listen") return speak(owner);
 		if (a.dataset.act === "copy") return copy(owner);
@@ -487,7 +663,7 @@
 	});
 
 	/* ---------------- boot ---------------- */
-	S.page = 1; initLang(); setLang(I.lang);
+	S.page = 1; initLang(); setLang(I.lang); loadQuota();
 	window.MARGIN_DEBUG = S;
 	if (new URLSearchParams(location.search).get("sample")) $("#openSample").click();
 })();

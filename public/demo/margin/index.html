@@ -344,15 +344,43 @@ footer a { color: var(--link); }
 #p2 #report { margin-top: 18px; }
 @media (max-width: 640px) { .nav-row #analyse { flex: 1 1 100%; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+
+/* v0.9 */
+.show-m { display: none; } @media (max-width: 640px) { .lang .hide-m { display: none; } .show-m { display: inline; } }
+.sep { display: flex; align-items: center; gap: 12px; color: var(--ink-3); font-size: 13.5px; margin: 2px 0; }
+.sep::before, .sep::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.fv { font-weight: 700; color: var(--ink); white-space: nowrap; }
+.fv::after { content: " —"; font-weight: 400; color: var(--ink-3); }
+.ask .mic { flex: none; width: 42px; height: 42px; border-radius: var(--r-md); border: 1px solid var(--line-2); background: var(--surface); color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.ask .mic:hover { border-color: var(--ink); color: var(--ink); }
+.ask .mic .i { width: 19px; height: 19px; }
+.ask .mic:disabled { opacity: .4; cursor: default; }
+.rec { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; height: 42px; }
+.rec[hidden] { display: none; }
+.rec-b { flex: none; width: 42px; height: 42px; border-radius: var(--r-md); border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.rec-b:hover { border-color: var(--ink); }
+.rec-b.ok { background: var(--ink); color: #fff; border-color: var(--ink); }
+.rec-b:disabled { opacity: .45; cursor: default; }
+.wave { flex: 1; min-width: 0; height: 32px; }
+.rec-t { flex: none; font: 500 13.5px var(--mono); color: var(--ink-3); min-width: 3.2em; text-align: end; }
+.ask.recording textarea, .ask.recording .go, .ask.recording .mic { display: none; }
+.quota { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13.5px; color: var(--ink-3); margin: -48px 0 56px; }
+#quota2 { margin: 14px 0 0; }
+.quota .bar { flex: none; width: 90px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.quota .bar i { display: block; height: 100%; background: var(--ok); }
+.quota.low { color: var(--warn); } .quota.low .bar i { background: var(--warn); }
+.quota.out { color: var(--bad); } .quota.out .bar i { background: var(--bad); }
+.quota .i { width: 16px; height: 16px; }
+@media (max-width: 640px) { .rep-h .res-acts { flex: 1 1 100%; justify-content: flex-start; margin-inline-start: -10px; } }
 </style>
 </head>
 <body>
-<div class="pf"><div class="pf-in"><span data-t="Portfolio demo · Margin is a concept by David Bitan. Brevholt Kelmarion and its handbook are invented.">Portfolio demo · Margin is a concept by David Bitan. Brevholt Kelmarion and its handbook are invented.</span><a href="/" data-t="Back to the portfolio">Back to the portfolio</a></div></div>
+<div class="pf"><div class="pf-in"><span data-t="Portfolio demo · Margin is a concept by David Bitan. Brevholt Kelmarion and its documents are invented.">Portfolio demo · Margin is a concept by David Bitan. Brevholt Kelmarion and its documents are invented.</span><a href="/" data-t="Back to the portfolio">Back to the portfolio</a></div></div>
 
 <header class="top"><div class="top-in">
 	<button class="logo" type="button" id="home" aria-label="Margin"><b>Marg<i>i</i>n</b></button>
 	<div class="lang" id="langWrap">
-		<button type="button" id="langBtn" aria-haspopup="listbox" aria-expanded="false" data-t-label="Language"><span data-ic="globe"></span><span id="langCode">EN</span><span data-ic="chevron-down"></span></button>
+		<button type="button" id="langBtn" aria-haspopup="listbox" aria-expanded="false" data-t-label="Language"><span data-ic="globe"></span><span id="langName" class="hide-m">English</span><span id="langCode" class="show-m">EN</span><span data-ic="chevron-down"></span></button>
 		<ul class="menu" id="langList" role="listbox" tabindex="-1" hidden></ul>
 	</div>
 </div></header>
@@ -362,14 +390,6 @@ footer a { color: var(--link); }
 		<h1 data-t="Your document, analysed and explained in a few clicks.">Your document, analysed and explained in a few clicks.</h1>
 		<p class="lead" data-t="Margin reads your document, pulls out what matters — in your favour, against you, what to watch — and shows you exactly where it says it.">Margin reads your document, pulls out what matters — in your favour, against you, what to watch — and shows you exactly where it says it.</p>
 
-		<div class="pick">
-			<span class="pick-l" id="outL" data-t="I want to understand it in">I want to understand it in</span>
-			<div class="dd" id="outWrap">
-				<button type="button" class="dd-btn" id="outBtn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="outL outBtn"><span data-ic="languages"></span><span id="outName">English</span><span data-ic="chevron-down"></span></button>
-				<ul class="menu" id="outList" role="listbox" tabindex="-1" hidden></ul>
-			</div>
-		</div>
-
 		<div class="inputs">
 			<form class="url" id="urlForm" autocomplete="off">
 				<span data-ic="link"></span>
@@ -377,13 +397,14 @@ footer a { color: var(--link); }
 				<input id="urlIn" type="url" inputmode="url" data-t-ph="Paste a link — terms of use, a contract online…" placeholder="Paste a link">
 				<button class="btn btn-sm" type="submit" id="urlGo" disabled data-t="Add">Add</button>
 			</form>
+			<div class="sep" aria-hidden="true"><span data-t="or">or</span></div>
 			<label class="drop" id="drop" for="fileIn">
 				<span data-ic="file-up"></span>
-				<b class="hide-m" id="dropTitle" data-t="Drop one or more PDF or Word files here">Drop one or more PDF or Word files here</b>
+				<b class="hide-m" id="dropTitle" data-t="Drop one or more files here">Drop one or more files here</b>
 				<span class="or hide-m" data-t="or">or</span>
 				<span class="btn btn-ink" id="dropBtn" aria-hidden="true"><span data-ic="file-text"></span><span data-t="Choose files">Choose files</span></span>
-				<small data-t="PDF or Word (.docx) · up to 60 pages · 20 MB">PDF or Word (.docx) · up to 60 pages · 20 MB</small>
-				<input type="file" id="fileIn" multiple accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+				<small data-t="PDF, Word, Excel, text or a photo (PNG, JPEG) · up to 60 pages · 20 MB">PDF, Word, Excel, text or a photo (PNG, JPEG) · up to 60 pages · 20 MB</small>
+				<input type="file" id="fileIn" multiple accept=".pdf,.docx,.xlsx,.csv,.txt,.md,.png,.jpg,.jpeg,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain,text/markdown,image/png,image/jpeg">
 			</label>
 			<div class="paste-wrap">
 				<button type="button" class="lnk" id="pasteBtn" aria-expanded="false" aria-controls="pasteBox"><span data-ic="clipboard-paste"></span><span data-t="Or paste the text">Or paste the text</span></button>
@@ -402,6 +423,7 @@ footer a { color: var(--link); }
 			<p class="privacy"><span data-ic="lock"></span><span data-t="Your file is read in this browser. Only the passages needed for an answer are sent to the AI, and nothing is kept: close the page and it’s gone. Demo — avoid very personal documents.">Your file is read in this browser.</span></p>
 			<button type="button" class="btn btn-ink" id="analyse" disabled><span data-ic="sparkles"></span><span data-t="Analyse">Analyse</span></button>
 		</div>
+		<div class="quota" id="quota1" hidden></div>
 	</section>
 
 	<section id="p2" hidden>
@@ -416,20 +438,29 @@ footer a { color: var(--link); }
 			<form class="ask" id="askForm" autocomplete="off">
 				<label class="sr" for="q" data-t="A question about this document?">A question about this document?</label>
 				<textarea id="q" rows="1" maxlength="300" data-t-ph="A question about this document?"></textarea>
+				<div class="rec" id="rec" hidden>
+					<button type="button" class="rec-b" id="recX" data-t-label="Cancel"><span data-ic="x"></span></button>
+					<canvas class="wave" id="wave" aria-hidden="true"></canvas>
+					<span class="rec-t" id="recT" aria-live="polite">0:00</span>
+					<button type="button" class="rec-b ok" id="recOk" data-t-label="Done"><span data-ic="check"></span></button>
+				</div>
+				<button class="mic" type="button" id="micBtn" data-t-label="Speak your question" hidden><span data-ic="mic"></span></button>
 				<button class="go" type="submit" disabled><span data-t="Ask">Ask</span><span data-ic="arrow-right" class="flip-ic"></span></button>
 			</form>
 			<div class="tries" id="tries"></div>
+			<div class="quota" id="quota2" hidden></div>
 		</section>
 	</section>
 </main>
 
-<footer><div class="wrap"><span data-t="Margin is a fictional product designed and built by David Bitan for his AI Lab. Brevholt Kelmarion and its handbook are invented.">Margin is a fictional product designed and built by David Bitan for his AI Lab. Brevholt Kelmarion and its handbook are invented.</span><span class="foot-links"><button type="button" class="lnk" id="legalBtn" data-t="Privacy &amp; terms">Privacy &amp; terms</button> · <a href="THIRD-PARTY-NOTICES.txt" data-t="Licences">Licences</a> · <span>Built with Llama</span> · <a href="/" data-t="Portfolio">Portfolio</a></span></div></footer>
+<footer><div class="wrap"><span data-t="Margin is a fictional product designed and built by David Bitan for his AI Lab. Brevholt Kelmarion and its documents are invented.">Margin is a fictional product designed and built by David Bitan for his AI Lab. Brevholt Kelmarion and its documents are invented.</span><span class="foot-links"><button type="button" class="lnk" id="legalBtn" data-t="Privacy &amp; terms">Privacy &amp; terms</button> · <a href="THIRD-PARTY-NOTICES.txt" data-t="Licences">Licences</a> · <span>Built with Llama</span> · <a href="/" data-t="Portfolio">Portfolio</a></span></div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="icons.js"></script>
 <script src="i18n.js"></script>
 <script src="vendor/pdf.min.js"></script>
 <script src="vendor/mammoth.browser.min.js"></script>
+<script src="vendor/fflate.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
