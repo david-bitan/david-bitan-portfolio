@@ -1554,6 +1554,28 @@ window.MARGIN_I18N = (() => {
 	  "tr": "Bu sayfa okunamadı. Bazı siteler otomatik okumayı engeller. Metni kopyalayın, ardından dosyaların altındaki “buraya” bağlantısıyla yapıştırın.",
 	  "id": "Halaman ini tidak bisa dibaca. Beberapa situs memblokir pembacaan otomatis. Salin teksnya, lalu tempel lewat tautan “klik di sini” di bawah file.",
 	  "he": "לא הצלחתי לקרוא את הדף. אתרים מסוימים חוסמים קריאה אוטומטית. העתיקו את הטקסט והדביקו אותו דרך הקישור ״ללחוץ כאן״ שמתחת לקבצים."
+	 },
+	 "Document {i} of {n}": {
+	  "fr": "Document {i} sur {n}",
+	  "es": "Documento {i} de {n}",
+	  "pt": "Documento {i} de {n}",
+	  "de": "Dokument {i} von {n}",
+	  "it": "Documento {i} di {n}",
+	  "ru": "Документ {i} из {n}",
+	  "tr": "Belge {i} / {n}",
+	  "id": "Dokumen {i} dari {n}",
+	  "he": "מסמך {i} מתוך {n}"
+	 },
+	 "Clear all": {
+	  "fr": "Tout effacer",
+	  "es": "Borrar todo",
+	  "pt": "Apagar tudo",
+	  "de": "Alles löschen",
+	  "it": "Cancella tutto",
+	  "ru": "Очистить всё",
+	  "tr": "Tümünü temizle",
+	  "id": "Hapus semua",
+	  "he": "מחיקת הכול"
 	 }
 	};
 	let lang = "en";

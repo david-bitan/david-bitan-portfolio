@@ -213,8 +213,8 @@
 		const all = ready().flatMap((d) => d.chunks); if (totalChars() <= WHOLE) return all;
 		const hits = new Set(bm25(question).slice(0, 14).map((h) => h.c)); return all.filter((c) => hits.has(c));
 	}
-	function importantChunks() {
-		const all = ready().flatMap((d) => d.chunks); if (totalChars() <= WHOLE) return all;
+	function importantChunks(doc) {
+		const all = doc ? doc.chunks : ready().flatMap((d) => d.chunks); if ((doc ? doc.chars : totalChars()) <= WHOLE) return all;
 		const score = (c) => (c.text.match(/\d/g) || []).length * 0.4 + (c.text.match(/\b(must|may not|cannot|within|deadline|penalt|fee|notice|terminate|liable|refund|waive|arbitration|doit|doivent|délai|pénalit|résili|frais|interdit|חייב|אסור|תוך|קנס|הודעה)/gi) || []).length * 2;
 		let total = 0; const keep = new Set();
 		for (const c of [...all].sort((a, b) => score(b) - score(a))) { if (total + c.text.length > WHOLE) continue; keep.add(c); total += c.text.length; }
@@ -275,27 +275,33 @@
 	let reportTimer;
 	function scheduleReport() { clearTimeout(reportTimer); reportTimer = setTimeout(() => { if (S.page === 2 && !S.loading && ready().length) makeReport(); }, 500); }
 	const GROUPS = [["short", "In short"], ["favour", "In your favour", "fav"], ["against", "Could work against you", "aga"], ["watch", "Watch out for", "wat"], ["facts", "Key dates and numbers", "fac"]];
+	/* One report per document: two files give two sections, each about its own file only. */
 	async function makeReport(keepTurns) {
-		const sig = ready().map((d) => d.fid).join(",") + "|" + S.out;
-		if (S.report && S.report.sig === sig && !S.report.failed) return;
-		const r = { sig, pending: true, step: 1, lang: S.out, id: "rep" + Date.now() };
+		const docs = ready(), sig = docs.map((d) => d.fid).join(",") + "|" + S.out;
+		if (S.report && S.report.sig === sig && !S.report.cleared && !S.report.parts?.some((p) => p.failed)) return;
+		const old = S.report?.sig === sig && S.report.parts ? S.report : null; // "Try again": keep the parts that worked
+		const r = { sig, lang: S.out, id: "rep" + Date.now(), parts: docs.map((d) => old?.parts.find((p) => p.fid === d.fid && !p.failed) || { fid: d.fid, name: d.name, pending: true, step: 1 }) };
 		const same = keepTurns || (S.report && S.report.sig.split("|")[0] === sig.split("|")[0]);
 		S.report = r; if (!same) S.turns = []; S.open.clear(); renderReport(); renderThread(); renderFiles();
-		const tick = async (n) => { if (S.report !== r) return; r.step = n; renderReport(); await wait(reduced ? 0 : 350); };
-		const chunks = importantChunks(); await tick(2);
-		let j = null;
-		let lim = false;
+		await Promise.all(r.parts.filter((p) => p.pending).map((p) => reportPart(r, p)));
+	}
+	async function reportPart(r, p) {
+		const d = S.docs.find((x) => x.fid === p.fid); if (!d) return;
+		const tick = async (n) => { if (S.report !== r) return; p.step = n; renderReport(); await wait(reduced ? 0 : 350); };
+		const chunks = importantChunks(d); await tick(2);
+		let j = null, lim = false;
 		try { j = await callApi({ mode: "report", lang: r.lang, passages: pass(chunks) }); } catch (e) { lim = Boolean(e.limit); console.warn("Margin AI:", e.message); }
 		if (S.report !== r) return;
 		await tick(3);
-		r.pending = false; r.model = j?.model || null;
-		if (!j) { r.failed = lim ? "limit" : "offline"; return renderAll(); }
-		r.groups = {}; let all = [], rem = [];
-		for (const [k] of GROUPS) { const v = verify(j[k], chunks, r.lang); r.groups[k] = v.kept; all = all.concat(v.kept); rem = rem.concat(v.removed); }
-		r.removed = rem; r.count = all.length;
-		if (!all.length) r.failed = rem.length ? "unbacked" : "empty";
+		p.pending = false;
+		if (!j) { p.failed = lim ? "limit" : "offline"; return renderAll(); }
+		p.groups = {}; let all = [], rem = [];
+		for (const [k] of GROUPS) { const v = verify(j[k], chunks, r.lang); p.groups[k] = v.kept; all = all.concat(v.kept); rem = rem.concat(v.removed); }
+		p.removed = rem; p.count = all.length;
+		if (!all.length) p.failed = rem.length ? "unbacked" : "empty";
 		renderAll();
 	}
+	const repItems = () => (S.report?.parts || []).filter((p) => p.groups).flatMap((p) => Object.values(p.groups).flat());
 	const renderAll = () => { renderReport(); renderThread(); renderFiles(); };
 	function go(n) {
 		S.page = n; $("#p1").hidden = n !== 1; $("#p2").hidden = n !== 2;
@@ -308,27 +314,30 @@
 		const box = $("#report"), r = S.report;
 		if (!r || !S.docs.length) { box.innerHTML = ""; $("#qa").hidden = true; return; }
 		box.setAttribute("lang", r.lang); box.dir = r.lang === "he" ? "rtl" : "ltr";
-		const names = ready().map((d) => d.name).join(" · ");
-		const title = t(ready().length > 1 ? "Your documents in short" : "Your document in short");
-		if (r.pending) {
-			box.innerHTML = `<div class="rep"><div class="rep-h"><div><span class="kind">${esc(names)}</span><h2>${title}</h2></div></div><div class="work"><ul>${["Reading the document", "Writing the summary", "Checking every point against the document"].map((s, i) => `<li class="${r.step > i + 1 ? "done" : r.step === i + 1 ? "on" : ""}">${r.step > i + 1 ? ic("check") : r.step === i + 1 ? ic("loader-circle", "spin") : ic("circle")}${t(s)}</li>`).join("")}</ul></div></div>`;
-			$("#qa").hidden = true; return;
-		}
 		if (r.cleared) { box.innerHTML = `<div class="rep"><p style="margin:0 0 12px;color:var(--ink-2)">${t("Analysis cleared.")}</p><button type="button" class="btn btn-sm" data-act="reanalyse">${ic("refresh-cw")}${t("Analyse again")}</button></div>`; $("#qa").hidden = true; return; }
-		if (r.failed) {
-			const msg = r.failed === "limit" ? limitMsg() : r.failed === "offline" ? "The AI can’t be reached right now, and this needs it. Please try again in a moment." : r.failed === "empty" ? "The AI’s answer came back incomplete this time. Please try again." : "The AI wrote points I couldn’t match to the document, so I didn’t show them. Please try again.";
-			box.innerHTML = `<div class="rep"><div class="rep-h"><div><span class="kind">${esc(names)}</span><h2>${title}</h2></div></div><div class="err">${ic("circle-alert")}<span>${r.failed === "limit" ? esc(msg) : t(msg)}</span></div>${r.failed === "limit" ? "" : `<button type="button" class="btn btn-sm reanalyse" data-act="reanalyse">${ic("refresh-cw")}${t("Try again")}</button>`}</div>`;
-			$("#qa").hidden = false; renderTries(); return;
+		const many = r.parts.length > 1;
+		box.innerHTML = r.parts.map((p, i) => partHtml(r, p, i, many)).join("");
+		const busy = r.parts.some((p) => p.pending);
+		S.snips = drawSnips(box); $("#qa").hidden = busy && !r.parts.some((p) => p.groups); renderTries();
+	}
+	function partHtml(r, p, i, many) {
+		const kind = many ? esc(t("Document {i} of {n}", { i: i + 1, n: r.parts.length })) : esc(p.name);
+		const title = many ? esc(p.name) : t("Your document in short");
+		const owner = "report:" + p.fid;
+		const head = (acts = "") => `<div class="rep-h"><div><span class="kind">${kind}</span><h2>${title}</h2></div>${acts}</div>`;
+		if (p.pending) return `<div class="rep">${head()}<div class="work"><ul>${["Reading the document", "Writing the summary", "Checking every point against the document"].map((s, k) => `<li class="${p.step > k + 1 ? "done" : p.step === k + 1 ? "on" : ""}">${p.step > k + 1 ? ic("check") : p.step === k + 1 ? ic("loader-circle", "spin") : ic("circle")}${t(s)}</li>`).join("")}</ul></div></div>`;
+		if (p.failed) {
+			const msg = p.failed === "limit" ? limitMsg() : t(p.failed === "offline" ? "The AI can’t be reached right now, and this needs it. Please try again in a moment." : p.failed === "empty" ? "The AI’s answer came back incomplete this time. Please try again." : "The AI wrote points I couldn’t match to the document, so I didn’t show them. Please try again.");
+			return `<div class="rep">${head()}<div class="err">${ic("circle-alert")}<span>${esc(msg)}</span></div>${p.failed === "limit" ? "" : `<button type="button" class="btn btn-sm reanalyse" data-act="reanalyse">${ic("refresh-cw")}${t("Try again")}</button>`}</div>`;
 		}
-		const item = (it) => `<li>${pointHtml(it)}</li>`;
-		const groupHtml = ([k, lbl, cls]) => `<div class="box ${cls}"><h3><span class="dot"></span>${t(lbl)}</h3>${r.groups[k].length ? `<ul>${r.groups[k].map(item).join("")}</ul>` : `<p class="empty">${t("Nothing found for this part.")}</p>`}</div>`;
-		const acts = `<div class="res-acts"><button type="button" class="btn btn-text btn-sm" data-act="listen" data-r="report">${ic(S.speaking === "report" ? "square" : "volume-2")}${t(S.speaking === "report" ? "Stop" : "Listen")}</button><button type="button" class="btn btn-text btn-sm" data-act="copy" data-r="report">${ic("copy")}${t("Copy")}</button><button type="button" class="btn btn-text btn-sm" data-act="clear" data-r="report">${ic("trash-2")}${t("Clear")}</button></div>`;
-		const first = !r.shown; r.shown = true;
-		box.innerHTML = `<article class="rep${first ? " in" : ""}"><div class="rep-h"><div><span class="kind">${esc(names)}</span><h2>${title}</h2></div>${acts}</div>
-			${r.groups.short.length ? `<div class="short">${r.groups.short.map((it) => `<span class="pt">${pointHtml(it)}</span>`).join(" ")}</div>` : ""}
+		const item = (it) => `<li>${pointHtml(it, owner)}</li>`;
+		const groupHtml = ([k, lbl, cls]) => `<div class="box ${cls}"><h3><span class="dot"></span>${t(lbl)}</h3>${p.groups[k].length ? `<ul>${p.groups[k].map(item).join("")}</ul>` : `<p class="empty">${t("Nothing found for this part.")}</p>`}</div>`;
+		const acts = `<div class="res-acts"><button type="button" class="btn btn-text btn-sm" data-act="listen" data-r="${owner}">${ic(S.speaking === owner ? "square" : "volume-2")}${t(S.speaking === owner ? "Stop" : "Listen")}</button><button type="button" class="btn btn-text btn-sm" data-act="copy" data-r="${owner}">${ic("copy")}${t("Copy")}</button>${i === 0 ? `<button type="button" class="btn btn-text btn-sm" data-act="clear" data-r="report">${ic("trash-2")}${t(many ? "Clear all" : "Clear")}</button>` : ""}</div>`;
+		const first = !p.shown; p.shown = true;
+		return `<article class="rep${first ? " in" : ""}">${head(acts)}
+			${p.groups.short.length ? `<div class="short">${p.groups.short.map((it) => `<span class="pt">${pointHtml(it, owner)}</span>`).join(" ")}</div>` : ""}
 			<div class="grid4">${GROUPS.slice(1).map(groupHtml).join("")}</div>
-			<div class="rep-foot"><span class="badge ok">${ic("shield-check")}${t("{n} points, each checked against the document", { n: r.count })}</span>${r.removed?.length ? `<span>${r.removed.length === 1 ? esc(t(r.removed[0].why === "num" ? "Removed: its number isn’t in the document." : "Removed: it had no source.")) : esc(t("{n} removed", { n: r.removed.length }))}</span>` : ""}<span>${t("This summary helps you read. It isn’t legal advice.")}</span></div></article>`;
-		S.snips = drawSnips(box); $("#qa").hidden = false; renderTries();
+			<div class="rep-foot"><span class="badge ok">${ic("shield-check")}${t("{n} points, each checked against the document", { n: p.count })}</span>${p.removed?.length ? `<span>${p.removed.length === 1 ? esc(t(p.removed[0].why === "num" ? "Removed: its number isn’t in the document." : "Removed: it had no source.")) : esc(t("{n} removed", { n: p.removed.length }))}</span>` : ""}<span>${t("This summary helps you read. It isn’t legal advice.")}</span></div></article>`;
 	}
 	/* a point, with a quiet "Where it says it" that opens the highlighted passage underneath */
 	function pointHtml(it, owner = "report") {
@@ -338,7 +347,7 @@
 	function srcHtml(it, id, owner) {
 		const c = chunk(id); if (!c) return "";
 		const d = docOf(c), where = [S.docs.length > 1 || d.type === "web" ? esc(d.name) : null, c.page ? t("Page {n}", { n: c.page }) : null].filter(Boolean).join(" · ");
-		const lang = owner === "report" ? S.report.lang : (S.turns.find((x) => x.id === owner)?.lang || S.out);
+		const lang = owner.startsWith("report") ? S.report.lang : (S.turns.find((x) => x.id === owner)?.lang || S.out);
 		const tr = it.tr?.[id];
 		const snip = visual(d) ? `<canvas data-snip="${id}" role="img" aria-label="${esc(c.text.slice(0, 300))}"></canvas>` : `<div class="snip-txt" dir="auto">${textSnip(d, c)}</div>`;
 		return `<article class="src" dir="${I.lang === "he" ? "rtl" : "ltr"}" lang="${I.lang}">${where ? `<div class="src-top"><span>${where}</span></div>` : ""}
@@ -370,7 +379,8 @@
 	const TRIES = ["Can I work for a competitor after I leave?", "What happens if I resign in the first year?", "Who owns what I create at home?"];
 	function renderTries() { $("#tries").innerHTML = S.docs.some((d) => d.sample) && !S.turns.length ? `<span>${t("Try:")}</span>${TRIES.map((q) => `<button type="button" class="chip" data-try="${esc(q)}">${esc(t(q))}</button>`).join("")}` : ""; }
 	const line = (x) => (x.value ? `${x.value}: ${x.text}` : x.text);
-	function reportText() { const r = S.report; if (!r || r.pending || r.failed) return ""; return GROUPS.map(([k, lbl]) => (r.groups[k].length ? `${lbl}: ${r.groups[k].map(line).join(" ")}` : "")).filter(Boolean).join("\n"); }
+	const partText = (p, lbl) => GROUPS.map(([k, l]) => (p.groups[k].length ? `${lbl(l)}: ${p.groups[k].map(line).join(" ")}` : "")).filter(Boolean).join("\n");
+	function reportText() { const r = S.report; if (!r?.parts) return ""; return r.parts.filter((p) => p.groups).map((p) => `[${p.name}]\n${partText(p, (l) => l)}`).join("\n"); }
 	async function ask(q) {
 		if (!ready().length || S.turns.some((x) => x.pending)) return;
 		const tu = { id: "t" + Date.now(), q, pending: true, lang: S.out };
@@ -427,14 +437,14 @@
 
 	/* ---------------- listen, copy ---------------- */
 	function plainOf(owner) {
-		if (owner === "report") { const r = S.report; if (!r || r.pending || r.failed) return ""; return GROUPS.map(([k, lbl]) => (r.groups[k].length ? `${t(lbl)}. ${r.groups[k].map(line).join(" ")}` : "")).filter(Boolean).join("\n"); }
+		if (owner.startsWith("report:")) { const p = S.report?.parts?.find((x) => "report:" + x.fid === owner); return p?.groups ? `${p.name}\n${partText(p, t)}` : ""; }
 		const tu = S.turns.find((x) => x.id === owner); return tu?.items?.length ? `${tu.q}\n${tu.items.map((x) => x.text).join(" ")}` : "";
 	}
 	function speak(owner) {
 		const syn = window.speechSynthesis; if (!syn) return toast(t("This device has no voice for this language."));
 		if (S.speaking) { const was = S.speaking; syn.cancel(); S.speaking = null; refreshListen(); if (was === owner) return; }
 		const txt = plainOf(owner); if (!txt) return;
-		const lang = owner === "report" ? S.report.lang : S.turns.find((x) => x.id === owner).lang;
+		const lang = owner.startsWith("report") ? S.report.lang : S.turns.find((x) => x.id === owner).lang;
 		const code = I.LANGS.find((x) => x[0] === lang)[3], voices = syn.getVoices();
 		const voice = voices.find((v) => v.lang === code) || voices.find((v) => v.lang?.toLowerCase().startsWith(lang));
 		if (voices.length && !voice) return toast(t("This device has no voice for this language."));
@@ -444,7 +454,7 @@
 	}
 	function refreshListen() { document.querySelectorAll('[data-act="listen"]').forEach((b) => { const on = S.speaking === b.dataset.r; b.innerHTML = `${ic(on ? "square" : "volume-2")}${t(on ? "Stop" : "Listen")}`; }); }
 	function copy(owner) {
-		const items = owner === "report" ? Object.values(S.report.groups).flat() : S.turns.find((x) => x.id === owner).items;
+		const items = owner.startsWith("report:") ? Object.values(S.report.parts.find((x) => "report:" + x.fid === owner)?.groups || {}).flat() : S.turns.find((x) => x.id === owner).items;
 		const ids = []; items.forEach((it) => it.cite.forEach((id) => !ids.includes(id) && ids.push(id)));
 		const src = ids.map((id, i) => { const c = chunk(id); return c ? `[${i + 1}] ${docOf(c).name}${c.page ? ", " + t("Page {n}", { n: c.page }) : ""}: ${c.text.slice(0, 160)}` : ""; }).join("\n");
 		navigator.clipboard?.writeText(`${plainOf(owner)}\n\n${t("Sources")}:\n${src}`).then(() => toast(t("Copied, with its sources.")), () => {});
@@ -561,7 +571,7 @@
 		const v = e.target.closest("[data-view]"); if (v) return view(v.dataset.view);
 		const x = e.target.closest("[data-tr]");
 		if (x) {
-			const it = [...Object.values(S.report?.groups || {}).flat(), ...S.turns.flatMap((u) => u.items || [])].find((i) => i.key === x.dataset.tr); if (!it) return;
+			const it = [...repItems(), ...S.turns.flatMap((u) => u.items || [])].find((i) => i.key === x.dataset.tr); if (!it) return;
 			const id = x.dataset.id, again = () => (x.closest("#thread") ? renderThread() : renderReport());
 			it.tr = it.tr || {};
 			if (it.tr[id] && it.tr[id] !== "…") { delete it.tr[id]; return again(); }
@@ -572,7 +582,7 @@
 		const a = e.target.closest("[data-act]"); if (!a) return;
 		const owner = a.dataset.r;
 		if (a.dataset.act === "whylimit") return toast(t("Margin is a free demo. It runs on Cloudflare’s free AI allowance, shared by every visitor, which renews each day."));
-		if (a.dataset.act === "reanalyse") { if (S.report) { S.report.failed = "retry"; S.report.cleared = false; } return makeReport(); }
+		if (a.dataset.act === "reanalyse") { if (S.report?.cleared) S.report = null; return makeReport(true); }
 		if (a.dataset.act === "listen") return speak(owner);
 		if (a.dataset.act === "copy") return copy(owner);
 		if (a.dataset.act === "clear") { if (S.speaking) speak(S.speaking); const rep = S.report, turns = S.turns; S.report = { sig: rep.sig, cleared: true, failed: "cleared", lang: rep.lang }; S.turns = []; renderAll(); toast(t("Analysis cleared."), t("Undo"), () => { S.report = rep; S.turns = turns; renderAll(); }); return; }
