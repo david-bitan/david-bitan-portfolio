@@ -552,18 +552,25 @@
 	const micOK = Boolean(navigator.mediaDevices?.getUserMedia && window.MediaRecorder && (window.AudioContext || window.webkitAudioContext));
 	if (micOK) $("#micBtn").hidden = false;
 	/* The AudioContext is created during the tap itself: browsers keep it "suspended" (silent) if it is created later. */
+	/* voice diagnostics, kept in this browser only (last 40 steps): read with MARGIN_VOICE_LOG() in the console */
+	function vlog(step, data) {
+		try { const L = JSON.parse(localStorage.getItem("margin-voice-log") || "[]"); L.push({ at: new Date().toISOString().slice(11, 19), step, ...(data || {}) }); localStorage.setItem("margin-voice-log", JSON.stringify(L.slice(-40))); } catch {}
+	}
+	window.MARGIN_VOICE_LOG = () => { try { return JSON.parse(localStorage.getItem("margin-voice-log") || "[]"); } catch { return []; } };
 	function micTap() {
-		if (rec.on) return;
+		if (rec.on) return; vlog("tap");
 		const AC = window.AudioContext || window.webkitAudioContext, ac = new AC(); ac.resume?.();
 		recStart(ac);
 	}
 	async function recStart(ac) {
 		let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
-		catch (e) { ac.close?.(); return toast(t(e?.name === "NotAllowedError" ? "Microphone access was refused. You can allow it in your browser settings." : "Your microphone isn’t available in this browser.")); }
+		catch (e) { vlog("mic-refused", { name: e?.name, msg: String(e?.message || "").slice(0, 80) }); ac.close?.(); return toast(t(e?.name === "NotAllowedError" ? "Microphone access was refused. You can allow it in your browser settings." : "Your microphone isn’t available in this browser.")); }
 		if (ac.state !== "running") { try { await ac.resume(); } catch {} }
+		{ const tr = stream.getAudioTracks()[0], st = tr?.getSettings?.() || {}; vlog("mic-open", { label: tr?.label, muted: tr?.muted, enabled: tr?.enabled, state: tr?.readyState, rate: st.sampleRate, ch: st.channelCount, ctx: ac.state }); }
 		const src = ac.createMediaStreamSource(stream), an = ac.createAnalyser(); an.fftSize = 1024; src.connect(an);
 		const mr = new MediaRecorder(stream), parts = [];
 		mr.ondataavailable = (e) => e.data.size && parts.push(e.data);
+		mr.onerror = (e) => vlog("recorder-error", { msg: String(e?.error?.message || e?.error || "").slice(0, 80) });
 		Object.assign(rec, { on: true, stream, ac, an, mr, parts, t0: performance.now(), heardAt: null, sawSignal: false, maxRms: 0, floor: 0, frames: 0, bars: [], level: 0 });
 		rec.timer = setInterval(sample, 50);
 		mr.start(250);
@@ -603,6 +610,7 @@
 		const { mr, stream, ac, parts, heardAt, t0, maxRms, sawSignal } = rec;
 		const done = new Promise((r) => (mr.onstop = r)); try { mr.stop(); } catch {} await done;
 		stream.getTracks().forEach((x) => x.stop());
+		vlog("stop", { keep, seconds: +((performance.now() - t0) / 1000).toFixed(1), type: mr.mimeType, parts: parts.length, KB: Math.round(parts.reduce((a, p) => a + p.size, 0) / 1024), sawSignal, maxRms: +maxRms.toFixed(4), heardAt });
 		const close = () => { ac.close?.(); $("#askForm").classList.remove("recording"); $("#rec").hidden = true; fit(); ta.focus(); };
 		if (!keep) { close(); return; }
 		if ((performance.now() - t0) < 600 || !parts.length) { close(); return toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak.")); }
@@ -612,10 +620,11 @@
 			const wav = await toWav(new Blob(parts, { type: mr.mimeType || "audio/webm" }), 0); // the whole recording: cutting on a guess lost words
 			const j = await callApi({ mode: "transcribe", audio: wav }, 30000);
 			const txt = String(j.text || "").trim();
+			vlog("transcribed", { wavKB: Math.round(wav.length * 0.75 / 1024), text: txt.slice(0, 120) });
 			console.info("Margin voice:", JSON.stringify({ seconds: +((performance.now() - t0) / 1000).toFixed(1), type: mr.mimeType, wavKB: Math.round(wav.length * 0.75 / 1024), sawSignal, maxRms: +maxRms.toFixed(4), heardAt, text: txt }));
 			if (!txt || HALLU.test(txt)) toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak."));
 			else { ta.value = (ta.value.trim() ? ta.value.trim() + " " : "") + txt; $("#toast").classList.remove("on"); }
-		} catch (e) { console.warn("Margin voice:", e.message); toast(e.limit ? limitMsg() : t("I couldn’t turn your voice into text. Please try again.")); }
+		} catch (e) { vlog("error", { msg: String(e?.message || e).slice(0, 120) }); console.warn("Margin voice:", e.message); toast(e.limit ? limitMsg() : t("I couldn’t turn your voice into text. Please try again.")); }
 		close();
 	}
 	/* the recording → 16 kHz mono WAV, without the silence before the first word, as base64 */
