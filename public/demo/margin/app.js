@@ -564,41 +564,49 @@
 		const src = ac.createMediaStreamSource(stream), an = ac.createAnalyser(); an.fftSize = 1024; src.connect(an);
 		const mr = new MediaRecorder(stream), parts = [];
 		mr.ondataavailable = (e) => e.data.size && parts.push(e.data);
-		Object.assign(rec, { on: true, stream, ac, an, mr, parts, t0: performance.now(), heardAt: null, measured: false, floor: 0, frames: 0, bars: [] });
+		Object.assign(rec, { on: true, stream, ac, an, mr, parts, t0: performance.now(), heardAt: null, sawSignal: false, floor: 0, frames: 0, bars: [], level: 0 });
+		rec.timer = setInterval(sample, 50);
 		mr.start(250);
 		$("#askForm").classList.add("recording"); $("#rec").hidden = false; $("#recOk").disabled = false; $("#recOk").focus();
 		draw();
 	}
 	/* a small live level meter (about 150 px): it moves whenever the microphone hears something */
+	/* Listening is measured every 50 ms (a timer keeps running even when the page isn't painted); the bars are drawn on screen frames. */
+	function sample() {
+		if (!rec.on) return;
+		const buf = new Float32Array(rec.an.fftSize); rec.an.getFloatTimeDomainData(buf);
+		let sum = 0, peak = 0; for (const x of buf) { sum += x * x; const a = Math.abs(x); if (a > peak) peak = a; }
+		const rms = Math.sqrt(sum / buf.length), sec = (performance.now() - rec.t0) / 1000;
+		if (rms > 0.0005) rec.sawSignal = true; // the meter really receives sound from the microphone
+		rec.frames++; if (rec.frames <= 4) rec.floor = Math.max(rec.floor, rms); // the room's own noise, first 0.2 s
+		if (rec.heardAt == null && rec.frames > 4 && (rms > Math.max(0.01, rec.floor * 2.2) || peak > 0.1)) rec.heardAt = sec;
+		rec.level = Math.min(1, Math.sqrt(Math.max(0, rms - rec.floor * 0.6)) * 3.2);
+		rec.bars.push(rec.level); while (rec.bars.length > 40) rec.bars.shift();
+		$("#recT").textContent = `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
+		// give up only when the meter works and has heard nothing: if it can't measure, the person decides with ✓
+		if (rec.sawSignal && rec.heardAt == null && sec > SILENT_GIVE_UP) { recStop(false); return toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak.")); }
+		if (sec >= REC_MAX) recStop(true);
+	}
 	function draw() {
 		if (!rec.on) return;
 		const cv = $("#wave"), g = cv.getContext("2d"), dpr = devicePixelRatio || 1, W = cv.clientWidth || 150, H = cv.clientHeight || 28;
 		if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
-		const buf = new Float32Array(rec.an.fftSize); rec.an.getFloatTimeDomainData(buf);
-		let sum = 0, peak = 0; for (const x of buf) { sum += x * x; const a = Math.abs(x); if (a > peak) peak = a; }
-		const rms = Math.sqrt(sum / buf.length), sec = (performance.now() - rec.t0) / 1000;
-		if (rms > 0 || rec.ac.state === "running") rec.measured = true; // a running context really listens, even to digital silence
-		rec.frames++; if (rec.frames <= 12) rec.floor = Math.max(rec.floor, rms); // the room's own noise, first 0.2 s
-		if (rec.heardAt == null && rec.frames > 12 && (rms > Math.max(0.012, rec.floor * 2.5) || peak > 0.12)) rec.heardAt = sec;
-		const level = Math.min(1, Math.sqrt(Math.max(0, rms - rec.floor * 0.6)) * 3.2);
-		rec.bars.push(level); const n = Math.floor(W / 5); while (rec.bars.length > n) rec.bars.shift();
+		const n = Math.floor(W / 5), bars = rec.bars.slice(-n);
 		g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); g.fillStyle = getComputedStyle($("#rec")).color;
-		for (let i = 0; i < n; i++) { const v = rec.bars[i - (n - rec.bars.length)] ?? 0, h = Math.max(3, v * (H - 2)); g.globalAlpha = 0.3 + v * 0.7; g.beginPath(); g.roundRect ? g.roundRect(i * 5, (H - h) / 2, 3, h, 1.5) : g.rect(i * 5, (H - h) / 2, 3, h); g.fill(); }
+		for (let i = 0; i < n; i++) { const v = bars[i - (n - bars.length)] ?? 0, h = Math.max(3, v * (H - 2)); g.globalAlpha = 0.3 + v * 0.7; g.beginPath(); g.roundRect ? g.roundRect(i * 5, (H - h) / 2, 3, h, 1.5) : g.rect(i * 5, (H - h) / 2, 3, h); g.fill(); }
 		g.globalAlpha = 1;
-		$("#recT").textContent = `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
-		if (rec.measured && rec.heardAt == null && sec > SILENT_GIVE_UP) { recStop(false); return toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak.")); }
-		if (sec >= REC_MAX) return recStop(true);
 		rec.raf = requestAnimationFrame(draw);
 	}
 	const HALLU = /^(thank you\.?|thanks for watching!?|you|merci\.?|sous-titrage[^]*|\.+)$/i; // what Whisper "hears" in near-silence
 	async function recStop(keep) {
-		if (!rec.on) return; rec.on = false; cancelAnimationFrame(rec.raf);
-		const { mr, stream, ac, parts, heardAt, measured } = rec;
+		if (!rec.on) return; rec.on = false; cancelAnimationFrame(rec.raf); clearInterval(rec.timer);
+		const { mr, stream, ac, parts, heardAt, t0 } = rec;
 		const done = new Promise((r) => (mr.onstop = r)); try { mr.stop(); } catch {} await done;
 		stream.getTracks().forEach((x) => x.stop());
 		const close = () => { ac.close?.(); $("#askForm").classList.remove("recording"); $("#rec").hidden = true; fit(); ta.focus(); };
 		if (!keep) { close(); return; }
-		if (measured && heardAt == null) { close(); return toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak.")); }
+		if ((performance.now() - t0) < 600 || !parts.length) { close(); return toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak.")); }
+		// ✓ always sends what was recorded: Whisper decides; near-silence comes back empty or as a known filler and is ignored
 		$("#recOk").disabled = true; $("#recT").textContent = "…"; toast(t("Turning your voice into text…"));
 		try {
 			const wav = await toWav(new Blob(parts, { type: mr.mimeType || "audio/webm" }), Math.max(0, (heardAt ?? 0) - 0.4));
