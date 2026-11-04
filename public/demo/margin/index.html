@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Margin · understand any document</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23141414' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='3' width='16' height='18' rx='3'/%3E%3Cpath d='M9 3v18'/%3E%3Cpath d='M12.5 8h4'/%3E%3Cpath d='M12.5 12h4'/%3E%3Cpath d='M12.5 16h2.5'/%3E%3C/svg%3E">
 <meta name="description" content="Margin reads a PDF or Word file and answers with the exact passage, highlighted. A portfolio concept by David Bitan.">
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="fonts/fonts.css">
@@ -35,10 +36,10 @@ a { color: inherit; }
 .pf a { color: #fff; text-underline-offset: 3px; }
 
 .top { background: var(--paper); border-bottom: 1px solid var(--line); }
-.top-in { max-width: 1120px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 16px; }
-.logo { display: flex; align-items: baseline; gap: 8px; border: 0; background: none; padding: 0; }
+.top-in { max-width: 1120px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 8px; } /* 8 px between the language and account buttons: one group */
+.logo { display: flex; align-items: center; gap: 8px; border: 0; background: none; padding: 0; color: var(--ink); }
+.logo .mk { width: 24px; height: 24px; flex: none; }
 .logo b { font: 700 22px/1 "Geist", var(--sans); letter-spacing: -.03em; direction: ltr; }
-.logo b i { font-style: normal; background: linear-gradient(transparent 58%, var(--marker) 58%); padding: 0 1px; }
 .lang { position: relative; margin-inline-start: auto; }
 .lang > button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-2); background: var(--surface); border-radius: 999px; padding: 7px 12px; font-size: 14px; font-weight: 500; }
 .lang > button .i { width: 16px; height: 16px; }
@@ -414,7 +415,7 @@ footer .wrap { padding-top: 10px; padding-bottom: 12px; align-items: center; gap
 #report > .rep + .rep { margin-top: 32px; } /* one section per document, clearly apart */
 
 /* demo account + My analyses */
-.acct { position: relative; margin-inline-start: 8px; }
+.acct { position: relative; }
 .acct > button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-2); background: var(--surface); border-radius: 999px; padding: 7px 12px; font-size: 14px; font-weight: 500; cursor: pointer; }
 .acct > button .i { width: 16px; height: 16px; }
 .acct .av { width: 22px; height: 22px; border-radius: 50%; background: var(--link); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; margin-inline-start: -5px; }
@@ -434,17 +435,27 @@ footer .wrap { padding-top: 10px; padding-bottom: 12px; align-items: center; gap
 .saved li small { color: var(--ink-3); font-size: 13.5px; }
 .saved li .row { display: flex; gap: 4px; flex: none; }
 .saved .none { display: block; color: var(--ink-2); background: none; border: 0; padding: 0; }
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin: 16px 0 16px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); }
+.auth-tabs button { border: 0; background: none; border-radius: 999px; padding: 8px 12px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+.auth-tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.fld-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.auth-err { margin: -4px 0 12px; color: var(--bad); font-size: 14px; font-weight: 600; }
+.legal .fine { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--ink-2); margin: 0 0 16px; }
+.legal .fine .i { width: 15px; height: 15px; flex: none; margin-top: 2px; }
+[dir="rtl"] .legal input[dir="ltr"] { text-align: right; }
+@media (max-width: 400px) { .fld-row { grid-template-columns: 1fr; gap: 0; } .viewer.acx .legal { padding: 20px 16px; } .auth-tabs button { padding: 8px 4px; font-size: 13px; white-space: nowrap; } .legal .fld { margin-bottom: 12px; } }
 .save-hint { display: flex; align-items: flex-start; gap: 8px; color: var(--ink-2); font-size: 14px; line-height: 20px; margin: 14px 0 0; }
 .save-hint .i { width: 16px; height: 16px; flex: none; margin-top: 2px; }
 @media (max-width: 480px) { .acrow { flex-direction: column-reverse; align-items: stretch; } .acrow .btn { width: 100%; justify-content: center; } }
 .viewing { display: flex; gap: 10px; align-items: flex-start; background: #DDEBFB; border: 1.5px solid #8FB5E6; border-radius: var(--r-lg); padding: 12px 16px; margin-bottom: 16px; font-size: 14.5px; }
 .viewing .i { width: 18px; height: 18px; flex: none; margin-top: 2px; color: var(--link); }
+@media (max-width: 380px) { .acct .lbl { display: none; } } /* very small phones: the person icon alone, labelled */
 @media (max-width: 640px) { .acct .nm { display: none; } .saved li { flex-wrap: wrap; } .saved li > div { flex-basis: 100%; } }
 </style>
 </head>
 <body>
 <header class="top"><div class="top-in">
-	<button class="logo" type="button" id="home" aria-label="Margin"><b>Marg<i>i</i>n</b></button>
+	<button class="logo" type="button" id="home" aria-label="Margin"><svg class="mk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M9 3v18"/><path d="M12.5 8h4"/><path d="M12.5 12h4"/><path d="M12.5 16h2.5"/></svg><b>Margin</b></button>
 	<div class="lang" id="langWrap">
 		<button type="button" id="langBtn" aria-haspopup="listbox" aria-expanded="false" data-t-label="Language"><span data-ic="globe"></span><span id="langName" class="hide-m">English</span><span id="langCode" class="show-m">EN</span><span data-ic="chevron-down"></span></button>
 		<ul class="menu" id="langList" role="listbox" tabindex="-1" hidden></ul>

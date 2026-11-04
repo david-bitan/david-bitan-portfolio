@@ -508,13 +508,22 @@
 
 	/* ---------------- demo account + My analyses: kept in this browser only, nothing is sent ---------------- */
 	const store = { get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } } };
-	const savedKey = () => "margin-analyses:" + (S.acct?.name || "").toLowerCase();
+	const savedKey = () => "margin-analyses:" + (S.acct?.email || "").toLowerCase();
 	const savedList = () => (S.acct ? store.get(savedKey(), []) : []);
 	const when = (iso) => new Date(iso).toLocaleString(I.lang, { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+	/* Accounts (demo), as in Otium: kept in this browser only, keyed by email. No password is stored or checked. */
+	const DEMO = { first: "Camille", last: "Martin", email: "camille.martin@margin.example" };
+	const accounts = () => store.get("margin-accounts", {});
+	const keepAccount = (a) => { const all = accounts(); all[a.email.toLowerCase()] = a; store.set("margin-accounts", all); };
 	S.acct = store.get("margin-account", null);
+	if (S.acct && !S.acct.email) { // v0.10 accounts had a first name only: Camille moves to the demo account, others sign in again
+		const old = store.get("margin-analyses:" + S.acct.name.toLowerCase(), null);
+		if (S.acct.name.toLowerCase() === "camille") { S.acct = { name: DEMO.first, email: DEMO.email }; store.set("margin-account", S.acct); if (old && !store.get(savedKey(), null)) store.set(savedKey(), old); }
+		else { S.acct = null; try { localStorage.removeItem("margin-account"); } catch {} }
+	}
 	function renderAcct() {
 		const b = $("#acctBtn");
-		b.innerHTML = S.acct ? `<span class="av" aria-hidden="true">${esc(S.acct.name.slice(0, 1).toUpperCase())}</span><span class="nm">${esc(S.acct.name)}</span>${ic("chevron-down")}` : `${ic("user")}<span>${t("Sign in")}</span>`;
+		b.innerHTML = S.acct ? `<span class="av" aria-hidden="true">${esc(S.acct.name.slice(0, 1).toUpperCase())}</span><span class="nm">${esc(S.acct.name)}</span>${ic("chevron-down")}` : `${ic("user")}<span class="lbl">${t("Sign in")}</span>`; b.setAttribute("aria-label", S.acct ? S.acct.name : t("Sign in"));
 		b.setAttribute("aria-haspopup", S.acct ? "menu" : "dialog");
 	}
 	function acctMenu(on) {
@@ -522,9 +531,9 @@
 		if (on) { const n = savedList().length; list.innerHTML = `<li role="menuitem" tabindex="-1" data-a="mine">${ic("history")}<span>${t("My analyses")}${n ? ` (${n})` : ""}</span></li><li role="menuitem" tabindex="-1" data-a="out">${ic("x")}<span>${t("Sign out")}</span></li>`; }
 		list.hidden = !on; b.setAttribute("aria-expanded", String(on)); if (on) list.firstElementChild.focus();
 	}
-	function signIn(name, then) {
-		S.acct = { name: name.trim().slice(0, 24) || "Camille", since: new Date().toISOString() }; store.set("margin-account", S.acct);
-		renderAcct(); toast(t("Signed in as {x}", { x: S.acct.name }));
+	function signIn(acc, then, created) {
+		S.acct = { name: acc.first || acc.email, email: acc.email }; store.set("margin-account", S.acct); keepAccount(acc);
+		renderAcct(); toast(t(created ? "Account created. Welcome, {x}!" : "Signed in as {x}", { x: S.acct.name }));
 		if (S.report && !S.viewing && S.report.parts?.every((p) => !p.pending)) saveAnalysis(S.report);
 		renderReport(); then?.();
 	}
@@ -533,20 +542,41 @@
 		renderAcct(); renderReport(); if (S.page === 3) go(1);
 		toast(t("Signed out. Your analyses stay in this browser."), t("Undo"), () => { S.acct = was; store.set("margin-account", was); renderAcct(); renderReport(); });
 	}
-	function openSignIn(then) {
-		const opener = document.activeElement, scrim = document.createElement("div"), v = document.createElement("div");
-		scrim.className = "scrim"; v.className = "viewer"; v.setAttribute("role", "dialog"); v.setAttribute("aria-modal", "true"); v.setAttribute("aria-labelledby", "acH");
-		v.innerHTML = `<div class="legal"><h3 id="acH">${t("Demo account")}</h3><p>${t("Margin is a portfolio demo: there are no real accounts. Choose a first name (it can be made up). Your analyses are kept in this browser only.")}</p>
-			<label class="fld"><span>${t("First name")}</span><input id="acName" maxlength="24" autocomplete="off" spellcheck="false"></label>
-			<div class="row acrow"><button type="button" class="btn btn-text btn-sm" data-close>${t("Cancel")}</button><button type="button" class="btn btn-sm" id="acDemo">${t("Use the demo account")}</button><button type="button" class="btn btn-ink btn-sm" id="acGo">${t("Continue")}</button></div></div>`;
+	function openSignIn(then, mode = "in", keepEmail) {
+		const up = mode === "up", opener = keepEmail != null ? null : document.activeElement;
+		document.querySelector(".scrim.acx")?.remove(); document.querySelector(".viewer.acx")?.remove();
+		const scrim = document.createElement("div"), v = document.createElement("div");
+		scrim.className = "scrim acx"; v.className = "viewer acx"; v.setAttribute("role", "dialog"); v.setAttribute("aria-modal", "true"); v.setAttribute("aria-labelledby", "acH");
+		v.innerHTML = `<div class="legal"><h3 id="acH">${t(up ? "Create your Margin account" : "Sign in to Margin")}</h3><p>${t("Keep every analysis in My analyses and open it again later.")}</p>
+			<div class="auth-tabs" role="tablist"><button type="button" role="tab" data-auth="in" aria-selected="${!up}">${t("I have an account")}</button><button type="button" role="tab" data-auth="up" aria-selected="${up}">${t("I’m new here")}</button></div>
+			${up ? `<div class="fld-row"><label class="fld"><span>${t("First name")}</span><input id="acFirst" maxlength="24" autocomplete="off"></label><label class="fld"><span>${t("Last name")}</span><input id="acLast" maxlength="32" autocomplete="off"></label></div>` : ""}
+			<label class="fld"><span>${t("Email")}</span><input id="acEmail" type="email" autocomplete="off" spellcheck="false" dir="ltr"></label>
+			<label class="fld"><span>${t(up ? "Choose a password" : "Password")}</span><input id="acPass" type="password" autocomplete="off" dir="ltr"></label>
+			<p class="auth-err" id="acErr" role="alert" hidden></p>
+			<p class="fine">${ic("info")}<span>${t("Demo: passwords aren’t checked and nothing is sent. Your account stays in this browser, signed in until you sign out.")}</span></p>
+			<div class="row acrow"><button type="button" class="btn btn-text btn-sm" data-close>${t("Cancel")}</button><button type="button" class="btn btn-sm" id="acDemo">${t("Use the demo account")}</button><button type="button" class="btn btn-ink btn-sm" id="acGo">${t(up ? "Create my account" : "Sign in")}</button></div></div>`;
 		const close = () => { scrim.remove(); v.remove(); document.removeEventListener("keydown", key); opener?.focus?.(); }, key = (e) => { if (e.key === "Escape") close(); };
-		v.addEventListener("click", (e) => { if (e.target === v || e.target.closest("[data-close]")) close(); });
+		const err = (m, link) => { const e = v.querySelector("#acErr"); e.hidden = false; e.innerHTML = `<span>${esc(t(m))}</span>${link ? ` <button type="button" class="lnk" data-auth="${link[0]}">${t(link[1])}</button>` : ""}`; };
+		v.addEventListener("click", (e) => {
+			if (e.target === v || e.target.closest("[data-close]")) return close();
+			const sw = e.target.closest("[data-auth]"); if (sw && (sw.dataset.auth !== mode || sw.classList.contains("lnk"))) { const em = v.querySelector("#acEmail").value; document.removeEventListener("keydown", key); scrim.remove(); v.remove(); openSignIn(then, sw.dataset.auth, em); }
+		});
 		document.addEventListener("keydown", key); document.body.append(scrim, v);
-		const inp = v.querySelector("#acName"); inp.focus();
-		const go2 = (name) => { close(); signIn(name, then); };
-		v.querySelector("#acDemo").onclick = () => go2("Camille");
-		v.querySelector("#acGo").onclick = () => go2(inp.value);
-		inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); go2(inp.value); } });
+		const $v = (q) => v.querySelector(q);
+		if (keepEmail) $v("#acEmail").value = keepEmail;
+		const go = (demo) => {
+			if (demo) { close(); return signIn(DEMO, then); }
+			const em = $v("#acEmail").value.trim(), k = em.toLowerCase();
+			if (up && (!$v("#acFirst").value.trim() || !$v("#acLast").value.trim())) return err("Enter your first and last name.");
+			if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em) || !$v("#acPass").value) return err("Enter an email and a password.");
+			const known = accounts()[k] || (k === DEMO.email ? DEMO : null);
+			if (up) { if (known) return err("An account already uses this email.", ["in", "Sign in instead"]); close(); return signIn({ first: $v("#acFirst").value.trim(), last: $v("#acLast").value.trim(), email: em }, then, true); }
+			if (!known) return err("No account with this email yet.", ["up", "Create one"]);
+			close(); signIn(known, then);
+		};
+		$v("#acDemo").onclick = () => go(true); $v("#acGo").onclick = () => go(false);
+		v.querySelectorAll("input").forEach((x) => x.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); go(false); } }));
+		setTimeout(() => (up ? $v("#acFirst") : $v(keepEmail ? "#acPass" : "#acEmail"))?.focus(), 30);
 	}
 	/* every finished analysis is saved while signed in: the points, and the passages they cite as text (not the files) */
 	function saveAnalysis(r) {
@@ -612,7 +642,7 @@
 	$("#legalBtn").onclick = () => { // privacy & terms, in the reader's language
 		const opener = document.activeElement, scrim = document.createElement("div"), v = document.createElement("div");
 		scrim.className = "scrim"; v.className = "viewer"; v.setAttribute("role", "dialog"); v.setAttribute("aria-modal", "true"); v.setAttribute("aria-labelledby", "lgH");
-		v.innerHTML = `<div class="legal"><h3 id="lgH">${t("Privacy & terms")}</h3>${["Files and pasted text are read in your browser. A link is fetched once by our server, only to read the page.", "This free demo shares a daily AI allowance between all visitors. When it runs out, it comes back the next day.", "To write the summary and the answers, only the passages needed are sent to Cloudflare Workers AI, which runs Llama 3.3 (Meta). Cloudflare states that it does not use this content to train AI models, and Margin stores nothing.", "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong. Always check the highlighted source.", "The demo account and My analyses stay in this browser only: no email, no password, nothing is sent. Signing out keeps them; clearing your browser data deletes them.", "Portfolio demo: please don’t add very personal or confidential documents."].map((k) => `<p>${esc(t(k))}</p>`).join("")}<p>Built with Llama · <a class="lnk" href="THIRD-PARTY-NOTICES.txt">${t("Licences")}</a></p><div class="row"><button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></div></div>`;
+		v.innerHTML = `<div class="legal"><h3 id="lgH">${t("Privacy & terms")}</h3>${["Files and pasted text are read in your browser. A link is fetched once by our server, only to read the page.", "This free demo shares a daily AI allowance between all visitors. When it runs out, it comes back the next day.", "To write the summary and the answers, only the passages needed are sent to Cloudflare Workers AI, which runs Llama 3.3 (Meta). Cloudflare states that it does not use this content to train AI models, and Margin stores nothing.", "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong. Always check the highlighted source.", "The demo account and My analyses stay in this browser only: nothing is sent and passwords aren’t checked. Signing out keeps them; clearing your browser data deletes them.", "Portfolio demo: please don’t add very personal or confidential documents."].map((k) => `<p>${esc(t(k))}</p>`).join("")}<p>Built with Llama · <a class="lnk" href="THIRD-PARTY-NOTICES.txt">${t("Licences")}</a></p><div class="row"><button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></div></div>`;
 		const close = () => { scrim.remove(); v.remove(); document.removeEventListener("keydown", key); opener?.focus(); }, key = (e) => { if (e.key === "Escape") close(); };
 		v.addEventListener("click", (e) => { if (e.target === v || e.target.closest("[data-close]")) close(); });
 		document.addEventListener("keydown", key); document.body.append(scrim, v); v.querySelector("[data-close]").focus();

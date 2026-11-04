@@ -1797,16 +1797,214 @@ window.MARGIN_I18N = (() => {
 	  "id": "Analisis milik {x} yang disimpan di browser ini.",
 	  "he": "ניתוחים של {x} שנשמרו בדפדפן הזה."
 	 },
-	 "The demo account and My analyses stay in this browser only: no email, no password, nothing is sent. Signing out keeps them; clearing your browser data deletes them.": {
-	  "fr": "Le compte démo et Mes analyses restent uniquement dans ce navigateur : ni e-mail, ni mot de passe, rien n’est envoyé. Se déconnecter les conserve ; effacer les données du navigateur les supprime.",
-	  "es": "La cuenta demo y Mis análisis solo se quedan en este navegador: sin correo, sin contraseña, no se envía nada. Cerrar sesión los conserva; borrar los datos del navegador los elimina.",
-	  "pt": "A conta demo e As minhas análises ficam só neste navegador: sem e-mail, sem palavra-passe, nada é enviado. Sair conserva-as; apagar os dados do navegador elimina-as.",
-	  "de": "Demo-Konto und Meine Analysen bleiben nur in diesem Browser: keine E-Mail, kein Passwort, nichts wird gesendet. Beim Abmelden bleiben sie erhalten; das Löschen der Browserdaten entfernt sie.",
-	  "it": "L’account demo e Le mie analisi restano solo in questo browser: niente e-mail, niente password, non viene inviato nulla. Uscire li conserva; cancellare i dati del browser li elimina.",
-	  "ru": "Демо-аккаунт и «Мои анализы» хранятся только в этом браузере: без e-mail и пароля, ничего не отправляется. При выходе они сохраняются; очистка данных браузера их удаляет.",
-	  "tr": "Demo hesabı ve Analizlerim yalnızca bu tarayıcıda kalır: e-posta yok, şifre yok, hiçbir şey gönderilmez. Çıkış yapmak onları korur; tarayıcı verilerini temizlemek siler.",
-	  "id": "Akun demo dan Analisis saya hanya ada di browser ini: tanpa email, tanpa kata sandi, tidak ada yang dikirim. Keluar tetap menyimpannya; menghapus data browser akan menghapusnya.",
-	  "he": "חשבון ההדגמה ו״הניתוחים שלי״ נשארים רק בדפדפן הזה: בלי אימייל, בלי סיסמה, שום דבר לא נשלח. התנתקות שומרת אותם; מחיקת נתוני הדפדפן מוחקת אותם."
+	 "Sign in to Margin": {
+	  "fr": "Se connecter à Margin",
+	  "es": "Iniciar sesión en Margin",
+	  "pt": "Entrar no Margin",
+	  "de": "Bei Margin anmelden",
+	  "it": "Accedi a Margin",
+	  "ru": "Вход в Margin",
+	  "tr": "Margin'e giriş yapın",
+	  "id": "Masuk ke Margin",
+	  "he": "התחברות ל־Margin"
+	 },
+	 "Create your Margin account": {
+	  "fr": "Créer votre compte Margin",
+	  "es": "Crea tu cuenta de Margin",
+	  "pt": "Criar a sua conta Margin",
+	  "de": "Ihr Margin-Konto erstellen",
+	  "it": "Crea il tuo account Margin",
+	  "ru": "Создайте аккаунт Margin",
+	  "tr": "Margin hesabınızı oluşturun",
+	  "id": "Buat akun Margin Anda",
+	  "he": "יצירת חשבון Margin"
+	 },
+	 "Keep every analysis in My analyses and open it again later.": {
+	  "fr": "Gardez chaque analyse dans Mes analyses et rouvrez-la plus tard.",
+	  "es": "Guarda cada análisis en Mis análisis y vuelve a abrirlo más tarde.",
+	  "pt": "Guarde cada análise em As minhas análises e volte a abri-la mais tarde.",
+	  "de": "Behalten Sie jede Analyse unter Meine Analysen und öffnen Sie sie später wieder.",
+	  "it": "Conserva ogni analisi in Le mie analisi e riaprila più tardi.",
+	  "ru": "Сохраняйте каждый анализ в «Моих анализах» и открывайте его снова позже.",
+	  "tr": "Her analizi Analizlerim'de saklayın ve daha sonra yeniden açın.",
+	  "id": "Simpan setiap analisis di Analisis saya dan buka lagi nanti.",
+	  "he": "שמרו כל ניתוח ב״הניתוחים שלי״ ופתחו אותו שוב מאוחר יותר."
+	 },
+	 "I have an account": {
+	  "fr": "J’ai un compte",
+	  "es": "Tengo una cuenta",
+	  "pt": "Já tenho conta",
+	  "de": "Ich habe ein Konto",
+	  "it": "Ho già un account",
+	  "ru": "У меня есть аккаунт",
+	  "tr": "Hesabım var",
+	  "id": "Saya punya akun",
+	  "he": "יש לי חשבון"
+	 },
+	 "I’m new here": {
+	  "fr": "Je suis nouveau",
+	  "es": "Soy nuevo aquí",
+	  "pt": "Sou novo aqui",
+	  "de": "Ich bin neu hier",
+	  "it": "Sono nuovo",
+	  "ru": "Я здесь впервые",
+	  "tr": "Burada yeniyim",
+	  "id": "Saya baru di sini",
+	  "he": "אני חדש כאן"
+	 },
+	 "Last name": {
+	  "fr": "Nom",
+	  "es": "Apellido",
+	  "pt": "Apelido",
+	  "de": "Nachname",
+	  "it": "Cognome",
+	  "ru": "Фамилия",
+	  "tr": "Soyadı",
+	  "id": "Nama belakang",
+	  "he": "שם משפחה"
+	 },
+	 "Email": {
+	  "fr": "E-mail",
+	  "es": "Correo electrónico",
+	  "pt": "E-mail",
+	  "de": "E-Mail",
+	  "it": "E-mail",
+	  "ru": "Эл. почта",
+	  "tr": "E-posta",
+	  "id": "Email",
+	  "he": "אימייל"
+	 },
+	 "Password": {
+	  "fr": "Mot de passe",
+	  "es": "Contraseña",
+	  "pt": "Palavra-passe",
+	  "de": "Passwort",
+	  "it": "Password",
+	  "ru": "Пароль",
+	  "tr": "Şifre",
+	  "id": "Kata sandi",
+	  "he": "סיסמה"
+	 },
+	 "Choose a password": {
+	  "fr": "Choisissez un mot de passe",
+	  "es": "Elige una contraseña",
+	  "pt": "Escolha uma palavra-passe",
+	  "de": "Wählen Sie ein Passwort",
+	  "it": "Scegli una password",
+	  "ru": "Придумайте пароль",
+	  "tr": "Bir şifre belirleyin",
+	  "id": "Buat kata sandi",
+	  "he": "בחרו סיסמה"
+	 },
+	 "Demo: passwords aren’t checked and nothing is sent. Your account stays in this browser, signed in until you sign out.": {
+	  "fr": "Démo : les mots de passe ne sont pas vérifiés et rien n’est envoyé. Votre compte reste dans ce navigateur, connecté jusqu’à ce que vous vous déconnectiez.",
+	  "es": "Demo: las contraseñas no se comprueban y no se envía nada. Tu cuenta se queda en este navegador, con la sesión abierta hasta que la cierres.",
+	  "pt": "Demo: as palavras-passe não são verificadas e nada é enviado. A sua conta fica neste navegador, com a sessão iniciada até sair.",
+	  "de": "Demo: Passwörter werden nicht geprüft und nichts wird gesendet. Ihr Konto bleibt in diesem Browser angemeldet, bis Sie sich abmelden.",
+	  "it": "Demo: le password non vengono verificate e non viene inviato nulla. Il tuo account resta in questo browser, connesso finché non esci.",
+	  "ru": "Демо: пароли не проверяются, ничего не отправляется. Аккаунт остаётся в этом браузере, и вход сохраняется, пока вы не выйдете.",
+	  "tr": "Demo: şifreler kontrol edilmez ve hiçbir şey gönderilmez. Hesabınız bu tarayıcıda kalır, çıkış yapana kadar oturumunuz açık kalır.",
+	  "id": "Demo: kata sandi tidak diperiksa dan tidak ada yang dikirim. Akun Anda tetap di browser ini dan tetap masuk sampai Anda keluar.",
+	  "he": "הדגמה: הסיסמאות לא נבדקות ושום דבר לא נשלח. החשבון נשאר בדפדפן הזה, מחובר עד שתתנתקו."
+	 },
+	 "Create my account": {
+	  "fr": "Créer mon compte",
+	  "es": "Crear mi cuenta",
+	  "pt": "Criar a minha conta",
+	  "de": "Mein Konto erstellen",
+	  "it": "Crea il mio account",
+	  "ru": "Создать аккаунт",
+	  "tr": "Hesabımı oluştur",
+	  "id": "Buat akun saya",
+	  "he": "יצירת החשבון שלי"
+	 },
+	 "Enter your first and last name.": {
+	  "fr": "Indiquez votre prénom et votre nom.",
+	  "es": "Escribe tu nombre y tu apellido.",
+	  "pt": "Indique o seu nome e apelido.",
+	  "de": "Geben Sie Ihren Vor- und Nachnamen ein.",
+	  "it": "Inserisci il tuo nome e cognome.",
+	  "ru": "Введите имя и фамилию.",
+	  "tr": "Adınızı ve soyadınızı girin.",
+	  "id": "Masukkan nama depan dan nama belakang Anda.",
+	  "he": "הזינו שם פרטי ושם משפחה."
+	 },
+	 "Enter an email and a password.": {
+	  "fr": "Indiquez un e-mail et un mot de passe.",
+	  "es": "Escribe un correo y una contraseña.",
+	  "pt": "Indique um e-mail e uma palavra-passe.",
+	  "de": "Geben Sie eine E-Mail und ein Passwort ein.",
+	  "it": "Inserisci un’e-mail e una password.",
+	  "ru": "Введите эл. почту и пароль.",
+	  "tr": "Bir e-posta ve bir şifre girin.",
+	  "id": "Masukkan email dan kata sandi.",
+	  "he": "הזינו אימייל וסיסמה."
+	 },
+	 "An account already uses this email.": {
+	  "fr": "Un compte utilise déjà cet e-mail.",
+	  "es": "Ya hay una cuenta con este correo.",
+	  "pt": "Já existe uma conta com este e-mail.",
+	  "de": "Für diese E-Mail gibt es schon ein Konto.",
+	  "it": "Esiste già un account con questa e-mail.",
+	  "ru": "Этот адрес уже используется другим аккаунтом.",
+	  "tr": "Bu e-postayı zaten bir hesap kullanıyor.",
+	  "id": "Email ini sudah dipakai oleh akun lain.",
+	  "he": "כבר יש חשבון עם האימייל הזה."
+	 },
+	 "Sign in instead": {
+	  "fr": "Me connecter plutôt",
+	  "es": "Iniciar sesión",
+	  "pt": "Entrar",
+	  "de": "Stattdessen anmelden",
+	  "it": "Accedi invece",
+	  "ru": "Войти",
+	  "tr": "Giriş yapın",
+	  "id": "Masuk saja",
+	  "he": "להתחבר במקום"
+	 },
+	 "No account with this email yet.": {
+	  "fr": "Aucun compte avec cet e-mail pour l’instant.",
+	  "es": "Aún no hay ninguna cuenta con este correo.",
+	  "pt": "Ainda não existe conta com este e-mail.",
+	  "de": "Noch kein Konto mit dieser E-Mail.",
+	  "it": "Ancora nessun account con questa e-mail.",
+	  "ru": "Аккаунта с этим адресом пока нет.",
+	  "tr": "Bu e-postayla henüz bir hesap yok.",
+	  "id": "Belum ada akun dengan email ini.",
+	  "he": "עדיין אין חשבון עם האימייל הזה."
+	 },
+	 "Create one": {
+	  "fr": "En créer un",
+	  "es": "Crear una",
+	  "pt": "Criar uma",
+	  "de": "Eines erstellen",
+	  "it": "Creane uno",
+	  "ru": "Создать",
+	  "tr": "Bir tane oluşturun",
+	  "id": "Buat akun",
+	  "he": "ליצור חשבון"
+	 },
+	 "Account created. Welcome, {x}!": {
+	  "fr": "Compte créé. Bienvenue, {x} !",
+	  "es": "Cuenta creada. Te damos la bienvenida, {x}.",
+	  "pt": "Conta criada. Boas-vindas, {x}!",
+	  "de": "Konto erstellt. Willkommen, {x}!",
+	  "it": "Account creato. Benvenuto, {x}!",
+	  "ru": "Аккаунт создан. Добро пожаловать, {x}!",
+	  "tr": "Hesap oluşturuldu. Hoş geldiniz, {x}!",
+	  "id": "Akun dibuat. Selamat datang, {x}!",
+	  "he": "החשבון נוצר. ברוכים הבאים, {x}!"
+	 },
+	 "The demo account and My analyses stay in this browser only: nothing is sent and passwords aren’t checked. Signing out keeps them; clearing your browser data deletes them.": {
+	  "fr": "Le compte démo et Mes analyses restent uniquement dans ce navigateur : rien n’est envoyé et les mots de passe ne sont pas vérifiés. Se déconnecter les conserve ; effacer les données du navigateur les supprime.",
+	  "es": "La cuenta demo y Mis análisis solo se quedan en este navegador: no se envía nada y las contraseñas no se comprueban. Cerrar sesión los conserva; borrar los datos del navegador los elimina.",
+	  "pt": "A conta demo e As minhas análises ficam só neste navegador: nada é enviado e as palavras-passe não são verificadas. Sair conserva-as; apagar os dados do navegador elimina-as.",
+	  "de": "Demo-Konto und Meine Analysen bleiben nur in diesem Browser: Nichts wird gesendet und Passwörter werden nicht geprüft. Beim Abmelden bleiben sie erhalten; das Löschen der Browserdaten entfernt sie.",
+	  "it": "L’account demo e Le mie analisi restano solo in questo browser: non viene inviato nulla e le password non vengono verificate. Uscire li conserva; cancellare i dati del browser li elimina.",
+	  "ru": "Демо-аккаунт и «Мои анализы» хранятся только в этом браузере: ничего не отправляется, пароли не проверяются. При выходе они сохраняются; очистка данных браузера их удаляет.",
+	  "tr": "Demo hesabı ve Analizlerim yalnızca bu tarayıcıda kalır: hiçbir şey gönderilmez ve şifreler kontrol edilmez. Çıkış yapmak onları korur; tarayıcı verilerini temizlemek siler.",
+	  "id": "Akun demo dan Analisis saya hanya ada di browser ini: tidak ada yang dikirim dan kata sandi tidak diperiksa. Keluar tetap menyimpannya; menghapus data browser akan menghapusnya.",
+	  "he": "חשבון ההדגמה ו״הניתוחים שלי״ נשארים רק בדפדפן הזה: שום דבר לא נשלח והסיסמאות לא נבדקות. התנתקות שומרת אותם; מחיקת נתוני הדפדפן מוחקת אותם."
 	 }
 	};
 	let lang = "en";
