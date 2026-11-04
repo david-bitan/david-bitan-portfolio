@@ -96,9 +96,9 @@
 		let u; try { u = new URL(url.trim()); if (!/^https?:$/.test(u.protocol)) throw 0; } catch { return showErr(t("This link doesn’t look valid.")); }
 		addSource(u.hostname, async () => {
 			const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ mode: "fetch", url: u.href }) });
-			if (!r.ok) { const e = new Error("fetch"); e.userMsg = t("I couldn’t read this page. Some sites block automatic reading. Copy the text and use “Or paste the text”."); throw e; }
+			if (!r.ok) { const e = new Error("fetch"); e.userMsg = t("I couldn’t read this page. Some sites block automatic reading. Copy the text and use “Click here to paste the text”."); throw e; }
 			if ((r.headers.get("content-type") || "").includes("pdf")) { const doc = await readPdf(await r.arrayBuffer()); doc.url = u.href; doc.title = decodeURIComponent(u.pathname.split("/").pop() || u.hostname); return doc; }
-			const j = await r.json(); if (!j.paragraphs?.length) { const e = new Error("empty"); e.userMsg = t("I couldn’t read this page. Some sites block automatic reading. Copy the text and use “Or paste the text”."); throw e; }
+			const j = await r.json(); if (!j.paragraphs?.length) { const e = new Error("empty"); e.userMsg = t("I couldn’t read this page. Some sites block automatic reading. Copy the text and use “Click here to paste the text”."); throw e; }
 			const doc = textDoc(j.paragraphs, "web"); doc.url = u.href; doc.title = j.title || u.hostname; return doc;
 		});
 	}
@@ -529,7 +529,7 @@
 
 	/* ---------------- free daily allowance: shown to everyone ---------------- */
 	const PER = 500; // about one report
-	const resetAt = () => (S.quota ? new Date(S.quota.reset).toLocaleTimeString(I.lang, { hour: "2-digit", minute: "2-digit" }) : "");
+	const resetAt = () => (S.quota ? new Date(S.quota.reset).toLocaleTimeString(I.lang, { hour: "2-digit", minute: "2-digit" }) + " " + t("(your local time)") : ""); // the visitor's own clock, wherever they are
 	const quotaOut = () => Boolean(S.quota && S.quota.limit - S.quota.used < PER * 0.6);
 	const limitMsg = () => t("This demo has used all of today’s free AI. It comes back at {time}.", { time: resetAt() || "00:00 UTC" });
 	function renderQuota() {
@@ -538,7 +538,7 @@
 			if (!q) { el.hidden = true; continue; }
 			const left = Math.max(0, q.limit - q.used), n = Math.floor(left / PER), pct = Math.round((left / q.limit) * 100);
 			const cls = left < PER * 0.6 ? "out" : pct <= 25 ? "low" : "";
-			const msg = cls === "out" ? limitMsg() : cls === "low" ? t("Free demo: almost used up for today (about {n} analyses left). It comes back at {time}.", { n: Math.max(1, n), time: resetAt() }) : t("Free demo: about {n} analyses left today, for all visitors.", { n });
+			const msg = cls === "out" ? limitMsg() : cls === "low" ? t("Free demo: almost used up for today (about {n} analyses left). It comes back at {time}.", { n: Math.max(1, n), time: resetAt() }) : t("Free demo: about {n} analyses left today, for all visitors. Renewed every day at {time}.", { n, time: resetAt() });
 			el.className = "quota " + cls; el.hidden = false;
 			el.innerHTML = `<span class="bar" role="img" aria-label="${pct} %"><i style="width:${pct}%"></i></span><span>${esc(msg)}</span><button type="button" class="lnk" data-act="whylimit">${t("Why a limit?")}</button>`;
 		}
@@ -660,7 +660,7 @@
 		try { const r = await fetch(href); if (!r.ok) throw 0; const url = URL.createObjectURL(await r.blob()); const a = document.createElement("a"); a.href = url; a.download = "brevholt-kelmarion-employment-contract.pdf"; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000); }
 		catch { location.href = href; }
 	});
-	$("#openSample").addEventListener("click", async () => { S.autoOpen = true; const r = await fetch("samples/brevholt-kelmarion-employment-contract.pdf"); addFiles([new File([await r.blob()], "brevholt-kelmarion-employment-contract.pdf", { type: "application/pdf" })], true); });
+	const openSample = async () => { S.autoOpen = true; const r = await fetch("samples/brevholt-kelmarion-employment-contract.pdf"); addFiles([new File([await r.blob()], "brevholt-kelmarion-employment-contract.pdf", { type: "application/pdf" })], true); };
 	$("#analyse").onclick = () => { go(2); makeReport(); };
 	$("#legalBtn").onclick = () => { // privacy & terms, in the reader's language
 		const opener = document.activeElement, scrim = document.createElement("div"), v = document.createElement("div");
@@ -729,5 +729,5 @@
 	/* ---------------- boot ---------------- */
 	S.page = 1; initLang(); setLang(I.lang); loadQuota();
 	window.MARGIN_DEBUG = S;
-	if (new URLSearchParams(location.search).get("sample")) $("#openSample").click();
+	if (new URLSearchParams(location.search).get("sample")) openSample(); // link from the case study
 })();

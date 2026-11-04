@@ -180,16 +180,16 @@ window.MARGIN_I18N = (() => {
 	  "id": "File ini tidak bisa dibuka. Mungkin rusak atau dilindungi kata sandi.",
 	  "he": "לא הצלחתי לפתוח את הקובץ. ייתכן שהוא פגום או מוגן בסיסמה."
 	 },
-	 "I couldn’t read this page. Some sites block automatic reading. Copy the text and use “Or paste the text”.": {
-	  "fr": "Je n’ai pas pu lire cette page. Certains sites bloquent la lecture automatique. Copiez le texte et utilisez « Ou collez le texte ».",
-	  "es": "No pude leer esta página. Algunos sitios bloquean la lectura automática: copia el texto y usa «O pega el texto».",
-	  "pt": "Não consegui ler esta página. Alguns sites bloqueiam a leitura automática. Copie o texto e use “Ou cole o texto”.",
-	  "de": "Diese Seite ließ sich nicht lesen. Manche Websites blockieren das automatische Lesen. Kopieren Sie den Text und nutzen Sie „Oder Text einfügen“.",
-	  "it": "Non sono riuscito a leggere questa pagina. Alcuni siti bloccano la lettura automatica: copia il testo e usa «Oppure incolla il testo».",
-	  "ru": "Не удалось прочитать страницу. Некоторые сайты блокируют автоматическое чтение. Скопируйте текст и используйте «Или вставьте текст».",
-	  "tr": "Bu sayfa okunamadı. Bazı siteler otomatik okumayı engeller. Metni kopyalayıp “Ya da metni yapıştırın” seçeneğini kullanın.",
-	  "id": "Halaman ini tidak bisa dibaca. Beberapa situs memblokir pembacaan otomatis. Salin teksnya dan gunakan “Atau tempel teksnya”.",
-	  "he": "לא הצלחתי לקרוא את הדף. אתרים מסוימים חוסמים קריאה אוטומטית. העתיקו את הטקסט והשתמשו ב״או הדביקו את הטקסט״."
+	 "I couldn’t read this page. Some sites block automatic reading. Copy the text and use “Click here to paste the text”.": {
+	  "fr": "Je n’ai pas pu lire cette page. Certains sites bloquent la lecture automatique. Copiez le texte et utilisez « Cliquez ici pour coller le texte ».",
+	  "es": "No pude leer esta página. Algunos sitios bloquean la lectura automática: copia el texto y usa «Haz clic aquí para pegar el texto».",
+	  "pt": "Não consegui ler esta página. Alguns sites bloqueiam a leitura automática. Copie o texto e use “Clique aqui para colar o texto”.",
+	  "de": "Diese Seite ließ sich nicht lesen. Manche Websites blockieren das automatische Lesen. Kopieren Sie den Text und nutzen Sie „Hier klicken, um den Text einzufügen“.",
+	  "it": "Non sono riuscito a leggere questa pagina. Alcuni siti bloccano la lettura automatica: copia il testo e usa «Clicca qui per incollare il testo».",
+	  "ru": "Не удалось прочитать страницу. Некоторые сайты блокируют автоматическое чтение. Скопируйте текст и используйте «Нажмите здесь, чтобы вставить текст».",
+	  "tr": "Bu sayfa okunamadı. Bazı siteler otomatik okumayı engeller. Metni kopyalayıp “Metni yapıştırmak için buraya tıklayın” seçeneğini kullanın.",
+	  "id": "Halaman ini tidak bisa dibaca. Beberapa situs memblokir pembacaan otomatis. Salin teksnya dan gunakan “Klik di sini untuk menempel teks”.",
+	  "he": "לא הצלחתי לקרוא את הדף. אתרים מסוימים חוסמים קריאה אוטומטית. העתיקו את הטקסט והשתמשו ב״לחצו כאן כדי להדביק את הטקסט״."
 	 },
 	 "I found almost no text. This may be a scan or a photo inside a PDF. I can’t read those yet.": {
 	  "fr": "Je n’ai trouvé presque aucun texte. C’est peut-être un scan ou une photo dans un PDF. Je ne sais pas encore les lire.",
@@ -301,16 +301,16 @@ window.MARGIN_I18N = (() => {
 	  "id": "Tidak ada yang ditemukan untuk bagian ini.",
 	  "he": "לא נמצא דבר לחלק הזה."
 	 },
-	 "Or paste the text": {
-	  "fr": "Ou collez le texte",
-	  "es": "O pega el texto",
-	  "pt": "Ou cole o texto",
-	  "de": "Oder Text einfügen",
-	  "it": "Oppure incolla il testo",
-	  "ru": "Или вставьте текст",
-	  "tr": "Ya da metni yapıştırın",
-	  "id": "Atau tempel teksnya",
-	  "he": "או הדביקו את הטקסט"
+	 "Click here to paste the text": {
+	  "fr": "Cliquez ici pour coller le texte",
+	  "es": "Haz clic aquí para pegar el texto",
+	  "pt": "Clique aqui para colar o texto",
+	  "de": "Hier klicken, um den Text einzufügen",
+	  "it": "Clicca qui per incollare il testo",
+	  "ru": "Нажмите здесь, чтобы вставить текст",
+	  "tr": "Metni yapıştırmak için buraya tıklayın",
+	  "id": "Klik di sini untuk menempel teks",
+	  "he": "לחצו כאן כדי להדביק את הטקסט"
 	 },
 	 "PDF or Word (.docx) · up to 60 pages · 20 MB": {
 	  "fr": "PDF ou Word (.docx) · jusqu’à 60 pages · 20 Mo",
@@ -1390,16 +1390,16 @@ window.MARGIN_I18N = (() => {
 	  "id": "Demo gratis: hampir habis untuk hari ini (tersisa sekitar {n} analisis). Tersedia lagi pukul {time}.",
 	  "he": "הדגמה חינמית: כמעט נגמרה להיום (נותרו בערך {n} ניתוחים). היא תחזור בשעה {time}."
 	 },
-	 "Free demo: about {n} analyses left today, for all visitors.": {
-	  "fr": "Démo gratuite : environ {n} analyses restantes aujourd’hui, pour tous les visiteurs.",
-	  "es": "Demo gratuita: quedan unos {n} análisis hoy, para todos los visitantes.",
-	  "pt": "Demo gratuita: restam cerca de {n} análises hoje, para todos os visitantes.",
-	  "de": "Kostenlose Demo: heute noch etwa {n} Analysen, für alle Besucher zusammen.",
-	  "it": "Demo gratuita: restano circa {n} analisi oggi, per tutti i visitatori.",
-	  "ru": "Бесплатная демоверсия: сегодня осталось около {n} анализов на всех посетителей.",
-	  "tr": "Ücretsiz demo: bugün tüm ziyaretçiler için yaklaşık {n} analiz kaldı.",
-	  "id": "Demo gratis: tersisa sekitar {n} analisis hari ini, untuk semua pengunjung.",
-	  "he": "הדגמה חינמית: נותרו היום בערך {n} ניתוחים, לכל המבקרים יחד."
+	 "Free demo: about {n} analyses left today, for all visitors. Renewed every day at {time}.": {
+	  "fr": "Démo gratuite : environ {n} analyses restantes aujourd’hui, pour tous les visiteurs. Renouvelé chaque jour à {time}.",
+	  "es": "Demo gratuita: quedan unos {n} análisis hoy, para todos los visitantes. Se renueva cada día a las {time}.",
+	  "pt": "Demo gratuita: restam cerca de {n} análises hoje, para todos os visitantes. Renovado todos os dias às {time}.",
+	  "de": "Kostenlose Demo: heute noch etwa {n} Analysen, für alle Besucher zusammen. Jeden Tag um {time} erneuert.",
+	  "it": "Demo gratuita: restano circa {n} analisi oggi, per tutti i visitatori. Si rinnova ogni giorno alle {time}.",
+	  "ru": "Бесплатная демоверсия: сегодня осталось около {n} анализов на всех посетителей. Обновляется каждый день в {time}.",
+	  "tr": "Ücretsiz demo: bugün tüm ziyaretçiler için yaklaşık {n} analiz kaldı. Her gün saat {time}’de yenilenir.",
+	  "id": "Demo gratis: tersisa sekitar {n} analisis hari ini, untuk semua pengunjung. Diperbarui setiap hari pukul {time}.",
+	  "he": "הדגמה חינמית: נותרו היום בערך {n} ניתוחים, לכל המבקרים יחד. מתחדש כל יום בשעה {time}."
 	 },
 	 "Why a limit?": {
 	  "fr": "Pourquoi une limite ?",
@@ -1488,6 +1488,39 @@ window.MARGIN_I18N = (() => {
 	  "tr": "Belgeleriniz ({n})",
 	  "id": "Dokumen Anda ({n})",
 	  "he": "המסמכים שלכם ({n})"
+	 },
+	 "No document at hand?": {
+	  "fr": "Pas de document sous la main ?",
+	  "es": "¿No tienes un documento a mano?",
+	  "pt": "Não tem um documento à mão?",
+	  "de": "Kein Dokument zur Hand?",
+	  "it": "Nessun documento a portata di mano?",
+	  "ru": "Нет документа под рукой?",
+	  "tr": "Elinizde belge yok mu?",
+	  "id": "Tidak punya dokumen?",
+	  "he": "אין מסמך בהישג יד?"
+	 },
+	 "Download the example contract (PDF)": {
+	  "fr": "Téléchargez le contrat d’exemple (PDF)",
+	  "es": "Descarga el contrato de ejemplo (PDF)",
+	  "pt": "Baixe o contrato de exemplo (PDF)",
+	  "de": "Beispielvertrag herunterladen (PDF)",
+	  "it": "Scarica il contratto di esempio (PDF)",
+	  "ru": "Скачайте пример договора (PDF)",
+	  "tr": "Örnek sözleşmeyi indirin (PDF)",
+	  "id": "Unduh contoh kontrak (PDF)",
+	  "he": "הורידו את חוזה הדוגמה (PDF)"
+	 },
+	 "(your local time)": {
+	  "fr": "(heure de chez vous)",
+	  "es": "(tu hora local)",
+	  "pt": "(hora local)",
+	  "de": "(Ihre Ortszeit)",
+	  "it": "(ora locale)",
+	  "ru": "(по вашему местному времени)",
+	  "tr": "(yerel saatinizle)",
+	  "id": "(waktu setempat Anda)",
+	  "he": "(לפי השעה המקומית שלכם)"
 	 }
 	};
 	let lang = "en";
