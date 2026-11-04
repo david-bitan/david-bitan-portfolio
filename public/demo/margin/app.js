@@ -17,7 +17,7 @@
 	const S = { shown: new Set(), docs: [], loading: 0, out: null, report: null, turns: [], speaking: null, seq: 0, cseq: 0, open: new Set() };
 	const chunk = (id) => { for (const d of S.docs) { const c = d.chunks.find((x) => x.id === id); if (c) return c; } return null; };
 	const docOf = (c) => S.docs.find((d) => d.fid === c.fid);
-	const visual = (d) => d.type === "pdf" || d.type === "image";
+	const visual = (d) => d.type === "pdf";
 	const ready = () => S.docs.filter((d) => !d.loading && d.words >= 30);
 
 	/* ---------------- language ---------------- */
@@ -78,17 +78,11 @@
 	function addFiles(list, isSample) {
 		$("#err1").hidden = true;
 		for (const file of [...list].slice(0, Math.max(0, MAX_FILES - S.docs.length))) {
-			const name = file.name || "document", ext = name.toLowerCase().split(".").pop(), kind = KINDS[ext] || (/^image\/(png|jpeg)$/.test(file.type) ? "image" : null);
-			if (!kind) { showErr(`${name}: ${t("This file type isn’t supported. Use a PDF, Word, Excel, text, PNG or JPEG file.")}`); continue; }
+			const name = file.name || "document", ext = name.toLowerCase().split(".").pop(), kind = KINDS[ext];
+			if (!kind) { showErr(`${name}: ${t("This file type isn’t supported yet. Use a PDF or a Word (.docx) file.")}`); continue; }
 			if (file.size > MAX_MB * 1048576) { showErr(`${name}: ${t("This file is larger than 20 MB.")}`); continue; }
 			if (S.docs.some((d) => d.name === name && d.size === file.size)) continue;
-			addSource(name, async (row) => {
-				if (kind === "image") return readImage(file, row);
-				if (kind === "text") return textDoc(splitParas(await file.text()), "txt");
-				if (kind === "csv") return sheetDoc([{ name: "", rows: parseCsv(await file.text()) }], "csv");
-				const buf = await file.arrayBuffer();
-				return kind === "pdf" ? readPdf(buf) : kind === "docx" ? readDocx(buf) : readXlsx(buf);
-			}, { size: file.size, sample: Boolean(isSample) });
+			addSource(name, async () => { const buf = await file.arrayBuffer(); return kind === "pdf" ? readPdf(buf) : readDocx(buf); }, { size: file.size, sample: Boolean(isSample) });
 		}
 	}
 	function addLink(url) {
@@ -123,12 +117,12 @@
 	function showErr(msg) { const err = $("#err1"); const prev = err.hidden ? "" : err.querySelector("span")?.innerHTML + "<br>"; err.innerHTML = `${ic("circle-alert")}<span>${prev || ""}${esc(msg)}</span>`; err.hidden = false; }
 
 	function renderFiles() {
-		const NAMES = { pdf: "PDF", docx: "Word", xlsx: "Excel", csv: "CSV", txt: t("Text"), image: t("Image"), web: t("Web page"), text: t("Text") };
-		const ICON = { web: "link", text: "clipboard-paste", image: "image", xlsx: "file-spreadsheet", csv: "file-spreadsheet" };
+		const NAMES = { pdf: "PDF", docx: "Word", web: t("Web page"), text: t("Text") };
+		const ICON = { web: "link", text: "clipboard-paste" };
 		$("#files").innerHTML = S.docs.map((d) => {
 			if (d.loading) return `<li class="frow busy-row"><span class="file-ic">${ic("file-text")}</span><div><b>${esc(d.name)}</b><small>${ic("loader-circle", "spin")}${d.note ? esc(d.note) : t("Reading your document…")}</small></div></li>`;
 			const bits = [NAMES[d.type], d.pages ? (d.pages === 1 ? t("1 page") : t("{n} pages", { n: d.pages })) : null, t("{n} words", { n: d.words.toLocaleString(I.lang) }), t(LANG_NAME[d.lang])].filter(Boolean);
-			const warn = d.words < 30 ? `<span class="w">${t(d.type === "image" ? "I could read almost no text in this image. Try a sharper, straight photo." : "I found almost no text. This may be a scan or a photo inside a PDF. I can’t read those yet.")}</span>` : d.pages > MAX_PAGES ? `<span class="w">${t("This document is long: I’ll read its first {n} pages.", { n: MAX_PAGES })}</span>` : "";
+			const warn = d.words < 30 ? `<span class="w">${t("I found almost no text. This may be a scan or a photo inside a PDF. I can’t read those yet.")}</span>` : d.pages > MAX_PAGES ? `<span class="w">${t("This document is long: I’ll read its first {n} pages.", { n: MAX_PAGES })}</span>` : "";
 			const fresh = !S.shown.has(d.fid); S.shown.add(d.fid);
 			return `<li class="frow${fresh ? " new" : ""}" data-fid="${d.fid}"><span class="file-ic">${ic(ICON[d.type] || "file-text")}</span><div><b>${esc(d.name)}</b><small><span>${bits.map(esc).join(" · ")}</span>${warn}</small></div>${d.words >= 30 ? `<span class="ok-ic">${ic("circle-check")}</span>` : ""}<button type="button" class="btn btn-text btn-sm" data-rm="${d.fid}" aria-label="${esc(t("Remove"))} ${esc(d.name)}">${ic("x")}<span class="hide-m">${t("Remove")}</span></button></li>`;
 		}).join("");
@@ -191,77 +185,7 @@
 		const paras = [...box.querySelectorAll("p, h1, h2, h3, h4, h5, h6, li, td")].filter((el) => el.textContent.trim() && !(el.tagName === "TD" && el.querySelector("p")) && !(el.tagName === "LI" && el.querySelector("p"))).map((el) => el.textContent.replace(/\s+/g, " ").trim());
 		const d = textDoc(paras, "docx"); return d;
 	}
-	const KINDS = { pdf: "pdf", docx: "docx", xlsx: "xlsx", csv: "csv", txt: "text", md: "text", text: "text", png: "image", jpg: "image", jpeg: "image" };
-	/* Excel (.xlsx): a zip of XML files, opened with fflate (MIT); each row becomes one line "A | B | C" */
-	function readXlsx(buf) {
-		const z = fflate.unzipSync(new Uint8Array(buf)), td = new TextDecoder(), xml = (n) => (z[n] ? new DOMParser().parseFromString(td.decode(z[n]), "application/xml") : null);
-		const tags = (doc, tag) => (doc ? [...doc.getElementsByTagNameNS("*", tag)] : []);
-		const shared = tags(xml("xl/sharedStrings.xml"), "si").map((si) => tags(si, "t").map((x) => x.textContent).join(""));
-		const rels = Object.fromEntries(tags(xml("xl/_rels/workbook.xml.rels"), "Relationship").map((r) => [r.getAttribute("Id"), r.getAttribute("Target")]));
-		const sheets = tags(xml("xl/workbook.xml"), "sheet").map((sh) => {
-			const target = rels[sh.getAttribute("r:id") || sh.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id")] || "";
-			const path = target.startsWith("/") ? target.slice(1) : "xl/" + target.replace(/^\.\//, "");
-			const rows = tags(xml(path), "row").map((row) => tags(row, "c").map((c) => {
-				const tp = c.getAttribute("t"), v = tags(c, "v")[0]?.textContent ?? "";
-				return tp === "s" ? shared[+v] ?? "" : tp === "inlineStr" ? tags(c, "t").map((x) => x.textContent).join("") : tp === "b" ? (v === "1" ? "TRUE" : "FALSE") : v;
-			}).map((x) => String(x).trim()));
-			return { name: sh.getAttribute("name") || "", rows };
-		});
-		return sheetDoc(sheets, "xlsx");
-	}
-	function parseCsv(txt) {
-		const first = txt.split(/\r?\n/, 1)[0] || "", sep = [";", "\t", ","].map((c) => [c, first.split(c).length]).sort((a, b) => b[1] - a[1])[0][0];
-		const rows = []; let row = [], cell = "", q = false;
-		for (let i = 0; i < txt.length; i++) {
-			const ch = txt[i];
-			if (q) { if (ch === '"' && txt[i + 1] === '"') { cell += '"'; i++; } else if (ch === '"') q = false; else cell += ch; }
-			else if (ch === '"') q = true; else if (ch === sep) { row.push(cell.trim()); cell = ""; }
-			else if (ch === "\n") { row.push(cell.trim()); rows.push(row); row = []; cell = ""; } else if (ch !== "\r") cell += ch;
-		}
-		if (cell || row.length) { row.push(cell.trim()); rows.push(row); }
-		return rows;
-	}
-	/* table rows → passages of about 600 characters, each starting with its sheet name */
-	function sheetDoc(sheets, type) {
-		const chunks = [];
-		for (const sh of sheets) {
-			let buf = [];
-			const flush = () => { if (buf.length) { const text = (sh.name && sheets.length > 1 ? sh.name + ": " : "") + buf.join(" ; "); chunks.push({ page: null, parts: [text], text }); buf = []; } };
-			for (const r of sh.rows) { const l = r.filter(Boolean).join(" | "); if (!l) continue; if (buf.join(" ; ").length + l.length > 600) flush(); buf.push(l.slice(0, 800)); }
-			flush();
-		}
-		return { type, pages: null, chunks };
-	}
-	/* PNG or JPEG: the text is read in this browser by Tesseract (Apache-2.0); each paragraph keeps its place on the image */
-	const OCR_LANG = { en: "eng", fr: "fra", es: "spa", pt: "por", de: "deu", it: "ita", ru: "rus", tr: "tur", id: "ind", he: "heb" };
-	let ocr = null;
-	async function ocrWorker(row) {
-		const langs = [...new Set(["eng", OCR_LANG[I.lang] || "eng"])].join("+");
-		if (ocr && ocr.langs === langs) return ocr.w;
-		if (ocr) { ocr.w.terminate(); ocr = null; }
-		const w = await Tesseract.createWorker(langs, 1, {
-			workerPath: "vendor/tesseract/worker.min.js", corePath: "vendor/tesseract/core", langPath: "vendor/tesseract/lang", gzip: true, workerBlobURL: false,
-			logger: (m) => { if (ocr?.row && m.progress != null) { ocr.row.note = `${t("Reading the text in the image…")} ${Math.round(m.progress * 100)} %`; renderFiles(); } },
-		});
-		ocr = { w, langs, row }; return w;
-	}
-	async function readImage(file, row) {
-		row.note = t("Reading the text in the image…"); renderFiles();
-		const bmp = await createImageBitmap(file), k0 = Math.min(1, 2400 / Math.max(bmp.width, bmp.height));
-		const img = document.createElement("canvas"); img.width = Math.round(bmp.width * k0); img.height = Math.round(bmp.height * k0);
-		img.getContext("2d").drawImage(bmp, 0, 0, img.width, img.height); bmp.close?.();
-		await loadScript("vendor/tesseract/tesseract.min.js");
-		const w = await ocrWorker(row); ocr.row = row;
-		const { data } = await w.recognize(img);
-		const k = img.width / 700, chunks = [];
-		for (const p of data.paragraphs || []) {
-			let lines = []; const push = () => { const text = lines.map((l) => l.text.trim()).join(" ").replace(/\s+/g, " ").trim(); if (text.length > 2) chunks.push({ page: 1, text, rects: lines.map((l) => ({ x: l.bbox.x0 / k, y: l.bbox.y0 / k, w: (l.bbox.x1 - l.bbox.x0) / k, h: (l.bbox.y1 - l.bbox.y0) / k })) }); lines = []; };
-			for (const l of p.lines || []) { if (l.confidence < 30 || !l.text.trim()) continue; lines.push(l); if (lines.reduce((a, x) => a + x.text.length, 0) > 650) push(); }
-			push();
-		}
-		const xs = chunks.flatMap((c) => c.rects), W = img.width / k, H = img.height / k;
-		return { type: "image", img, pages: 1, read: 1, pageInfo: [{ w: W, h: H, left: xs.length ? Math.min(...xs.map((r) => r.x)) : 0, right: xs.length ? Math.max(...xs.map((r) => r.x + r.w)) : W }], chunks, canvases: {} };
-	}
+	const KINDS = { pdf: "pdf", docx: "docx" };
 	const LANG_NAME = { en: "English", fr: "French", es: "Spanish", pt: "Portuguese", de: "German", it: "Italian", ru: "Russian", tr: "Turkish", id: "Indonesian", he: "Hebrew", other: "another language" };
 	const STOPW = {
 		en: "the and you is for with are your of to not this that will", fr: "le la les des est vous une pour dans avec pas du qui que", es: "el los las del es usted una para con por que se como sus",
@@ -277,7 +201,6 @@
 	}
 	async function pageCanvas(d, p, scale = 2) {
 		const key = p + "@" + scale; if (d.canvases[key]) return d.canvases[key];
-		if (d.img) { const c = document.createElement("canvas"), info = d.pageInfo[0]; c.width = Math.round(info.w * scale); c.height = Math.round(info.h * scale); c.getContext("2d").drawImage(d.img, 0, 0, c.width, c.height); return (d.canvases[key] = c); }
 		const page = await d.pdf.getPage(p), vp = page.getViewport({ scale }), c = document.createElement("canvas");
 		c.width = Math.ceil(vp.width); c.height = Math.ceil(vp.height);
 		await page.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
@@ -546,8 +469,6 @@
 	}
 	async function loadQuota() { try { const r = await fetch(API, { cache: "no-store" }); const j = await r.json(); if (j.quota) { S.quota = j.quota; renderQuota(); } } catch {} }
 
-	/* Tesseract is large: it loads only when the first photo arrives */
-	const loadScript = (src) => new Promise((ok, no) => { if (document.querySelector(`script[src="${src}"]`)) return ok(); const el = document.createElement("script"); el.src = src; el.onload = ok; el.onerror = no; document.head.append(el); });
 
 	/* open or close a block smoothly (height + fade); the passage images are drawn first so the height is right */
 	async function slide(el, open) {
@@ -595,7 +516,7 @@
 	$("#legalBtn").onclick = () => { // privacy & terms, in the reader's language
 		const opener = document.activeElement, scrim = document.createElement("div"), v = document.createElement("div");
 		scrim.className = "scrim"; v.className = "viewer"; v.setAttribute("role", "dialog"); v.setAttribute("aria-modal", "true"); v.setAttribute("aria-labelledby", "lgH");
-		v.innerHTML = `<div class="legal"><h3 id="lgH">${t("Privacy & terms")}</h3>${["Files, photos and pasted text are read in your browser. A link is fetched once by our server, only to read the page.", "This free demo shares a daily AI allowance between all visitors. When it runs out, it comes back the next day.", "To write the summary and the answers, only the passages needed are sent to Cloudflare Workers AI, which runs Llama 3.3 (Meta). Cloudflare states that it does not use this content to train AI models, and Margin stores nothing.", "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong. Always check the highlighted source.", "Portfolio demo: please don’t add very personal or confidential documents."].map((k) => `<p>${esc(t(k))}</p>`).join("")}<p>Built with Llama · <a class="lnk" href="THIRD-PARTY-NOTICES.txt">${t("Licences")}</a></p><div class="row"><button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></div></div>`;
+		v.innerHTML = `<div class="legal"><h3 id="lgH">${t("Privacy & terms")}</h3>${["Files and pasted text are read in your browser. A link is fetched once by our server, only to read the page.", "This free demo shares a daily AI allowance between all visitors. When it runs out, it comes back the next day.", "To write the summary and the answers, only the passages needed are sent to Cloudflare Workers AI, which runs Llama 3.3 (Meta). Cloudflare states that it does not use this content to train AI models, and Margin stores nothing.", "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong. Always check the highlighted source.", "Portfolio demo: please don’t add very personal or confidential documents."].map((k) => `<p>${esc(t(k))}</p>`).join("")}<p>Built with Llama · <a class="lnk" href="THIRD-PARTY-NOTICES.txt">${t("Licences")}</a></p><div class="row"><button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></div></div>`;
 		const close = () => { scrim.remove(); v.remove(); document.removeEventListener("keydown", key); opener?.focus(); }, key = (e) => { if (e.key === "Escape") close(); };
 		v.addEventListener("click", (e) => { if (e.target === v || e.target.closest("[data-close]")) close(); });
 		document.addEventListener("keydown", key); document.body.append(scrim, v); v.querySelector("[data-close]").focus();

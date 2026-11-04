@@ -438,11 +438,11 @@ footer .wrap { padding-top: 10px; padding-bottom: 12px; align-items: center; gap
 			<ul class="files" id="files" aria-live="polite"></ul></div>
 			<label class="drop" id="drop" for="fileIn">
 				<span data-ic="file-up"></span>
-				<b class="hide-m" id="dropTitle" data-t="Drop one or more files here">Drop one or more files here</b>
+				<b class="hide-m" id="dropTitle" data-t="Drop one or more PDF or Word files here">Drop one or more PDF or Word files here</b>
 				<span class="or hide-m" data-t="or">or</span>
 				<span class="btn btn-ink" id="dropBtn" aria-hidden="true"><span data-ic="file-text"></span><span data-t="Choose files">Choose files</span></span>
-				<small data-t="PDF, Word, Excel, text or a photo (PNG, JPEG) · up to 60 pages · 20 MB">PDF, Word, Excel, text or a photo (PNG, JPEG) · up to 60 pages · 20 MB</small>
-				<input type="file" id="fileIn" multiple accept=".pdf,.docx,.xlsx,.csv,.txt,.md,.png,.jpg,.jpeg,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain,text/markdown,image/png,image/jpeg">
+				<small data-t="PDF or Word (.docx) · up to 60 pages · 20 MB">PDF or Word (.docx) · up to 60 pages · 20 MB</small>
+				<input type="file" id="fileIn" multiple accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
 			</label>
 			<div class="paste-wrap">
 				<p class="paste-line"><span data-ic="clipboard-paste"></span><span id="pasteLine">You can also <button type="button" class="lnk" id="pasteBtn" aria-expanded="false" aria-controls="pasteBox">click here</button> to paste the text of a contract, a letter or any other document.</span></p>
@@ -490,7 +490,6 @@ footer .wrap { padding-top: 10px; padding-bottom: 12px; align-items: center; gap
 <script src="i18n.js"></script>
 <script src="vendor/pdf.min.js"></script>
 <script src="vendor/mammoth.browser.min.js"></script>
-<script src="vendor/fflate.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
