@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Margin — understand any document</title>
+<title>Margin · understand any document</title>
 <meta name="description" content="Margin reads a PDF or Word file and answers with the exact passage, highlighted. A portfolio concept by David Bitan.">
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="fonts/fonts.css">
@@ -333,7 +333,7 @@ footer a { color: var(--link); }
 .inputs { display: flex; flex-direction: column; gap: 12px; }
 .inputs .url { flex: none; }
 .paste-wrap { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-.paste-wrap .paste { width: 100%; }
+.paste-wrap .paste { width: 100%; flex: none; }
 .sample-line { display: flex; gap: 8px; align-items: flex-start; margin: 2px 0 0; font-size: 14.5px; color: var(--ink-2); }
 .sample-line > .i { width: 16px; height: 16px; margin-top: 3px; color: var(--ink-3); }
 #files { margin-top: 18px; }
@@ -350,7 +350,8 @@ footer a { color: var(--link); }
 .sep { display: flex; align-items: center; gap: 12px; color: var(--ink-3); font-size: 13.5px; margin: 2px 0; }
 .sep::before, .sep::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .fv { font-weight: 700; color: var(--ink); white-space: nowrap; }
-.fv::after { content: " —"; font-weight: 400; color: var(--ink-3); }
+.fv::after { content: ":"; font-weight: 700; }
+html[lang="fr"] .fv::after { content: "\00a0:"; }
 .ask .mic { flex: none; width: 42px; height: 42px; border-radius: var(--r-md); border: 1px solid var(--line-2); background: var(--surface); color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
 .ask .mic:hover { border-color: var(--ink); color: var(--ink); }
 .ask .mic .i { width: 19px; height: 19px; }
@@ -392,18 +393,19 @@ footer a { color: var(--link); }
 .rep.in .box { animation: rise .42s var(--ease) both; }
 .rep.in .box:nth-child(2) { animation-delay: .05s; } .rep.in .box:nth-child(3) { animation-delay: .1s; } .rep.in .box:nth-child(4) { animation-delay: .15s; }
 .turn.new { animation: rise .32s var(--ease) both; }
-.paste.open { animation: rise .26s var(--ease) both; }
 .drop { transition: border-color .2s, background .2s, padding .3s var(--ease); }
 
 /* the footer always sits at the bottom of the window, even when the page is short */
 body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 body > main { flex: 1 0 auto; width: 100%; box-sizing: border-box; }
 body > footer { flex: none; }
+
+/* a thin, light footer band */
+footer { font-size: 12.5px; line-height: 1.45; }
+footer .wrap { padding-top: 10px; padding-bottom: 12px; align-items: center; gap: 4px 20px; }
 </style>
 </head>
 <body>
-<div class="pf"><div class="pf-in"><span data-t="Portfolio demo · Margin is a concept by David Bitan. Brevholt Kelmarion and its documents are invented.">Portfolio demo · Margin is a concept by David Bitan. Brevholt Kelmarion and its documents are invented.</span><a href="/" data-t="Back to the portfolio">Back to the portfolio</a></div></div>
-
 <header class="top"><div class="top-in">
 	<button class="logo" type="button" id="home" aria-label="Margin"><b>Marg<i>i</i>n</b></button>
 	<div class="lang" id="langWrap">
@@ -415,13 +417,13 @@ body > footer { flex: none; }
 <main class="wrap">
 	<section id="p1">
 		<h1 data-t="Your document, analysed and explained in a few clicks.">Your document, analysed and explained in a few clicks.</h1>
-		<p class="lead" data-t="Margin reads your document, explains what matters in plain words — your rights, your commitments, the key dates — and shows you exactly where it says it.">Margin reads your document, explains what matters in plain words — your rights, your commitments, the key dates — and shows you exactly where it says it.</p>
+		<p class="lead" data-t="Margin reads your document, explains what matters in plain words (your rights, your commitments, the key dates) and shows you the exact passage behind each point.">Margin reads your document, explains what matters in plain words (your rights, your commitments, the key dates) and shows you the exact passage behind each point.</p>
 
 		<div class="inputs">
 			<form class="url" id="urlForm" autocomplete="off">
 				<span data-ic="link"></span>
 				<label class="sr" for="urlIn" data-t="Paste a link">Paste a link</label>
-				<input id="urlIn" type="url" inputmode="url" data-t-ph="Paste a link — terms of use, a contract online…" placeholder="Paste a link">
+				<input id="urlIn" type="url" inputmode="url" data-t-ph="Paste a link: terms of use, a contract online…" placeholder="Paste a link">
 				<button class="btn btn-sm" type="submit" id="urlGo" disabled data-t="Add">Add</button>
 			</form>
 			<div class="sep" aria-hidden="true"><span data-t="or">or</span></div>
@@ -448,7 +450,7 @@ body > footer { flex: none; }
 
 		<div class="err" id="err1" role="alert" hidden></div>
 		<div class="nav-row">
-			<p class="privacy"><span data-ic="lock"></span><span data-t="Your file is read in this browser. Only the passages needed for an answer are sent to the AI, and nothing is kept: close the page and it’s gone. Demo — avoid very personal documents.">Your file is read in this browser.</span></p>
+			<p class="privacy"><span data-ic="lock"></span><span data-t="Your file is read in this browser. Only the passages needed for an answer are sent to the AI, and nothing is kept: close the page and it’s gone. Demo: avoid very personal documents.">Your file is read in this browser.</span></p>
 			<button type="button" class="btn btn-ink" id="analyse" disabled><span data-ic="sparkles"></span><span data-t="Analyse">Analyse</span></button>
 		</div>
 		<div class="quota" id="quota1" hidden></div>
@@ -481,7 +483,7 @@ body > footer { flex: none; }
 	</section>
 </main>
 
-<footer><div class="wrap"><span data-t="Margin is a fictional product designed and built by David Bitan for his AI Lab. Brevholt Kelmarion and its documents are invented.">Margin is a fictional product designed and built by David Bitan for his AI Lab. Brevholt Kelmarion and its documents are invented.</span><span class="foot-links"><button type="button" class="lnk" id="legalBtn" data-t="Privacy &amp; terms">Privacy &amp; terms</button> · <a href="THIRD-PARTY-NOTICES.txt" data-t="Licences">Licences</a> · <span>Built with Llama</span> · <a href="/" data-t="Portfolio">Portfolio</a></span></div></footer>
+<footer><div class="wrap"><span data-t="A fictional product by David Bitan for his AI Lab. Brevholt Kelmarion is invented.">A fictional product by David Bitan for his AI Lab. Brevholt Kelmarion is invented.</span><span class="foot-links"><button type="button" class="lnk" id="legalBtn" data-t="Privacy &amp; terms">Privacy &amp; terms</button> · <a href="THIRD-PARTY-NOTICES.txt" data-t="Licences">Licences</a> · <span>Built with Llama</span> · <a href="/" data-t="Back to the portfolio">Back to the portfolio</a></span></div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="icons.js"></script>

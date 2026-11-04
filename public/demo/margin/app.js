@@ -68,16 +68,19 @@
 				const i = S.docs.indexOf(row); if (i >= 0) S.docs[i] = doc;
 			} catch (e) {
 				console.warn("Margin, reading:", e); S.docs = S.docs.filter((d) => d !== row);
-				showErr(`${name} — ${e.userMsg || t("I couldn’t open this file. It may be damaged or protected by a password.")}`);
-			} finally { S.loading--; S.index = null; renderFiles(); scheduleReport(); }
+				showErr(`${name}: ${e.userMsg || t("I couldn’t open this file. It may be damaged or protected by a password.")}`);
+			} finally {
+				S.loading--; S.index = null; renderFiles(); scheduleReport();
+				if (S.autoOpen && !S.loading) { S.autoOpen = false; if (ready().length && !quotaOut()) { go(2); makeReport(); } } // "open it directly" goes straight to the analysis
+			}
 		})();
 	}
 	function addFiles(list, isSample) {
 		$("#err1").hidden = true;
 		for (const file of [...list].slice(0, Math.max(0, MAX_FILES - S.docs.length))) {
 			const name = file.name || "document", ext = name.toLowerCase().split(".").pop(), kind = KINDS[ext] || (/^image\/(png|jpeg)$/.test(file.type) ? "image" : null);
-			if (!kind) { showErr(`${name} — ${t("This file type isn’t supported. Use a PDF, Word, Excel, text, PNG or JPEG file.")}`); continue; }
-			if (file.size > MAX_MB * 1048576) { showErr(`${name} — ${t("This file is larger than 20 MB.")}`); continue; }
+			if (!kind) { showErr(`${name}: ${t("This file type isn’t supported. Use a PDF, Word, Excel, text, PNG or JPEG file.")}`); continue; }
+			if (file.size > MAX_MB * 1048576) { showErr(`${name}: ${t("This file is larger than 20 MB.")}`); continue; }
 			if (S.docs.some((d) => d.name === name && d.size === file.size)) continue;
 			addSource(name, async (row) => {
 				if (kind === "image") return readImage(file, row);
@@ -93,9 +96,9 @@
 		let u; try { u = new URL(url.trim()); if (!/^https?:$/.test(u.protocol)) throw 0; } catch { return showErr(t("This link doesn’t look valid.")); }
 		addSource(u.hostname, async () => {
 			const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ mode: "fetch", url: u.href }) });
-			if (!r.ok) { const e = new Error("fetch"); e.userMsg = t("I couldn’t read this page. Some sites block automatic reading — copy the text and use “Or paste the text”."); throw e; }
+			if (!r.ok) { const e = new Error("fetch"); e.userMsg = t("I couldn’t read this page. Some sites block automatic reading. Copy the text and use “Or paste the text”."); throw e; }
 			if ((r.headers.get("content-type") || "").includes("pdf")) { const doc = await readPdf(await r.arrayBuffer()); doc.url = u.href; doc.title = decodeURIComponent(u.pathname.split("/").pop() || u.hostname); return doc; }
-			const j = await r.json(); if (!j.paragraphs?.length) { const e = new Error("empty"); e.userMsg = t("I couldn’t read this page. Some sites block automatic reading — copy the text and use “Or paste the text”."); throw e; }
+			const j = await r.json(); if (!j.paragraphs?.length) { const e = new Error("empty"); e.userMsg = t("I couldn’t read this page. Some sites block automatic reading. Copy the text and use “Or paste the text”."); throw e; }
 			const doc = textDoc(j.paragraphs, "web"); doc.url = u.href; doc.title = j.title || u.hostname; return doc;
 		});
 	}
@@ -110,11 +113,11 @@
 		for (const p of paras) {
 			if (p.length < 70 && !/[.!?:;]$/.test(p)) { pending.push(p); continue; }
 			const all = [...pending, p]; pending = [];
-			const text = all.join(" — ");
+			const text = all.map((x, i) => (i < all.length - 1 && !/[.!?:;]$/.test(x) ? x + "." : x)).join(" ");
 			if (text.length > 900) { for (let i = 0; i < text.length; i += 800) chunks.push({ page: null, parts: [text.slice(i, i + 800)], text: text.slice(i, i + 800) }); }
 			else chunks.push({ page: null, parts: all, text });
 		}
-		if (pending.length) chunks.push({ page: null, parts: pending, text: pending.join(" — ") });
+		if (pending.length) chunks.push({ page: null, parts: pending, text: pending.join(". ") });
 		return { type, pages: null, chunks };
 	}
 	function showErr(msg) { const err = $("#err1"); const prev = err.hidden ? "" : err.querySelector("span")?.innerHTML + "<br>"; err.innerHTML = `${ic("circle-alert")}<span>${prev || ""}${esc(msg)}</span>`; err.hidden = false; }
@@ -125,7 +128,7 @@
 		$("#files").innerHTML = S.docs.map((d) => {
 			if (d.loading) return `<li class="frow busy-row"><span class="file-ic">${ic("file-text")}</span><div><b>${esc(d.name)}</b><small>${ic("loader-circle", "spin")}${d.note ? esc(d.note) : t("Reading your document…")}</small></div></li>`;
 			const bits = [NAMES[d.type], d.pages ? (d.pages === 1 ? t("1 page") : t("{n} pages", { n: d.pages })) : null, t("{n} words", { n: d.words.toLocaleString(I.lang) }), t(LANG_NAME[d.lang])].filter(Boolean);
-			const warn = d.words < 30 ? `<span class="w">${t(d.type === "image" ? "I could read almost no text in this image. Try a sharper, straight photo." : "I found almost no text. This may be a scan or a photo inside a PDF — I can’t read those yet.")}</span>` : d.pages > MAX_PAGES ? `<span class="w">${t("This document is long: I’ll read its first {n} pages.", { n: MAX_PAGES })}</span>` : "";
+			const warn = d.words < 30 ? `<span class="w">${t(d.type === "image" ? "I could read almost no text in this image. Try a sharper, straight photo." : "I found almost no text. This may be a scan or a photo inside a PDF. I can’t read those yet.")}</span>` : d.pages > MAX_PAGES ? `<span class="w">${t("This document is long: I’ll read its first {n} pages.", { n: MAX_PAGES })}</span>` : "";
 			const fresh = !S.shown.has(d.fid); S.shown.add(d.fid);
 			return `<li class="frow${fresh ? " new" : ""}" data-fid="${d.fid}"><span class="file-ic">${ic(ICON[d.type] || "file-text")}</span><div><b>${esc(d.name)}</b><small><span>${bits.map(esc).join(" · ")}</span>${warn}</small></div>${d.words >= 30 ? `<span class="ok-ic">${ic("circle-check")}</span>` : ""}<button type="button" class="btn btn-text btn-sm" data-rm="${d.fid}" aria-label="${esc(t("Remove"))} ${esc(d.name)}">${ic("x")}<span class="hide-m">${t("Remove")}</span></button></li>`;
 		}).join("");
@@ -327,12 +330,13 @@
 		s = s.replace(/(?<![\d.,])(\d{1,3}(?:,\d{3})+)(?:\.(\d{1,2}))?(?![\d,]|\.\d)/g, (m, int, dec) => fmt(+(int.replace(/,/g, "") + (dec ? "." + dec : "")), dec ? dec.length : 0));
 		s = s.replace(new RegExp(`(${CUR}\\s?)(\\d+)\\.(\\d{1,2})(?![\\d.])`, "g"), (m, c, a, b) => c + fmt(+(a + "." + b), b.length));
 		s = s.replace(new RegExp(`(?<![\\d.,])(\\d+)\\.(\\d{1,2})(?=\\s?(?:${CUR}|%))`, "g"), (m, a, b) => fmt(+(a + "." + b), b.length));
+		s = s.replace(/([€$£₪])\s?(\d(?:[\d.,\u202f\u00a0 ]*\d)?)/g, "$2\u00a0$1"); // 68 000 €, not €68 000
 		return s;
 	}
 	function verify(items, chunks, lang) {
 		const byId = Object.fromEntries(chunks.map((c) => [c.id, c])), kept = [], removed = [];
 		for (const it of items || []) {
-			let text = String(it?.text || "").replace(/[*#`]/g, "").trim(); if (!text) continue;
+			let text = String(it?.text || "").replace(/[*#`]/g, "").replace(/\s+[—–]\s+/g, ", ").trim(); if (!text) continue;
 			const value = String(it?.value || "").replace(/[*#`]/g, "").trim().slice(0, 60);
 			if (!/[.!?…:”"״)]$/.test(text)) text += ".";
 			const cites = [...new Set((Array.isArray(it.cite) ? it.cite : [it.cite]).map(String).filter((id) => byId[id]))];
@@ -400,7 +404,7 @@
 		box.innerHTML = `<article class="rep${first ? " in" : ""}"><div class="rep-h"><div><span class="kind">${esc(names)}</span><h2>${title}</h2></div>${acts}</div>
 			${r.groups.short.length ? `<div class="short">${r.groups.short.map((it) => `<span class="pt">${pointHtml(it)}</span>`).join(" ")}</div>` : ""}
 			<div class="grid4">${GROUPS.slice(1).map(groupHtml).join("")}</div>
-			<div class="rep-foot"><span class="badge ok">${ic("shield-check")}${t("{n} points, each checked against the document", { n: r.count })}</span>${r.removed?.length ? `<span>${r.removed.length === 1 ? esc(t(r.removed[0].why === "num" ? "Removed: its number isn’t in the document." : "Removed: it had no source.")) : esc(t("{n} removed", { n: r.removed.length }))}</span>` : ""}<span>${t("This summary helps you read — it isn’t legal advice.")}</span></div></article>`;
+			<div class="rep-foot"><span class="badge ok">${ic("shield-check")}${t("{n} points, each checked against the document", { n: r.count })}</span>${r.removed?.length ? `<span>${r.removed.length === 1 ? esc(t(r.removed[0].why === "num" ? "Removed: its number isn’t in the document." : "Removed: it had no source.")) : esc(t("{n} removed", { n: r.removed.length }))}</span>` : ""}<span>${t("This summary helps you read. It isn’t legal advice.")}</span></div></article>`;
 		S.snips = drawSnips(box); $("#qa").hidden = false; renderTries();
 	}
 	/* a point, with a quiet "Where it says it" that opens the highlighted passage underneath */
@@ -416,7 +420,7 @@
 		const snip = visual(d) ? `<canvas data-snip="${id}" role="img" aria-label="${esc(c.text.slice(0, 300))}"></canvas>` : `<div class="snip-txt" dir="auto">${textSnip(d, c)}</div>`;
 		return `<article class="src" dir="${I.lang === "he" ? "rtl" : "ltr"}" lang="${I.lang}">${where ? `<div class="src-top"><span>${where}</span></div>` : ""}
 			<button type="button" class="snip" data-view="${id}" aria-label="${esc(t("See it in the document"))}">${snip}</button>
-			${tr && tr !== "…" ? `<div class="tr" lang="${lang}" dir="${lang === "he" ? "rtl" : "ltr"}">${esc(tr)}<small>${t("Machine translation — the highlighted original is what counts.")}</small></div>` : ""}
+			${tr && tr !== "…" ? `<div class="tr" lang="${lang}" dir="${lang === "he" ? "rtl" : "ltr"}">${esc(tr)}<small>${t("Machine translation. The highlighted original is what counts.")}</small></div>` : ""}
 			<div class="src-acts">${d.lang !== lang ? `<button type="button" class="btn btn-text" data-tr="${it.key}" data-id="${id}" data-lang="${lang}">${tr === "…" ? ic("loader-circle", "spin") : ic("languages")}${t(tr && tr !== "…" ? "Show the original" : "Translate this passage")}</button>` : ""}<button type="button" class="btn btn-text" data-view="${id}">${ic("zoom-in")}${t("See it in the document")}</button></div></article>`;
 	}
 	function textSnip(d, c) {
@@ -519,7 +523,7 @@
 	function copy(owner) {
 		const items = owner === "report" ? Object.values(S.report.groups).flat() : S.turns.find((x) => x.id === owner).items;
 		const ids = []; items.forEach((it) => it.cite.forEach((id) => !ids.includes(id) && ids.push(id)));
-		const src = ids.map((id, i) => { const c = chunk(id); return c ? `[${i + 1}] ${docOf(c).name}${c.page ? ", " + t("Page {n}", { n: c.page }) : ""} — ${c.text.slice(0, 160)}` : ""; }).join("\n");
+		const src = ids.map((id, i) => { const c = chunk(id); return c ? `[${i + 1}] ${docOf(c).name}${c.page ? ", " + t("Page {n}", { n: c.page }) : ""}: ${c.text.slice(0, 160)}` : ""; }).join("\n");
 		navigator.clipboard?.writeText(`${plainOf(owner)}\n\n${t("Sources")}:\n${src}`).then(() => toast(t("Copied, with its sources.")), () => {});
 	}
 
@@ -623,15 +627,15 @@
 
 	/* open or close a block smoothly (height + fade); the passage images are drawn first so the height is right */
 	async function slide(el, open) {
-		if (!el || !el.classList.contains("proof") || reduced) return;
+		if (!el || reduced) return;
 		el.style.overflow = "hidden";
-		if (open) { el.style.height = "0px"; el.style.opacity = "0"; await S.snips; await new Promise(requestAnimationFrame); }
+		if (open) { el.style.height = "0px"; el.style.opacity = "0"; if (el.classList.contains("proof")) await S.snips; await new Promise(requestAnimationFrame); }
 		const from = open ? 0 : el.scrollHeight, to = open ? el.scrollHeight : 0;
 		el.style.height = from + "px"; void el.offsetHeight;
 		el.style.transition = "height .34s cubic-bezier(.2,.7,.2,1), opacity .26s ease";
 		el.style.height = to + "px"; el.style.opacity = open ? "1" : "0";
 		await new Promise((r) => { const done = () => { el.removeEventListener("transitionend", done); r(); }; el.addEventListener("transitionend", done); setTimeout(done, 420); });
-		if (open) { el.style.height = el.style.overflow = el.style.transition = el.style.opacity = ""; }
+		el.style.height = el.style.overflow = el.style.transition = el.style.opacity = "";
 	}
 
 	/* ---------------- toast ---------------- */
@@ -650,12 +654,18 @@
 	drop.addEventListener("drop", (e) => { if (e.dataTransfer?.files?.length) addFiles(e.dataTransfer.files); });
 	addEventListener("dragover", (e) => e.preventDefault()); addEventListener("drop", (e) => { e.preventDefault(); if (e.dataTransfer?.files?.length && !e.target.closest("#drop")) addFiles(e.dataTransfer.files); });
 	$("#fileIn").addEventListener("change", (e) => { if (e.target.files?.length) addFiles(e.target.files); e.target.value = ""; });
-	$("#openSample").addEventListener("click", async () => { const r = await fetch("samples/brevholt-kelmarion-employment-contract.pdf"); addFiles([new File([await r.blob()], "brevholt-kelmarion-employment-contract.pdf", { type: "application/pdf" })], true); });
+	/* "download it": a real download (a file saved), never a PDF opened in a tab */
+	$("#sample a[download]").addEventListener("click", async (e) => {
+		e.preventDefault(); const href = e.currentTarget.getAttribute("href");
+		try { const r = await fetch(href); if (!r.ok) throw 0; const url = URL.createObjectURL(await r.blob()); const a = document.createElement("a"); a.href = url; a.download = "brevholt-kelmarion-employment-contract.pdf"; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000); }
+		catch { location.href = href; }
+	});
+	$("#openSample").addEventListener("click", async () => { S.autoOpen = true; const r = await fetch("samples/brevholt-kelmarion-employment-contract.pdf"); addFiles([new File([await r.blob()], "brevholt-kelmarion-employment-contract.pdf", { type: "application/pdf" })], true); });
 	$("#analyse").onclick = () => { go(2); makeReport(); };
 	$("#legalBtn").onclick = () => { // privacy & terms, in the reader's language
 		const opener = document.activeElement, scrim = document.createElement("div"), v = document.createElement("div");
 		scrim.className = "scrim"; v.className = "viewer"; v.setAttribute("role", "dialog"); v.setAttribute("aria-modal", "true"); v.setAttribute("aria-labelledby", "lgH");
-		v.innerHTML = `<div class="legal"><h3 id="lgH">${t("Privacy & terms")}</h3>${["Files, photos and pasted text are read in your browser. A link is fetched once by our server, only to read the page.", "When you speak a question, the recording is sent once to Cloudflare Workers AI (Whisper, by OpenAI) to turn it into text, and isn’t kept.", "This free demo shares a daily AI allowance between all visitors. When it runs out, it comes back the next day.", "To write the summary and the answers, only the passages needed are sent to Cloudflare Workers AI, which runs Llama 3.3 (Meta). Cloudflare states that it does not use this content to train AI models, and Margin stores nothing.", "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong — always check the highlighted source.", "Portfolio demo: please don’t add very personal or confidential documents."].map((k) => `<p>${esc(t(k))}</p>`).join("")}<p>Built with Llama · <a class="lnk" href="THIRD-PARTY-NOTICES.txt">${t("Licences")}</a></p><div class="row"><button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></div></div>`;
+		v.innerHTML = `<div class="legal"><h3 id="lgH">${t("Privacy & terms")}</h3>${["Files, photos and pasted text are read in your browser. A link is fetched once by our server, only to read the page.", "When you speak a question, the recording is sent once to Cloudflare Workers AI (Whisper, by OpenAI) to turn it into text, and isn’t kept.", "This free demo shares a daily AI allowance between all visitors. When it runs out, it comes back the next day.", "To write the summary and the answers, only the passages needed are sent to Cloudflare Workers AI, which runs Llama 3.3 (Meta). Cloudflare states that it does not use this content to train AI models, and Margin stores nothing.", "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong. Always check the highlighted source.", "Portfolio demo: please don’t add very personal or confidential documents."].map((k) => `<p>${esc(t(k))}</p>`).join("")}<p>Built with Llama · <a class="lnk" href="THIRD-PARTY-NOTICES.txt">${t("Licences")}</a></p><div class="row"><button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></div></div>`;
 		const close = () => { scrim.remove(); v.remove(); document.removeEventListener("keydown", key); opener?.focus(); }, key = (e) => { if (e.key === "Escape") close(); };
 		v.addEventListener("click", (e) => { if (e.target === v || e.target.closest("[data-close]")) close(); });
 		document.addEventListener("keydown", key); document.body.append(scrim, v); v.querySelector("[data-close]").focus();
@@ -663,7 +673,14 @@
 	$("#back2").onclick = () => go(1);
 	$("#urlIn").addEventListener("input", (e) => ($("#urlGo").disabled = !e.target.value.trim()));
 	$("#urlForm").addEventListener("submit", (e) => { e.preventDefault(); const v = $("#urlIn").value.trim(); if (!v) return; $("#urlIn").value = ""; $("#urlGo").disabled = true; addLink(/^https?:\/\//i.test(v) ? v : "https://" + v); });
-	const pasteOpen = (on) => { $("#pasteBox").hidden = !on; $("#pasteBox").classList.toggle("open", on); $("#pasteBtn").setAttribute("aria-expanded", String(on)); if (on) $("#pasteIn").focus(); };
+	let pasteBusy = false;
+	async function pasteOpen(on) {
+		const box = $("#pasteBox"); if (pasteBusy || box.hidden === !on) return; pasteBusy = true;
+		$("#pasteBtn").setAttribute("aria-expanded", String(on));
+		if (on) { box.hidden = false; $("#pasteIn").focus({ preventScroll: true }); await slide(box, true); }
+		else { await slide(box, false); box.hidden = true; }
+		pasteBusy = false;
+	}
 	$("#pasteBtn").onclick = () => pasteOpen($("#pasteBox").hidden);
 	$("#pasteCancel").onclick = () => { pasteOpen(false); $("#pasteBtn").focus(); };
 	$("#pasteIn").addEventListener("input", (e) => ($("#pasteOk").disabled = e.target.value.trim().split(/\s+/).length < 30));

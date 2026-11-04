@@ -82,7 +82,7 @@ window.MARGIN_I18N = (() => {
 	  "he": "לשאול"
 	 },
 	 "Back to the portfolio": {
-	  "fr": "Retour au portfolio",
+	  "fr": "Retourner au portfolio",
 	  "es": "Volver al portafolio",
 	  "pt": "Voltar ao portfólio",
 	  "de": "Zurück zum Portfolio",
@@ -180,27 +180,27 @@ window.MARGIN_I18N = (() => {
 	  "id": "File ini tidak bisa dibuka. Mungkin rusak atau dilindungi kata sandi.",
 	  "he": "לא הצלחתי לפתוח את הקובץ. ייתכן שהוא פגום או מוגן בסיסמה."
 	 },
-	 "I couldn’t read this page. Some sites block automatic reading — copy the text and use “Or paste the text”.": {
-	  "fr": "Je n’ai pas pu lire cette page. Certains sites bloquent la lecture automatique — copiez le texte et utilisez « Ou collez le texte ».",
+	 "I couldn’t read this page. Some sites block automatic reading. Copy the text and use “Or paste the text”.": {
+	  "fr": "Je n’ai pas pu lire cette page. Certains sites bloquent la lecture automatique. Copiez le texte et utilisez « Ou collez le texte ».",
 	  "es": "No pude leer esta página. Algunos sitios bloquean la lectura automática: copia el texto y usa «O pega el texto».",
-	  "pt": "Não consegui ler esta página. Alguns sites bloqueiam a leitura automática — copie o texto e use “Ou cole o texto”.",
-	  "de": "Diese Seite ließ sich nicht lesen. Manche Websites blockieren das automatische Lesen – kopieren Sie den Text und nutzen Sie „Oder Text einfügen“.",
+	  "pt": "Não consegui ler esta página. Alguns sites bloqueiam a leitura automática. Copie o texto e use “Ou cole o texto”.",
+	  "de": "Diese Seite ließ sich nicht lesen. Manche Websites blockieren das automatische Lesen. Kopieren Sie den Text und nutzen Sie „Oder Text einfügen“.",
 	  "it": "Non sono riuscito a leggere questa pagina. Alcuni siti bloccano la lettura automatica: copia il testo e usa «Oppure incolla il testo».",
-	  "ru": "Не удалось прочитать страницу. Некоторые сайты блокируют автоматическое чтение — скопируйте текст и используйте «Или вставьте текст».",
-	  "tr": "Bu sayfa okunamadı. Bazı siteler otomatik okumayı engeller — metni kopyalayıp “Ya da metni yapıştırın” seçeneğini kullanın.",
-	  "id": "Halaman ini tidak bisa dibaca. Beberapa situs memblokir pembacaan otomatis — salin teksnya dan gunakan “Atau tempel teksnya”.",
-	  "he": "לא הצלחתי לקרוא את הדף. אתרים מסוימים חוסמים קריאה אוטומטית — העתיקו את הטקסט והשתמשו ב״או הדביקו את הטקסט״."
+	  "ru": "Не удалось прочитать страницу. Некоторые сайты блокируют автоматическое чтение. Скопируйте текст и используйте «Или вставьте текст».",
+	  "tr": "Bu sayfa okunamadı. Bazı siteler otomatik okumayı engeller. Metni kopyalayıp “Ya da metni yapıştırın” seçeneğini kullanın.",
+	  "id": "Halaman ini tidak bisa dibaca. Beberapa situs memblokir pembacaan otomatis. Salin teksnya dan gunakan “Atau tempel teksnya”.",
+	  "he": "לא הצלחתי לקרוא את הדף. אתרים מסוימים חוסמים קריאה אוטומטית. העתיקו את הטקסט והשתמשו ב״או הדביקו את הטקסט״."
 	 },
-	 "I found almost no text. This may be a scan or a photo inside a PDF — I can’t read those yet.": {
-	  "fr": "Je n’ai trouvé presque aucun texte. C’est peut-être un scan ou une photo dans un PDF — je ne sais pas encore les lire.",
+	 "I found almost no text. This may be a scan or a photo inside a PDF. I can’t read those yet.": {
+	  "fr": "Je n’ai trouvé presque aucun texte. C’est peut-être un scan ou une photo dans un PDF. Je ne sais pas encore les lire.",
 	  "es": "Casi no encontré texto. Puede ser un escaneo o una foto dentro de un PDF; aún no puedo leerlos.",
-	  "pt": "Quase não encontrei texto. Pode ser um documento digitalizado ou uma foto dentro de um PDF — ainda não consigo lê-los.",
-	  "de": "Ich habe kaum Text gefunden. Vielleicht ist es ein Scan oder ein Foto in einem PDF – das kann ich noch nicht lesen.",
+	  "pt": "Quase não encontrei texto. Pode ser um documento digitalizado ou uma foto dentro de um PDF. Ainda não consigo lê-los.",
+	  "de": "Ich habe kaum Text gefunden. Vielleicht ist es ein Scan oder ein Foto in einem PDF. Das kann ich noch nicht lesen.",
 	  "it": "Non ho trovato quasi nessun testo. Potrebbe essere una scansione o una foto in un PDF: non riesco ancora a leggerle.",
-	  "ru": "Текста почти нет. Возможно, это скан или фото внутри PDF — такие я пока не читаю.",
-	  "tr": "Neredeyse hiç metin bulamadım. Bu bir tarama ya da PDF içindeki bir fotoğraf olabilir — bunları henüz okuyamıyorum.",
-	  "id": "Hampir tidak ada teks. Mungkin ini hasil pindaian atau foto di dalam PDF — saya belum bisa membacanya.",
-	  "he": "כמעט לא מצאתי טקסט. ייתכן שזו סריקה או תמונה בתוך PDF — עדיין איני יודע לקרוא כאלה."
+	  "ru": "Текста почти нет. Возможно, это скан или фото внутри PDF. Такие я пока не читаю.",
+	  "tr": "Neredeyse hiç metin bulamadım. Bu bir tarama ya da PDF içindeki bir fotoğraf olabilir. Bunları henüz okuyamıyorum.",
+	  "id": "Hampir tidak ada teks. Mungkin ini hasil pindaian atau foto di dalam PDF. Saya belum bisa membacanya.",
+	  "he": "כמעט לא מצאתי טקסט. ייתכן שזו סריקה או תמונה בתוך PDF. עדיין איני יודע לקרוא כאלה."
 	 },
 	 "I found nothing about this in the document.": {
 	  "fr": "Je n’ai rien trouvé sur ce sujet dans le document.",
@@ -246,38 +246,38 @@ window.MARGIN_I18N = (() => {
 	  "id": "Bahasa",
 	  "he": "שפה"
 	 },
-	 "Machine translation — the highlighted original is what counts.": {
-	  "fr": "Traduction automatique — c’est l’original surligné qui fait foi.",
+	 "Machine translation. The highlighted original is what counts.": {
+	  "fr": "Traduction automatique. C’est l’original surligné qui fait foi.",
 	  "es": "Traducción automática: lo que cuenta es el original resaltado.",
-	  "pt": "Tradução automática — o que vale é o original destacado.",
-	  "de": "Maschinelle Übersetzung – maßgeblich ist das markierte Original.",
+	  "pt": "Tradução automática. O que vale é o original destacado.",
+	  "de": "Maschinelle Übersetzung. Maßgeblich ist das markierte Original.",
 	  "it": "Traduzione automatica: fa fede l’originale evidenziato.",
-	  "ru": "Машинный перевод — значение имеет выделенный оригинал.",
-	  "tr": "Makine çevirisi — geçerli olan, vurgulanan orijinal metindir.",
-	  "id": "Terjemahan mesin — yang berlaku adalah teks asli yang ditandai.",
-	  "he": "תרגום אוטומטי — המקור המסומן הוא הקובע."
+	  "ru": "Машинный перевод. Значение имеет выделенный оригинал.",
+	  "tr": "Makine çevirisi. Geçerli olan, vurgulanan orijinal metindir.",
+	  "id": "Terjemahan mesin. Yang berlaku adalah teks asli yang ditandai.",
+	  "he": "תרגום אוטומטי. המקור המסומן הוא הקובע."
 	 },
-	 "Margin is a fictional product designed and built by David Bitan for his AI Lab. Brevholt Kelmarion and its documents are invented.": {
-	  "fr": "Margin est un produit fictif conçu et développé par David Bitan pour son AI Lab. Brevholt Kelmarion et ses documents sont inventés.",
-	  "es": "Margin es un producto ficticio diseñado y creado por David Bitan para su AI Lab. Brevholt Kelmarion y sus documentos son inventados.",
-	  "pt": "Margin é um produto fictício criado e desenvolvido por David Bitan para o seu AI Lab. A Brevholt Kelmarion e os seus documentos são inventados.",
-	  "de": "Margin ist ein fiktives Produkt, gestaltet und gebaut von David Bitan für sein AI Lab. Brevholt Kelmarion und seine Dokumente sind erfunden.",
-	  "it": "Margin è un prodotto immaginario progettato e realizzato da David Bitan per il suo AI Lab. Brevholt Kelmarion e i suoi documenti sono inventati.",
-	  "ru": "Margin — вымышленный продукт, который Давид Битан спроектировал и создал для своей AI Lab. Компания Brevholt Kelmarion и её документы выдуманы.",
-	  "tr": "Margin, David Bitan’ın AI Lab için tasarlayıp geliştirdiği kurgusal bir üründür. Brevholt Kelmarion ve belgeleri hayal ürünüdür.",
-	  "id": "Margin adalah produk fiktif yang dirancang dan dibuat oleh David Bitan untuk AI Lab miliknya. Brevholt Kelmarion dan dokumennya adalah rekaan.",
-	  "he": "Margin הוא מוצר בדוי שעוצב ונבנה על ידי דוד ביטן עבור ה־AI Lab שלו. ברבהולט קלמריון והמסמכים שלה בדויים."
+	 "A fictional product by David Bitan for his AI Lab. Brevholt Kelmarion is invented.": {
+	  "fr": "Produit fictif créé par David Bitan pour son AI Lab. Brevholt Kelmarion est inventé.",
+	  "es": "Producto ficticio creado por David Bitan para su AI Lab. Brevholt Kelmarion es inventada.",
+	  "pt": "Produto fictício criado por David Bitan para o seu AI Lab. A Brevholt Kelmarion é inventada.",
+	  "de": "Ein fiktives Produkt von David Bitan für sein AI Lab. Brevholt Kelmarion ist erfunden.",
+	  "it": "Prodotto fittizio creato da David Bitan per il suo AI Lab. Brevholt Kelmarion è inventata.",
+	  "ru": "Вымышленный продукт Давида Битана для его AI Lab. Brevholt Kelmarion выдумана.",
+	  "tr": "David Bitan’ın AI Lab’i için kurgusal bir ürün. Brevholt Kelmarion hayal ürünüdür.",
+	  "id": "Produk fiktif karya David Bitan untuk AI Lab miliknya. Brevholt Kelmarion adalah rekaan.",
+	  "he": "מוצר בדוי של דוד ביטן עבור ה־AI Lab שלו. ברבהולט קלמריון בדויה."
 	 },
-	 "Margin reads your document, explains what matters in plain words — your rights, your commitments, the key dates — and shows you exactly where it says it.": {
-	  "fr": "Margin lit votre document, vous en explique l’essentiel en mots simples — vos droits, vos engagements, les dates clés — et vous montre exactement où c’est écrit.",
-	  "es": "Margin lee tu documento, te explica lo importante con palabras sencillas —tus derechos, tus compromisos, las fechas clave— y te muestra exactamente dónde lo dice.",
-	  "pt": "O Margin lê o seu documento, explica o essencial em palavras simples — os seus direitos, os seus compromissos, as datas importantes — e mostra exatamente onde está escrito.",
-	  "de": "Margin liest Ihr Dokument, erklärt das Wichtigste in einfachen Worten – Ihre Rechte, Ihre Verpflichtungen, die wichtigen Termine – und zeigt genau, wo es steht.",
-	  "it": "Margin legge il tuo documento, ti spiega l’essenziale con parole semplici — i tuoi diritti, i tuoi impegni, le date chiave — e ti mostra esattamente dove è scritto.",
-	  "ru": "Margin читает ваш документ, простыми словами объясняет главное — ваши права, ваши обязательства, ключевые даты — и показывает, где именно это написано.",
-	  "tr": "Margin belgenizi okur, önemli olanı sade bir dille açıklar — haklarınızı, yükümlülüklerinizi, önemli tarihleri — ve tam olarak nerede yazdığını gösterir.",
-	  "id": "Margin membaca dokumen Anda, menjelaskan hal penting dengan kata-kata sederhana — hak Anda, kewajiban Anda, tanggal-tanggal penting — lalu menunjukkan persis di mana tertulisnya.",
-	  "he": "Margin קורא את המסמך שלכם, מסביר את העיקר במילים פשוטות — הזכויות שלכם, ההתחייבויות שלכם, התאריכים החשובים — ומראה בדיוק איפה זה כתוב."
+	 "Margin reads your document, explains what matters in plain words (your rights, your commitments, the key dates) and shows you the exact passage behind each point.": {
+	  "fr": "Margin lit votre document, vous en explique l’essentiel en mots simples (vos droits, vos engagements, les dates clés) et vous indique, pour chaque point, le passage exact du document.",
+	  "es": "Margin lee tu documento, te explica lo importante con palabras sencillas (tus derechos, tus compromisos, las fechas clave) y te indica, para cada punto, el pasaje exacto del documento.",
+	  "pt": "O Margin lê o seu documento, explica o essencial em palavras simples (os seus direitos, os seus compromissos, as datas importantes) e indica, para cada ponto, o trecho exato do documento.",
+	  "de": "Margin liest Ihr Dokument, erklärt das Wichtigste in einfachen Worten (Ihre Rechte, Ihre Verpflichtungen, die wichtigen Termine) und zeigt Ihnen zu jedem Punkt die genaue Stelle im Dokument.",
+	  "it": "Margin legge il tuo documento, ti spiega l’essenziale con parole semplici (i tuoi diritti, i tuoi impegni, le date chiave) e ti indica, per ogni punto, il passaggio esatto del documento.",
+	  "ru": "Margin читает ваш документ, простыми словами объясняет главное (ваши права, ваши обязательства, ключевые даты) и для каждого пункта показывает точное место в документе.",
+	  "tr": "Margin belgenizi okur, önemli olanı sade bir dille açıklar (haklarınızı, yükümlülüklerinizi, önemli tarihleri) ve her madde için belgedeki tam bölümü gösterir.",
+	  "id": "Margin membaca dokumen Anda, menjelaskan hal penting dengan kata-kata sederhana (hak Anda, kewajiban Anda, tanggal-tanggal penting) dan untuk setiap poin menunjukkan bagian persisnya di dokumen.",
+	  "he": "Margin קורא את המסמך שלכם, מסביר את העיקר במילים פשוטות (הזכויות שלכם, ההתחייבויות שלכם, התאריכים החשובים) ומציג לכל נקודה את הקטע המדויק במסמך."
 	 },
 	 "No document at hand? Try Brevholt Kelmarion’s example contract:": {
 	  "fr": "Pas de document sous la main ? Essayez le contrat d’exemple de Brevholt Kelmarion :",
@@ -334,16 +334,16 @@ window.MARGIN_I18N = (() => {
 	  "id": "Tempel tautan",
 	  "he": "הדבקת קישור"
 	 },
-	 "Paste a link — terms of use, a contract online…": {
-	  "fr": "Collez un lien — conditions d’utilisation, contrat en ligne…",
+	 "Paste a link: terms of use, a contract online…": {
+	  "fr": "Collez un lien : conditions d’utilisation, contrat en ligne…",
 	  "es": "Pega un enlace: condiciones de uso, un contrato en línea…",
-	  "pt": "Cole um link — termos de uso, um contrato on-line…",
-	  "de": "Link einfügen – Nutzungsbedingungen, ein Online-Vertrag…",
-	  "it": "Incolla un link — condizioni d’uso, un contratto online…",
-	  "ru": "Вставьте ссылку — условия использования, договор онлайн…",
-	  "tr": "Bir bağlantı yapıştırın — kullanım koşulları, çevrimiçi bir sözleşme…",
-	  "id": "Tempel tautan — syarat penggunaan, kontrak online…",
-	  "he": "הדביקו קישור — תנאי שימוש, חוזה באינטרנט…"
+	  "pt": "Cole um link: termos de uso, um contrato on-line…",
+	  "de": "Link einfügen: Nutzungsbedingungen, ein Online-Vertrag…",
+	  "it": "Incolla un link: condizioni d’uso, un contratto online…",
+	  "ru": "Вставьте ссылку: условия использования, договор онлайн…",
+	  "tr": "Bir bağlantı yapıştırın: kullanım koşulları, çevrimiçi bir sözleşme…",
+	  "id": "Tempel tautan: syarat penggunaan, kontrak online…",
+	  "he": "הדביקו קישור: תנאי שימוש, חוזה באינטרנט…"
 	 },
 	 "Paste the text here": {
 	  "fr": "Collez le texte ici",
@@ -384,7 +384,7 @@ window.MARGIN_I18N = (() => {
 	  "pt": "Demo de portfólio · Margin é um conceito de David Bitan. A Brevholt Kelmarion e os seus documentos são inventados.",
 	  "de": "Portfolio-Demo · Margin ist ein Konzept von David Bitan. Brevholt Kelmarion und seine Dokumente sind erfunden.",
 	  "it": "Demo del portfolio · Margin è un concept di David Bitan. Brevholt Kelmarion e i suoi documenti sono inventati.",
-	  "ru": "Демо из портфолио · Margin — концепт Давида Битана. Brevholt Kelmarion и её документы выдуманы.",
+	  "ru": "Демо из портфолио · Margin является концептом Давида Битана. Brevholt Kelmarion и её документы выдуманы.",
 	  "tr": "Portfolyo demosu · Margin, David Bitan’ın bir konseptidir. Brevholt Kelmarion ve belgeleri hayal ürünüdür.",
 	  "id": "Demo portofolio · Margin adalah konsep karya David Bitan. Brevholt Kelmarion dan dokumennya adalah rekaan.",
 	  "he": "הדגמה מתיק עבודות · Margin הוא קונספט של דוד ביטן. ברבהולט קלמריון והמסמכים שלה בדויים."
@@ -565,16 +565,16 @@ window.MARGIN_I18N = (() => {
 	  "id": "Tautan ini tampaknya tidak valid.",
 	  "he": "הקישור לא נראה תקין."
 	 },
-	 "This summary helps you read — it isn’t legal advice.": {
-	  "fr": "Ce résumé aide à lire — ce n’est pas un avis juridique.",
+	 "This summary helps you read. It isn’t legal advice.": {
+	  "fr": "Ce résumé aide à lire. Ce n’est pas un avis juridique.",
 	  "es": "Este resumen te ayuda a leer; no es asesoramiento jurídico.",
-	  "pt": "Este resumo ajuda na leitura — não é aconselhamento jurídico.",
-	  "de": "Diese Zusammenfassung hilft beim Lesen – sie ist keine Rechtsberatung.",
+	  "pt": "Este resumo ajuda na leitura. Não é aconselhamento jurídico.",
+	  "de": "Diese Zusammenfassung hilft beim Lesen. Sie ist keine Rechtsberatung.",
 	  "it": "Questo riassunto ti aiuta a leggere: non è una consulenza legale.",
-	  "ru": "Эта сводка помогает читать — это не юридическая консультация.",
-	  "tr": "Bu özet okumanıza yardımcı olur — hukuki tavsiye değildir.",
-	  "id": "Ringkasan ini membantu Anda membaca — bukan nasihat hukum.",
-	  "he": "הסיכום עוזר לקרוא — הוא אינו ייעוץ משפטי."
+	  "ru": "Эта сводка помогает читать. Это не юридическая консультация.",
+	  "tr": "Bu özet okumanıza yardımcı olur. Hukuki tavsiye değildir.",
+	  "id": "Ringkasan ini membantu Anda membaca. Bukan nasihat hukum.",
+	  "he": "הסיכום עוזר לקרוא. הוא אינו ייעוץ משפטי."
 	 },
 	 "Try again": {
 	  "fr": "Réessayer",
@@ -659,21 +659,21 @@ window.MARGIN_I18N = (() => {
 	  "pt": "O seu documento, analisado e explicado em poucos cliques.",
 	  "de": "Ihr Dokument, analysiert und erklärt mit wenigen Klicks.",
 	  "it": "Il tuo documento, analizzato e spiegato in pochi clic.",
-	  "ru": "Ваш документ — проанализирован и объяснён в пару кликов.",
+	  "ru": "Ваш документ проанализирован и объяснён в пару кликов.",
 	  "tr": "Belgeniz birkaç tıkla analiz edilip açıklanır.",
 	  "id": "Dokumen Anda, dianalisis dan dijelaskan dalam beberapa klik.",
 	  "he": "המסמך שלכם, מנותח ומוסבר בכמה קליקים."
 	 },
-	 "Your file is read in this browser. Only the passages needed for an answer are sent to the AI, and nothing is kept: close the page and it’s gone. Demo — avoid very personal documents.": {
-	  "fr": "Votre fichier est lu dans ce navigateur. Seuls les passages utiles à une réponse sont envoyés à l’IA, et rien n’est gardé : fermez la page, tout disparaît. Démo — évitez les documents très personnels.",
+	 "Your file is read in this browser. Only the passages needed for an answer are sent to the AI, and nothing is kept: close the page and it’s gone. Demo: avoid very personal documents.": {
+	  "fr": "Votre fichier est lu dans ce navigateur. Seuls les passages utiles à une réponse sont envoyés à l’IA, et rien n’est gardé : fermez la page, tout disparaît. Démo : évitez les documents très personnels.",
 	  "es": "Tu archivo se lee en este navegador. Solo se envían a la IA los pasajes necesarios para una respuesta y no se guarda nada: cierra la página y desaparece. Demo: evita documentos muy personales.",
-	  "pt": "O seu arquivo é lido neste navegador. Só os trechos necessários para uma resposta são enviados à IA, e nada é guardado: feche a página e tudo some. Demo — evite documentos muito pessoais.",
-	  "de": "Ihre Datei wird in diesem Browser gelesen. Nur die für eine Antwort nötigen Stellen gehen an die KI, und nichts wird gespeichert: Seite schließen, alles weg. Demo – bitte keine sehr persönlichen Dokumente.",
+	  "pt": "O seu arquivo é lido neste navegador. Só os trechos necessários para uma resposta são enviados à IA, e nada é guardado: feche a página e tudo some. Demo: evite documentos muito pessoais.",
+	  "de": "Ihre Datei wird in diesem Browser gelesen. Nur die für eine Antwort nötigen Stellen gehen an die KI, und nichts wird gespeichert: Seite schließen, alles weg. Demo: bitte keine sehr persönlichen Dokumente.",
 	  "it": "Il tuo file viene letto in questo browser. All’IA vengono inviati solo i passaggi necessari a una risposta e non viene conservato nulla: chiudi la pagina e sparisce tutto. Demo: evita documenti molto personali.",
-	  "ru": "Файл читается в этом браузере. ИИ получает только нужные для ответа фрагменты, ничего не сохраняется: закройте страницу — и всё исчезнет. Демо — не загружайте очень личные документы.",
-	  "tr": "Dosyanız bu tarayıcıda okunur. Yapay zekâya yalnızca yanıt için gereken bölümler gönderilir ve hiçbir şey saklanmaz: sayfayı kapatınca her şey silinir. Demo — çok kişisel belgeler yüklemeyin.",
-	  "id": "File Anda dibaca di browser ini. Hanya bagian yang diperlukan untuk jawaban yang dikirim ke AI, dan tidak ada yang disimpan: tutup halaman, semuanya hilang. Demo — hindari dokumen yang sangat pribadi.",
-	  "he": "הקובץ נקרא בדפדפן הזה. רק הקטעים הדרושים לתשובה נשלחים ל־AI, ושום דבר לא נשמר: סוגרים את הדף והכול נעלם. הדגמה — הימנעו ממסמכים אישיים מאוד."
+	  "ru": "Файл читается в этом браузере. ИИ получает только нужные для ответа фрагменты, ничего не сохраняется: закройте страницу, и всё исчезнет. Демо: не загружайте очень личные документы.",
+	  "tr": "Dosyanız bu tarayıcıda okunur. Yapay zekâya yalnızca yanıt için gereken bölümler gönderilir ve hiçbir şey saklanmaz: sayfayı kapatınca her şey silinir. Demo: çok kişisel belgeler yüklemeyin.",
+	  "id": "File Anda dibaca di browser ini. Hanya bagian yang diperlukan untuk jawaban yang dikirim ke AI, dan tidak ada yang disimpan: tutup halaman, semuanya hilang. Demo: hindari dokumen yang sangat pribadi.",
+	  "he": "הקובץ נקרא בדפדפן הזה. רק הקטעים הדרושים לתשובה נשלחים ל־AI, ושום דבר לא נשמר: סוגרים את הדף והכול נעלם. הדגמה: הימנעו ממסמכים אישיים מאוד."
 	 },
 	 "download it": {
 	  "fr": "le télécharger",
@@ -1187,7 +1187,7 @@ window.MARGIN_I18N = (() => {
 	  "pt": "Os arquivos e o texto colado são lidos no seu navegador. Um link é aberto uma única vez pelo nosso servidor, apenas para ler a página.",
 	  "de": "Dateien und eingefügter Text werden in Ihrem Browser gelesen. Ein Link wird einmal von unserem Server abgerufen, nur um die Seite zu lesen.",
 	  "it": "I file e il testo incollato vengono letti nel tuo browser. Un link viene aperto una sola volta dal nostro server, solo per leggere la pagina.",
-	  "ru": "Файлы и вставленный текст читаются в вашем браузере. Ссылку наш сервер открывает один раз — только чтобы прочитать страницу.",
+	  "ru": "Файлы и вставленный текст читаются в вашем браузере. Ссылку наш сервер открывает один раз, только чтобы прочитать страницу.",
 	  "tr": "Dosyalar ve yapıştırılan metin tarayıcınızda okunur. Bir bağlantı, yalnızca sayfayı okumak için sunucumuz tarafından bir kez açılır.",
 	  "id": "File dan teks yang ditempel dibaca di browser Anda. Tautan dibuka satu kali oleh server kami, hanya untuk membaca halamannya.",
 	  "he": "קבצים וטקסט מודבק נקראים בדפדפן שלכם. קישור נפתח פעם אחת על ידי השרת שלנו, רק כדי לקרוא את הדף."
@@ -1203,16 +1203,16 @@ window.MARGIN_I18N = (() => {
 	  "id": "Untuk menulis ringkasan dan jawaban, hanya bagian yang diperlukan yang dikirim ke Cloudflare Workers AI, yang menjalankan Llama 3.3 (Meta). Cloudflare menyatakan tidak memakai konten ini untuk melatih model AI, dan Margin tidak menyimpan apa pun.",
 	  "he": "כדי לכתוב את הסיכום והתשובות, רק הקטעים הנדרשים נשלחים ל־Cloudflare Workers AI, שמריץ את Llama 3.3 ‏(Meta). Cloudflare מצהירה שהיא אינה משתמשת בתוכן הזה לאימון מודלים, ו־Margin אינו שומר דבר."
 	 },
-	 "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong — always check the highlighted source.": {
-	  "fr": "Margin vous aide à lire un document. Ce n’est pas un conseil juridique, financier ou médical : pour une décision importante, demandez à un professionnel. L’IA peut se tromper — vérifiez toujours la source surlignée.",
+	 "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong. Always check the highlighted source.": {
+	  "fr": "Margin vous aide à lire un document. Ce n’est pas un conseil juridique, financier ou médical : pour une décision importante, demandez à un professionnel. L’IA peut se tromper. Vérifiez toujours la source surlignée.",
 	  "es": "Margin te ayuda a leer un documento. No es asesoramiento jurídico, financiero ni médico: para una decisión importante, consulta a un profesional. La IA puede equivocarse; revisa siempre la fuente resaltada.",
-	  "pt": "O Margin ajuda você a ler um documento. Não é aconselhamento jurídico, financeiro ou médico: para uma decisão importante, consulte um profissional. A IA pode errar — confira sempre a fonte destacada.",
-	  "de": "Margin hilft Ihnen, ein Dokument zu lesen. Es ist keine Rechts-, Finanz- oder medizinische Beratung: Fragen Sie bei wichtigen Entscheidungen eine Fachperson. Die KI kann sich irren – prüfen Sie immer die markierte Quelle.",
+	  "pt": "O Margin ajuda você a ler um documento. Não é aconselhamento jurídico, financeiro ou médico: para uma decisão importante, consulte um profissional. A IA pode errar. Confira sempre a fonte destacada.",
+	  "de": "Margin hilft Ihnen, ein Dokument zu lesen. Es ist keine Rechts-, Finanz- oder medizinische Beratung: Fragen Sie bei wichtigen Entscheidungen eine Fachperson. Die KI kann sich irren. Prüfen Sie immer die markierte Quelle.",
 	  "it": "Margin ti aiuta a leggere un documento. Non è una consulenza legale, finanziaria o medica: per una decisione importante, chiedi a un professionista. L’IA può sbagliare: controlla sempre la fonte evidenziata.",
-	  "ru": "Margin помогает прочитать документ. Это не юридическая, финансовая или медицинская консультация: для важного решения обратитесь к специалисту. ИИ может ошибаться — всегда проверяйте выделенный источник.",
-	  "tr": "Margin bir belgeyi okumanıza yardımcı olur. Hukuki, mali veya tıbbi tavsiye değildir: önemli bir karar için bir uzmana danışın. Yapay zekâ yanılabilir — vurgulanan kaynağı her zaman kontrol edin.",
-	  "id": "Margin membantu Anda membaca dokumen. Ini bukan nasihat hukum, keuangan, atau medis: untuk keputusan penting, tanyakan kepada profesional. AI bisa keliru — selalu periksa sumber yang ditandai.",
-	  "he": "Margin עוזר לקרוא מסמך. אין זה ייעוץ משפטי, פיננסי או רפואי: להחלטה חשובה פנו לאיש מקצוע. ה־AI עלול לטעות — בדקו תמיד את המקור המסומן."
+	  "ru": "Margin помогает прочитать документ. Это не юридическая, финансовая или медицинская консультация: для важного решения обратитесь к специалисту. ИИ может ошибаться. Всегда проверяйте выделенный источник.",
+	  "tr": "Margin bir belgeyi okumanıza yardımcı olur. Hukuki, mali veya tıbbi tavsiye değildir: önemli bir karar için bir uzmana danışın. Yapay zekâ yanılabilir. Vurgulanan kaynağı her zaman kontrol edin.",
+	  "id": "Margin membantu Anda membaca dokumen. Ini bukan nasihat hukum, keuangan, atau medis: untuk keputusan penting, tanyakan kepada profesional. AI bisa keliru. Selalu periksa sumber yang ditandai.",
+	  "he": "Margin עוזר לקרוא מסמך. אין זה ייעוץ משפטי, פיננסי או רפואי: להחלטה חשובה פנו לאיש מקצוע. ה־AI עלול לטעות. בדקו תמיד את המקור המסומן."
 	 },
 	 "Portfolio demo: please don’t add very personal or confidential documents.": {
 	  "fr": "Démo de portfolio : merci de ne pas ajouter de documents très personnels ou confidentiels.",
@@ -1418,7 +1418,7 @@ window.MARGIN_I18N = (() => {
 	  "pt": "O Margin é uma demo gratuita. Funciona com a cota de IA gratuita da Cloudflare, compartilhada por todos os visitantes e renovada todos os dias.",
 	  "de": "Margin ist eine kostenlose Demo. Sie läuft mit dem kostenlosen KI-Kontingent von Cloudflare, das sich alle Besucher teilen und das sich täglich erneuert.",
 	  "it": "Margin è una demo gratuita. Funziona con la quota di IA gratuita di Cloudflare, condivisa da tutti i visitatori e rinnovata ogni giorno.",
-	  "ru": "Margin — бесплатная демоверсия. Она работает на бесплатной квоте ИИ от Cloudflare, общей для всех посетителей и обновляемой каждый день.",
+	  "ru": "Margin является бесплатной демоверсией. Она работает на бесплатной квоте ИИ от Cloudflare, общей для всех посетителей и обновляемой каждый день.",
 	  "tr": "Margin ücretsiz bir demodur. Tüm ziyaretçilerin paylaştığı ve her gün yenilenen Cloudflare ücretsiz yapay zekâ kotasıyla çalışır.",
 	  "id": "Margin adalah demo gratis. Demo ini berjalan dengan kuota AI gratis dari Cloudflare, yang dipakai bersama semua pengunjung dan diperbarui setiap hari.",
 	  "he": "Margin היא הדגמה חינמית. היא פועלת על מכסת ה־AI החינמית של Cloudflare, המשותפת לכל המבקרים ומתחדשת בכל יום."
