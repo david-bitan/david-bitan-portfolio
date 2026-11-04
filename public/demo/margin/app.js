@@ -611,14 +611,14 @@
 
 	/* ---------------- toast ---------------- */
 	let toastT;
-	function toast(msg, undoLabel, undo) {
+	function toast(msg, undoLabel, undo, msFixed) {
 		const el = $("#toast"); clearTimeout(toastT);
 		el.innerHTML = `<span>${esc(msg)}</span>${undo ? `<button type="button">${esc(undoLabel)}</button>` : ""}`;
 		// a wrapped message: shrink the box to its longest line, so the space is the same on both sides
 		const sp = el.firstElementChild; sp.style.width = ""; el.classList.remove("multi"); requestAnimationFrame(() => { const r = document.createRange(); r.selectNodeContents(sp); const rs = [...r.getClientRects()]; if (rs.length > 1) el.classList.add("multi"), sp.style.width = Math.ceil(Math.max(...rs.map((x) => x.right)) - Math.min(...rs.map((x) => x.left))) + 1 + "px"; });
 		if (undo) el.querySelector("button").onclick = () => { undo(); el.classList.remove("on"); };
 		// reading time: about two words a second, plus a moment to notice it (never under 3 s, 6 s with Undo)
-		const words = String(msg).trim().split(/\s+/).length, ms = Math.max(undo ? 6000 : 3000, words * 500 + 1500);
+		const words = String(msg).trim().split(/\s+/).length, ms = msFixed || Math.max(undo ? 6000 : 3000, words * 500 + 1500);
 		const hide = () => el.classList.remove("on"), arm = () => { clearTimeout(toastT); toastT = setTimeout(hide, ms); };
 		el.onmouseenter = () => clearTimeout(toastT); el.onmouseleave = arm; // hovering keeps it open
 		el.classList.add("on"); arm();
@@ -707,7 +707,7 @@
 		const owner = a.dataset.r;
 		if (a.dataset.act === "signin") return openSignIn();
 		if (a.dataset.act === "mine") return go(3);
-		if (a.dataset.act === "whylimit") return toast(t("Margin is a free demo. It runs on Cloudflare’s free AI allowance, shared by every visitor, which renews each day."));
+		if (a.dataset.act === "whylimit") return toast(t("Margin is a free demo. It runs on Cloudflare’s free AI allowance, shared by every visitor, which renews each day."), null, null, 7000); // 7 s: long enough to read, hovering keeps it open
 		if (a.dataset.act === "reanalyse") { if (S.report?.cleared) S.report = null; return makeReport(true); }
 		if (a.dataset.act === "listen") return speak(owner);
 		if (a.dataset.act === "copy") return copy(owner);
