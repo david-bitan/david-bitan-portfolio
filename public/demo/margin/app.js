@@ -26,7 +26,7 @@
 	function setLang(l) {
 		I.set(l); try { localStorage.setItem("margin-lang", I.lang); } catch {}
 		I.translateStatic(); $("#langCode").textContent = I.LANGS.find((x) => x[0] === I.lang)[2];
-		S.out = I.lang;
+		S.out = I.lang; pasteLine();
 		$("#langName").textContent = I.LANGS.find((x) => x[0] === I.lang)[1];
 		renderFiles(); renderTries(); renderReport(); renderThread(); if (S.quota) renderQuota();
 		if (S.page === 2 && S.report && !S.report.cleared && S.report.lang !== I.lang) makeReport(true); // the report follows the language
@@ -96,9 +96,9 @@
 		let u; try { u = new URL(url.trim()); if (!/^https?:$/.test(u.protocol)) throw 0; } catch { return showErr(t("This link doesn’t look valid.")); }
 		addSource(u.hostname, async () => {
 			const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ mode: "fetch", url: u.href }) });
-			if (!r.ok) { const e = new Error("fetch"); e.userMsg = t("I couldn’t read this page. Some sites block automatic reading. Copy the text and use “Click here to paste the text”."); throw e; }
+			if (!r.ok) { const e = new Error("fetch"); e.userMsg = t("I couldn’t read this page. Some sites block automatic reading. Copy the text, then paste it with the “click here” link under the files."); throw e; }
 			if ((r.headers.get("content-type") || "").includes("pdf")) { const doc = await readPdf(await r.arrayBuffer()); doc.url = u.href; doc.title = decodeURIComponent(u.pathname.split("/").pop() || u.hostname); return doc; }
-			const j = await r.json(); if (!j.paragraphs?.length) { const e = new Error("empty"); e.userMsg = t("I couldn’t read this page. Some sites block automatic reading. Copy the text and use “Click here to paste the text”."); throw e; }
+			const j = await r.json(); if (!j.paragraphs?.length) { const e = new Error("empty"); e.userMsg = t("I couldn’t read this page. Some sites block automatic reading. Copy the text, then paste it with the “click here” link under the files."); throw e; }
 			const doc = textDoc(j.paragraphs, "web"); doc.url = u.href; doc.title = j.title || u.hostname; return doc;
 		});
 	}
@@ -643,8 +643,14 @@
 	function toast(msg, undoLabel, undo) {
 		const el = $("#toast"); clearTimeout(toastT);
 		el.innerHTML = `<span>${esc(msg)}</span>${undo ? `<button type="button">${esc(undoLabel)}</button>` : ""}`;
+		// a wrapped message: shrink the box to its longest line, so the space is the same on both sides
+		const sp = el.firstElementChild; sp.style.width = ""; el.classList.remove("multi"); requestAnimationFrame(() => { const r = document.createRange(); r.selectNodeContents(sp); const rs = [...r.getClientRects()]; if (rs.length > 1) el.classList.add("multi"), sp.style.width = Math.ceil(Math.max(...rs.map((x) => x.right)) - Math.min(...rs.map((x) => x.left))) + 1 + "px"; });
 		if (undo) el.querySelector("button").onclick = () => { undo(); el.classList.remove("on"); };
-		el.classList.add("on"); toastT = setTimeout(() => el.classList.remove("on"), undo ? 6000 : 3200);
+		// reading time: about two words a second, plus a moment to notice it (never under 3 s, 6 s with Undo)
+		const words = String(msg).trim().split(/\s+/).length, ms = Math.max(undo ? 6000 : 3000, words * 500 + 1500);
+		const hide = () => el.classList.remove("on"), arm = () => { clearTimeout(toastT); toastT = setTimeout(hide, ms); };
+		el.onmouseenter = () => clearTimeout(toastT); el.onmouseleave = arm; // hovering keeps it open
+		el.classList.add("on"); arm();
 	}
 
 	/* ---------------- events ---------------- */
@@ -673,6 +679,12 @@
 	$("#back2").onclick = () => go(1);
 	$("#urlIn").addEventListener("input", (e) => ($("#urlGo").disabled = !e.target.value.trim()));
 	$("#urlForm").addEventListener("submit", (e) => { e.preventDefault(); const v = $("#urlIn").value.trim(); if (!v) return; $("#urlIn").value = ""; $("#urlGo").disabled = true; addLink(/^https?:\/\//i.test(v) ? v : "https://" + v); });
+	/* "You can also [click here] to paste…": only the two words are the link; the sentence is rebuilt in each language */
+	function pasteLine() {
+		const btn = $("#pasteBtn"), [before, after = ""] = t("You can also {link} to paste the text of a contract, a letter or any other document.").split("{link}");
+		btn.textContent = t("click here"); btn.setAttribute("aria-label", t("Click here to paste the text"));
+		$("#pasteLine").replaceChildren(document.createTextNode(before), btn, document.createTextNode(after));
+	}
 	let pasteBusy = false;
 	async function pasteOpen(on) {
 		const box = $("#pasteBox"); if (pasteBusy || box.hidden === !on) return; pasteBusy = true;

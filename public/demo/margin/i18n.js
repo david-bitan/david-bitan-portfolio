@@ -1521,6 +1521,39 @@ window.MARGIN_I18N = (() => {
 	  "tr": "(yerel saatinizle)",
 	  "id": "(waktu setempat Anda)",
 	  "he": "(לפי השעה המקומית שלכם)"
+	 },
+	 "You can also {link} to paste the text of a contract, a letter or any other document.": {
+	  "fr": "Vous pouvez aussi {link} pour coller le texte d’un contrat, d’un courrier ou de tout autre document.",
+	  "es": "También puedes {link} para pegar el texto de un contrato, una carta o cualquier otro documento.",
+	  "pt": "Também pode {link} para colar o texto de um contrato, de uma carta ou de qualquer outro documento.",
+	  "de": "Sie können auch {link}, um den Text eines Vertrags, eines Briefs oder eines anderen Dokuments einzufügen.",
+	  "it": "Puoi anche {link} per incollare il testo di un contratto, di una lettera o di qualsiasi altro documento.",
+	  "ru": "Вы также можете {link}, чтобы вставить текст договора, письма или любого другого документа.",
+	  "tr": "Bir sözleşmenin, mektubun veya başka bir belgenin metnini yapıştırmak için {link} da tıklayabilirsiniz.",
+	  "id": "Anda juga bisa {link} untuk menempel teks kontrak, surat, atau dokumen lainnya.",
+	  "he": "אפשר גם {link} כדי להדביק טקסט של חוזה, מכתב או כל מסמך אחר."
+	 },
+	 "click here": {
+	  "fr": "cliquer ici",
+	  "es": "hacer clic aquí",
+	  "pt": "clicar aqui",
+	  "de": "hier klicken",
+	  "it": "cliccare qui",
+	  "ru": "нажать здесь",
+	  "tr": "buraya",
+	  "id": "klik di sini",
+	  "he": "ללחוץ כאן"
+	 },
+	 "I couldn’t read this page. Some sites block automatic reading. Copy the text, then paste it with the “click here” link under the files.": {
+	  "fr": "Je n’ai pas pu lire cette page. Certains sites bloquent la lecture automatique. Copiez le texte, puis collez-le avec le lien « cliquer ici » sous les fichiers.",
+	  "es": "No pude leer esta página. Algunos sitios bloquean la lectura automática. Copia el texto y pégalo con el enlace «hacer clic aquí» bajo los archivos.",
+	  "pt": "Não consegui ler esta página. Alguns sites bloqueiam a leitura automática. Copie o texto e cole-o com o link “clicar aqui” abaixo dos arquivos.",
+	  "de": "Diese Seite ließ sich nicht lesen. Manche Websites blockieren das automatische Lesen. Kopieren Sie den Text und fügen Sie ihn über den Link „hier klicken“ unter den Dateien ein.",
+	  "it": "Non sono riuscito a leggere questa pagina. Alcuni siti bloccano la lettura automatica. Copia il testo e incollalo con il link «cliccare qui» sotto i file.",
+	  "ru": "Не удалось прочитать страницу. Некоторые сайты блокируют автоматическое чтение. Скопируйте текст и вставьте его по ссылке «нажать здесь» под файлами.",
+	  "tr": "Bu sayfa okunamadı. Bazı siteler otomatik okumayı engeller. Metni kopyalayın, ardından dosyaların altındaki “buraya” bağlantısıyla yapıştırın.",
+	  "id": "Halaman ini tidak bisa dibaca. Beberapa situs memblokir pembacaan otomatis. Salin teksnya, lalu tempel lewat tautan “klik di sini” di bawah file.",
+	  "he": "לא הצלחתי לקרוא את הדף. אתרים מסוימים חוסמים קריאה אוטומטית. העתיקו את הטקסט והדביקו אותו דרך הקישור ״ללחוץ כאן״ שמתחת לקבצים."
 	 }
 	};
 	let lang = "en";

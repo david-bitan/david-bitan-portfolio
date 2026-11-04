@@ -203,7 +203,7 @@ h2 { font: 700 clamp(24px, 3vw, 32px)/1.15 var(--sans); letter-spacing: -.025em;
 .v-doc { padding: 24px 28px; font-size: 16px; line-height: 1.6; }
 .v-doc .hl { background: var(--marker-soft); box-shadow: 0 0 0 6px var(--marker-soft); border-radius: 4px; }
 
-.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; visibility: hidden; z-index: 60; background: var(--ink); color: #fff; border-radius: 999px; padding: 10px 10px 10px 18px; display: flex; gap: 12px; align-items: center; font-size: 14.5px; transition: transform .25s var(--ease), opacity .25s, visibility .25s; max-width: calc(100% - 32px); }
+.toast { position: fixed; left: 50%; bottom: 24px; width: max-content; max-width: min(620px, calc(100% - 32px)) !important; transform: translate(-50%, 20px); opacity: 0; visibility: hidden; z-index: 60; background: var(--ink); color: #fff; border-radius: 999px; padding: 10px 20px; display: flex; gap: 12px; align-items: center; font-size: 14.5px; transition: transform .25s var(--ease), opacity .25s, visibility .25s; max-width: calc(100% - 32px); }
 .toast.on { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
 .toast button { border: 0; background: rgba(255,255,255,.14); color: #fff; border-radius: 999px; padding: 6px 12px; font-weight: 600; font-size: 13.5px; }
 
@@ -403,6 +403,13 @@ body > footer { flex: none; }
 /* a thin, light footer band */
 footer { font-size: 12.5px; line-height: 1.45; }
 footer .wrap { padding-top: 10px; padding-bottom: 12px; align-items: center; gap: 4px 20px; }
+.paste-line { display: flex; align-items: flex-start; gap: 8px; margin: 0; color: var(--ink-2); font-size: 15px; }
+.paste-line .i { width: 18px; height: 18px; flex: none; margin-top: 2px; color: var(--ink-3); }
+.paste-line .lnk { font: inherit; padding: 0; }
+.toast:has(button) { padding-inline-end: 8px; } /* the Undo pill sits close to the edge, same curve */
+.toast span { line-height: 1.4; text-wrap: balance; }
+.toast.multi { border-radius: 22px; padding-block: 12px; }
+.url { border-radius: 999px; padding-inline-start: 18px; } /* a full pill, the same shape as its Add button */
 </style>
 </head>
 <body>
@@ -438,7 +445,7 @@ footer .wrap { padding-top: 10px; padding-bottom: 12px; align-items: center; gap
 				<input type="file" id="fileIn" multiple accept=".pdf,.docx,.xlsx,.csv,.txt,.md,.png,.jpg,.jpeg,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain,text/markdown,image/png,image/jpeg">
 			</label>
 			<div class="paste-wrap">
-				<button type="button" class="lnk" id="pasteBtn" aria-expanded="false" aria-controls="pasteBox"><span data-ic="clipboard-paste"></span><span data-t="Click here to paste the text">Click here to paste the text</span></button>
+				<p class="paste-line"><span data-ic="clipboard-paste"></span><span id="pasteLine">You can also <button type="button" class="lnk" id="pasteBtn" aria-expanded="false" aria-controls="pasteBox">click here</button> to paste the text of a contract, a letter or any other document.</span></p>
 				<div class="paste" id="pasteBox" hidden>
 					<label class="sr" for="pasteIn" data-t="Paste the text here">Paste the text here</label>
 					<textarea id="pasteIn" rows="6" data-t-ph="Paste the text here"></textarea>
