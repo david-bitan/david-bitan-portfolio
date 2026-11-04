@@ -52,7 +52,7 @@ const ds = project.designSystem;
 ---
 
 <Layout
-	title={`${project.title} — AI Lab · David Bitan`}
+	title={`${project.title} · AI Lab · David Bitan`}
 	description={seoDescription}
 	ogImage={seoOgImage}
 	structuredData={projectJsonLd}
@@ -293,7 +293,7 @@ const ds = project.designSystem;
 					<div class="ai-lab-shot block overflow-hidden rounded-md bg-card">
 						<img
 							src={src}
-							alt={`${project.title} — screenshot ${i + 1}`}
+							alt={`${project.title}: screenshot ${i + 1}`}
 							loading={i === 0 ? 'eager' : 'lazy'}
 							class="h-auto w-full object-cover"
 						/>
@@ -312,7 +312,7 @@ const ds = project.designSystem;
 						<div class="ai-lab-shot block overflow-hidden rounded-md border border-ink/10 bg-card">
 							<img
 								src={src}
-								alt={`${project.title} — mobile screenshot ${i + 1}`}
+								alt={`${project.title}: mobile screenshot ${i + 1}`}
 								loading="lazy"
 								class="h-auto w-full object-cover"
 							/>

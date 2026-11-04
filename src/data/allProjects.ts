@@ -50,21 +50,21 @@ export const allProjects: FullProject[] = [
 
 	{
 		slug: 'sonary-dashboard',
-		title: `Sonary — Software Stack Manager`,
+		title: `Sonary · Software Stack Manager`,
 		client: `Ryze Beyond`,
 		year: '2025',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Sole-designed a SaaS to track software subscriptions — full dark/light design system, 96+ shipped frames, AI-powered flows.`,
-		fullDesc: `Sole-designed a SaaS to track software subscriptions — full dark/light design system, 2,000+ frames, AI chat bot for natural-language queries. See structured case study below.`,
+		shortDesc: `Sole-designed a SaaS to track software subscriptions: full dark/light design system, 96+ shipped frames, AI-powered flows.`,
+		fullDesc: `Sole-designed a SaaS to track software subscriptions: full dark/light design system, 2,000+ frames, AI chat bot for natural-language queries. See structured case study below.`,
 		liveUrl: 'https://sonary.com',
 		liveUrlNote: `Note: to reach the actual dashboard, click 'Login/Sign up' at the top right. Alternatively, 'Get started' leads to a landing page with a Sign up button.`,
 		sections: [
 			{
 				heading: 'Context',
-				body: `Software subscriptions are messy — teams sign up for SaaS across departments, individual receipts sit in different inboxes, and nobody has a clean picture of what's actually being spent, used, or duplicated.
+				body: `Software subscriptions are messy: teams sign up for SaaS across departments, individual receipts sit in different inboxes, and nobody has a clean picture of what's actually being spent, used, or duplicated.
 
-Sonary was Ryze Beyond's answer: a single dashboard that gives users a full view of their subscription stack (spend per month, potential savings, unused tools) while surfacing personalized alternatives — recommendations funded through Sonary's affiliate model, which keeps the product free for end users.`,
+Sonary was Ryze Beyond's answer: a single dashboard that gives users a full view of their subscription stack (spend per month, potential savings, unused tools) while surfacing personalized alternatives: recommendations funded through Sonary's affiliate model, which keeps the product free for end users.`,
 			},
 			{
 				heading: 'Role',
@@ -78,21 +78,21 @@ Research phase: user interviews, competitive benchmarking, curated inspiration f
 
 Then: information architecture, wireframes, high-fidelity design, iteration on stakeholder feedback, developer hand-off, and design QA after implementation to verify conformance screen by screen.
 
-Design system extended from the Sonary Website foundation (already ~6 years mature at that point), then expanded with dashboard-heavy components — data grids, filters, complex flows, multi-state modals — all responsive across 5 breakpoints (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375), with all component states (empty, loading, filter, multi-select, modals) documented. Separate motion design system documented in Figma for developers, complemented by SVGator animations delivered when needed. An AI chat bot was designed as a dedicated flow so users could query their stack in natural language.`,
+Design system extended from the Sonary Website foundation (already ~6 years mature at that point), then expanded with dashboard-heavy components (data grids, filters, complex flows, multi-state modals), all responsive across 5 breakpoints (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375), with all component states (empty, loading, filter, multi-select, modals) documented. Separate motion design system documented in Figma for developers, complemented by SVGator animations delivered when needed. An AI chat bot was designed as a dedicated flow so users could query their stack in natural language.`,
 			},
 			{
 				heading: 'Key challenge',
-				body: `An initial visual direction, defined collectively upfront, didn't pass top-level review — deemed too close to what competitors were shipping.
+				body: `An initial visual direction, defined collectively upfront, didn't pass top-level review, deemed too close to what competitors were shipping.
 
 I then brought forward the alternative I had been proposing from the start; once validated, it required a full re-design in two weeks (9 working days at 4.5 days/week): new palette, new iconography, addition of a dark mode (only one mode existed at first), applied across a project of 2,000+ frames. Delivered on time.`,
 			},
 			{
 				heading: 'Deliverables',
-				body: `6 core surfaces (Software Stack, Calculators, User Settings, Login, Dashboard, AI Chat Bot). Design system with variants, auto-layout, nested and interactive components. The full project runs over 2,000 frames — the screens shown here are a representative sample.`,
+				body: `6 core surfaces (Software Stack, Calculators, User Settings, Login, Dashboard, AI Chat Bot). Design system with variants, auto-layout, nested and interactive components. The full project runs over 2,000 frames: the screens shown here are a representative sample.`,
 			},
 			{
 				heading: 'What I took from it',
-				body: `Consolidating both sides of the value equation into one product — help users spend less, help the business recommend more — is a UX balancing act that only works in a team.
+				body: `Consolidating both sides of the value equation into one product (help users spend less, help the business recommend more) is a UX balancing act that only works in a team.
 
 Building on top of the Sonary Website design system, itself mature after six years, meant the Dashboard could ship complex flows quickly while contributing new patterns (data grids, dashboard widgets, chat bot flows) back to the shared library.`,
 			},
@@ -208,18 +208,18 @@ Building on top of the Sonary Website design system, itself mature after six yea
 	},
 	{
 		slug: 'sonary-website',
-		title: `Sonary — Marketing Website`,
+		title: `Sonary · Marketing Website`,
 		client: `Ryze Beyond`,
 		year: '2019 – 2026',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Sole designer since 2019 on Sonary's SaaS comparison platform — 37 verticals, ~3,000 CMS pages, three major redesigns.`,
+		shortDesc: `Sole designer since 2019 on Sonary's SaaS comparison platform: 37 verticals, ~3,000 CMS pages, three major redesigns.`,
 		fullDesc: `Sole designer on Sonary's SaaS comparison and review platform since 2019. Design system that later seeded the Sonary Dashboard product. See structured case study below.`,
 		liveUrl: 'https://sonary.com',
 		sections: [
 			{
 				heading: 'Context',
-				body: `Sonary is a SaaS software comparison and review platform for SMBs, published by Ryze Beyond. The site covers 37 verticals (AI, E-commerce, Design, Development, Finance, HR, IT, Productivity, Sales & Marketing, and more) through buying guides, side-by-side comparisons, editorial reviews, and category lineups. It complements Sonary Dashboard — the software subscription tracker from the same publisher, shipped in 2026.`,
+				body: `Sonary is a SaaS software comparison and review platform for SMBs, published by Ryze Beyond. The site covers 37 verticals (AI, E-commerce, Design, Development, Finance, HR, IT, Productivity, Sales & Marketing, and more) through buying guides, side-by-side comparisons, editorial reviews, and category lineups. It complements Sonary Dashboard: the software subscription tracker from the same publisher, shipped in 2026.`,
 			},
 			{
 				heading: 'Role',
@@ -229,25 +229,25 @@ Building on top of the Sonary Website design system, itself mature after six yea
 				heading: 'Approach',
 				body: `Constant benchmarking of domain references (G2, Capterra, Software Advice) cross-referenced with Dribbble and Pinterest to avoid the "directory" look. On the latest redesign, the research phase was accelerated with Midjourney, Firefly and Figma AI for moodboards and concept exploration.
 
-The design system was built for the site starting in 2019 (color tokens, Inter typography, radius, light and dark modes) — later extended to the Sonary Dashboard product shipped in 2026. Components were designed from day one as editable templates so the content team could add reviews without design intervention.`,
+The design system was built for the site starting in 2019 (color tokens, Inter typography, radius, light and dark modes), later extended to the Sonary Dashboard product shipped in 2026. Components were designed from day one as editable templates so the content team could add reviews without design intervention.`,
 			},
 			{
 				heading: 'Key challenge',
-				body: `Designing a system that could absorb the site's growth — 37 very different verticals (finance, AI, HR, e-commerce…) and close to 3,000 CMS-generated pages — without losing consistency or editorial tone. Every template needed to feel warm and inviting despite the functional density (comparison tables, review cards, scoring, lineups).
+				body: `Designing a system that could absorb the site's growth: 37 very different verticals (finance, AI, HR, e-commerce…) and close to 3,000 CMS-generated pages, without losing consistency or editorial tone. Every template needed to feel warm and inviting despite the functional density (comparison tables, review cards, scoring, lineups).
 
 Addressed through a strict smart-component hierarchy and a library of editorial patterns (illustrated headers, quote blocks, category chips) that break up the dense sections.`,
 			},
 			{
 				heading: 'Deliverables',
-				body: `Templates covering homepage, article hub, article, review, comparison, alternative/lineup, about and category pages — close to 3,000 pages generated through the CMS across 37 verticals.
+				body: `Templates covering homepage, article hub, article, review, comparison, alternative/lineup, about and category pages: close to 3,000 pages generated through the CMS across 37 verticals.
 
-Notable components: homepage, 37-category mega menu, review card, comparison table, interactive lineup — all built as smart components reused across templates.
+Notable components: homepage, 37-category mega menu, review card, comparison table, interactive lineup: all built as smart components reused across templates.
 
 Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress → Webflow migration on the latest redesign, with a full design system rebuild in Webflow and handoff to the content team. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
 			},
 			{
 				heading: 'What I took from it',
-				body: `Seven years on the same site taught me that a design system lasts when it makes the team autonomous — content, marketing, developers — not when it piles on rules.`,
+				body: `Seven years on the same site taught me that a design system lasts when it makes the team autonomous (content, marketing, developers), not when it piles on rules.`,
 			},
 		],
 		// article-hub/ files were uploaded before the -desktop / -mobile naming
@@ -293,12 +293,12 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 		category: 'SaaS',
 		categories: ['SaaS', 'B2B', 'UI/UX'],
 		shortDesc: `Sole designer on a family of ~37 vertical comparison sites (mattresses, POS, merchant services, dating…) powered by a single parametric Figma design system.`,
-		fullDesc: `Sole designer on Top5 since 2020 — a family of ~37 vertical comparison sites all powered by one parametric Figma design system (smart components that inherit color tokens from their parent frame). See structured case study below.`,
+		fullDesc: `Sole designer on Top5 since 2020: a family of ~37 vertical comparison sites all powered by one parametric Figma design system (smart components that inherit color tokens from their parent frame). See structured case study below.`,
 		liveUrl: 'https://top5-mattresses.com',
 		sections: [
 			{
 				heading: 'Context',
-				body: `Top5 is a family of comparison sites for products and services aimed at SMBs, published by Ryze Beyond. The family currently spans about 37 vertical spinoffs — mattresses, POS providers, merchant services, dating sites, website builders, and more — each on its own domain (top5-mattresses.com, top-posproviders.com, top-merchantservices.com, top5-datingsites.com…) but all powered by a shared parametric design system.`,
+				body: `Top5 is a family of comparison sites for products and services aimed at SMBs, published by Ryze Beyond. The family currently spans about 37 vertical spinoffs (mattresses, POS providers, merchant services, dating sites, website builders, and more), each on its own domain (top5-mattresses.com, top-posproviders.com, top-merchantservices.com, top5-datingsites.com…) but all powered by a shared parametric design system.`,
 			},
 			{
 				heading: 'Role',
@@ -310,9 +310,9 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 			},
 			{
 				heading: 'Key challenge',
-				body: `Designing a system that could serve 37 distinct vertical sites — entirely different content, its own color identity per site — without duplicating components manually. Every site needed its own accent (from four base themes, extensible to more) while sharing the same UI architecture and behavior.
+				body: `Designing a system that could serve 37 distinct vertical sites (entirely different content, its own color identity per site), without duplicating components manually. Every site needed its own accent (from four base themes, extensible to more) while sharing the same UI architecture and behavior.
 
-Addressed through a parametric design system in Figma: each smart component reads its color tokens from its parent frame via Figma variables. Result: a drag-and-drop into a pre-themed section re-skins all colored elements automatically (buttons, chips, cards, accents) — a single asset serving all 37 sites, just by changing the parent container.`,
+Addressed through a parametric design system in Figma: each smart component reads its color tokens from its parent frame via Figma variables. Result: a drag-and-drop into a pre-themed section re-skins all colored elements automatically (buttons, chips, cards, accents): a single asset serving all 37 sites, just by changing the parent container.`,
 			},
 			{
 				heading: 'Deliverables',
@@ -320,7 +320,7 @@ Addressed through a parametric design system in Figma: each smart component read
 			},
 			{
 				heading: 'What I took from it',
-				body: `A well-architected smart component system — one that inherits tokens from its container rather than binding manually — multiplies production velocity. What could have cost 37 sites × N components becomes one design system × 37 parametric variants. The discipline required upfront (structured Figma variables, container-first thinking) pays off across the entire lifespan of the project.`,
+				body: `A well-architected smart component system (one that inherits tokens from its container rather than binding manually) multiplies production velocity. What could have cost 37 sites × N components becomes one design system × 37 parametric variants. The discipline required upfront (structured Figma variables, container-first thinking) pays off across the entire lifespan of the project.`,
 			},
 		],
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/portfolio/top5/homepage/mattresses-desktop-1920.webp',
@@ -345,13 +345,13 @@ Addressed through a parametric design system in Figma: each smart component read
 	},
 	{
 		slug: 'ryze-brand',
-		title: `Ryze Beyond — Brand`,
+		title: `Ryze Beyond · Brand`,
 		client: `Ryze Beyond`,
 		year: '2026',
 		category: 'Branding',
 		categories: ['Branding', 'UI/UX'],
 		shortDesc: `Sole designer on the third full redesign of Ryze Beyond's marketing website (2026). Abstract-illustration design system built from scratch.`,
-		fullDesc: `Sole designer on the 2026 redesign of ryzebeyond.com — the marketing website for the company behind Sonary Dashboard, Sonary Website, Top5, Playright and other products. Third full redesign of the site; ~2 months of work with an abstract-illustration design system built from scratch. See structured case study below.`,
+		fullDesc: `Sole designer on the 2026 redesign of ryzebeyond.com: the marketing website for the company behind Sonary Dashboard, Sonary Website, Top5, Playright and other products. Third full redesign of the site; ~2 months of work with an abstract-illustration design system built from scratch. See structured case study below.`,
 		liveUrl: 'https://ryzebeyond.com/',
 		sections: [
 			{
@@ -370,7 +370,7 @@ Addressed through a parametric design system in Figma: each smart component read
 				heading: 'Key challenge',
 				body: `Several visual directions were explored collaboratively before landing on the final line. One of the challenges was finding the right balance between a tech-forward identity (positioning Ryze as a modern SaaS publisher) and a warm personality that could speak equally to hiring talent and to business partners.
 
-The solution: a system of abstract illustrations — colored geometric shapes, textured patterns — used as a visual thread across the entire site. More narrative explorations (illustrated characters) were carried out during the process — a few remain visible in the selection presented here.`,
+The solution: a system of abstract illustrations (colored geometric shapes, textured patterns) used as a visual thread across the entire site. More narrative explorations (illustrated characters) were carried out during the process: a few remain visible in the selection presented here.`,
 			},
 			{
 				heading: 'Deliverables',
@@ -378,7 +378,7 @@ The solution: a system of abstract illustrations — colored geometric shapes, t
 			},
 			{
 				heading: 'What I took from it',
-				body: `A corporate site has multiple simultaneous audiences — customers, investors, hiring talent — and each reads a visual through its own filter. Designing a system that lets the same page speak to these different audiences takes more iteration rounds than a product site aimed at a single audience. The final compromise (abstract illustrations as the visual thread) illustrates that tension well.`,
+				body: `A corporate site has multiple simultaneous audiences (customers, investors, hiring talent), and each reads a visual through its own filter. Designing a system that lets the same page speak to these different audiences takes more iteration rounds than a product site aimed at a single audience. The final compromise (abstract illustrations as the visual thread) illustrates that tension well.`,
 			},
 		],
 		// Full site captures organised by David into 10 numbered folders (01-09
@@ -432,8 +432,8 @@ The solution: a system of abstract illustrations — colored geometric shapes, t
 		year: '2025',
 		category: 'Branding',
 		categories: ['Branding', 'UI/UX'],
-		shortDesc: `Sole-designed internal portal for Ryze Beyond employees — brand assets, product info and quick access in one place. Personal initiative from concept to full design system.`,
-		fullDesc: `Sole designer on Ryze Hub — an internal employee portal I proposed and led end-to-end (2025). Concept, structure, dedicated design system, and templates. Delivered at full design level; production paused with an internal roadmap change. See structured case study below.`,
+		shortDesc: `Sole-designed internal portal for Ryze Beyond employees: brand assets, product info and quick access in one place. Personal initiative from concept to full design system.`,
+		fullDesc: `Sole designer on Ryze Hub: an internal employee portal I proposed and led end-to-end (2025). Concept, structure, dedicated design system, and templates. Delivered at full design level; production paused with an internal roadmap change. See structured case study below.`,
 		sections: [
 			{
 				heading: 'Context',
@@ -441,11 +441,11 @@ The solution: a system of abstract illustrations — colored geometric shapes, t
 			},
 			{
 				heading: 'Role',
-				body: `Sole designer on the project, from the initial idea — proposed internally — through the full design system, site structure, and templates. Solo delivery with direct validation from the manager.`,
+				body: `Sole designer on the project, from the initial idea (proposed internally) through the full design system, site structure, and templates. Solo delivery with direct validation from the manager.`,
 			},
 			{
 				heading: 'Approach',
-				body: `Research through direct observation of internal needs (recurring requests for brand assets and product information). Benchmarking of internal tech portals (brand asset portals like Frontify/Brandfolder, team wikis like Notion, Confluence-based sites) and visual references from Dribbble and Behance. Design system built from scratch for this project, with its own "internal hub" identity — modular, geared toward fast navigation and scannable reading.`,
+				body: `Research through direct observation of internal needs (recurring requests for brand assets and product information). Benchmarking of internal tech portals (brand asset portals like Frontify/Brandfolder, team wikis like Notion, Confluence-based sites) and visual references from Dribbble and Behance. Design system built from scratch for this project, with its own "internal hub" identity: modular, geared toward fast navigation and scannable reading.`,
 			},
 			{
 				heading: 'Key challenge',
@@ -457,7 +457,7 @@ The solution: a system of abstract illustrations — colored geometric shapes, t
 			},
 			{
 				heading: 'What I took from it',
-				body: `Carrying an idea from an observed need through to a delivered design system is a different exercise than a commissioned project: the vision has to be clear enough to convince before it even exists. Ryze Hub illustrates this full path (idea → concept → system → templates) — a methodological framework I've been reusing since.`,
+				body: `Carrying an idea from an observed need through to a delivered design system is a different exercise than a commissioned project: the vision has to be clear enough to convince before it even exists. Ryze Hub illustrates this full path (idea → concept → system → templates): a methodological framework I've been reusing since.`,
 			},
 		],
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342009/portfolio/ryze-hub/desktop/company-hub---home-page---step-01.webp',
@@ -474,12 +474,12 @@ The solution: a system of abstract illustrations — colored geometric shapes, t
 	},
 	{
 		slug: 'sonary-mailer',
-		title: `Sonary — Email Templates`,
+		title: `Sonary · Email Templates`,
 		client: `Ryze Beyond`,
 		year: '2025',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Sole designer on a modular master email template for the Sonary ecosystem — 600/375 breakpoints, dark-mode aware, on-brand.`,
+		shortDesc: `Sole designer on a modular master email template for the Sonary ecosystem: 600/375 breakpoints, dark-mode aware, on-brand.`,
 		fullDesc: `Sole designer on the Sonary email marketing and newsletter template system (2025). Built on the existing Sonary design system tokens; a master template spinning off into multiple campaign variants. See structured case study below.`,
 		sections: [
 			{
@@ -492,13 +492,13 @@ The solution: a system of abstract illustrations — colored geometric shapes, t
 			},
 			{
 				heading: 'Approach',
-				body: `Benchmarking of email marketing references (Mailchimp, HubSpot, Substack) cross-referenced with Dribbble and Pinterest. Research phase accelerated with Midjourney, Firefly and Figma AI for moodboards and concepts. No new design system — templates built on the existing Sonary design system tokens (Inter typography, palette, radius, light and dark modes) for immediate brand consistency. A master template designed to spin off into multiple variants depending on the campaign type.`,
+				body: `Benchmarking of email marketing references (Mailchimp, HubSpot, Substack) cross-referenced with Dribbble and Pinterest. Research phase accelerated with Midjourney, Firefly and Figma AI for moodboards and concepts. No new design system: templates built on the existing Sonary design system tokens (Inter typography, palette, radius, light and dark modes) for immediate brand consistency. A master template designed to spin off into multiple variants depending on the campaign type.`,
 			},
 			{
 				heading: 'Key challenge',
 				body: `Email client technical constraints are rigid: maximum 600-pixel width on desktop (past that, clients truncate or zoom), and mobile rendering that must adapt automatically to the device's width, with a design reference at 375 pixels. This means a much narrower grid than standard web, and a mobile-first layout designed at 375 and scaled up to 600.
 
-Addressed through a master template with two strict breakpoints (Desktop 600, Mobile 375) and components that restructure vertically on mobile — each block designed to be added, removed, or duplicated without breaking the layout.`,
+Addressed through a master template with two strict breakpoints (Desktop 600, Mobile 375) and components that restructure vertically on mobile: each block designed to be added, removed, or duplicated without breaking the layout.`,
 			},
 			{
 				heading: 'Deliverables',
@@ -506,7 +506,7 @@ Addressed through a master template with two strict breakpoints (Desktop 600, Mo
 			},
 			{
 				heading: 'What I took from it',
-				body: `An email isn't a web page: technical constraints (width, heterogeneous email clients, table-based rendering) force a different discipline. Designing a master template modular enough to absorb every future campaign is more valuable than one polished one-off — it's a design system in a very small footprint.`,
+				body: `An email isn't a web page: technical constraints (width, heterogeneous email clients, table-based rendering) force a different discipline. Designing a master template modular enough to absorb every future campaign is more valuable than one polished one-off: it's a design system in a very small footprint.`,
 			},
 		],
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342153/portfolio/sonary-mailer/desktop/mailer-1-desktop.webp',
@@ -531,14 +531,14 @@ Addressed through a master template with two strict breakpoints (Desktop 600, Mo
 		year: '2019 – 2026',
 		category: 'Gaming',
 		categories: ['Gaming', 'UI/UX'],
-		shortDesc: `Sole designer on Playright since 2019 — UK online casino comparison platform. Initial 4-month delivery, then years of continuous design iteration. Full redesign underway.`,
-		fullDesc: `Sole designer on Playright since 2019 — Ryze Beyond's UK online casino comparison platform. Initial delivery in ~4 months (2019-2020), then continuous design iteration over the following years, with a full redesign currently underway. See structured case study below.`,
+		shortDesc: `Sole designer on Playright since 2019: UK online casino comparison platform. Initial 4-month delivery, then years of continuous design iteration. Full redesign underway.`,
+		fullDesc: `Sole designer on Playright since 2019: Ryze Beyond's UK online casino comparison platform. Initial delivery in ~4 months (2019-2020), then continuous design iteration over the following years, with a full redesign currently underway. See structured case study below.`,
 		liveUrl: 'https://playright.co.uk/casino/reviews/',
 		liveUrlNote: `Note: the site is geo-restricted to the UK. A VPN is required to view it from outside.`,
 		sections: [
 			{
 				heading: 'Context',
-				body: `Playright is an online casino comparison platform for the UK market, published by Ryze Beyond. The site guides players toward the best offers through editorial reviews, side-by-side comparisons, top listings, and vertical pages by game type or payment method. The domain is geo-restricted — UK-only access; a VPN is required to view it from outside the UK.`,
+				body: `Playright is an online casino comparison platform for the UK market, published by Ryze Beyond. The site guides players toward the best offers through editorial reviews, side-by-side comparisons, top listings, and vertical pages by game type or payment method. The domain is geo-restricted: UK-only access; a VPN is required to view it from outside the UK.`,
 			},
 			{
 				heading: 'Role',
@@ -546,13 +546,13 @@ Addressed through a master template with two strict breakpoints (Desktop 600, Mo
 			},
 			{
 				heading: 'Approach',
-				body: `Benchmarking of casino comparison sites (AskGamblers, Casino.org, Gambling.com) and visual references from Dribbble and Pinterest. On initial delivery (2019-2020), no design system yet — design produced page by page. The design system was built retroactively as the site grew, capitalizing on recurring patterns. On more recent redesigns, research accelerated with Midjourney, Firefly and Figma AI for moodboards and concepts.`,
+				body: `Benchmarking of casino comparison sites (AskGamblers, Casino.org, Gambling.com) and visual references from Dribbble and Pinterest. On initial delivery (2019-2020), no design system yet: design produced page by page. The design system was built retroactively as the site grew, capitalizing on recurring patterns. On more recent redesigns, research accelerated with Midjourney, Firefly and Figma AI for moodboards and concepts.`,
 			},
 			{
 				heading: 'Key challenge',
 				body: `Balancing UK regulatory constraints (UKGC framework, responsible gambling notices, transparency on bonuses and wagering) with a compelling design that had to convert on a saturated market of comparators. Adding trust blocks (18+, GamStop, responsible gambling) without crushing the visual hierarchy.
 
-The project also held a particular status in the Ryze roadmap: design often ran ahead of production, with engineering priorities allocated elsewhere. My contribution continued steadily over the years — some designs integrated quickly, others still pending.`,
+The project also held a particular status in the Ryze roadmap: design often ran ahead of production, with engineering priorities allocated elsewhere. My contribution continued steadily over the years: some designs integrated quickly, others still pending.`,
 			},
 			{
 				heading: 'Deliverables',
@@ -560,7 +560,7 @@ The project also held a particular status in the Ryze roadmap: design often ran 
 			},
 			{
 				heading: 'What I took from it',
-				body: `A project that spans several years reveals one simple lesson: a design system's value shows up when you have to revisit your own work two years later. Playright pushed me to retroactively formalize what could have stayed ad hoc — and to accept that design has its own pace, sometimes running ahead of production.`,
+				body: `A project that spans several years reveals one simple lesson: a design system's value shows up when you have to revisit your own work two years later. Playright pushed me to retroactively formalize what could have stayed ad hoc, and to accept that design has its own pace, sometimes running ahead of production.`,
 			},
 		],
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785341989/portfolio/playright/home-page/desktop---1200px---container-1140px.webp',
@@ -583,10 +583,10 @@ The project also held a particular status in the Ryze roadmap: design often ran 
 		client: `Multiple clients`,
 		year: '2011 – 2018',
 		category: 'UI/UX',
-		shortDesc: `Selection of UI/UX work from 2011-2018 — Wochat instant translation app, a full SaaS dashboard, plus personal explorations in music apps, landing concepts and wireframes.`,
-		fullDesc: `Selection of UI/UX work produced between 2011 and 2018, before Ryze Beyond. This period spanned several companies I worked at — notably a mobile instant translation app (Wochat, voice + text + video) and a full SaaS dashboard for customer / product / invoicing management with an integrated chat room. Every project covered the full cycle: research, low-fi wireframes, high-fidelity design, iteration, and dev handoff.
+		shortDesc: `Selection of UI/UX work from 2011-2018: Wochat instant translation app, a full SaaS dashboard, plus personal explorations in music apps, landing concepts and wireframes.`,
+		fullDesc: `Selection of UI/UX work produced between 2011 and 2018, before Ryze Beyond. This period spanned several companies I worked at: notably a mobile instant translation app (Wochat, voice + text + video) and a full SaaS dashboard for customer / product / invoicing management with an integrated chat room. Every project covered the full cycle: research, low-fi wireframes, high-fidelity design, iteration, and dev handoff.
 
-The remaining captures gather more personal designs — music apps (MUSIK, HitShot, ALEXIA), landing page concepts (Ultra Bright System, Model Photos Creation) and wireframe explorations — produced outside any professional brief, to test visual directions, keep the practice sharp, and explore more experimental palettes than the ones allowed in a professional context.`,
+The remaining captures gather more personal designs: music apps (MUSIK, HitShot, ALEXIA), landing page concepts (Ultra Bright System, Model Photos Creation) and wireframe explorations, produced outside any professional brief, to test visual directions, keep the practice sharp, and explore more experimental palettes than the ones allowed in a professional context.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785346103/portfolio/old-wix/ui-ux/ui-ux-20.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785346098/portfolio/old-wix/ui-ux/ui-ux-17.webp',
@@ -621,8 +621,8 @@ The remaining captures gather more personal designs — music apps (MUSIK, HitSh
 		year: '2006 – 2011',
 		category: 'Branding',
 		categories: ['Branding', 'UI/UX'],
-		shortDesc: `Digital campaigns produced at Arc Interactive (Publicis Group) between 2006 and 2011 — mini-sites, mini-games and animated banners in Flash and HTML/CSS. Cactus awards period.`,
-		fullDesc: `Selection of work produced between 2006 and 2011 at Arc Interactive, a media agency of the Publicis Group. My contribution covered the production of digital campaigns for several advertisers — short mini-sites (2 to 3 pages), mini-games and animated banners in large volume, built in Flash (Adobe) and in HTML/CSS.
+		shortDesc: `Digital campaigns produced at Arc Interactive (Publicis Group) between 2006 and 2011: mini-sites, mini-games and animated banners in Flash and HTML/CSS. Cactus awards period.`,
+		fullDesc: `Selection of work produced between 2006 and 2011 at Arc Interactive, a media agency of the Publicis Group. My contribution covered the production of digital campaigns for several advertisers: short mini-sites (2 to 3 pages), mini-games and animated banners in large volume, built in Flash (Adobe) and in HTML/CSS.
 
 Among the clients: Banque Leumi, Afeka Academic Engineering College, UMI Motors (Cadillac and Chevrolet importer in Israel) and others. Some of these campaigns were recognized with Cactus awards (gold, silver, bronze), the annual awards for advertising in Israel, in the years that followed.
 
@@ -649,12 +649,12 @@ The captures below gather a selection of 13 pieces of work from that period.`,
 	},
 	{
 		slug: 'gamingtech',
-		title: `Gamingtech — Casino & Sport Betting Platforms`,
+		title: `Gamingtech · Casino & Sport Betting Platforms`,
 		client: `Gamingtech`,
 		year: '2015 – 2017',
 		category: 'Gaming',
-		shortDesc: `Sole designer on Gamingtech's three brands (10Bet, Real Deal Bet, Bet Rally) — each running a casino and a sport betting vertical — for about 2.5 years.`,
-		fullDesc: `Selection of work produced at Gamingtech between 2015 and 2017 (about two and a half years) — sole designer on the three brands operated by the company: 10Bet, Real Deal Bet and Bet Rally. Each brand ran two operational verticals — a casino and a sport betting site — for a total of six sites evolving in parallel.
+		shortDesc: `Sole designer on Gamingtech's three brands (10Bet, Real Deal Bet, Bet Rally), each running a casino and a sport betting vertical, for about 2.5 years.`,
+		fullDesc: `Selection of work produced at Gamingtech between 2015 and 2017 (about two and a half years). Sole designer on the three brands operated by the company: 10Bet, Real Deal Bet and Bet Rally. Each brand ran two operational verticals (a casino and a sport betting site) for a total of six sites evolving in parallel.
 
 Deliverables covered game lobbies, bonus systems, deposit funnels, promotional banners in large volume, mobile and desktop interfaces, as well as animations produced as videos and Flash (SWF) files for dynamic elements.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785345993/portfolio/old-wix/casino/casino-12.webp',
@@ -711,12 +711,12 @@ Deliverables covered game lobbies, bonus systems, deposit funnels, promotional b
 	},
 	{
 		slug: 'tradologic',
-		title: `Tradologic — Casino Platforms`,
+		title: `Tradologic · Casino Platforms`,
 		client: `Tradologic`,
 		year: '2011 – 2013',
 		category: 'Gaming',
-		shortDesc: `Casino platform work at Tradologic (2011-2013, ~1.5-2 years) — white-label backend for Crown Europe, City Club Casino, City Tower Casino and other operators.`,
-		fullDesc: `Selection of work produced at Tradologic between 2011 and 2013 (about a year and a half to two years), within a team of several designers. Tradologic supplied white-label casino platforms to multiple operators — notably Crown Europe, City Club Casino and City Tower Casino, whose captures appear in this selection.
+		shortDesc: `Casino platform work at Tradologic (2011-2013, ~1.5-2 years): white-label backend for Crown Europe, City Club Casino, City Tower Casino and other operators.`,
+		fullDesc: `Selection of work produced at Tradologic between 2011 and 2013 (about a year and a half to two years), within a team of several designers. Tradologic supplied white-label casino platforms to multiple operators: notably Crown Europe, City Club Casino and City Tower Casino, whose captures appear in this selection.
 
 My work quickly took on the most visible projects. Deliverables covered game lobbies, promotional banners, desktop interfaces, and animations produced as videos and Flash (SWF) files.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785346008/portfolio/old-wix/casino/casino-21.webp',

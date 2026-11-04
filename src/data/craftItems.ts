@@ -14,7 +14,7 @@ export interface CraftItem {
 export const craftItems: CraftItem[] = [
 	{
 		slug: '3d-03',
-		title: `Roadster concept — red`,
+		title: `Roadster concept · red`,
 		year: '2014',
 		category: '3D',
 		description: `Hard-surface study of a two-seat body with an exposed intake spine. Lighting kept deliberately flat so the panel breaks carry the form.`,
@@ -23,7 +23,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-09',
-		title: `Roadster concept — rear quarter`,
+		title: `Roadster concept · rear quarter`,
 		year: '2014',
 		category: '3D',
 		description: `Rear three-quarter, framed to show how the roofline resolves into the wheel arch.`,
@@ -32,7 +32,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-18',
-		title: `Roadster concept — front`,
+		title: `Roadster concept · front`,
 		year: '2014',
 		category: '3D',
 		description: `The same shell in black. Stripping the colour puts the whole read on the highlights and the gap lines.`,
@@ -41,7 +41,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-20',
-		title: `Roadster concept — three-quarter`,
+		title: `Roadster concept · three-quarter`,
 		year: '2014',
 		category: '3D',
 		description: `The angle that sells a car: three-quarter front, low horizon, wheels turned just enough to show the arch.`,
@@ -53,13 +53,13 @@ export const craftItems: CraftItem[] = [
 		title: `RC buggy and transmitter`,
 		year: '2014',
 		category: '3D',
-		description: `Chrome bodyshell over a suspension built rather than faked — springs, dampers and linkages all modelled.`,
+		description: `Chrome bodyshell over a suspension built rather than faked: springs, dampers and linkages all modelled.`,
 		image: 'https://res.cloudinary.com/akael/image/upload/v1785345914/portfolio/old-wix/3d/3d-05.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
 		slug: '3d-13',
-		title: `RC buggy — ground level`,
+		title: `RC buggy · ground level`,
 		year: '2014',
 		category: '3D',
 		description: `Shot from the dirt so the tyres dominate the frame, with an open sky to throw the chrome into contrast.`,
@@ -68,7 +68,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-04',
-		title: `Reptilian — full figure`,
+		title: `Reptilian · full figure`,
 		year: '2014',
 		category: '3D',
 		description: `Anatomy pass on a bipedal reptile. Scales sculpted as overlapping plates instead of a tiled texture.`,
@@ -77,7 +77,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-15',
-		title: `Reptilian — bust`,
+		title: `Reptilian · bust`,
 		year: '2014',
 		category: '3D',
 		description: `Closer crop onto the head and shoulder mass, where the plate layering has to survive the light.`,
@@ -86,7 +86,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-16',
-		title: `Reptilian — portrait`,
+		title: `Reptilian · portrait`,
 		year: '2014',
 		category: '3D',
 		description: `Three-quarter portrait with a rim light along the jaw to lift the silhouette off the background.`,
@@ -107,13 +107,13 @@ export const craftItems: CraftItem[] = [
 		title: `Creature in motion`,
 		year: '2014',
 		category: '3D',
-		description: `Speed pass on a charging creature — the form deliberately half-lost in the smear, lit from inside the frame.`,
+		description: `Speed pass on a charging creature: the form deliberately half-lost in the smear, lit from inside the frame.`,
 		image: 'https://res.cloudinary.com/akael/image/upload/v1785345909/portfolio/old-wix/3d/3d-02.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
 		slug: '3d-21',
-		title: `Podracer — engine detail`,
+		title: `Podracer · engine detail`,
 		year: '2014',
 		category: '3D',
 		description: `Turbine and tether rig close up, with the cockpit sled trailing behind on its cables.`,
@@ -122,7 +122,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-19',
-		title: `Caped figure — torso`,
+		title: `Caped figure · torso`,
 		year: '2014',
 		category: '3D',
 		description: `Untextured clay pass. At this stage the only thing that matters is whether the muscle groups hold together.`,
@@ -131,7 +131,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-23',
-		title: `Thruster pod — hull`,
+		title: `Thruster pod · hull`,
 		year: '2014',
 		category: '3D',
 		description: `Panelled casing inside its retaining ring, with decals worn back to keep it from looking freshly built.`,
@@ -140,7 +140,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-25',
-		title: `Thruster pod — nozzles`,
+		title: `Thruster pod · nozzles`,
 		year: '2014',
 		category: '3D',
 		description: `Rear view onto the four exhausts, where all the mechanical detail of the piece is concentrated.`,
@@ -149,7 +149,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-06',
-		title: `Horned demon — front`,
+		title: `Horned demon · front`,
 		year: '2014',
 		category: '3D',
 		description: `Sculpt pass on a horned head. The horns are modelled as one continuous sweep so they read as grown, not attached.`,
@@ -158,7 +158,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-08',
-		title: `Caped figure — front`,
+		title: `Caped figure · front`,
 		year: '2014',
 		category: '3D',
 		description: `Full figure, symmetrical stance, cape falling straight so the proportions can be checked against the centre line.`,
@@ -167,7 +167,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-11',
-		title: `Caped figure — three-quarter`,
+		title: `Caped figure · three-quarter`,
 		year: '2014',
 		category: '3D',
 		description: `Turned into a walk, where the cape stops being a flat plane and has to behave like cloth.`,
@@ -176,7 +176,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-12',
-		title: `Longsword — ornate hilt`,
+		title: `Longsword · ornate hilt`,
 		year: '2014',
 		category: '3D',
 		description: `Product-style render on white. The guard and pommel carry the detail; the blade stays plain to hold the light.`,
@@ -194,7 +194,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-07',
-		title: `Horned demon — three-quarter`,
+		title: `Horned demon · three-quarter`,
 		year: '2014',
 		category: '3D',
 		description: `The angle that tests the horn silhouette, and where the brow and cheek planes have to resolve.`,
@@ -203,16 +203,16 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-17',
-		title: `Podracer — desert run`,
+		title: `Podracer · desert run`,
 		year: '2014',
 		category: '3D',
-		description: `Wide shot across the dunes. The vehicle sits small in frame on purpose — the landscape is the speed.`,
+		description: `Wide shot across the dunes. The vehicle sits small in frame on purpose: the landscape is the speed.`,
 		image: 'https://res.cloudinary.com/akael/image/upload/v1785345932/portfolio/old-wix/3d/3d-17.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
 		slug: '3d-01',
-		title: `Podracer — coupling`,
+		title: `Podracer · coupling`,
 		year: '2014',
 		category: '3D',
 		description: `The energy tether between the two engines, which is what makes the whole rig read as one machine.`,
@@ -221,7 +221,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-14',
-		title: `Podracer — head on`,
+		title: `Podracer · head on`,
 		year: '2014',
 		category: '3D',
 		description: `Straight down the line at full tilt, motion blur pulled through the background to a low sun.`,
@@ -233,7 +233,7 @@ export const craftItems: CraftItem[] = [
 		title: `Emoji set`,
 		year: '2013',
 		category: 'Digital Painting',
-		description: `Sixteen expressions painted as a single family — consistent light, consistent gloss, distinct at small sizes.`,
+		description: `Sixteen expressions painted as a single family: consistent light, consistent gloss, distinct at small sizes.`,
 		image: 'https://res.cloudinary.com/akael/image/upload/v1785346035/portfolio/old-wix/digital-painting/digital-painting-01.webp',
 		tags: ['Digital Art', 'Painting'],
 	},
@@ -248,7 +248,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: 'paint-03',
-		title: `White rose — three steps`,
+		title: `White rose · three steps`,
 		year: '2013',
 		category: 'Digital Painting',
 		description: `The same painting at three stages: sketch and colour choice, mixing, then texture and finish.`,
@@ -260,7 +260,7 @@ export const craftItems: CraftItem[] = [
 		title: `Material study`,
 		year: '2013',
 		category: 'Digital Painting',
-		description: `Sphere, ice and metal on one gradient — a test of how three surfaces handle the same single light.`,
+		description: `Sphere, ice and metal on one gradient: a test of how three surfaces handle the same single light.`,
 		image: 'https://res.cloudinary.com/akael/image/upload/v1785346039/portfolio/old-wix/digital-painting/digital-painting-04.webp',
 		tags: ['Digital Art', 'Painting'],
 	},

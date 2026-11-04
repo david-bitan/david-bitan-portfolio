@@ -37,7 +37,7 @@ const davidDid = [
 type BuildStat = { n: string; label: string; sub?: string };
 
 const buildStats: BuildStat[] = [
-	{ n: '~2 weeks', label: 'From empty repo to live site', sub: 'Real elapsed time — capped by daily Claude session + token limits' },
+	{ n: '~2 weeks', label: 'From empty repo to live site', sub: 'Real elapsed time, capped by daily Claude session + token limits' },
 	{ n: '75+', label: 'Iteration checkpoints tracked locally' },
 	{ n: '17', label: 'Pages designed + coded' },
 	{ n: 'Solo', label: 'Designer + AI-assisted dev' },
@@ -46,18 +46,18 @@ const buildStats: BuildStat[] = [
 // Design tokens actually shipped — kept in sync with src/styles/global.css.
 // Split into two blocks so the layout reads as "colors first, then shape".
 const palette = [
-	{ swatch: '#F3F4F6', name: 'Background', role: 'Near-white canvas — launchnow.design-inspired, easy on the eyes' },
+	{ swatch: '#F3F4F6', name: 'Background', role: 'Near-white canvas: launchnow.design-inspired, easy on the eyes' },
 	{ swatch: '#0A0A0A', name: 'Ink', role: 'Body copy + headlines, high contrast on the light bg' },
 	{ swatch: '#4B5563', name: 'Muted', role: 'Secondary text, metadata, captions' },
-	{ swatch: '#F25C24', name: 'Accent', role: 'CTAs, links, active states — preserved in both light + dark' },
+	{ swatch: '#F25C24', name: 'Accent', role: 'CTAs, links, active states, preserved in both light + dark' },
 	{ swatch: '#1C1B1A', name: 'Footer / Dark bg', role: 'Warm charcoal (Claude-interface family), not navy or pure black' },
 ];
 
 const shape = [
-	{ label: 'Typeface', value: 'Manrope 400 / 500 / 700 / 800', why: 'Geometric sans with tight tracking on headlines — modern without being sterile.' },
+	{ label: 'Typeface', value: 'Manrope 400 / 500 / 700 / 800', why: 'Geometric sans with tight tracking on headlines: modern without being sterile.' },
 	{ label: 'Radius', value: '8px · 12px · pill', why: 'Buttons 8, cards 12, CTAs full-round. Kept small tokens; no random values.' },
-	{ label: 'Corners', value: 'Squircle (superellipse 3)', why: 'iOS-style corner-shape on rounded cards where supported — quiet upgrade, falls back to normal radius elsewhere.' },
-	{ label: 'Dark mode', value: 'Warm charcoal, orange kept', why: 'Same family as the footer — never navy. Accent orange is identical in both modes, so the brand reads the same.' },
+	{ label: 'Corners', value: 'Squircle (superellipse 3)', why: 'iOS-style corner-shape on rounded cards where supported: quiet upgrade, falls back to normal radius elsewhere.' },
+	{ label: 'Dark mode', value: 'Warm charcoal, orange kept', why: 'Same family as the footer, never navy. Accent orange is identical in both modes, so the brand reads the same.' },
 ];
 
 const method = [
@@ -67,7 +67,7 @@ const method = [
 	},
 	{
 		title: 'Versioned local archives before every edit',
-		body: 'Each substantive change gets a numbered snapshot in `/archives/vNNN_.../` with a README and the exact rollback command. 75+ checkpoints so far — one-click revert whenever an experiment does not land.',
+		body: 'Each substantive change gets a numbered snapshot in `/archives/vNNN_.../` with a README and the exact rollback command. 75+ checkpoints so far: one-click revert whenever an experiment does not land.',
 	},
 	{
 		title: 'Session memory file',
@@ -75,7 +75,7 @@ const method = [
 	},
 	{
 		title: 'Content in Google Sheets, code in Astro',
-		body: 'Projects, craft items, timeline and metadata live in a five-tab spreadsheet, parsed by a TypeScript layer at build time. Edit the sheet, rebuild, ship — no CMS to host.',
+		body: 'Projects, craft items, timeline and metadata live in a five-tab spreadsheet, parsed by a TypeScript layer at build time. Edit the sheet, rebuild, ship: no CMS to host.',
 	},
 	{
 		title: 'Behance-informed layout, own tokens',
@@ -88,7 +88,7 @@ const method = [
 ];
 ---
 
-<Layout title="Colophon — How this site was built">
+<Layout title="Colophon · How this site was built">
 	<Nav />
 
 	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 lg:px-0" data-reveal>
@@ -121,7 +121,7 @@ const method = [
 	<section class="mx-auto max-w-[1200px] px-6 py-16 lg:px-0" data-reveal>
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Design system</h2>
 		<p class="mt-4 max-w-2xl text-muted">
-			A small, opinionated set of tokens shared across every page — the same values
+			A small, opinionated set of tokens shared across every page: the same values
 			live in <code class="rounded bg-ink/5 px-1.5 py-0.5 text-sm">global.css</code>.
 		</p>
 
@@ -160,7 +160,7 @@ const method = [
 	<section class="mx-auto max-w-[1200px] px-6 py-16 lg:px-0" data-reveal>
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Method</h2>
 		<p class="mt-4 max-w-2xl text-muted">
-			How the work actually got done — the process behind the pixels.
+			How the work actually got done: the process behind the pixels.
 		</p>
 		<div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
 			{
@@ -177,7 +177,7 @@ const method = [
 	<section class="mx-auto max-w-[1200px] px-6 py-16 lg:px-0" data-reveal>
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Who did what</h2>
 		<p class="mt-4 max-w-2xl text-muted">
-			Pair-designing with an AI isn't magic — it's a division of labor. Here's how the
+			Pair-designing with an AI isn't magic: it's a division of labor. Here's how the
 			work actually split.
 		</p>
 
@@ -231,13 +231,13 @@ const method = [
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">A note on honesty</h2>
 		<div class="mt-6 max-w-2xl space-y-4 text-lg text-muted">
 			<p>
-				Every project shown here was designed by hand — Figma today, Adobe XD before that,
-				Photoshop and Illustrator in the earlier years — plus Cinema 4D, ZBrush,
+				Every project shown here was designed by hand: Figma today, Adobe XD before that,
+				Photoshop and Illustrator in the earlier years, plus Cinema 4D, ZBrush,
 				After Effects and Spline for motion and 3D.
 			</p>
 			<p>
-				What changed in 2025-2026 is <em>how</em> I ship the surface around the work —
-				this portfolio, its filters, its case-study pages — not the design craft itself.
+				What changed in 2025-2026 is <em>how</em> I ship the surface around the work:
+				this portfolio, its filters, its case-study pages, not the design craft itself.
 			</p>
 			<p>
 				If you want to see the same workflow applied to your product, that's exactly what

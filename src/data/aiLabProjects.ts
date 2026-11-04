@@ -158,8 +158,8 @@ The hard part of an AI reader is trust, so the design is built around one rule: 
 		subtitle: 'An AI travel agent that plans in the open and asks before it acts.',
 		eyebrow: 'Travel · 2026',
 		shortDesc:
-			'A fictional AI travel agent — it reads a trip described in plain words, searches, compares and holds flights and a stay, then stops for your OK before it pays or shares your details. Five languages, Hebrew in RTL.',
-		intro: `Otium is a fictional AI travel agent I designed and built end-to-end. The question behind it is the one every agentic product now faces: once an AI can act for you — search, book, pay — how do you stay in control without doing the work yourself?
+			'A fictional AI travel agent: it reads a trip described in plain words, searches, compares and holds flights and a stay, then stops for your OK before it pays or shares your details. Five languages, Hebrew in RTL.',
+		intro: `Otium is a fictional AI travel agent I designed and built end-to-end. The question behind it is the one every agentic product now faces: once an AI can act for you (search, book, pay), how do you stay in control without doing the work yourself?
 
 The answer I designed is an agent that works in the open. You describe a trip in your own words; Otium shows each step as it happens, flags what it assumed, and lets you correct any of it. Searching is automatic. Paying, sharing your details and going over budget always wait for an explicit yes, with a before/after view of what changes. Every booking can be cancelled from the trip, every decision is written to a trip history, and a human travel team is always one tap away.
 
@@ -167,22 +167,22 @@ The language model only reads the request. Prices, the plan, the budget check an
 		aiFeature: {
 			eyebrow: 'AI UX · Agent',
 			title: 'An agent that asks before it acts',
-			lead: 'Otium plans a full short trip on its own — flights, a stay, the days — but every action with consequences waits for the traveller. The request is read by an LLM (Llama 3.3 on Cloudflare Workers AI); everything else is deterministic code. T-Bot, a built-in helper, answers questions along the way and only ever points to the control where the traveller decides.',
+			lead: 'Otium plans a full short trip on its own (flights, a stay, the days), but every action with consequences waits for the traveller. The request is read by an LLM (Llama 3.3 on Cloudflare Workers AI); everything else is deterministic code. T-Bot, a built-in helper, answers questions along the way and only ever points to the control where the traveller decides.',
 			tryUrl: '/demo/otium/',
 			tryLabel: 'Try the demo',
-			states: ['Request read by AI, with assumptions flagged', 'Basic matching when the AI is offline', 'Clarifying question when the place is missing', 'Destination not covered — no guessing', 'Steps shown live, foldable', 'Pause and resume', 'Over budget — stops and offers options', 'Approval before payment, with before/after', 'Approval before sharing traveller details', 'Ask before every choice', 'Pay alone up to a limit — labelled on the step', 'Co-traveller approval', 'Price drop after booking — asks before rebooking', 'Trip picked up after a refresh', 'One-minute video of a full run, plus a step-by-step tour', 'Fare changed — asks again', 'Flight sold out — plan B', 'Edit flight or stay before approving', 'Cancel one booking or all', 'Trip history, tap to jump to a step', 'Several trips saved in My trips', 'Date-range calendar', 'Details missing at payment — sends to the profile, then resumes', 'Tickets and hotel voucher as PDF, calendar file', 'T-Bot helper with action buttons', 'Talk to a human', 'Five languages, Hebrew in RTL'],
+			states: ['Request read by AI, with assumptions flagged', 'Basic matching when the AI is offline', 'Clarifying question when the place is missing', 'Destination not covered: no guessing', 'Steps shown live, foldable', 'Pause and resume', 'Over budget: stops and offers options', 'Approval before payment, with before/after', 'Approval before sharing traveller details', 'Ask before every choice', 'Pay alone up to a limit, labelled on the step', 'Co-traveller approval', 'Price drop after booking: asks before rebooking', 'Trip picked up after a refresh', 'One-minute video of a full run, plus a step-by-step tour', 'Fare changed: asks again', 'Flight sold out: plan B', 'Edit flight or stay before approving', 'Cancel one booking or all', 'Trip history, tap to jump to a step', 'Several trips saved in My trips', 'Date-range calendar', 'Details missing at payment: sends to the profile, then resumes', 'Tickets and hotel voucher as PDF, calendar file', 'T-Bot helper with action buttons', 'Talk to a human', 'Five languages, Hebrew in RTL'],
 			decisions: [
-				{ title: 'Model for reading, code for acting', body: 'The LLM turns a sentence into fields — city, nights, travellers, budget. Prices, the plan, the budget check and every booking step are computed in code, so the model can never invent a fare or approve a payment.' },
+				{ title: 'Model for reading, code for acting', body: 'The LLM turns a sentence into fields: city, nights, travellers, budget. Prices, the plan, the budget check and every booking step are computed in code, so the model can never invent a fare or approve a payment.' },
 				{ title: 'Automatic vs. needs you', body: 'Each step carries a tag. Searching and comparing run on their own; paying, sharing personal data and going over budget always stop and wait. Permissions show the same rules in one place.' },
 				{ title: 'Autonomy is the traveller’s choice', body: 'Permissions offer three levels: ask before every choice, ask before payments and personal data (the default), or pay alone up to a limit. Even at the most autonomous level, sharing personal data always waits, and an auto-approved payment says so on the step and can be cancelled.' },
-				{ title: 'Show what it assumed', body: 'Anything the traveller did not say — dates, number of travellers, budget — is shown dashed in “What I understood”. One tap changes it and the agent re-plans from that point.' },
+				{ title: 'Show what it assumed', body: 'Anything the traveller did not say (dates, number of travellers, budget) is shown dashed in “What I understood”. One tap changes it and the agent re-plans from that point.' },
 				{ title: 'Approve with a before/after', body: 'Every approval card shows what changes: amount held, what is refundable, what happens next. Edit and No are as visible as Yes.' },
 				{ title: 'Plan B instead of an error', body: 'A sold-out flight or a fare change does not end in a dead end: the agent explains, proposes the next option and asks again.' },
-				{ title: 'Nothing gets lost', body: 'Every plan is saved in My trips with its status — draft, waiting for your OK, booked. Starting a new plan sets the current one aside instead of replacing it, and the agent resumes exactly where it stopped.' },
-				{ title: 'Help that points, never acts', body: 'T-Bot answers questions in context and offers one button from a fixed list — change dates, show what needs me, cancel options, talk to a human. It never pays, books or cancels on its own.' },
+				{ title: 'Nothing gets lost', body: 'Every plan is saved in My trips with its status: draft, waiting for your OK, booked. Starting a new plan sets the current one aside instead of replacing it, and the agent resumes exactly where it stopped.' },
+				{ title: 'Help that points, never acts', body: 'T-Bot answers questions in context and offers one button from a fixed list: change dates, show what needs me, cancel options, talk to a human. It never pays, books or cancels on its own.' },
 				{ title: 'Two stops, not one', body: 'Paying and sharing personal data are two different consents, so they get two separate approvals. One combined “OK” would bundle them: you could not pay now and send passport details later, and you would never see exactly what goes to whom. The second card lists every field the airline receives, and the phone number is optional.' },
 				{ title: 'Explain every choice', body: '“Why this flight?” and “Why this stay?” show the rule the agent applied and the options it compared, with prices. An agent that cannot explain itself cannot be trusted with money.' },
-				{ title: 'An agent that keeps working', body: 'After booking, Otium keeps watching the price of a refundable stay. When it drops, it comes back with a before/after and asks before rebooking — and the rebooking has an undo.' },
+				{ title: 'An agent that keeps working', body: 'After booking, Otium keeps watching the price of a refundable stay. When it drops, it comes back with a before/after and asks before rebooking, and the rebooking has an undo.' },
 				{ title: 'Two people, one trip', body: 'A trip for two can wait for a co-traveller’s approval before payment. The card shows who approved and that the traveller’s OK is the last one.' },
 				{ title: 'Needs travel with you', body: 'Travel assistance (wheelchair, extra legroom, a baby) is set once in the profile. Seats that suit it are highlighted on the seat map, and the request is listed on the data-sharing card and in the trip summary.' },
 				{ title: 'What I left out on purpose', body: 'No auto-booking without a visible card, no countdown pressure, no hidden fees, no pre-ticked extras. A free-text chat with the agent was kept to a helper that points to controls (T-Bot) rather than one that acts.' },
@@ -196,14 +196,14 @@ The language model only reads the request. Prices, the plan, the budget check an
 				{ name: 'Confirm green', hex: '#1E8A5A', role: 'Done · automatic · under budget · refunded' },
 				{ name: 'Calm blue', hex: '#2F6FB5', role: 'Selection · your seats · trip held' },
 				{ name: 'Ink', hex: '#222222', role: 'Type · T-Bot button · portfolio strip' },
-				{ name: 'White', hex: '#FFFFFF', role: 'Canvas — light, rounded cards, fine lines' },
+				{ name: 'White', hex: '#FFFFFF', role: 'Canvas: light, rounded cards, fine lines' },
 			],
 			typography: [
 				{ family: 'Plus Jakarta Sans', weights: '400 · 500 · 600 · 700', role: 'Interface · headings · body', sample: 'You decide. Otium does the legwork.' },
 				{ family: 'Heebo', weights: '400 · 500 · 700', role: 'Hebrew, right-to-left', sample: 'אתם מחליטים. Otium עושה את העבודה.' },
 			],
 			micro: [
-				'One icon set everywhere — Lucide, thin strokes, no filled shapes',
+				'One icon set everywhere: Lucide, thin strokes, no filled shapes',
 				'Steps tick in one by one, then fold so the timeline stays short',
 				'A budget bar with the cap marked: green under the cap, red the moment the plan goes over',
 				'Red dot on My trips and on T-Bot when something waits for you',
@@ -215,16 +215,16 @@ The language model only reads the request. Prices, the plan, the budget check an
 				'Approval cards with before/after, Edit and No as visible as Yes',
 				'Cancel per booking or all, with what is refunded shown first',
 				'My trips: several plans kept side by side, each resumes where it stopped',
-				'Language switch translates every trip in place — nothing is re-planned',
+				'Language switch translates every trip in place: nothing is re-planned',
 				'T-Bot chat with contextual suggestions and one safe action per answer',
 				'Sign-in and profile: payment waits until traveller details, address and a card are saved',
 				'32 destinations with filters and sorting',
 			],
 			constraints: [
-				'Plain HTML, CSS and JavaScript — no framework, no bundler, no CDN',
+				'Plain HTML, CSS and JavaScript: no framework, no bundler, no CDN',
 				'The model only reads; prices and actions are computed in code',
 				'Five languages from one string table, Hebrew in RTL',
-				'Fictional airlines, stays and prices — nothing is booked, charged or sent',
+				'Fictional airlines, stays and prices: nothing is booked, charged or sent',
 				'Photography from Pexels (free licence, credits in /demo/otium/media/CREDITS.txt), one daylight treatment for all 32 destinations',
 				'Tested end-to-end in a headless browser: full flow, six tricky cases, mobile at 390 px, five languages',
 			],
@@ -255,28 +255,28 @@ The language model only reads the request. Prices, the plan, the budget check an
 		subtitle: 'An oceanfront strength and recovery club in Miami Beach, invented and built out to five pages.',
 		eyebrow: 'Fitness · 2026',
 		shortDesc:
-			'A fictional members club — five interlinked pages, a booking gate, a live timetable, a shop with a persistent cart, a QR guest pass, and APEX Coach, an AI assistant designed state by state.',
+			'A fictional members club: five interlinked pages, a booking gate, a live timetable, a shop with a persistent cart, a QR guest pass, and APEX Coach, an AI assistant designed state by state.',
 		intro: `APEX Athletic Club is a fictional private gym I invented and built end-to-end, and the brief I set myself was to go past the marketing page: a mini-site is easy to fake in one screen, and much harder to hold together across five.
 
-The visual language is the opposite of the wellness pastel most gyms reach for. Ink canvas, one hot pink accent, one mint signal, Space Grotesk for display and JetBrains Mono for anything numeric — times, prices, capacities — so the timetable reads like a schedule board rather than a brochure. The photography is stock, so the grid imposes its own treatment (grayscale, dimmed, colour returning on hover) instead of hoping six unrelated shoots agree with each other.
+The visual language is the opposite of the wellness pastel most gyms reach for. Ink canvas, one hot pink accent, one mint signal, Space Grotesk for display and JetBrains Mono for anything numeric (times, prices, capacities), so the timetable reads like a schedule board rather than a brochure. The photography is stock, so the grid imposes its own treatment (grayscale, dimmed, colour returning on hover) instead of hoping six unrelated shoots agree with each other.
 
-Almost all of the work was in the parts that are usually faked. Booking a class is a member action, so the CTA opens an identity gate, not a payment funnel — and after signing in, the booking the visitor originally clicked resumes on its own. The seven-day timetable is generated from the real date, so it can never show a stale week. The shop derives its member discount from the list price at render time rather than storing a second number that could drift. The guest pass emits an actual ticket with a scannable QR, encoded by hand — around 200 lines of Reed-Solomon and mask scoring — and validated by decoding the rendered bitmap, because a QR that looks right and never scans is the easiest thing in the world to ship.`,
+Almost all of the work was in the parts that are usually faked. Booking a class is a member action, so the CTA opens an identity gate, not a payment funnel, and after signing in, the booking the visitor originally clicked resumes on its own. The seven-day timetable is generated from the real date, so it can never show a stale week. The shop derives its member discount from the list price at render time rather than storing a second number that could drift. The guest pass emits an actual ticket with a scannable QR, encoded by hand (around 200 lines of Reed-Solomon and mask scoring), and validated by decoding the rendered bitmap, because a QR that looks right and never scans is the easiest thing in the world to ship.`,
 		aiFeature: {
 			eyebrow: 'AI UX · Assistant',
 			title: 'APEX Coach',
-			lead: 'An AI assistant on every page of APEX. Open questions about training, nutrition, BMI, body fat, hydration or recovery are answered live by an LLM (Llama 3.3 on Cloudflare Workers AI) with a coaching system prompt and the member’s own numbers. Tasks where numbers must be exact — programs, prices, warning signs — run through designed, deterministic flows.',
+			lead: 'An AI assistant on every page of APEX. Open questions about training, nutrition, BMI, body fat, hydration or recovery are answered live by an LLM (Llama 3.3 on Cloudflare Workers AI) with a coaching system prompt and the member’s own numbers. Tasks where numbers must be exact (programs, prices, warning signs) run through designed, deterministic flows.',
 			tryUrl: '/demo/apex-athletic-club/user.html?coach=open',
 			tryLabel: 'Try APEX Coach',
 			states: ['Empty state with starters', 'Thinking with visible steps', 'Streaming answer', 'Clarifying question', 'Structured plan with actions', 'Setup form for missing details', 'Body metrics: BMI, water, body fat', 'Diets, allergies & dislikes', 'Exercise demos for every muscle group, side + front, with tempo', 'Training + meal program, 1 to 4 weeks', 'PDF export with workout log', 'Low-confidence note', 'AI service offline fallback', 'Safety refusal', 'Out of scope', 'Error + retry', 'Stop · Regenerate · Copy', 'Feedback with reasons'],
 			decisions: [
-				{ title: 'Show what it uses', body: 'A context bar lists exactly what Coach can see — membership tier, calculator numbers, this week’s timetable. Users trust an answer more when they know where it comes from.' },
+				{ title: 'Show what it uses', body: 'A context bar lists exactly what Coach can see: membership tier, calculator numbers, this week’s timetable. Users trust an answer more when they know where it comes from.' },
 				{ title: 'Ask before guessing', body: 'A vague goal like “lose weight” gets one clarifying question with tappable options instead of a generic plan. One question, not an interview.' },
 				{ title: 'Answers that lead to action', body: 'A training week comes back as a structured card where every session has a Book link into the real class flow, not a wall of text to copy.' },
 				{ title: 'Model for talk, code for numbers', body: 'The LLM handles open questions, but BMI, healthy weight range, water, protein and calorie targets are computed in code and passed to it as facts, so it explains numbers instead of guessing them. Programs and prices never go through the model.' },
 				{ title: 'One plan, not two', body: 'Workout and menu come from the same settings. Training days get more food, rest days less, so the weekly average hits the goal, and loads progress week by week with a lighter fourth week. Everything exports as a PDF with blank log sheets, like a real gym program.' },
-				{ title: 'Say when it’s unsure', body: 'Plans and nutrition answers carry a short note on their limits — no access to training history, not a meal prescription — and point to the human who can go further.' },
+				{ title: 'Say when it’s unsure', body: 'Plans and nutrition answers carry a short note on their limits (no access to training history, not a meal prescription), and point to the human who can go further.' },
 				{ title: 'Refuse safely, then redirect', body: 'Warning signs like chest pain or fainting get a fixed, human-written answer, never a model guess. Injury and medical questions are redirected to the club doctor and physio by the system prompt.' },
-				{ title: 'The user stays in control', body: 'Stop mid-answer, regenerate, copy, or flag a bad reply with a reason. Billing changes are never done by the assistant — it links to the plan screen instead.' },
+				{ title: 'The user stays in control', body: 'Stop mid-answer, regenerate, copy, or flag a bad reply with a reason. Billing changes are never done by the assistant: it links to the plan screen instead.' },
 			],
 		},
 		designSystem: {
@@ -311,20 +311,20 @@ Almost all of the work was in the parts that are usually faked. Booking a class 
 				'A single pink block that travels between tabs instead of backgrounds that blink',
 				'Cards entering in a 55ms cascade on filter change, skipped on first paint',
 				'Availability shifting mint to amber to pink as a class fills',
-				'Stock photography unified by the grid — grayscale and dimmed, colour on hover',
+				'Stock photography unified by the grid: grayscale and dimmed, colour on hover',
 			],
 			interactions: [
-				'Identity gate before any payment funnel — and the booking resumes after sign-in',
+				'Identity gate before any payment funnel, and the booking resumes after sign-in',
 				'Seven-day timetable generated from the current date, filtered by type and level',
 				'Cart and wishlist drawers persisted in localStorage across pages',
 				'Member pricing derived from list price at render time, never stored twice',
-				'Guest pass issued as a ticket — hand-written QR encoder, PNG export, print sheet',
+				'Guest pass issued as a ticket: hand-written QR encoder, PNG export, print sheet',
 				'Custom date picker replacing the native control, positioned to escape modal overflow',
 			],
 			constraints: [
-				'Five self-contained HTML files — no framework, no bundler, no CDN',
-				'Vanilla JS only, including the QR encoder — Reed-Solomon over GF(256), all eight masks',
-				'localStorage as the only backend — account, cart and wishlist',
+				'Five self-contained HTML files: no framework, no bundler, no CDN',
+				'Vanilla JS only, including the QR encoder: Reed-Solomon over GF(256), all eight masks',
+				'localStorage as the only backend: account, cart and wishlist',
 				'Every QR decoded by machine before shipping, not eyeballed',
 				'Overflow detection run programmatically across 5 pages × 8 widths, overlays opened and measured individually',
 			],
@@ -349,12 +349,12 @@ Almost all of the work was in the parts that are usually faked. Booking a class 
 		subtitle: 'A family kitchen in San Gimignano, imagined from scratch.',
 		eyebrow: 'Restaurant · 2026',
 		shortDesc:
-			'A fictional Michelin-adjacent trattoria — full brand system, menu, reservation flow with fake auth. Built as a single-page experience.',
+			'A fictional Michelin-adjacent trattoria: full brand system, menu, reservation flow with fake auth. Built as a single-page experience.',
 		intro: `Trattoria Fiori is a fictional Tuscan restaurant I designed and built end-to-end as a personal exercise.
 
-The design language borrows from fine-dining editorial — Playfair Display and Cormorant Garamond over a noir + brushed-gold + ivoire palette, dish photography treated as painterly plates rather than product shots, and micro-typography for the menu (dotted leaders, lining figures, italic wine notes) that would look at home on a printed carte.
+The design language borrows from fine-dining editorial: Playfair Display and Cormorant Garamond over a noir + brushed-gold + ivoire palette, dish photography treated as painterly plates rather than product shots, and micro-typography for the menu (dotted leaders, lining figures, italic wine notes) that would look at home on a printed carte.
 
-The build is a single self-contained page of hand-written HTML, CSS, and vanilla JS: view-transitions between sections, a lightbox-based reservation flow with a mock auth (Google + email), a "My space" client area with cancel confirmation, and a hero parallax that respects reduced-motion. No frameworks, no CMS — the constraint was to see how far a single-file mini-site could be pushed with AI as the sparring partner.`,
+The build is a single self-contained page of hand-written HTML, CSS, and vanilla JS: view-transitions between sections, a lightbox-based reservation flow with a mock auth (Google + email), a "My space" client area with cancel confirmation, and a hero parallax that respects reduced-motion. No frameworks, no CMS: the constraint was to see how far a single-file mini-site could be pushed with AI as the sparring partner.`,
 		designSystem: {
 			colors: [
 				{ name: 'Noir', hex: '#0F0E0C', role: 'Canvas · nav · deep backgrounds' },
@@ -373,13 +373,13 @@ The build is a single self-contained page of hand-written HTML, CSS, and vanilla
 					family: 'Cormorant Garamond',
 					weights: '300 · 400 · 500 italic',
 					role: 'Wine notes · ambient italics',
-					sample: 'Chianti Classico, 2019 — cherry, tobacco',
+					sample: 'Chianti Classico, 2019 · cherry, tobacco',
 				},
 				{
 					family: 'Inter',
 					weights: '300 · 400 · 500 · 600',
 					role: 'UI · form fields · buttons',
-					sample: 'Reserve a table — 8:30 pm',
+					sample: 'Reserve a table · 8:30 pm',
 				},
 			],
 			micro: [
@@ -389,17 +389,17 @@ The build is a single self-contained page of hand-written HTML, CSS, and vanilla
 				'All-caps eyebrows with wide tracking as section anchors',
 			],
 			interactions: [
-				'Four lightbox modals — Reserve, Auth, My Space, Cancel confirm',
-				'Mock auth flow — Continue with Google or email, no password',
+				'Four lightbox modals: Reserve, Auth, My Space, Cancel confirm',
+				'Mock auth flow: Continue with Google or email, no password',
 				'Client area persists reservations per account in localStorage',
 				'Hero parallax honoring prefers-reduced-motion',
 				'Cross-page nav lock kills the transitional flash between Home and Menu',
 			],
 			constraints: [
-				'Single self-contained HTML file per page — no framework, no bundler',
-				'Vanilla JS only — DOM APIs, event delegation, no dependencies',
-				'localStorage as the only backend — tf_account and tf_reservations',
-				'Progressive enhancement — the menu and story read fine without JS',
+				'Single self-contained HTML file per page: no framework, no bundler',
+				'Vanilla JS only: DOM APIs, event delegation, no dependencies',
+				'localStorage as the only backend: tf_account and tf_reservations',
+				'Progressive enhancement: the menu and story read fine without JS',
 			],
 		},
 		gallery: [
@@ -420,7 +420,7 @@ The build is a single self-contained page of hand-written HTML, CSS, and vanilla
 		subtitle: 'The site you are reading, taken apart.',
 		eyebrow: 'Portfolio · 2026',
 		shortDesc:
-			'How this site is built — the stack, the token set, the method, and an honest account of what was designed by hand and what was not.',
+			'How this site is built: the stack, the token set, the method, and an honest account of what was designed by hand and what was not.',
 		intro: '',
 		gallery: [],
 		demoUrl: '/colophon',

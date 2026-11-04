@@ -20,8 +20,8 @@ const defaultNote = hasFormspree
 ---
 
 <Layout
-	title="Contact — David Bitan"
-	description="Get in touch — reach out about product design, SaaS, UI/UX, brand systems or a freelance collaboration."
+	title="Contact · David Bitan"
+	description="Get in touch: reach out about product design, SaaS, UI/UX, brand systems or a freelance collaboration."
 >
 	<Nav />
 
@@ -29,7 +29,7 @@ const defaultNote = hasFormspree
 		<p class="text-sm font-semibold uppercase tracking-widest text-muted">Contact</p>
 		<h1 class="mt-4 max-w-2xl text-4xl font-extrabold tracking-tight sm:text-5xl">Let's build something.</h1>
 		<p class="mt-6 max-w-xl text-lg text-muted">
-			Tell me about your project — I'll get back to you at {email}.
+			Tell me about your project: I'll get back to you at {email}.
 		</p>
 
 		<div class="mt-14 grid grid-cols-1 gap-16 lg:grid-cols-[1fr_320px]">
@@ -139,7 +139,7 @@ const defaultNote = hasFormspree
 		const from = String(data.get('email') ?? '');
 		const message = String(data.get('message') ?? '');
 		const subject = `Portfolio contact from ${name}`;
-		const body = `${message}\n\n— ${name} (${from})`;
+		const body = `${message}\n\n${name} (${from})`;
 		window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 	}
 
@@ -164,7 +164,7 @@ const defaultNote = hasFormspree
 
 			if (res.ok) {
 				form.reset();
-				setNote('success', "Thanks — I'll get back to you shortly.");
+				setNote('success', "Thanks, I'll get back to you shortly.");
 			} else {
 				// Formspree returns JSON with a helpful `errors` array on 4xx
 				// (missing field, spam trap, etc.). We surface a generic message
