@@ -564,7 +564,7 @@
 		const src = ac.createMediaStreamSource(stream), an = ac.createAnalyser(); an.fftSize = 1024; src.connect(an);
 		const mr = new MediaRecorder(stream), parts = [];
 		mr.ondataavailable = (e) => e.data.size && parts.push(e.data);
-		Object.assign(rec, { on: true, stream, ac, an, mr, parts, t0: performance.now(), heardAt: null, sawSignal: false, floor: 0, frames: 0, bars: [], level: 0 });
+		Object.assign(rec, { on: true, stream, ac, an, mr, parts, t0: performance.now(), heardAt: null, sawSignal: false, maxRms: 0, floor: 0, frames: 0, bars: [], level: 0 });
 		rec.timer = setInterval(sample, 50);
 		mr.start(250);
 		$("#askForm").classList.add("recording"); $("#rec").hidden = false; $("#recOk").disabled = false; $("#recOk").focus();
@@ -577,7 +577,7 @@
 		const buf = new Float32Array(rec.an.fftSize); rec.an.getFloatTimeDomainData(buf);
 		let sum = 0, peak = 0; for (const x of buf) { sum += x * x; const a = Math.abs(x); if (a > peak) peak = a; }
 		const rms = Math.sqrt(sum / buf.length), sec = (performance.now() - rec.t0) / 1000;
-		if (rms > 0.0005) rec.sawSignal = true; // the meter really receives sound from the microphone
+		if (rms > 0.0005) rec.sawSignal = true; if (rms > rec.maxRms) rec.maxRms = rms; // the meter really receives sound from the microphone
 		rec.frames++; if (rec.frames <= 4) rec.floor = Math.max(rec.floor, rms); // the room's own noise, first 0.2 s
 		if (rec.heardAt == null && rec.frames > 4 && (rms > Math.max(0.01, rec.floor * 2.2) || peak > 0.1)) rec.heardAt = sec;
 		rec.level = Math.min(1, Math.sqrt(Math.max(0, rms - rec.floor * 0.6)) * 3.2);
@@ -600,7 +600,7 @@
 	const HALLU = /^(thank you\.?|thanks for watching!?|you|merci\.?|sous-titrage[^]*|\.+)$/i; // what Whisper "hears" in near-silence
 	async function recStop(keep) {
 		if (!rec.on) return; rec.on = false; cancelAnimationFrame(rec.raf); clearInterval(rec.timer);
-		const { mr, stream, ac, parts, heardAt, t0 } = rec;
+		const { mr, stream, ac, parts, heardAt, t0, maxRms, sawSignal } = rec;
 		const done = new Promise((r) => (mr.onstop = r)); try { mr.stop(); } catch {} await done;
 		stream.getTracks().forEach((x) => x.stop());
 		const close = () => { ac.close?.(); $("#askForm").classList.remove("recording"); $("#rec").hidden = true; fit(); ta.focus(); };
@@ -609,9 +609,10 @@
 		// ✓ always sends what was recorded: Whisper decides; near-silence comes back empty or as a known filler and is ignored
 		$("#recOk").disabled = true; $("#recT").textContent = "…"; toast(t("Turning your voice into text…"));
 		try {
-			const wav = await toWav(new Blob(parts, { type: mr.mimeType || "audio/webm" }), Math.max(0, (heardAt ?? 0) - 0.4));
+			const wav = await toWav(new Blob(parts, { type: mr.mimeType || "audio/webm" }), 0); // the whole recording: cutting on a guess lost words
 			const j = await callApi({ mode: "transcribe", audio: wav }, 30000);
 			const txt = String(j.text || "").trim();
+			console.info("Margin voice:", JSON.stringify({ seconds: +((performance.now() - t0) / 1000).toFixed(1), type: mr.mimeType, wavKB: Math.round(wav.length * 0.75 / 1024), sawSignal, maxRms: +maxRms.toFixed(4), heardAt, text: txt }));
 			if (!txt || HALLU.test(txt)) toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak."));
 			else { ta.value = (ta.value.trim() ? ta.value.trim() + " " : "") + txt; $("#toast").classList.remove("on"); }
 		} catch (e) { console.warn("Margin voice:", e.message); toast(e.limit ? limitMsg() : t("I couldn’t turn your voice into text. Please try again.")); }
