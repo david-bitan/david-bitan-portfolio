@@ -1576,6 +1576,237 @@ window.MARGIN_I18N = (() => {
 	  "tr": "Tümünü temizle",
 	  "id": "Hapus semua",
 	  "he": "מחיקת הכול"
+	 },
+	 "Sign in": {
+	  "fr": "Se connecter",
+	  "es": "Iniciar sesión",
+	  "pt": "Entrar",
+	  "de": "Anmelden",
+	  "it": "Accedi",
+	  "ru": "Войти",
+	  "tr": "Giriş yap",
+	  "id": "Masuk",
+	  "he": "התחברות"
+	 },
+	 "Demo account": {
+	  "fr": "Compte démo",
+	  "es": "Cuenta demo",
+	  "pt": "Conta demo",
+	  "de": "Demo-Konto",
+	  "it": "Account demo",
+	  "ru": "Демо-аккаунт",
+	  "tr": "Demo hesabı",
+	  "id": "Akun demo",
+	  "he": "חשבון הדגמה"
+	 },
+	 "Margin is a portfolio demo: there are no real accounts. Choose a first name (it can be made up). Your analyses are kept in this browser only.": {
+	  "fr": "Margin est une démo de portfolio : il n’y a pas de vrais comptes. Choisissez un prénom (il peut être inventé). Vos analyses sont gardées uniquement dans ce navigateur.",
+	  "es": "Margin es una demo de portafolio: no hay cuentas reales. Elige un nombre (puede ser inventado). Tus análisis se guardan solo en este navegador.",
+	  "pt": "O Margin é uma demo de portfólio: não há contas reais. Escolha um nome (pode ser inventado). As suas análises ficam guardadas só neste navegador.",
+	  "de": "Margin ist eine Portfolio-Demo: Es gibt keine echten Konten. Wählen Sie einen Vornamen (er darf erfunden sein). Ihre Analysen bleiben nur in diesem Browser.",
+	  "it": "Margin è una demo del portfolio: non esistono account veri. Scegli un nome (può essere inventato). Le tue analisi restano solo in questo browser.",
+	  "ru": "Margin является демоверсией из портфолио: настоящих аккаунтов нет. Выберите имя (можно вымышленное). Ваши анализы хранятся только в этом браузере.",
+	  "tr": "Margin bir portfolyo demosudur: gerçek hesap yoktur. Bir ad seçin (uydurma olabilir). Analizleriniz yalnızca bu tarayıcıda saklanır.",
+	  "id": "Margin adalah demo portofolio: tidak ada akun sungguhan. Pilih nama depan (boleh rekaan). Analisis Anda hanya disimpan di browser ini.",
+	  "he": "Margin היא הדגמה מתיק עבודות: אין חשבונות אמיתיים. בחרו שם פרטי (אפשר גם שם בדוי). הניתוחים שלכם נשמרים רק בדפדפן הזה."
+	 },
+	 "First name": {
+	  "fr": "Prénom",
+	  "es": "Nombre",
+	  "pt": "Nome",
+	  "de": "Vorname",
+	  "it": "Nome",
+	  "ru": "Имя",
+	  "tr": "Ad",
+	  "id": "Nama depan",
+	  "he": "שם פרטי"
+	 },
+	 "Use the demo account": {
+	  "fr": "Utiliser le compte démo",
+	  "es": "Usar la cuenta demo",
+	  "pt": "Usar a conta demo",
+	  "de": "Demo-Konto verwenden",
+	  "it": "Usa l’account demo",
+	  "ru": "Использовать демо-аккаунт",
+	  "tr": "Demo hesabını kullan",
+	  "id": "Pakai akun demo",
+	  "he": "שימוש בחשבון ההדגמה"
+	 },
+	 "Continue": {
+	  "fr": "Continuer",
+	  "es": "Continuar",
+	  "pt": "Continuar",
+	  "de": "Weiter",
+	  "it": "Continua",
+	  "ru": "Продолжить",
+	  "tr": "Devam",
+	  "id": "Lanjut",
+	  "he": "המשך"
+	 },
+	 "My analyses": {
+	  "fr": "Mes analyses",
+	  "es": "Mis análisis",
+	  "pt": "As minhas análises",
+	  "de": "Meine Analysen",
+	  "it": "Le mie analisi",
+	  "ru": "Мои анализы",
+	  "tr": "Analizlerim",
+	  "id": "Analisis saya",
+	  "he": "הניתוחים שלי"
+	 },
+	 "Sign out": {
+	  "fr": "Se déconnecter",
+	  "es": "Cerrar sesión",
+	  "pt": "Sair",
+	  "de": "Abmelden",
+	  "it": "Esci",
+	  "ru": "Выйти",
+	  "tr": "Çıkış yap",
+	  "id": "Keluar",
+	  "he": "התנתקות"
+	 },
+	 "Signed in as {x}": {
+	  "fr": "Connecté en tant que {x}",
+	  "es": "Sesión iniciada como {x}",
+	  "pt": "Sessão iniciada como {x}",
+	  "de": "Angemeldet als {x}",
+	  "it": "Accesso effettuato come {x}",
+	  "ru": "Вы вошли как {x}",
+	  "tr": "{x} olarak giriş yapıldı",
+	  "id": "Masuk sebagai {x}",
+	  "he": "מחוברים בתור {x}"
+	 },
+	 "Signed out. Your analyses stay in this browser.": {
+	  "fr": "Déconnecté. Vos analyses restent dans ce navigateur.",
+	  "es": "Sesión cerrada. Tus análisis siguen en este navegador.",
+	  "pt": "Sessão terminada. As suas análises continuam neste navegador.",
+	  "de": "Abgemeldet. Ihre Analysen bleiben in diesem Browser.",
+	  "it": "Disconnesso. Le tue analisi restano in questo browser.",
+	  "ru": "Вы вышли. Ваши анализы остаются в этом браузере.",
+	  "tr": "Çıkış yapıldı. Analizleriniz bu tarayıcıda kalır.",
+	  "id": "Sudah keluar. Analisis Anda tetap ada di browser ini.",
+	  "he": "התנתקתם. הניתוחים שלכם נשארים בדפדפן הזה."
+	 },
+	 "Sign in with the demo account to keep this analysis in My analyses.": {
+	  "fr": "Connectez-vous avec le compte démo pour garder cette analyse dans Mes analyses.",
+	  "es": "Inicia sesión con la cuenta demo para guardar este análisis en Mis análisis.",
+	  "pt": "Entre com a conta demo para guardar esta análise em As minhas análises.",
+	  "de": "Melden Sie sich mit dem Demo-Konto an, um diese Analyse in Meine Analysen zu behalten.",
+	  "it": "Accedi con l’account demo per conservare questa analisi in Le mie analisi.",
+	  "ru": "Войдите через демо-аккаунт, чтобы сохранить этот анализ в «Мои анализы».",
+	  "tr": "Bu analizi Analizlerim’de saklamak için demo hesabıyla giriş yapın.",
+	  "id": "Masuk dengan akun demo untuk menyimpan analisis ini di Analisis saya.",
+	  "he": "התחברו עם חשבון ההדגמה כדי לשמור את הניתוח הזה ב״הניתוחים שלי״."
+	 },
+	 "Saved in My analyses.": {
+	  "fr": "Enregistrée dans Mes analyses.",
+	  "es": "Guardado en Mis análisis.",
+	  "pt": "Guardada em As minhas análises.",
+	  "de": "In Meine Analysen gespeichert.",
+	  "it": "Salvata in Le mie analisi.",
+	  "ru": "Сохранено в «Мои анализы».",
+	  "tr": "Analizlerim’e kaydedildi.",
+	  "id": "Tersimpan di Analisis saya.",
+	  "he": "נשמר ב״הניתוחים שלי״."
+	 },
+	 "See them": {
+	  "fr": "Les voir",
+	  "es": "Verlos",
+	  "pt": "Ver",
+	  "de": "Ansehen",
+	  "it": "Vedile",
+	  "ru": "Посмотреть",
+	  "tr": "Görüntüle",
+	  "id": "Lihat",
+	  "he": "לצפייה"
+	 },
+	 "You have no saved analyses yet. Every analysis you run while signed in appears here.": {
+	  "fr": "Vous n’avez pas encore d’analyse enregistrée. Chaque analyse faite en étant connecté apparaît ici.",
+	  "es": "Aún no tienes análisis guardados. Cada análisis que hagas con la sesión iniciada aparecerá aquí.",
+	  "pt": "Ainda não tem análises guardadas. Cada análise feita com a sessão iniciada aparece aqui.",
+	  "de": "Sie haben noch keine gespeicherten Analysen. Jede Analyse, die Sie angemeldet durchführen, erscheint hier.",
+	  "it": "Non hai ancora analisi salvate. Ogni analisi fatta dopo l’accesso compare qui.",
+	  "ru": "Сохранённых анализов пока нет. Здесь появится каждый анализ, сделанный после входа.",
+	  "tr": "Henüz kayıtlı analiziniz yok. Giriş yapmışken yaptığınız her analiz burada görünür.",
+	  "id": "Belum ada analisis tersimpan. Setiap analisis yang Anda jalankan saat masuk akan muncul di sini.",
+	  "he": "עדיין אין ניתוחים שמורים. כל ניתוח שתעשו כשאתם מחוברים יופיע כאן."
+	 },
+	 "Open": {
+	  "fr": "Ouvrir",
+	  "es": "Abrir",
+	  "pt": "Abrir",
+	  "de": "Öffnen",
+	  "it": "Apri",
+	  "ru": "Открыть",
+	  "tr": "Aç",
+	  "id": "Buka",
+	  "he": "פתיחה"
+	 },
+	 "Delete": {
+	  "fr": "Supprimer",
+	  "es": "Eliminar",
+	  "pt": "Eliminar",
+	  "de": "Löschen",
+	  "it": "Elimina",
+	  "ru": "Удалить",
+	  "tr": "Sil",
+	  "id": "Hapus",
+	  "he": "מחיקה"
+	 },
+	 "Analysis deleted.": {
+	  "fr": "Analyse supprimée.",
+	  "es": "Análisis eliminado.",
+	  "pt": "Análise eliminada.",
+	  "de": "Analyse gelöscht.",
+	  "it": "Analisi eliminata.",
+	  "ru": "Анализ удалён.",
+	  "tr": "Analiz silindi.",
+	  "id": "Analisis dihapus.",
+	  "he": "הניתוח נמחק."
+	 },
+	 "{n} points": {
+	  "fr": "{n} points",
+	  "es": "{n} puntos",
+	  "pt": "{n} pontos",
+	  "de": "{n} Punkte",
+	  "it": "{n} punti",
+	  "ru": "пунктов: {n}",
+	  "tr": "{n} madde",
+	  "id": "{n} poin",
+	  "he": "{n} נקודות"
+	 },
+	 "Saved analysis from {date}. Read-only: to ask new questions, add the document again.": {
+	  "fr": "Analyse enregistrée le {date}. En lecture seule : pour poser de nouvelles questions, ajoutez à nouveau le document.",
+	  "es": "Análisis guardado el {date}. Solo lectura: para hacer nuevas preguntas, vuelve a añadir el documento.",
+	  "pt": "Análise guardada em {date}. Só leitura: para fazer novas perguntas, adicione o documento outra vez.",
+	  "de": "Gespeicherte Analyse vom {date}. Nur lesen: Für neue Fragen fügen Sie das Dokument erneut hinzu.",
+	  "it": "Analisi salvata il {date}. Sola lettura: per fare nuove domande, aggiungi di nuovo il documento.",
+	  "ru": "Анализ сохранён {date}. Только чтение: чтобы задать новые вопросы, добавьте документ снова.",
+	  "tr": "{date} tarihli kayıtlı analiz. Salt okunur: yeni soru sormak için belgeyi yeniden ekleyin.",
+	  "id": "Analisis tersimpan pada {date}. Hanya baca: untuk bertanya lagi, tambahkan dokumennya kembali.",
+	  "he": "ניתוח שמור מ־{date}. לקריאה בלבד: כדי לשאול שאלות חדשות, הוסיפו שוב את המסמך."
+	 },
+	 "Analyses kept in this browser for {x}.": {
+	  "fr": "Analyses gardées dans ce navigateur pour {x}.",
+	  "es": "Análisis guardados en este navegador para {x}.",
+	  "pt": "Análises guardadas neste navegador para {x}.",
+	  "de": "In diesem Browser gespeicherte Analysen von {x}.",
+	  "it": "Analisi conservate in questo browser per {x}.",
+	  "ru": "Анализы пользователя {x}, сохранённые в этом браузере.",
+	  "tr": "{x} için bu tarayıcıda saklanan analizler.",
+	  "id": "Analisis milik {x} yang disimpan di browser ini.",
+	  "he": "ניתוחים של {x} שנשמרו בדפדפן הזה."
+	 },
+	 "The demo account and My analyses stay in this browser only: no email, no password, nothing is sent. Signing out keeps them; clearing your browser data deletes them.": {
+	  "fr": "Le compte démo et Mes analyses restent uniquement dans ce navigateur : ni e-mail, ni mot de passe, rien n’est envoyé. Se déconnecter les conserve ; effacer les données du navigateur les supprime.",
+	  "es": "La cuenta demo y Mis análisis solo se quedan en este navegador: sin correo, sin contraseña, no se envía nada. Cerrar sesión los conserva; borrar los datos del navegador los elimina.",
+	  "pt": "A conta demo e As minhas análises ficam só neste navegador: sem e-mail, sem palavra-passe, nada é enviado. Sair conserva-as; apagar os dados do navegador elimina-as.",
+	  "de": "Demo-Konto und Meine Analysen bleiben nur in diesem Browser: keine E-Mail, kein Passwort, nichts wird gesendet. Beim Abmelden bleiben sie erhalten; das Löschen der Browserdaten entfernt sie.",
+	  "it": "L’account demo e Le mie analisi restano solo in questo browser: niente e-mail, niente password, non viene inviato nulla. Uscire li conserva; cancellare i dati del browser li elimina.",
+	  "ru": "Демо-аккаунт и «Мои анализы» хранятся только в этом браузере: без e-mail и пароля, ничего не отправляется. При выходе они сохраняются; очистка данных браузера их удаляет.",
+	  "tr": "Demo hesabı ve Analizlerim yalnızca bu tarayıcıda kalır: e-posta yok, şifre yok, hiçbir şey gönderilmez. Çıkış yapmak onları korur; tarayıcı verilerini temizlemek siler.",
+	  "id": "Akun demo dan Analisis saya hanya ada di browser ini: tanpa email, tanpa kata sandi, tidak ada yang dikirim. Keluar tetap menyimpannya; menghapus data browser akan menghapusnya.",
+	  "he": "חשבון ההדגמה ו״הניתוחים שלי״ נשארים רק בדפדפן הזה: בלי אימייל, בלי סיסמה, שום דבר לא נשלח. התנתקות שומרת אותם; מחיקת נתוני הדפדפן מוחקת אותם."
 	 }
 	};
 	let lang = "en";

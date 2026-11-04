@@ -26,6 +26,7 @@ a { color: inherit; }
 .i { width: 18px; height: 18px; flex: none; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+[tabindex="-1"]:focus { outline: none; } /* headings focused for screen readers after a page change: no box */
 [hidden] { display: none !important; }
 [dir="rtl"] .flip-ic { transform: scaleX(-1); }
 
@@ -411,6 +412,34 @@ footer .wrap { padding-top: 10px; padding-bottom: 12px; align-items: center; gap
 .toast.multi { border-radius: 22px; padding-block: 12px; }
 .url { border-radius: 999px; padding-inline-start: 18px; } /* a full pill, the same shape as its Add button */
 #report > .rep + .rep { margin-top: 32px; } /* one section per document, clearly apart */
+
+/* demo account + My analyses */
+.acct { position: relative; margin-inline-start: 8px; }
+.acct > button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-2); background: var(--surface); border-radius: 999px; padding: 7px 12px; font-size: 14px; font-weight: 500; cursor: pointer; }
+.acct > button .i { width: 16px; height: 16px; }
+.acct .av { width: 22px; height: 22px; border-radius: 50%; background: var(--link); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; margin-inline-start: -5px; }
+.acct .menu li { cursor: pointer; justify-content: flex-start; align-items: center; }
+.acct .menu li .i { width: 16px; height: 16px; color: var(--ink-3); }
+.legal .fld { display: block; margin: 4px 0 16px; }
+.legal .fld span { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
+.legal .fld input { width: 100%; border: 1px solid var(--line-2); border-radius: 999px; padding: 10px 16px; font: 400 16px var(--sans); background: var(--surface); color: var(--ink); }
+.legal .fld input:focus { outline: none; border-color: var(--ink); }
+.legal .row { gap: 8px; flex-wrap: wrap; }
+.p3-h { font-size: clamp(30px, 4vw, 44px); letter-spacing: -.02em; margin: 24px 0 8px; }
+.saved { list-style: none; margin: 18px 0 64px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.saved li { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 14px 16px; }
+.saved li > div { flex: 1; min-width: 0; }
+.saved li b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15.5px; }
+[dir="rtl"] .saved li b { unicode-bidi: plaintext; text-align: right; } /* a Latin file name keeps its start, the ellipsis goes at its end */
+.saved li small { color: var(--ink-3); font-size: 13.5px; }
+.saved li .row { display: flex; gap: 4px; flex: none; }
+.saved .none { display: block; color: var(--ink-2); background: none; border: 0; padding: 0; }
+.save-hint { display: flex; align-items: flex-start; gap: 8px; color: var(--ink-2); font-size: 14px; line-height: 20px; margin: 14px 0 0; }
+.save-hint .i { width: 16px; height: 16px; flex: none; margin-top: 2px; }
+@media (max-width: 480px) { .acrow { flex-direction: column-reverse; align-items: stretch; } .acrow .btn { width: 100%; justify-content: center; } }
+.viewing { display: flex; gap: 10px; align-items: flex-start; background: #DDEBFB; border: 1.5px solid #8FB5E6; border-radius: var(--r-lg); padding: 12px 16px; margin-bottom: 16px; font-size: 14.5px; }
+.viewing .i { width: 18px; height: 18px; flex: none; margin-top: 2px; color: var(--link); }
+@media (max-width: 640px) { .acct .nm { display: none; } .saved li { flex-wrap: wrap; } .saved li > div { flex-basis: 100%; } }
 </style>
 </head>
 <body>
@@ -419,6 +448,10 @@ footer .wrap { padding-top: 10px; padding-bottom: 12px; align-items: center; gap
 	<div class="lang" id="langWrap">
 		<button type="button" id="langBtn" aria-haspopup="listbox" aria-expanded="false" data-t-label="Language"><span data-ic="globe"></span><span id="langName" class="hide-m">English</span><span id="langCode" class="show-m">EN</span><span data-ic="chevron-down"></span></button>
 		<ul class="menu" id="langList" role="listbox" tabindex="-1" hidden></ul>
+	</div>
+	<div class="acct" id="acctWrap">
+		<button type="button" id="acctBtn" aria-haspopup="menu" aria-expanded="false"></button>
+		<ul class="menu" id="acctList" role="menu" tabindex="-1" hidden></ul>
 	</div>
 </div></header>
 
@@ -462,6 +495,13 @@ footer .wrap { padding-top: 10px; padding-bottom: 12px; align-items: center; gap
 			<button type="button" class="btn btn-ink" id="analyse" disabled><span data-ic="sparkles"></span><span data-t="Analyse">Analyse</span></button>
 		</div>
 		<div class="quota" id="quota1" hidden></div>
+	</section>
+
+	<section id="p3" hidden>
+		<div class="s2-top"><button type="button" class="btn btn-sm" id="back3"><span data-ic="arrow-left" class="flip-ic"></span><span data-t="Back">Back</span></button></div>
+		<h1 class="p3-h" data-t="My analyses">My analyses</h1>
+		<p class="lead" id="p3lead"></p>
+		<ul class="saved" id="saved"></ul>
 	</section>
 
 	<section id="p2" hidden>

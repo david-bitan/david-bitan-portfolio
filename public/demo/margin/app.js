@@ -15,8 +15,15 @@
 
 	const MAX_PAGES = 60, MAX_MB = 20, MAX_FILES = 5, WHOLE = 22000;
 	const S = { shown: new Set(), docs: [], loading: 0, out: null, report: null, turns: [], speaking: null, seq: 0, cseq: 0, open: new Set() };
-	const chunk = (id) => { for (const d of S.docs) { const c = d.chunks.find((x) => x.id === id); if (c) return c; } return null; };
-	const docOf = (c) => S.docs.find((d) => d.fid === c.fid);
+	const chunk = (id) => { if (S.viewing) return savedChunk(id); for (const d of S.docs) { const c = d.chunks.find((x) => x.id === id); if (c) return c; } return null; };
+	const docOf = (c) => (c.saved ? c.doc : S.docs.find((d) => d.fid === c.fid));
+	/* a saved analysis keeps the cited passages as text: each one becomes a small one-passage document */
+	function savedChunk(id) {
+		const v = S.viewing, k = v.cache || (v.cache = {}); if (k[id]) return k[id];
+		const raw = v.cited[id]; if (!raw) return null;
+		const c = { id, text: raw.text, page: raw.page, saved: true }; c.doc = { name: raw.doc, type: "saved", chunks: [c], lang: raw.lang };
+		return (k[id] = c);
+	}
 	const visual = (d) => d.type === "pdf";
 	const ready = () => S.docs.filter((d) => !d.loading && d.words >= 30);
 
@@ -29,7 +36,8 @@
 		S.out = I.lang; pasteLine();
 		$("#langName").textContent = I.LANGS.find((x) => x[0] === I.lang)[1];
 		renderFiles(); renderTries(); renderReport(); renderThread(); if (S.quota) renderQuota();
-		if (S.page === 2 && S.report && !S.report.cleared && S.report.lang !== I.lang) makeReport(true); // the report follows the language
+		if (S.page === 3) renderSaved(); renderAcct();
+		if (S.page === 2 && !S.viewing && S.report && !S.report.cleared && S.report.lang !== I.lang) makeReport(true); // the report follows the language
 	}
 	function initLang() {
 		dropdown($("#langBtn"), $("#langList"), () => I.lang, (l) => setLang(l));
@@ -284,6 +292,7 @@
 		const same = keepTurns || (S.report && S.report.sig.split("|")[0] === sig.split("|")[0]);
 		S.report = r; if (!same) S.turns = []; S.open.clear(); renderReport(); renderThread(); renderFiles();
 		await Promise.all(r.parts.filter((p) => p.pending).map((p) => reportPart(r, p)));
+		if (S.report === r) { saveAnalysis(r); renderReport(); }
 	}
 	async function reportPart(r, p) {
 		const d = S.docs.find((x) => x.fid === p.fid); if (!d) return;
@@ -304,21 +313,25 @@
 	const repItems = () => (S.report?.parts || []).filter((p) => p.groups).flatMap((p) => Object.values(p.groups).flat());
 	const renderAll = () => { renderReport(); renderThread(); renderFiles(); };
 	function go(n) {
-		S.page = n; $("#p1").hidden = n !== 1; $("#p2").hidden = n !== 2;
-		const pg = $(n === 1 ? "#p1" : "#p2"); pg.classList.remove("page-in"); void pg.offsetWidth; pg.classList.add("page-in");
-		if (n === 2) $("#s2files").textContent = ready().map((d) => d.name).join(" · ");
+		if (S.viewing && n !== 2) leaveSaved();
+		S.page = n; $("#p1").hidden = n !== 1; $("#p2").hidden = n !== 2; $("#p3").hidden = n !== 3;
+		const pg = $(n === 1 ? "#p1" : n === 2 ? "#p2" : "#p3"); pg.classList.remove("page-in"); void pg.offsetWidth; pg.classList.add("page-in");
+		if (n === 2) $("#s2files").textContent = S.viewing ? S.viewing.names.join(" · ") : ready().map((d) => d.name).join(" · ");
+		if (n === 3) renderSaved();
 		scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
-		const h = n === 1 ? $("#p1 h1") : $("#report h2") || $("#back2"); if (h) { if (h.tagName !== "BUTTON") h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }
+		const h = n === 1 ? $("#p1 h1") : n === 3 ? $("#p3 h1") : $("#report h2") || $("#back2"); if (h) { if (h.tagName !== "BUTTON") h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }
 	}
 	function renderReport() {
 		const box = $("#report"), r = S.report;
-		if (!r || !S.docs.length) { box.innerHTML = ""; $("#qa").hidden = true; return; }
+		if (!r || (!S.docs.length && !S.viewing)) { box.innerHTML = ""; $("#qa").hidden = true; return; }
 		box.setAttribute("lang", r.lang); box.dir = r.lang === "he" ? "rtl" : "ltr";
 		if (r.cleared) { box.innerHTML = `<div class="rep"><p style="margin:0 0 12px;color:var(--ink-2)">${t("Analysis cleared.")}</p><button type="button" class="btn btn-sm" data-act="reanalyse">${ic("refresh-cw")}${t("Analyse again")}</button></div>`; $("#qa").hidden = true; return; }
 		const many = r.parts.length > 1;
-		box.innerHTML = r.parts.map((p, i) => partHtml(r, p, i, many)).join("");
 		const busy = r.parts.some((p) => p.pending);
-		S.snips = drawSnips(box); $("#qa").hidden = busy && !r.parts.some((p) => p.groups); renderTries();
+		const top = S.viewing ? `<div class="viewing">${ic("history")}<span>${esc(t("Saved analysis from {date}. Read-only: to ask new questions, add the document again.", { date: when(S.viewing.at) }))}</span></div>` : "";
+		const hint = S.viewing || busy || !r.parts.some((p) => p.groups) ? "" : S.acct && r.savedId ? `<p class="save-hint">${ic("circle-check")}<span>${t("Saved in My analyses.")} <button type="button" class="lnk" data-act="mine">${t("See them")}</button></span></p>` : `<p class="save-hint">${ic("history")}<span>${t("Sign in with the demo account to keep this analysis in My analyses.")} <button type="button" class="lnk" data-act="signin">${t("Sign in")}</button></span></p>`;
+		box.innerHTML = top + r.parts.map((p, i) => partHtml(r, p, i, many)).join("") + hint;
+		S.snips = drawSnips(box); $("#qa").hidden = Boolean(S.viewing) || (busy && !r.parts.some((p) => p.groups)); renderTries();
 	}
 	function partHtml(r, p, i, many) {
 		const kind = many ? esc(t("Document {i} of {n}", { i: i + 1, n: r.parts.length })) : esc(p.name);
@@ -332,7 +345,7 @@
 		}
 		const item = (it) => `<li>${pointHtml(it, owner)}</li>`;
 		const groupHtml = ([k, lbl, cls]) => `<div class="box ${cls}"><h3><span class="dot"></span>${t(lbl)}</h3>${p.groups[k].length ? `<ul>${p.groups[k].map(item).join("")}</ul>` : `<p class="empty">${t("Nothing found for this part.")}</p>`}</div>`;
-		const acts = `<div class="res-acts"><button type="button" class="btn btn-text btn-sm" data-act="listen" data-r="${owner}">${ic(S.speaking === owner ? "square" : "volume-2")}${t(S.speaking === owner ? "Stop" : "Listen")}</button><button type="button" class="btn btn-text btn-sm" data-act="copy" data-r="${owner}">${ic("copy")}${t("Copy")}</button>${i === 0 ? `<button type="button" class="btn btn-text btn-sm" data-act="clear" data-r="report">${ic("trash-2")}${t(many ? "Clear all" : "Clear")}</button>` : ""}</div>`;
+		const acts = `<div class="res-acts"><button type="button" class="btn btn-text btn-sm" data-act="listen" data-r="${owner}">${ic(S.speaking === owner ? "square" : "volume-2")}${t(S.speaking === owner ? "Stop" : "Listen")}</button><button type="button" class="btn btn-text btn-sm" data-act="copy" data-r="${owner}">${ic("copy")}${t("Copy")}</button>${i === 0 && !S.viewing ? `<button type="button" class="btn btn-text btn-sm" data-act="clear" data-r="report">${ic("trash-2")}${t(many ? "Clear all" : "Clear")}</button>` : ""}</div>`;
 		const first = !p.shown; p.shown = true;
 		return `<article class="rep${first ? " in" : ""}">${head(acts)}
 			${p.groups.short.length ? `<div class="short">${p.groups.short.map((it) => `<span class="pt">${pointHtml(it, owner)}</span>`).join(" ")}</div>` : ""}
@@ -493,6 +506,79 @@
 		el.style.height = el.style.overflow = el.style.transition = el.style.opacity = "";
 	}
 
+	/* ---------------- demo account + My analyses: kept in this browser only, nothing is sent ---------------- */
+	const store = { get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } } };
+	const savedKey = () => "margin-analyses:" + (S.acct?.name || "").toLowerCase();
+	const savedList = () => (S.acct ? store.get(savedKey(), []) : []);
+	const when = (iso) => new Date(iso).toLocaleString(I.lang, { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+	S.acct = store.get("margin-account", null);
+	function renderAcct() {
+		const b = $("#acctBtn");
+		b.innerHTML = S.acct ? `<span class="av" aria-hidden="true">${esc(S.acct.name.slice(0, 1).toUpperCase())}</span><span class="nm">${esc(S.acct.name)}</span>${ic("chevron-down")}` : `${ic("user")}<span>${t("Sign in")}</span>`;
+		b.setAttribute("aria-haspopup", S.acct ? "menu" : "dialog");
+	}
+	function acctMenu(on) {
+		const list = $("#acctList"), b = $("#acctBtn");
+		if (on) { const n = savedList().length; list.innerHTML = `<li role="menuitem" tabindex="-1" data-a="mine">${ic("history")}<span>${t("My analyses")}${n ? ` (${n})` : ""}</span></li><li role="menuitem" tabindex="-1" data-a="out">${ic("x")}<span>${t("Sign out")}</span></li>`; }
+		list.hidden = !on; b.setAttribute("aria-expanded", String(on)); if (on) list.firstElementChild.focus();
+	}
+	function signIn(name, then) {
+		S.acct = { name: name.trim().slice(0, 24) || "Camille", since: new Date().toISOString() }; store.set("margin-account", S.acct);
+		renderAcct(); toast(t("Signed in as {x}", { x: S.acct.name }));
+		if (S.report && !S.viewing && S.report.parts?.every((p) => !p.pending)) saveAnalysis(S.report);
+		renderReport(); then?.();
+	}
+	function signOut() {
+		const was = S.acct; S.acct = null; try { localStorage.removeItem("margin-account"); } catch {}
+		renderAcct(); renderReport(); if (S.page === 3) go(1);
+		toast(t("Signed out. Your analyses stay in this browser."), t("Undo"), () => { S.acct = was; store.set("margin-account", was); renderAcct(); renderReport(); });
+	}
+	function openSignIn(then) {
+		const opener = document.activeElement, scrim = document.createElement("div"), v = document.createElement("div");
+		scrim.className = "scrim"; v.className = "viewer"; v.setAttribute("role", "dialog"); v.setAttribute("aria-modal", "true"); v.setAttribute("aria-labelledby", "acH");
+		v.innerHTML = `<div class="legal"><h3 id="acH">${t("Demo account")}</h3><p>${t("Margin is a portfolio demo: there are no real accounts. Choose a first name (it can be made up). Your analyses are kept in this browser only.")}</p>
+			<label class="fld"><span>${t("First name")}</span><input id="acName" maxlength="24" autocomplete="off" spellcheck="false"></label>
+			<div class="row acrow"><button type="button" class="btn btn-text btn-sm" data-close>${t("Cancel")}</button><button type="button" class="btn btn-sm" id="acDemo">${t("Use the demo account")}</button><button type="button" class="btn btn-ink btn-sm" id="acGo">${t("Continue")}</button></div></div>`;
+		const close = () => { scrim.remove(); v.remove(); document.removeEventListener("keydown", key); opener?.focus?.(); }, key = (e) => { if (e.key === "Escape") close(); };
+		v.addEventListener("click", (e) => { if (e.target === v || e.target.closest("[data-close]")) close(); });
+		document.addEventListener("keydown", key); document.body.append(scrim, v);
+		const inp = v.querySelector("#acName"); inp.focus();
+		const go2 = (name) => { close(); signIn(name, then); };
+		v.querySelector("#acDemo").onclick = () => go2("Camille");
+		v.querySelector("#acGo").onclick = () => go2(inp.value);
+		inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); go2(inp.value); } });
+	}
+	/* every finished analysis is saved while signed in: the points, and the passages they cite as text (not the files) */
+	function saveAnalysis(r) {
+		if (!S.acct || !r?.parts?.some((p) => p.groups)) return;
+		const parts = r.parts.filter((p) => p.groups).map((p) => ({ name: p.name, groups: p.groups, removed: p.removed || [], count: p.count }));
+		const cited = {};
+		for (const p of parts) for (const it of Object.values(p.groups).flat()) for (const id of it.cite) { const c = chunk(id); if (c && !cited[id]) { const d = docOf(c); cited[id] = { text: c.text.slice(0, 1200), page: c.page || null, doc: d?.name || "", lang: d?.lang }; } }
+		const docsSig = r.sig.split("|")[0], list = savedList();
+		const entry = { id: r.savedId || "a" + Date.now(), at: new Date().toISOString(), lang: r.lang, names: parts.map((p) => p.name), parts, cited, docsSig };
+		const i = list.findIndex((x) => x.id === entry.id || x.docsSig === docsSig);
+		if (i >= 0) { entry.id = list[i].id; list.splice(i, 1); }
+		list.unshift(entry); r.savedId = entry.id;
+		while (list.length > 20) list.pop();
+		while (!store.set(savedKey(), list) && list.length > 1) list.pop(); // browser storage full: drop the oldest
+	}
+	function renderSaved() {
+		const list = savedList();
+		$("#p3lead").textContent = S.acct ? t("Analyses kept in this browser for {x}.", { x: S.acct.name }) : "";
+		$("#saved").innerHTML = list.length ? list.map((x) => `<li><div><b>${esc(x.names.join(" · "))}</b><small>${esc(when(x.at))} · ${esc(t("{n} points", { n: x.parts.reduce((a, p) => a + (p.count || 0), 0) }))} · ${esc(I.LANGS.find((l) => l[0] === x.lang)?.[1] || x.lang)}</small></div><span class="row"><button type="button" class="btn btn-sm" data-open="${x.id}">${ic("book-open")}${t("Open")}</button><button type="button" class="btn btn-text btn-sm" data-del="${x.id}" aria-label="${esc(t("Delete"))} ${esc(x.names.join(", "))}">${ic("trash-2")}<span class="hide-m">${t("Delete")}</span></button></span></li>`).join("") : `<li class="none">${t("You have no saved analyses yet. Every analysis you run while signed in appears here.")}</li>`;
+	}
+	function openSaved(id) {
+		const x = savedList().find((a) => a.id === id); if (!x) return;
+		if (!S.viewing) S.live = { report: S.report, turns: S.turns, open: new Set(S.open) };
+		S.viewing = x; S.open = new Set();
+		S.report = { sig: "saved:" + x.id, lang: x.lang, parts: x.parts.map((p, i) => ({ ...p, fid: "s" + i, pending: false, shown: true })) };
+		renderReport(); go(2);
+	}
+	function leaveSaved() {
+		const L = S.live || {}; S.viewing = null; S.report = L.report || null; S.turns = L.turns || []; S.open = L.open || new Set(); S.live = null;
+		renderReport(); renderThread();
+	}
+
 	/* ---------------- toast ---------------- */
 	let toastT;
 	function toast(msg, undoLabel, undo) {
@@ -526,12 +612,17 @@
 	$("#legalBtn").onclick = () => { // privacy & terms, in the reader's language
 		const opener = document.activeElement, scrim = document.createElement("div"), v = document.createElement("div");
 		scrim.className = "scrim"; v.className = "viewer"; v.setAttribute("role", "dialog"); v.setAttribute("aria-modal", "true"); v.setAttribute("aria-labelledby", "lgH");
-		v.innerHTML = `<div class="legal"><h3 id="lgH">${t("Privacy & terms")}</h3>${["Files and pasted text are read in your browser. A link is fetched once by our server, only to read the page.", "This free demo shares a daily AI allowance between all visitors. When it runs out, it comes back the next day.", "To write the summary and the answers, only the passages needed are sent to Cloudflare Workers AI, which runs Llama 3.3 (Meta). Cloudflare states that it does not use this content to train AI models, and Margin stores nothing.", "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong. Always check the highlighted source.", "Portfolio demo: please don’t add very personal or confidential documents."].map((k) => `<p>${esc(t(k))}</p>`).join("")}<p>Built with Llama · <a class="lnk" href="THIRD-PARTY-NOTICES.txt">${t("Licences")}</a></p><div class="row"><button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></div></div>`;
+		v.innerHTML = `<div class="legal"><h3 id="lgH">${t("Privacy & terms")}</h3>${["Files and pasted text are read in your browser. A link is fetched once by our server, only to read the page.", "This free demo shares a daily AI allowance between all visitors. When it runs out, it comes back the next day.", "To write the summary and the answers, only the passages needed are sent to Cloudflare Workers AI, which runs Llama 3.3 (Meta). Cloudflare states that it does not use this content to train AI models, and Margin stores nothing.", "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong. Always check the highlighted source.", "The demo account and My analyses stay in this browser only: no email, no password, nothing is sent. Signing out keeps them; clearing your browser data deletes them.", "Portfolio demo: please don’t add very personal or confidential documents."].map((k) => `<p>${esc(t(k))}</p>`).join("")}<p>Built with Llama · <a class="lnk" href="THIRD-PARTY-NOTICES.txt">${t("Licences")}</a></p><div class="row"><button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></div></div>`;
 		const close = () => { scrim.remove(); v.remove(); document.removeEventListener("keydown", key); opener?.focus(); }, key = (e) => { if (e.key === "Escape") close(); };
 		v.addEventListener("click", (e) => { if (e.target === v || e.target.closest("[data-close]")) close(); });
 		document.addEventListener("keydown", key); document.body.append(scrim, v); v.querySelector("[data-close]").focus();
 	};
-	$("#back2").onclick = () => go(1);
+	$("#back2").onclick = () => go(S.viewing ? 3 : 1);
+	$("#back3").onclick = () => go(1);
+	$("#acctBtn").onclick = (e) => { e.stopPropagation(); if (!S.acct) return openSignIn(); acctMenu($("#acctList").hidden); };
+	$("#acctList").addEventListener("click", (e) => { const li = e.target.closest("li"); if (!li) return; acctMenu(false); if (li.dataset.a === "mine") go(3); else signOut(); });
+	$("#acctList").addEventListener("keydown", (e) => { const items = [...$("#acctList").children], i = items.indexOf(document.activeElement); if (e.key === "Escape") { acctMenu(false); $("#acctBtn").focus(); } else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); items[(i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length].focus(); } else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); document.activeElement.click(); } });
+	document.addEventListener("click", (e) => { if (!$("#acctList").hidden && !e.target.closest("#acctWrap")) acctMenu(false); });
 	$("#urlIn").addEventListener("input", (e) => ($("#urlGo").disabled = !e.target.value.trim()));
 	$("#urlForm").addEventListener("submit", (e) => { e.preventDefault(); const v = $("#urlIn").value.trim(); if (!v) return; $("#urlIn").value = ""; $("#urlGo").disabled = true; addLink(/^https?:\/\//i.test(v) ? v : "https://" + v); });
 	/* "You can also [click here] to paste…": only the two words are the link; the sentence is rebuilt in each language */
@@ -559,6 +650,9 @@
 	ta.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#askForm").requestSubmit(); } });
 	$("#askForm").addEventListener("submit", (e) => { e.preventDefault(); const v = ta.value.trim(); if (!v) return; ta.value = ""; fit(); ask(v); });
 	document.addEventListener("click", async (e) => {
+		const op = e.target.closest("[data-open]"); if (op) return openSaved(op.dataset.open);
+		const dl = e.target.closest("[data-del]");
+		if (dl) { const list = savedList(), i = list.findIndex((x) => x.id === dl.dataset.del); if (i < 0) return; const [gone] = list.splice(i, 1); store.set(savedKey(), list); renderSaved(); toast(t("Analysis deleted."), t("Undo"), () => { const l = savedList(); l.splice(i, 0, gone); store.set(savedKey(), l); renderSaved(); }); return; }
 		const rm = e.target.closest("[data-rm]");
 		if (rm) { const i = S.docs.findIndex((d) => d.fid === rm.dataset.rm), d = S.docs[i]; if (!d) return; const rep = S.report, turns = S.turns; S.docs.splice(i, 1); S.index = null; if (!S.docs.length) { S.report = null; S.turns = []; } renderAll(); scheduleReport(); toast(t("File removed."), t("Undo"), () => { S.docs.splice(i, 0, d); S.index = null; S.report = rep; S.turns = turns; renderAll(); }); return; }
 		const w = e.target.closest("[data-where]");
@@ -581,6 +675,8 @@
 		}
 		const a = e.target.closest("[data-act]"); if (!a) return;
 		const owner = a.dataset.r;
+		if (a.dataset.act === "signin") return openSignIn();
+		if (a.dataset.act === "mine") return go(3);
 		if (a.dataset.act === "whylimit") return toast(t("Margin is a free demo. It runs on Cloudflare’s free AI allowance, shared by every visitor, which renews each day."));
 		if (a.dataset.act === "reanalyse") { if (S.report?.cleared) S.report = null; return makeReport(true); }
 		if (a.dataset.act === "listen") return speak(owner);
@@ -590,7 +686,7 @@
 	});
 
 	/* ---------------- boot ---------------- */
-	S.page = 1; initLang(); setLang(I.lang); loadQuota();
+	S.page = 1; initLang(); setLang(I.lang); loadQuota(); renderAcct();
 	window.MARGIN_DEBUG = S;
 	if (new URLSearchParams(location.search).get("sample")) openSample(); // link from the case study
 })();
