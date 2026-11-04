@@ -475,13 +475,6 @@ footer .wrap { padding-top: 10px; padding-bottom: 12px; align-items: center; gap
 			<form class="ask" id="askForm" autocomplete="off">
 				<label class="sr" for="q" data-t="A question about this document?">A question about this document?</label>
 				<textarea id="q" rows="1" maxlength="300" data-t-ph="A question about this document?"></textarea>
-				<div class="rec" id="rec" hidden>
-					<button type="button" class="rec-b" id="recX" data-t-label="Cancel"><span data-ic="x"></span></button>
-					<span class="rec-live"><span class="rec-dot" aria-hidden="true"></span><canvas class="wave" id="wave" aria-hidden="true"></canvas><span class="rec-t" id="recT">0:00</span></span>
-					<span class="rec-fill"></span>
-					<button type="button" class="rec-b ok" id="recOk" data-t-label="Done"><span data-ic="check"></span></button>
-				</div>
-				<button class="mic" type="button" id="micBtn" data-t-label="Speak your question" hidden><span data-ic="mic"></span></button>
 				<button class="go" type="submit" disabled><span data-t="Ask">Ask</span><span data-ic="arrow-right" class="flip-ic"></span></button>
 			</form>
 			<div class="tries" id="tries"></div>

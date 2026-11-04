@@ -96,8 +96,8 @@ const clean = (arr, ids) => (Array.isArray(arr) ? arr : []).slice(0, 8)
  * and reset at 00:00 UTC. Margin keeps itself under MARGIN_BUDGET, counted in a KV namespace bound as MARGIN_KV.
  * Without that binding, Margin still works; it just can't show what's left. */
 const MARGIN_BUDGET = 6000;
-const COST = { report: 500, ask: 300, summary: 450, simple: 400, translate: 80, transcribe: 60 };
-const RATE_IN = 26668 / 1e6, RATE_OUT = 204805 / 1e6, WHISPER_PER_MIN = 46.63;
+const COST = { report: 500, ask: 300, summary: 450, simple: 400, translate: 80 };
+const RATE_IN = 26668 / 1e6, RATE_OUT = 204805 / 1e6;
 const dayKey = () => "used:" + new Date().toISOString().slice(0, 10);
 function nextReset() { const d = new Date(); d.setUTCHours(24, 0, 0, 0); return d.toISOString(); }
 async function quota(env) {
@@ -127,7 +127,6 @@ export async function onRequestPost({ request, env }) {
 	return new Response(JSON.stringify(j), { status: res.status, headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS } });
 }
 async function handle(body, env, meter) {
-	if (body?.mode === "transcribe") return transcribe(env, body.audio, meter);
 	const out = LANG[body?.lang] || "English";
 	let stage = "run";
 	try {
@@ -206,18 +205,4 @@ export function onRequestOptions() {
 }
 export function onRequest() {
 	return bad(405, "method_not_allowed");
-}
-
-/* Voice → text: a short WAV recorded in the reader's browser, read once by Whisper (OpenAI, MIT licence) on Workers AI. Nothing is kept. */
-const WHISPER = "@cf/openai/whisper-large-v3-turbo";
-async function transcribe(env, audio, meter) {
-	if (typeof audio !== "string" || audio.length < 1000) return bad(400, "empty_audio");
-	if (audio.length > 3500000) return bad(413, "audio_too_long");
-	try {
-		const r = await env.AI.run(WHISPER, { audio });
-		meter.n += Math.max(0.1, (audio.length * 0.75) / 32000 / 60) * WHISPER_PER_MIN;
-		return ok({ text: String(r?.text ?? "").replace(/\s+/g, " ").trim().slice(0, 600), model: WHISPER });
-	} catch (e) {
-		return bad(502, "transcribe_error", String(e?.message || e).slice(0, 200));
-	}
 }

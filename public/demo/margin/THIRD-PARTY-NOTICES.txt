@@ -1797,8 +1797,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-
-==============================================================================
-Whisper (OpenAI) — MIT License — runs on Cloudflare Workers AI (@cf/openai/whisper-large-v3-turbo); not distributed with this page
-------------------------------------------------------------------------------
-Speech-to-text for spoken questions. Model by OpenAI, released under the MIT License: https://github.com/openai/whisper/blob/main/LICENSE

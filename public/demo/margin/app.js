@@ -542,104 +542,10 @@
 			el.className = "quota " + cls; el.hidden = false;
 			el.innerHTML = `<span class="bar" role="img" aria-label="${pct} %"><i style="width:${pct}%"></i></span><span>${esc(msg)}</span><button type="button" class="lnk" data-act="whylimit">${t("Why a limit?")}</button>`;
 		}
-		$("#micBtn").disabled = quotaOut(); $("#analyse").disabled = !ready().length || S.loading > 0 || quotaOut();
+		$("#analyse").disabled = !ready().length || S.loading > 0 || quotaOut();
 	}
 	async function loadQuota() { try { const r = await fetch(API, { cache: "no-store" }); const j = await r.json(); if (j.quota) { S.quota = j.quota; renderQuota(); } } catch {} }
 
-	/* ---------------- speak a question: record here, then Whisper writes it ---------------- */
-	const REC_MAX = 60, SILENT_GIVE_UP = 6;
-	const rec = { on: false };
-	const micOK = Boolean(navigator.mediaDevices?.getUserMedia && window.MediaRecorder && (window.AudioContext || window.webkitAudioContext));
-	if (micOK) $("#micBtn").hidden = false;
-	/* The AudioContext is created during the tap itself: browsers keep it "suspended" (silent) if it is created later. */
-	/* voice diagnostics, kept in this browser only (last 40 steps): read with MARGIN_VOICE_LOG() in the console */
-	function vlog(step, data) {
-		try { const L = JSON.parse(localStorage.getItem("margin-voice-log") || "[]"); L.push({ at: new Date().toISOString().slice(11, 19), step, ...(data || {}) }); localStorage.setItem("margin-voice-log", JSON.stringify(L.slice(-40))); } catch {}
-	}
-	window.MARGIN_VOICE_LOG = () => { try { return JSON.parse(localStorage.getItem("margin-voice-log") || "[]"); } catch { return []; } };
-	function micTap() {
-		if (rec.on) return; vlog("tap");
-		const AC = window.AudioContext || window.webkitAudioContext, ac = new AC(); ac.resume?.();
-		recStart(ac);
-	}
-	async function recStart(ac) {
-		let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
-		catch (e) { vlog("mic-refused", { name: e?.name, msg: String(e?.message || "").slice(0, 80) }); ac.close?.(); return toast(t(e?.name === "NotAllowedError" ? "Microphone access was refused. You can allow it in your browser settings." : "Your microphone isn’t available in this browser.")); }
-		if (ac.state !== "running") { try { await ac.resume(); } catch {} }
-		{ const tr = stream.getAudioTracks()[0], st = tr?.getSettings?.() || {}; vlog("mic-open", { label: tr?.label, muted: tr?.muted, enabled: tr?.enabled, state: tr?.readyState, rate: st.sampleRate, ch: st.channelCount, ctx: ac.state }); }
-		const src = ac.createMediaStreamSource(stream), an = ac.createAnalyser(); an.fftSize = 1024; src.connect(an);
-		const mr = new MediaRecorder(stream), parts = [];
-		mr.ondataavailable = (e) => e.data.size && parts.push(e.data);
-		mr.onerror = (e) => vlog("recorder-error", { msg: String(e?.error?.message || e?.error || "").slice(0, 80) });
-		Object.assign(rec, { on: true, stream, ac, an, mr, parts, t0: performance.now(), heardAt: null, sawSignal: false, maxRms: 0, floor: 0, frames: 0, bars: [], level: 0 });
-		rec.timer = setInterval(sample, 50);
-		mr.start(250);
-		$("#askForm").classList.add("recording"); $("#rec").hidden = false; $("#recOk").disabled = false; $("#recOk").focus();
-		draw();
-	}
-	/* a small live level meter (about 150 px): it moves whenever the microphone hears something */
-	/* Listening is measured every 50 ms (a timer keeps running even when the page isn't painted); the bars are drawn on screen frames. */
-	function sample() {
-		if (!rec.on) return;
-		const buf = new Float32Array(rec.an.fftSize); rec.an.getFloatTimeDomainData(buf);
-		let sum = 0, peak = 0; for (const x of buf) { sum += x * x; const a = Math.abs(x); if (a > peak) peak = a; }
-		const rms = Math.sqrt(sum / buf.length), sec = (performance.now() - rec.t0) / 1000;
-		if (rms > 0.0005) rec.sawSignal = true; if (rms > rec.maxRms) rec.maxRms = rms; // the meter really receives sound from the microphone
-		rec.frames++; if (rec.frames <= 4) rec.floor = Math.max(rec.floor, rms); // the room's own noise, first 0.2 s
-		if (rec.heardAt == null && rec.frames > 4 && (rms > Math.max(0.01, rec.floor * 2.2) || peak > 0.1)) rec.heardAt = sec;
-		rec.level = Math.min(1, Math.sqrt(Math.max(0, rms - rec.floor * 0.6)) * 3.2);
-		rec.bars.push(rec.level); while (rec.bars.length > 40) rec.bars.shift();
-		$("#recT").textContent = `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
-		// give up only when the meter works and has heard nothing: if it can't measure, the person decides with ✓
-		if (rec.sawSignal && rec.heardAt == null && sec > SILENT_GIVE_UP) { recStop(false); return toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak.")); }
-		if (sec >= REC_MAX) recStop(true);
-	}
-	function draw() {
-		if (!rec.on) return;
-		const cv = $("#wave"), g = cv.getContext("2d"), dpr = devicePixelRatio || 1, W = cv.clientWidth || 150, H = cv.clientHeight || 28;
-		if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
-		const n = Math.floor(W / 5), bars = rec.bars.slice(-n);
-		g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); g.fillStyle = getComputedStyle($("#rec")).color;
-		for (let i = 0; i < n; i++) { const v = bars[i - (n - bars.length)] ?? 0, h = Math.max(3, v * (H - 2)); g.globalAlpha = 0.3 + v * 0.7; g.beginPath(); g.roundRect ? g.roundRect(i * 5, (H - h) / 2, 3, h, 1.5) : g.rect(i * 5, (H - h) / 2, 3, h); g.fill(); }
-		g.globalAlpha = 1;
-		rec.raf = requestAnimationFrame(draw);
-	}
-	const HALLU = /^(thank you\.?|thanks for watching!?|you|merci\.?|sous-titrage[^]*|\.+)$/i; // what Whisper "hears" in near-silence
-	async function recStop(keep) {
-		if (!rec.on) return; rec.on = false; cancelAnimationFrame(rec.raf); clearInterval(rec.timer);
-		const { mr, stream, ac, parts, heardAt, t0, maxRms, sawSignal } = rec;
-		const done = new Promise((r) => (mr.onstop = r)); try { mr.stop(); } catch {} await done;
-		stream.getTracks().forEach((x) => x.stop());
-		vlog("stop", { keep, seconds: +((performance.now() - t0) / 1000).toFixed(1), type: mr.mimeType, parts: parts.length, KB: Math.round(parts.reduce((a, p) => a + p.size, 0) / 1024), sawSignal, maxRms: +maxRms.toFixed(4), heardAt });
-		const close = () => { ac.close?.(); $("#askForm").classList.remove("recording"); $("#rec").hidden = true; fit(); ta.focus(); };
-		if (!keep) { close(); return; }
-		if ((performance.now() - t0) < 600 || !parts.length) { close(); return toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak.")); }
-		// ✓ always sends what was recorded: Whisper decides; near-silence comes back empty or as a known filler and is ignored
-		$("#recOk").disabled = true; $("#recT").textContent = "…"; toast(t("Turning your voice into text…"));
-		try {
-			const wav = await toWav(new Blob(parts, { type: mr.mimeType || "audio/webm" }), 0); // the whole recording: cutting on a guess lost words
-			const j = await callApi({ mode: "transcribe", audio: wav }, 30000);
-			const txt = String(j.text || "").trim();
-			vlog("transcribed", { wavKB: Math.round(wav.length * 0.75 / 1024), text: txt.slice(0, 120) });
-			console.info("Margin voice:", JSON.stringify({ seconds: +((performance.now() - t0) / 1000).toFixed(1), type: mr.mimeType, wavKB: Math.round(wav.length * 0.75 / 1024), sawSignal, maxRms: +maxRms.toFixed(4), heardAt, text: txt }));
-			if (!txt || HALLU.test(txt)) toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak."));
-			else { ta.value = (ta.value.trim() ? ta.value.trim() + " " : "") + txt; $("#toast").classList.remove("on"); }
-		} catch (e) { vlog("error", { msg: String(e?.message || e).slice(0, 120) }); console.warn("Margin voice:", e.message); toast(e.limit ? limitMsg() : t("I couldn’t turn your voice into text. Please try again.")); }
-		close();
-	}
-	/* the recording → 16 kHz mono WAV, without the silence before the first word, as base64 */
-	async function toWav(blob, skip) {
-		const audio = await new OfflineAudioContext(1, 1, 16000).decodeAudioData(await blob.arrayBuffer());
-		const rate = 16000, start = Math.min(skip, audio.duration), len = Math.max(1, Math.ceil((audio.duration - start) * rate));
-		const off = new OfflineAudioContext(1, len, rate), node = off.createBufferSource(); node.buffer = audio; node.connect(off.destination); node.start(0, start);
-		const pcm = (await off.startRendering()).getChannelData(0), out = new DataView(new ArrayBuffer(44 + pcm.length * 2));
-		const str = (o, s) => [...s].forEach((c, i) => out.setUint8(o + i, c.charCodeAt(0)));
-		str(0, "RIFF"); out.setUint32(4, 36 + pcm.length * 2, true); str(8, "WAVEfmt "); out.setUint32(16, 16, true); out.setUint16(20, 1, true); out.setUint16(22, 1, true);
-		out.setUint32(24, rate, true); out.setUint32(28, rate * 2, true); out.setUint16(32, 2, true); out.setUint16(34, 16, true); str(36, "data"); out.setUint32(40, pcm.length * 2, true);
-		for (let i = 0; i < pcm.length; i++) out.setInt16(44 + i * 2, Math.max(-1, Math.min(1, pcm[i])) * 0x7fff, true);
-		const bytes = new Uint8Array(out.buffer); let bin = ""; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-		return btoa(bin);
-	}
 	/* Tesseract is large: it loads only when the first photo arrives */
 	const loadScript = (src) => new Promise((ok, no) => { if (document.querySelector(`script[src="${src}"]`)) return ok(); const el = document.createElement("script"); el.src = src; el.onload = ok; el.onerror = no; document.head.append(el); });
 
@@ -689,7 +595,7 @@
 	$("#legalBtn").onclick = () => { // privacy & terms, in the reader's language
 		const opener = document.activeElement, scrim = document.createElement("div"), v = document.createElement("div");
 		scrim.className = "scrim"; v.className = "viewer"; v.setAttribute("role", "dialog"); v.setAttribute("aria-modal", "true"); v.setAttribute("aria-labelledby", "lgH");
-		v.innerHTML = `<div class="legal"><h3 id="lgH">${t("Privacy & terms")}</h3>${["Files, photos and pasted text are read in your browser. A link is fetched once by our server, only to read the page.", "When you speak a question, the recording is sent once to Cloudflare Workers AI (Whisper, by OpenAI) to turn it into text, and isn’t kept.", "This free demo shares a daily AI allowance between all visitors. When it runs out, it comes back the next day.", "To write the summary and the answers, only the passages needed are sent to Cloudflare Workers AI, which runs Llama 3.3 (Meta). Cloudflare states that it does not use this content to train AI models, and Margin stores nothing.", "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong. Always check the highlighted source.", "Portfolio demo: please don’t add very personal or confidential documents."].map((k) => `<p>${esc(t(k))}</p>`).join("")}<p>Built with Llama · <a class="lnk" href="THIRD-PARTY-NOTICES.txt">${t("Licences")}</a></p><div class="row"><button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></div></div>`;
+		v.innerHTML = `<div class="legal"><h3 id="lgH">${t("Privacy & terms")}</h3>${["Files, photos and pasted text are read in your browser. A link is fetched once by our server, only to read the page.", "This free demo shares a daily AI allowance between all visitors. When it runs out, it comes back the next day.", "To write the summary and the answers, only the passages needed are sent to Cloudflare Workers AI, which runs Llama 3.3 (Meta). Cloudflare states that it does not use this content to train AI models, and Margin stores nothing.", "Margin helps you read a document. It is not legal, financial or medical advice: for an important decision, ask a professional. The AI can be wrong. Always check the highlighted source.", "Portfolio demo: please don’t add very personal or confidential documents."].map((k) => `<p>${esc(t(k))}</p>`).join("")}<p>Built with Llama · <a class="lnk" href="THIRD-PARTY-NOTICES.txt">${t("Licences")}</a></p><div class="row"><button type="button" class="btn btn-sm" data-close>${ic("x")}${t("Close")}</button></div></div>`;
 		const close = () => { scrim.remove(); v.remove(); document.removeEventListener("keydown", key); opener?.focus(); }, key = (e) => { if (e.key === "Escape") close(); };
 		v.addEventListener("click", (e) => { if (e.target === v || e.target.closest("[data-close]")) close(); });
 		document.addEventListener("keydown", key); document.body.append(scrim, v); v.querySelector("[data-close]").focus();
@@ -720,10 +626,6 @@
 	const fit = () => { ta.style.height = "auto"; ta.style.height = Math.min(ta.scrollHeight, 160) + "px"; goBtn.disabled = !ta.value.trim(); };
 	ta.addEventListener("input", fit);
 	ta.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#askForm").requestSubmit(); } });
-	$("#micBtn").onclick = micTap;
-	$("#recX").onclick = () => recStop(false);
-	$("#recOk").onclick = () => recStop(true);
-	document.addEventListener("keydown", (e) => { if (rec.on && e.key === "Escape") recStop(false); });
 	$("#askForm").addEventListener("submit", (e) => { e.preventDefault(); const v = ta.value.trim(); if (!v) return; ta.value = ""; fit(); ask(v); });
 	document.addEventListener("click", async (e) => {
 		const rm = e.target.closest("[data-rm]");
