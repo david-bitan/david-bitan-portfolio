@@ -182,13 +182,15 @@ const ds = project.designSystem;
 								<span class="ai-more-close">Show fewer decisions</span>
 								<svg class="ai-more-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
 							</summary>
-							<div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-								{project.aiFeature.decisions.slice(3).map((d) => (
-									<div>
-										<p class="font-semibold">{d.title}</p>
-										<p class="mt-2 text-sm text-muted">{d.body}</p>
-									</div>
-								))}
+							<div class="ai-more-body">
+								<div class="grid grid-cols-1 gap-6 pt-6 sm:grid-cols-2 lg:grid-cols-3">
+									{project.aiFeature.decisions.slice(3).map((d) => (
+										<div>
+											<p class="font-semibold">{d.title}</p>
+											<p class="mt-2 text-sm text-muted">{d.body}</p>
+										</div>
+									))}
+								</div>
 							</div>
 						</details>
 					)}
@@ -454,8 +456,13 @@ const ds = project.designSystem;
 	.ai-more .ai-more-close { display: none; }
 	.ai-more[open] .ai-more-open { display: none; }
 	.ai-more[open] .ai-more-close { display: inline; }
-	.ai-more .ai-more-ic { transition: transform 0.2s ease; }
+	.ai-more .ai-more-ic { transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1); }
 	.ai-more[open] .ai-more-ic { transform: rotate(180deg); }
+	/* while closing, the button already reads "See the …" and the chevron turns back */
+	.ai-more.is-closing .ai-more-open { display: inline; }
+	.ai-more.is-closing .ai-more-close { display: none; }
+	.ai-more.is-closing .ai-more-ic { transform: none; }
+	.ai-more-body { overflow: hidden; }
 </style>
 
 <script is:inline>
@@ -498,6 +505,45 @@ const ds = project.designSystem;
 		btn.addEventListener('click', () => {
 			const expanded = btn.getAttribute('aria-expanded') === 'true';
 			setExpanded(!expanded);
+		});
+	})();
+
+	// "See the N other decisions": the same opening as Show more (500 ms, same
+	// curve), and a slightly quicker closing. Native <details> stays the base,
+	// so it still works without JavaScript and with reduced motion.
+	(() => {
+		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+		const EASE = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+		document.querySelectorAll('details.ai-more').forEach((d) => {
+			const summary = d.querySelector('summary');
+			const body = d.querySelector('.ai-more-body');
+			if (!summary || !body) return;
+			let anim = null;
+			summary.addEventListener('click', (e) => {
+				if (reduce.matches || !body.animate) return;
+				e.preventDefault();
+				const from = anim ? body.getBoundingClientRect().height : null;
+				anim?.cancel();
+				const closing = d.open && !d.classList.contains('is-closing');
+				if (!closing) {
+					d.classList.remove('is-closing');
+					d.open = true;
+					const h = body.scrollHeight;
+					anim = body.animate(
+						[{ height: (from ?? 0) + 'px', opacity: from ? 1 : 0 }, { height: h + 'px', opacity: 1 }],
+						{ duration: 500, easing: EASE }
+					);
+					anim.onfinish = () => { anim = null; };
+				} else {
+					d.classList.add('is-closing');
+					const h = from ?? body.getBoundingClientRect().height;
+					anim = body.animate(
+						[{ height: h + 'px', opacity: 1 }, { height: '0px', opacity: 0 }],
+						{ duration: 400, easing: EASE }
+					);
+					anim.onfinish = () => { d.open = false; d.classList.remove('is-closing'); anim = null; };
+				}
+			});
 		});
 	})();
 </script>
