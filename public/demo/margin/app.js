@@ -14,7 +14,7 @@
 	if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "vendor/pdf.worker.min.js";
 
 	const MAX_PAGES = 60, MAX_MB = 20, MAX_FILES = 5, WHOLE = 22000;
-	const S = { docs: [], loading: 0, out: null, report: null, turns: [], speaking: null, seq: 0, cseq: 0, open: new Set() };
+	const S = { shown: new Set(), docs: [], loading: 0, out: null, report: null, turns: [], speaking: null, seq: 0, cseq: 0, open: new Set() };
 	const chunk = (id) => { for (const d of S.docs) { const c = d.chunks.find((x) => x.id === id); if (c) return c; } return null; };
 	const docOf = (c) => S.docs.find((d) => d.fid === c.fid);
 	const visual = (d) => d.type === "pdf" || d.type === "image";
@@ -126,9 +126,11 @@
 			if (d.loading) return `<li class="frow busy-row"><span class="file-ic">${ic("file-text")}</span><div><b>${esc(d.name)}</b><small>${ic("loader-circle", "spin")}${d.note ? esc(d.note) : t("Reading your document…")}</small></div></li>`;
 			const bits = [NAMES[d.type], d.pages ? (d.pages === 1 ? t("1 page") : t("{n} pages", { n: d.pages })) : null, t("{n} words", { n: d.words.toLocaleString(I.lang) }), t(LANG_NAME[d.lang])].filter(Boolean);
 			const warn = d.words < 30 ? `<span class="w">${t(d.type === "image" ? "I could read almost no text in this image. Try a sharper, straight photo." : "I found almost no text. This may be a scan or a photo inside a PDF — I can’t read those yet.")}</span>` : d.pages > MAX_PAGES ? `<span class="w">${t("This document is long: I’ll read its first {n} pages.", { n: MAX_PAGES })}</span>` : "";
-			return `<li class="frow" data-fid="${d.fid}"><span class="file-ic">${ic(ICON[d.type] || "file-text")}</span><div><b>${esc(d.name)}</b><small><span>${bits.map(esc).join(" · ")}</span>${warn}</small></div>${d.words >= 30 ? `<span class="ok-ic">${ic("circle-check")}</span>` : ""}<button type="button" class="btn btn-text btn-sm" data-rm="${d.fid}" aria-label="${esc(t("Remove"))} ${esc(d.name)}">${ic("x")}<span class="hide-m">${t("Remove")}</span></button></li>`;
+			const fresh = !S.shown.has(d.fid); S.shown.add(d.fid);
+			return `<li class="frow${fresh ? " new" : ""}" data-fid="${d.fid}"><span class="file-ic">${ic(ICON[d.type] || "file-text")}</span><div><b>${esc(d.name)}</b><small><span>${bits.map(esc).join(" · ")}</span>${warn}</small></div>${d.words >= 30 ? `<span class="ok-ic">${ic("circle-check")}</span>` : ""}<button type="button" class="btn btn-text btn-sm" data-rm="${d.fid}" aria-label="${esc(t("Remove"))} ${esc(d.name)}">${ic("x")}<span class="hide-m">${t("Remove")}</span></button></li>`;
 		}).join("");
 		const has = S.docs.length > 0;
+		$("#filesH").hidden = !has; $("#filesH").textContent = S.docs.length > 1 ? t("Your documents ({n})", { n: S.docs.length }) : t("Your document");
 		$("#sample").hidden = has;
 		$("#analyse").disabled = !ready().length || S.loading > 0 || quotaOut();
 		$("#drop").classList.toggle("compact", has);
@@ -315,7 +317,19 @@
 	const NUMW = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, twelve: 12, twenty: 20, thirty: 30, un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, sept: 7, huit: 8, neuf: 9, dix: 10, douze: 12, vingt: 20, trente: 30, "אחד": 1, "אחת": 1, "שניים": 2, "שתיים": 2, "שלושה": 3, "שלוש": 3, "ארבעה": 4, "ארבע": 4, "חמישה": 5, "חמש": 5, "שבוע": 1, "יומיים": 2, "שבועיים": 2, "חודשיים": 2, "שנתיים": 2, "החודשיים": 2 };
 	const nums = (s) => (String(s).replace(/(\d)[\s  '’](?=\d{3}\b)/g, "$1").replace(/(\d)[,.](?=\d{3}\b)/g, "$1").match(/\d+(?:[.,]\d+)?/g) || []).map((n) => n.replace(",", "."));
 	function srcNums(c) { const set = new Set(nums(c.text)); for (const w of String(c.text).toLowerCase().split(/[^\p{L}]+/u)) if (NUMW[w] != null) set.add(String(NUMW[w])); if (/\bhalf\b|moitié|חצי/i.test(c.text)) set.add("50"); return set; }
-	function verify(items, chunks) {
+	/* Numbers written the English way (68,000 · 9.99) are rewritten the way the reader's language writes them
+	 * (fr 68 000 · 9,99 — de 68.000 · 9,99), so "68,000" is never read as 68. English and Hebrew keep 68,000 and 9.99. */
+	const LOC = { en: "en-GB", fr: "fr-FR", es: "es-ES", pt: "pt-PT", de: "de-DE", it: "it-IT", ru: "ru-RU", tr: "tr-TR", id: "id-ID", he: "he-IL" };
+	const CUR = "(?:[€$£₪]|EUR|USD|GBP|ILS|NIS)";
+	function localNums(s, lang) {
+		if (!lang || lang === "en" || lang === "he") return s;
+		const fmt = (n, dec) => new Intl.NumberFormat(LOC[lang], { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n);
+		s = s.replace(/(?<![\d.,])(\d{1,3}(?:,\d{3})+)(?:\.(\d{1,2}))?(?![\d,]|\.\d)/g, (m, int, dec) => fmt(+(int.replace(/,/g, "") + (dec ? "." + dec : "")), dec ? dec.length : 0));
+		s = s.replace(new RegExp(`(${CUR}\\s?)(\\d+)\\.(\\d{1,2})(?![\\d.])`, "g"), (m, c, a, b) => c + fmt(+(a + "." + b), b.length));
+		s = s.replace(new RegExp(`(?<![\\d.,])(\\d+)\\.(\\d{1,2})(?=\\s?(?:${CUR}|%))`, "g"), (m, a, b) => fmt(+(a + "." + b), b.length));
+		return s;
+	}
+	function verify(items, chunks, lang) {
 		const byId = Object.fromEntries(chunks.map((c) => [c.id, c])), kept = [], removed = [];
 		for (const it of items || []) {
 			let text = String(it?.text || "").replace(/[*#`]/g, "").trim(); if (!text) continue;
@@ -325,7 +339,7 @@
 			if (!cites.length) { removed.push({ text, why: "src" }); continue; }
 			const allowed = new Set(cites.flatMap((id) => [...srcNums(byId[id])]));
 			if (nums(value + " " + text).some((n) => !allowed.has(n) && !allowed.has(String(Math.round(+n))))) { removed.push({ text, why: "num" }); continue; }
-			kept.push({ ...(value ? { value } : {}), text, cite: cites, key: Math.random().toString(36).slice(2, 8) });
+			kept.push({ ...(value ? { value: localNums(value, lang) } : {}), text: localNums(text, lang), cite: cites, key: Math.random().toString(36).slice(2, 8) });
 		}
 		return { kept, removed };
 	}
@@ -350,7 +364,7 @@
 		r.pending = false; r.model = j?.model || null;
 		if (!j) { r.failed = lim ? "limit" : "offline"; return renderAll(); }
 		r.groups = {}; let all = [], rem = [];
-		for (const [k] of GROUPS) { const v = verify(j[k], chunks); r.groups[k] = v.kept; all = all.concat(v.kept); rem = rem.concat(v.removed); }
+		for (const [k] of GROUPS) { const v = verify(j[k], chunks, r.lang); r.groups[k] = v.kept; all = all.concat(v.kept); rem = rem.concat(v.removed); }
 		r.removed = rem; r.count = all.length;
 		if (!all.length) r.failed = rem.length ? "unbacked" : "empty";
 		renderAll();
@@ -358,6 +372,7 @@
 	const renderAll = () => { renderReport(); renderThread(); renderFiles(); };
 	function go(n) {
 		S.page = n; $("#p1").hidden = n !== 1; $("#p2").hidden = n !== 2;
+		const pg = $(n === 1 ? "#p1" : "#p2"); pg.classList.remove("page-in"); void pg.offsetWidth; pg.classList.add("page-in");
 		if (n === 2) $("#s2files").textContent = ready().map((d) => d.name).join(" · ");
 		scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
 		const h = n === 1 ? $("#p1 h1") : $("#report h2") || $("#back2"); if (h) { if (h.tagName !== "BUTTON") h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }
@@ -381,11 +396,12 @@
 		const item = (it) => `<li>${pointHtml(it)}</li>`;
 		const groupHtml = ([k, lbl, cls]) => `<div class="box ${cls}"><h3><span class="dot"></span>${t(lbl)}</h3>${r.groups[k].length ? `<ul>${r.groups[k].map(item).join("")}</ul>` : `<p class="empty">${t("Nothing found for this part.")}</p>`}</div>`;
 		const acts = `<div class="res-acts"><button type="button" class="btn btn-text btn-sm" data-act="listen" data-r="report">${ic(S.speaking === "report" ? "square" : "volume-2")}${t(S.speaking === "report" ? "Stop" : "Listen")}</button><button type="button" class="btn btn-text btn-sm" data-act="copy" data-r="report">${ic("copy")}${t("Copy")}</button><button type="button" class="btn btn-text btn-sm" data-act="clear" data-r="report">${ic("trash-2")}${t("Clear")}</button></div>`;
-		box.innerHTML = `<article class="rep"><div class="rep-h"><div><span class="kind">${esc(names)}</span><h2>${title}</h2></div>${acts}</div>
+		const first = !r.shown; r.shown = true;
+		box.innerHTML = `<article class="rep${first ? " in" : ""}"><div class="rep-h"><div><span class="kind">${esc(names)}</span><h2>${title}</h2></div>${acts}</div>
 			${r.groups.short.length ? `<div class="short">${r.groups.short.map((it) => `<span class="pt">${pointHtml(it)}</span>`).join(" ")}</div>` : ""}
 			<div class="grid4">${GROUPS.slice(1).map(groupHtml).join("")}</div>
 			<div class="rep-foot"><span class="badge ok">${ic("shield-check")}${t("{n} points, each checked against the document", { n: r.count })}</span>${r.removed?.length ? `<span>${r.removed.length === 1 ? esc(t(r.removed[0].why === "num" ? "Removed: its number isn’t in the document." : "Removed: it had no source.")) : esc(t("{n} removed", { n: r.removed.length }))}</span>` : ""}<span>${t("This summary helps you read — it isn’t legal advice.")}</span></div></article>`;
-		drawSnips(box); $("#qa").hidden = false; renderTries();
+		S.snips = drawSnips(box); $("#qa").hidden = false; renderTries();
 	}
 	/* a point, with a quiet "Where it says it" that opens the highlighted passage underneath */
 	function pointHtml(it, owner = "report") {
@@ -438,7 +454,7 @@
 		try { j = await callApi({ mode: "ask", lang: tu.lang, question: q, passages: pass(chunks), report: reportText().slice(0, 2500), history }); } catch (e) { tu.limit = Boolean(e.limit); console.warn("Margin AI:", e.message); }
 		tu.pending = false;
 		if (!j) { const h = bm25(q), best = h.slice(0, 2).filter((x, i) => !i || x.s > 0.7 * h[0].s).map((x) => x.c); if (best.length) { tu.status = "quoted"; tu.items = best.map((c) => ({ text: c.text, cite: [c.id], quote: true, key: Math.random().toString(36).slice(2, 8) })); } else tu.status = "notfound"; }
-		else { const v = verify(j.answer, chunks); tu.items = v.kept; tu.removed = v.removed; tu.status = v.kept.length ? "answered" : "notfound"; }
+		else { const v = verify(j.answer, chunks, tu.lang); tu.items = v.kept; tu.removed = v.removed; tu.status = v.kept.length ? "answered" : "notfound"; }
 		renderThread(); renderTries();
 	}
 	function renderThread() {
@@ -448,9 +464,10 @@
 			if (tu.pending) body = `<p class="a busy">${ic("loader-circle", "spin")} ${t("Working on it…")}</p>`;
 			else if (tu.status === "notfound") body = `<p class="a"><span class="badge none">${ic("search-x")}${t("I found nothing about this in the document.")}</span></p>`;
 			else body = `<p class="a">${tu.items.map((it) => pointHtml(it, tu.id)).join(" ")}</p>${tu.status === "quoted" ? `<div class="trust"><span class="badge none">${ic("quote")}${t("Quoted directly")}</span><span>${tu.limit ? esc(limitMsg()) + " " + t("Here are the passages that match best, word for word.") : t("The AI can’t be reached right now. Here are the passages that match best, word for word.")}</span></div>` : ""}`;
-			return `<article class="turn" id="${tu.id}" lang="${tu.lang}" dir="${tu.lang === "he" ? "rtl" : "ltr"}"><p class="q">${esc(tu.q)}</p>${body}${acts}</article>`;
+			const fresh = !tu.shown && !tu.pending; if (fresh) tu.shown = true;
+			return `<article class="turn${fresh ? " new" : ""}" id="${tu.id}" lang="${tu.lang}" dir="${tu.lang === "he" ? "rtl" : "ltr"}"><p class="q">${esc(tu.q)}</p>${body}${acts}</article>`;
 		}).join("");
-		drawSnips($("#thread"));
+		S.snips = drawSnips($("#thread"));
 	}
 
 	/* ---------------- the document viewer ---------------- */
@@ -530,55 +547,67 @@
 	const rec = { on: false };
 	const micOK = Boolean(navigator.mediaDevices?.getUserMedia && window.MediaRecorder && (window.AudioContext || window.webkitAudioContext));
 	if (micOK) $("#micBtn").hidden = false;
-	async function recStart() {
+	/* The AudioContext is created during the tap itself: browsers keep it "suspended" (silent) if it is created later. */
+	function micTap() {
 		if (rec.on) return;
-		let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
-		catch (e) { return toast(t(e?.name === "NotAllowedError" ? "Microphone access was refused. You can allow it in your browser settings." : "Your microphone isn’t available in this browser.")); }
-		const AC = window.AudioContext || window.webkitAudioContext, ac = new AC(), src = ac.createMediaStreamSource(stream), an = ac.createAnalyser();
-		an.fftSize = 1024; src.connect(an);
+		const AC = window.AudioContext || window.webkitAudioContext, ac = new AC(); ac.resume?.();
+		recStart(ac);
+	}
+	async function recStart(ac) {
+		let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
+		catch (e) { ac.close?.(); return toast(t(e?.name === "NotAllowedError" ? "Microphone access was refused. You can allow it in your browser settings." : "Your microphone isn’t available in this browser.")); }
+		if (ac.state !== "running") { try { await ac.resume(); } catch {} }
+		const src = ac.createMediaStreamSource(stream), an = ac.createAnalyser(); an.fftSize = 1024; src.connect(an);
 		const mr = new MediaRecorder(stream), parts = [];
 		mr.ondataavailable = (e) => e.data.size && parts.push(e.data);
-		Object.assign(rec, { on: true, stream, ac, an, mr, parts, t0: performance.now(), heardAt: null, bars: [], floor: 0.012 });
+		Object.assign(rec, { on: true, stream, ac, an, mr, parts, t0: performance.now(), heardAt: null, measured: false, floor: 0, frames: 0, bars: [] });
 		mr.start(250);
-		$("#askForm").classList.add("recording"); $("#rec").hidden = false; $("#recOk").disabled = false; $("#recX").focus();
+		$("#askForm").classList.add("recording"); $("#rec").hidden = false; $("#recOk").disabled = false; $("#recOk").focus();
 		draw();
 	}
+	/* a small live level meter (about 150 px): it moves whenever the microphone hears something */
 	function draw() {
 		if (!rec.on) return;
-		const cv = $("#wave"), g = cv.getContext("2d"), dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+		const cv = $("#wave"), g = cv.getContext("2d"), dpr = devicePixelRatio || 1, W = cv.clientWidth || 150, H = cv.clientHeight || 28;
 		if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
 		const buf = new Float32Array(rec.an.fftSize); rec.an.getFloatTimeDomainData(buf);
-		const rms = Math.sqrt(buf.reduce((a, x) => a + x * x, 0) / buf.length), sec = (performance.now() - rec.t0) / 1000;
-		if (rms > 0.025 && rec.heardAt == null) rec.heardAt = sec;
-		rec.bars.push(Math.min(1, rms * 9)); const n = Math.floor(W / 5); while (rec.bars.length > n) rec.bars.shift();
-		g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); g.fillStyle = getComputedStyle(document.body).color;
-		rec.bars.forEach((v, i) => { const h = Math.max(2, v * (H - 4)); g.globalAlpha = 0.35 + v * 0.65; g.fillRect(W - (rec.bars.length - i) * 5, (H - h) / 2, 3, h); });
+		let sum = 0, peak = 0; for (const x of buf) { sum += x * x; const a = Math.abs(x); if (a > peak) peak = a; }
+		const rms = Math.sqrt(sum / buf.length), sec = (performance.now() - rec.t0) / 1000;
+		if (rms > 0 || rec.ac.state === "running") rec.measured = true; // a running context really listens, even to digital silence
+		rec.frames++; if (rec.frames <= 12) rec.floor = Math.max(rec.floor, rms); // the room's own noise, first 0.2 s
+		if (rec.heardAt == null && rec.frames > 12 && (rms > Math.max(0.012, rec.floor * 2.5) || peak > 0.12)) rec.heardAt = sec;
+		const level = Math.min(1, Math.sqrt(Math.max(0, rms - rec.floor * 0.6)) * 3.2);
+		rec.bars.push(level); const n = Math.floor(W / 5); while (rec.bars.length > n) rec.bars.shift();
+		g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); g.fillStyle = getComputedStyle($("#rec")).color;
+		for (let i = 0; i < n; i++) { const v = rec.bars[i - (n - rec.bars.length)] ?? 0, h = Math.max(3, v * (H - 2)); g.globalAlpha = 0.3 + v * 0.7; g.beginPath(); g.roundRect ? g.roundRect(i * 5, (H - h) / 2, 3, h, 1.5) : g.rect(i * 5, (H - h) / 2, 3, h); g.fill(); }
 		g.globalAlpha = 1;
 		$("#recT").textContent = `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
-		if (rec.heardAt == null && sec > SILENT_GIVE_UP) { recStop(false); return toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak.")); }
+		if (rec.measured && rec.heardAt == null && sec > SILENT_GIVE_UP) { recStop(false); return toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak.")); }
 		if (sec >= REC_MAX) return recStop(true);
 		rec.raf = requestAnimationFrame(draw);
 	}
+	const HALLU = /^(thank you\.?|thanks for watching!?|you|merci\.?|sous-titrage[^]*|\.+)$/i; // what Whisper "hears" in near-silence
 	async function recStop(keep) {
 		if (!rec.on) return; rec.on = false; cancelAnimationFrame(rec.raf);
-		const { mr, stream, ac, parts, heardAt } = rec;
+		const { mr, stream, ac, parts, heardAt, measured } = rec;
 		const done = new Promise((r) => (mr.onstop = r)); try { mr.stop(); } catch {} await done;
 		stream.getTracks().forEach((x) => x.stop());
 		const close = () => { ac.close?.(); $("#askForm").classList.remove("recording"); $("#rec").hidden = true; fit(); ta.focus(); };
-		if (!keep || heardAt == null) { close(); return; }
+		if (!keep) { close(); return; }
+		if (measured && heardAt == null) { close(); return toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak.")); }
 		$("#recOk").disabled = true; $("#recT").textContent = "…"; toast(t("Turning your voice into text…"));
 		try {
-			const wav = await toWav(new Blob(parts, { type: mr.mimeType || "audio/webm" }), ac, Math.max(0, heardAt - 0.4));
+			const wav = await toWav(new Blob(parts, { type: mr.mimeType || "audio/webm" }), Math.max(0, (heardAt ?? 0) - 0.4));
 			const j = await callApi({ mode: "transcribe", audio: wav }, 30000);
 			const txt = String(j.text || "").trim();
-			if (!txt) toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak."));
+			if (!txt || HALLU.test(txt)) toast(t("I didn’t hear anything, so I stopped the microphone. Tap it again to speak."));
 			else { ta.value = (ta.value.trim() ? ta.value.trim() + " " : "") + txt; $("#toast").classList.remove("on"); }
-		} catch (e) { toast(e.limit ? limitMsg() : t("I couldn’t turn your voice into text. Please try again.")); }
+		} catch (e) { console.warn("Margin voice:", e.message); toast(e.limit ? limitMsg() : t("I couldn’t turn your voice into text. Please try again.")); }
 		close();
 	}
 	/* the recording → 16 kHz mono WAV, without the silence before the first word, as base64 */
-	async function toWav(blob, ac, skip) {
-		const audio = await ac.decodeAudioData(await blob.arrayBuffer());
+	async function toWav(blob, skip) {
+		const audio = await new OfflineAudioContext(1, 1, 16000).decodeAudioData(await blob.arrayBuffer());
 		const rate = 16000, start = Math.min(skip, audio.duration), len = Math.max(1, Math.ceil((audio.duration - start) * rate));
 		const off = new OfflineAudioContext(1, len, rate), node = off.createBufferSource(); node.buffer = audio; node.connect(off.destination); node.start(0, start);
 		const pcm = (await off.startRendering()).getChannelData(0), out = new DataView(new ArrayBuffer(44 + pcm.length * 2));
@@ -591,6 +620,19 @@
 	}
 	/* Tesseract is large: it loads only when the first photo arrives */
 	const loadScript = (src) => new Promise((ok, no) => { if (document.querySelector(`script[src="${src}"]`)) return ok(); const el = document.createElement("script"); el.src = src; el.onload = ok; el.onerror = no; document.head.append(el); });
+
+	/* open or close a block smoothly (height + fade); the passage images are drawn first so the height is right */
+	async function slide(el, open) {
+		if (!el || !el.classList.contains("proof") || reduced) return;
+		el.style.overflow = "hidden";
+		if (open) { el.style.height = "0px"; el.style.opacity = "0"; await S.snips; await new Promise(requestAnimationFrame); }
+		const from = open ? 0 : el.scrollHeight, to = open ? el.scrollHeight : 0;
+		el.style.height = from + "px"; void el.offsetHeight;
+		el.style.transition = "height .34s cubic-bezier(.2,.7,.2,1), opacity .26s ease";
+		el.style.height = to + "px"; el.style.opacity = open ? "1" : "0";
+		await new Promise((r) => { const done = () => { el.removeEventListener("transitionend", done); r(); }; el.addEventListener("transitionend", done); setTimeout(done, 420); });
+		if (open) { el.style.height = el.style.overflow = el.style.transition = el.style.opacity = ""; }
+	}
 
 	/* ---------------- toast ---------------- */
 	let toastT;
@@ -621,7 +663,7 @@
 	$("#back2").onclick = () => go(1);
 	$("#urlIn").addEventListener("input", (e) => ($("#urlGo").disabled = !e.target.value.trim()));
 	$("#urlForm").addEventListener("submit", (e) => { e.preventDefault(); const v = $("#urlIn").value.trim(); if (!v) return; $("#urlIn").value = ""; $("#urlGo").disabled = true; addLink(/^https?:\/\//i.test(v) ? v : "https://" + v); });
-	const pasteOpen = (on) => { $("#pasteBox").hidden = !on; $("#pasteBtn").setAttribute("aria-expanded", String(on)); if (on) $("#pasteIn").focus(); };
+	const pasteOpen = (on) => { $("#pasteBox").hidden = !on; $("#pasteBox").classList.toggle("open", on); $("#pasteBtn").setAttribute("aria-expanded", String(on)); if (on) $("#pasteIn").focus(); };
 	$("#pasteBtn").onclick = () => pasteOpen($("#pasteBox").hidden);
 	$("#pasteCancel").onclick = () => { pasteOpen(false); $("#pasteBtn").focus(); };
 	$("#pasteIn").addEventListener("input", (e) => ($("#pasteOk").disabled = e.target.value.trim().split(/\s+/).length < 30));
@@ -631,7 +673,7 @@
 	const fit = () => { ta.style.height = "auto"; ta.style.height = Math.min(ta.scrollHeight, 160) + "px"; goBtn.disabled = !ta.value.trim(); };
 	ta.addEventListener("input", fit);
 	ta.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#askForm").requestSubmit(); } });
-	$("#micBtn").onclick = () => recStart();
+	$("#micBtn").onclick = micTap;
 	$("#recX").onclick = () => recStop(false);
 	$("#recOk").onclick = () => recStop(true);
 	document.addEventListener("keydown", (e) => { if (rec.on && e.key === "Escape") recStop(false); });
@@ -639,7 +681,12 @@
 	document.addEventListener("click", async (e) => {
 		const rm = e.target.closest("[data-rm]");
 		if (rm) { const i = S.docs.findIndex((d) => d.fid === rm.dataset.rm), d = S.docs[i]; if (!d) return; const rep = S.report, turns = S.turns; S.docs.splice(i, 1); S.index = null; if (!S.docs.length) { S.report = null; S.turns = []; } renderAll(); scheduleReport(); toast(t("File removed."), t("Undo"), () => { S.docs.splice(i, 0, d); S.index = null; S.report = rep; S.turns = turns; renderAll(); }); return; }
-		const w = e.target.closest("[data-where]"); if (w) { const k = w.dataset.where; S.open.has(k) ? S.open.delete(k) : S.open.add(k); const inThread = w.closest("#thread"); inThread ? renderThread() : renderReport(); document.querySelector(`[data-where="${k}"]`)?.focus(); return; }
+		const w = e.target.closest("[data-where]");
+		if (w) {
+			const k = w.dataset.where, again = () => (w.closest("#thread") ? renderThread() : renderReport());
+			if (S.open.has(k)) { await slide(w.nextElementSibling, false); S.open.delete(k); again(); document.querySelector(`[data-where="${k}"]`)?.focus(); return; }
+			S.open.add(k); again(); const b = document.querySelector(`[data-where="${k}"]`); b?.focus(); slide(b?.nextElementSibling, true); return;
+		}
 		const tr = e.target.closest("[data-try]"); if (tr) return ask(t(tr.dataset.try));
 		const v = e.target.closest("[data-view]"); if (v) return view(v.dataset.view);
 		const x = e.target.closest("[data-tr]");

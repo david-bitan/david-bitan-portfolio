@@ -361,7 +361,11 @@ footer a { color: var(--link); }
 .rec-b:hover { border-color: var(--ink); }
 .rec-b.ok { background: var(--ink); color: #fff; border-color: var(--ink); }
 .rec-b:disabled { opacity: .45; cursor: default; }
-.wave { flex: 1; min-width: 0; height: 32px; }
+.rec-live { display: inline-flex; align-items: center; gap: 10px; padding: 0 12px; height: 42px; border-radius: var(--r-md); background: var(--paper); color: var(--ink); }
+.rec-fill { flex: 1; }
+.rec-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bad); animation: recdot 1.2s ease-in-out infinite; }
+@keyframes recdot { 50% { opacity: .35; } }
+.wave { flex: none; width: 150px; max-width: 34vw; height: 28px; }
 .rec-t { flex: none; font: 500 13.5px var(--mono); color: var(--ink-3); min-width: 3.2em; text-align: end; }
 .ask.recording textarea, .ask.recording .go, .ask.recording .mic { display: none; }
 .quota { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13.5px; color: var(--ink-3); margin: -48px 0 56px; }
@@ -372,6 +376,24 @@ footer a { color: var(--link); }
 .quota.out { color: var(--bad); } .quota.out .bar i { background: var(--bad); }
 .quota .i { width: 16px; height: 16px; }
 @media (max-width: 640px) { .rep-h .res-acts { flex: 1 1 100%; justify-content: flex-start; margin-inline-start: -10px; } }
+
+/* v0.9.1: the files you added stand out; quiet, smooth motion */
+.frow { background: #EEF4FC; border-color: #CADCF3; }
+.frow .file-ic { color: var(--link); }
+.files-wrap:has(.files:empty) { display: none; }
+.files-wrap .files { margin: 0; }
+.files-h { margin: 0 0 8px; font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
+.files-h[hidden] { display: none; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+.frow.new { animation: rise .32s var(--ease) both; }
+.page-in { animation: rise .36s var(--ease) both; }
+.rep.in { animation: fade .4s var(--ease) both; }
+.rep.in .box { animation: rise .42s var(--ease) both; }
+.rep.in .box:nth-child(2) { animation-delay: .05s; } .rep.in .box:nth-child(3) { animation-delay: .1s; } .rep.in .box:nth-child(4) { animation-delay: .15s; }
+.turn.new { animation: rise .32s var(--ease) both; }
+.paste.open { animation: rise .26s var(--ease) both; }
+.drop { transition: border-color .2s, background .2s, padding .3s var(--ease); }
 </style>
 </head>
 <body>
@@ -398,6 +420,8 @@ footer a { color: var(--link); }
 				<button class="btn btn-sm" type="submit" id="urlGo" disabled data-t="Add">Add</button>
 			</form>
 			<div class="sep" aria-hidden="true"><span data-t="or">or</span></div>
+			<div class="files-wrap"><p class="files-h" id="filesH" hidden></p>
+			<ul class="files" id="files" aria-live="polite"></ul></div>
 			<label class="drop" id="drop" for="fileIn">
 				<span data-ic="file-up"></span>
 				<b class="hide-m" id="dropTitle" data-t="Drop one or more files here">Drop one or more files here</b>
@@ -417,7 +441,6 @@ footer a { color: var(--link); }
 			<p class="sample-line" id="sample"><span data-ic="clipboard-list"></span><span><span data-t="No document at hand? Try Brevholt Kelmarion’s example contract:">No document at hand? Try Brevholt Kelmarion’s example contract:</span> <a class="lnk" href="samples/brevholt-kelmarion-employment-contract.pdf" download data-t="download it">download it</a> · <button type="button" class="lnk" id="openSample" data-t="open it directly">open it directly</button></span></p>
 		</div>
 
-		<ul class="files" id="files" aria-live="polite"></ul>
 		<div class="err" id="err1" role="alert" hidden></div>
 		<div class="nav-row">
 			<p class="privacy"><span data-ic="lock"></span><span data-t="Your file is read in this browser. Only the passages needed for an answer are sent to the AI, and nothing is kept: close the page and it’s gone. Demo — avoid very personal documents.">Your file is read in this browser.</span></p>
@@ -440,8 +463,8 @@ footer a { color: var(--link); }
 				<textarea id="q" rows="1" maxlength="300" data-t-ph="A question about this document?"></textarea>
 				<div class="rec" id="rec" hidden>
 					<button type="button" class="rec-b" id="recX" data-t-label="Cancel"><span data-ic="x"></span></button>
-					<canvas class="wave" id="wave" aria-hidden="true"></canvas>
-					<span class="rec-t" id="recT" aria-live="polite">0:00</span>
+					<span class="rec-live"><span class="rec-dot" aria-hidden="true"></span><canvas class="wave" id="wave" aria-hidden="true"></canvas><span class="rec-t" id="recT">0:00</span></span>
+					<span class="rec-fill"></span>
 					<button type="button" class="rec-b ok" id="recOk" data-t-label="Done"><span data-ic="check"></span></button>
 				</div>
 				<button class="mic" type="button" id="micBtn" data-t-label="Speak your question" hidden><span data-ic="mic"></span></button>

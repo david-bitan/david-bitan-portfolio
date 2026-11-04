@@ -18,7 +18,7 @@ const BASE = `You help people understand a document they received (a handbook, a
 Rules:
 - Every sentence must be fully supported by the passages it cites. Put the ids it relies on in "cite".
 - Never use outside knowledge, never guess, never give legal or medical advice.
-- Keep numbers, amounts, dates and durations exactly as in the passage, written with digits.
+- Keep the same numbers, amounts, dates and durations as in the passage, written with digits, but format them the way the OUTPUT LANGUAGE does (68,000 € is "68 000 €" in French and Russian, "68.000 €" in German, Spanish, Italian, Portuguese, Turkish and Indonesian; 9.99 is "9,99" in those languages). Never drop the thousands.
 - Short, plain sentences. Address the reader as "you". No markdown.
 - Write in the OUTPUT LANGUAGE, even if the document is in another language.
 Reply with ONE JSON object and nothing else. The JSON keys stay in English exactly as shown, whatever the output language.`;

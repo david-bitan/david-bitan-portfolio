@@ -1466,6 +1466,28 @@ window.MARGIN_I18N = (() => {
 	  "tr": "Bu ücretsiz demo, günlük yapay zekâ kotasını tüm ziyaretçiler arasında paylaştırır. Kota bittiğinde ertesi gün yenilenir.",
 	  "id": "Demo gratis ini membagi kuota AI harian ke semua pengunjung. Jika habis, kuota tersedia lagi keesokan harinya.",
 	  "he": "ההדגמה החינמית הזו מחלקת מכסת AI יומית בין כל המבקרים. כשהיא נגמרת, היא חוזרת למחרת."
+	 },
+	 "Your document": {
+	  "fr": "Votre document",
+	  "es": "Tu documento",
+	  "pt": "O seu documento",
+	  "de": "Ihr Dokument",
+	  "it": "Il tuo documento",
+	  "ru": "Ваш документ",
+	  "tr": "Belgeniz",
+	  "id": "Dokumen Anda",
+	  "he": "המסמך שלכם"
+	 },
+	 "Your documents ({n})": {
+	  "fr": "Vos documents ({n})",
+	  "es": "Tus documentos ({n})",
+	  "pt": "Os seus documentos ({n})",
+	  "de": "Ihre Dokumente ({n})",
+	  "it": "I tuoi documenti ({n})",
+	  "ru": "Ваши документы ({n})",
+	  "tr": "Belgeleriniz ({n})",
+	  "id": "Dokumen Anda ({n})",
+	  "he": "המסמכים שלכם ({n})"
 	 }
 	};
 	let lang = "en";
