@@ -268,16 +268,16 @@ window.MARGIN_I18N = (() => {
 	  "id": "Margin adalah produk fiktif yang dirancang dan dibuat oleh David Bitan untuk AI Lab miliknya. Brevholt Kelmarion dan dokumennya adalah rekaan.",
 	  "he": "Margin הוא מוצר בדוי שעוצב ונבנה על ידי דוד ביטן עבור ה־AI Lab שלו. ברבהולט קלמריון והמסמכים שלה בדויים."
 	 },
-	 "Margin reads your document, pulls out what matters — in your favour, against you, what to watch — and shows you exactly where it says it.": {
-	  "fr": "Margin lit votre document, en sort l’essentiel — en votre faveur, contre vous, à surveiller — et vous montre exactement où c’est écrit.",
-	  "es": "Margin lee tu documento, extrae lo importante —a tu favor, en tu contra, lo que hay que vigilar— y te muestra exactamente dónde lo dice.",
-	  "pt": "O Margin lê o seu documento, destaca o que importa — a seu favor, contra você, o que vigiar — e mostra exatamente onde está escrito.",
-	  "de": "Margin liest Ihr Dokument, hebt das Wichtige hervor – was für Sie spricht, was gegen Sie, worauf Sie achten müssen – und zeigt genau, wo es steht.",
-	  "it": "Margin legge il tuo documento, ne estrae ciò che conta — a tuo favore, contro di te, cosa tenere d’occhio — e ti mostra esattamente dove è scritto.",
-	  "ru": "Margin читает ваш документ, выделяет главное — что в вашу пользу, что против вас, за чем следить — и показывает, где именно это написано.",
-	  "tr": "Margin belgenizi okur, önemli olanı çıkarır — lehinize olanı, aleyhinize olanı, dikkat edilmesi gerekenleri — ve tam olarak nerede yazdığını gösterir.",
-	  "id": "Margin membaca dokumen Anda, mengambil hal penting — yang menguntungkan, merugikan, dan perlu diwaspadai — lalu menunjukkan persis di mana tertulisnya.",
-	  "he": "Margin קורא את המסמך שלכם, מוציא את מה שחשוב — לטובתכם, נגדכם, למה לשים לב — ומראה בדיוק איפה זה כתוב."
+	 "Margin reads your document, explains what matters in plain words — your rights, your commitments, the key dates — and shows you exactly where it says it.": {
+	  "fr": "Margin lit votre document, vous en explique l’essentiel en mots simples — vos droits, vos engagements, les dates clés — et vous montre exactement où c’est écrit.",
+	  "es": "Margin lee tu documento, te explica lo importante con palabras sencillas —tus derechos, tus compromisos, las fechas clave— y te muestra exactamente dónde lo dice.",
+	  "pt": "O Margin lê o seu documento, explica o essencial em palavras simples — os seus direitos, os seus compromissos, as datas importantes — e mostra exatamente onde está escrito.",
+	  "de": "Margin liest Ihr Dokument, erklärt das Wichtigste in einfachen Worten – Ihre Rechte, Ihre Verpflichtungen, die wichtigen Termine – und zeigt genau, wo es steht.",
+	  "it": "Margin legge il tuo documento, ti spiega l’essenziale con parole semplici — i tuoi diritti, i tuoi impegni, le date chiave — e ti mostra esattamente dove è scritto.",
+	  "ru": "Margin читает ваш документ, простыми словами объясняет главное — ваши права, ваши обязательства, ключевые даты — и показывает, где именно это написано.",
+	  "tr": "Margin belgenizi okur, önemli olanı sade bir dille açıklar — haklarınızı, yükümlülüklerinizi, önemli tarihleri — ve tam olarak nerede yazdığını gösterir.",
+	  "id": "Margin membaca dokumen Anda, menjelaskan hal penting dengan kata-kata sederhana — hak Anda, kewajiban Anda, tanggal-tanggal penting — lalu menunjukkan persis di mana tertulisnya.",
+	  "he": "Margin קורא את המסמך שלכם, מסביר את העיקר במילים פשוטות — הזכויות שלכם, ההתחייבויות שלכם, התאריכים החשובים — ומראה בדיוק איפה זה כתוב."
 	 },
 	 "No document at hand? Try Brevholt Kelmarion’s example contract:": {
 	  "fr": "Pas de document sous la main ? Essayez le contrat d’exemple de Brevholt Kelmarion :",

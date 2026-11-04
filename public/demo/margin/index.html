@@ -394,6 +394,11 @@ footer a { color: var(--link); }
 .turn.new { animation: rise .32s var(--ease) both; }
 .paste.open { animation: rise .26s var(--ease) both; }
 .drop { transition: border-color .2s, background .2s, padding .3s var(--ease); }
+
+/* the footer always sits at the bottom of the window, even when the page is short */
+body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+body > main { flex: 1 0 auto; width: 100%; box-sizing: border-box; }
+body > footer { flex: none; }
 </style>
 </head>
 <body>
@@ -410,7 +415,7 @@ footer a { color: var(--link); }
 <main class="wrap">
 	<section id="p1">
 		<h1 data-t="Your document, analysed and explained in a few clicks.">Your document, analysed and explained in a few clicks.</h1>
-		<p class="lead" data-t="Margin reads your document, pulls out what matters — in your favour, against you, what to watch — and shows you exactly where it says it.">Margin reads your document, pulls out what matters — in your favour, against you, what to watch — and shows you exactly where it says it.</p>
+		<p class="lead" data-t="Margin reads your document, explains what matters in plain words — your rights, your commitments, the key dates — and shows you exactly where it says it.">Margin reads your document, explains what matters in plain words — your rights, your commitments, the key dates — and shows you exactly where it says it.</p>
 
 		<div class="inputs">
 			<form class="url" id="urlForm" autocomplete="off">
