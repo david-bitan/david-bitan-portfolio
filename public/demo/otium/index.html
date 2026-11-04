@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Otium — Trips planned for you, decided by you</title>
+<title>Otium: Trips planned for you, decided by you</title>
 <meta name="description" content="Otium is a fictional AI travel agent by David Bitan: it plans and holds a short trip, and asks before it pays, shares data or goes over budget.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23982427'/%3E%3Cpath d='M7 19a9 9 0 0 1 18 0' fill='none' stroke='%23FBF8F3' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -1428,14 +1428,14 @@ body.touring #tourCard { pointer-events: auto; }
 		<div class="how">
 			<article>
 				<div class="art" style="--t:#E4F3EB" aria-hidden="true"><div class="mini mini-steps"><div><i data-i="check"></i><span>Find flights from Paris</span><em>Automatic</em></div><div><i data-i="check"></i><span>Find a place to stay</span><em>Automatic</em></div><div class="wait"><i data-i="hand"></i><span>Hold flights and stay</span><em>Needs you</em></div></div></div>
-				<span class="n">01</span><h3>It shows its plan first</h3><p>Every step, its cost and whether it needs you — before anything happens.</p>
+				<span class="n">01</span><h3>It shows its plan first</h3><p>Every step, its cost and whether it needs you: before anything happens.</p>
 			</article>
 			<article>
 				<div class="art" style="--t:#FBEAED" aria-hidden="true"><div class="mini mini-ask"><b>Approve this payment?</b><strong id="artPay">€583</strong><div><span class="y">Approve</span><span class="n">Not now</span></div></div></div>
 				<span class="n">02</span><h3>It asks when it matters</h3><p>Searching runs on its own. Paying and sharing your details always wait for a yes.</p>
 			</article>
 			<article>
-				<div class="art" style="--t:#E4EFF7" aria-hidden="true"><div class="mini mini-undo"><div><i data-i="plane"></i><span>Aerolume · 07:10</span><span class="c"><i data-i="undo-2"></i>Cancel</span></div><div><i data-i="hotel"></i><span>Rua Nova Rooms</span><span class="c"><i data-i="undo-2"></i>Cancel</span></div><p><i data-i="check"></i>Cancelled — £327 back</p></div></div>
+				<div class="art" style="--t:#E4EFF7" aria-hidden="true"><div class="mini mini-undo"><div><i data-i="plane"></i><span>Aerolume · 07:10</span><span class="c"><i data-i="undo-2"></i>Cancel</span></div><div><i data-i="hotel"></i><span>Rua Nova Rooms</span><span class="c"><i data-i="undo-2"></i>Cancel</span></div><p><i data-i="check"></i>Cancelled: £327 back</p></div></div>
 				<span class="n">03</span><h3>Nothing is final</h3><p>Full history, undo on every action, and a budget it can’t exceed.</p>
 			</article>
 		</div>
@@ -1499,7 +1499,7 @@ body.touring #tourCard { pointer-events: auto; }
 <div class="scrim" id="scrim" hidden></div>
 
 <a class="pf-fab" href="/#ai-lab" aria-label="Back to portfolio"><i data-i="arrow-left"></i><span class="lbl">Back to portfolio</span></a>
-<button class="help-fab" id="openHelp" data-help type="button" aria-label="Help — talk to a human"><i data-i="circle-help"></i><span class="lbl">Help</span><span class="bot-tip" aria-hidden="true">Talk to a human, 24/7</span></button>
+<button class="help-fab" id="openHelp" data-help type="button" aria-label="Help: talk to a human"><i data-i="circle-help"></i><span class="lbl">Help</span><span class="bot-tip" aria-hidden="true">Talk to a human, 24/7</span></button>
 <button class="bot-fab" id="botFab" type="button" aria-label="Ask T-Bot, your trip helper"><i data-i="bot"></i><span class="lbl">Ask T-Bot</span><span class="bot-tip" aria-hidden="true">Stuck? Ask T-Bot</span></button>
 <aside class="drawer bot-d" id="botDrawer" aria-label="T-Bot" aria-hidden="true">
 	<div class="drawer-h"><div class="bot-h"><span class="bot-av"><i data-i="bot"></i></span><div><h2>T-Bot</h2><small id="botMode">Your trip helper</small></div></div><button class="icon-btn" data-close aria-label="Close"><i data-i="x"></i></button></div>
@@ -1524,7 +1524,7 @@ body.touring #tourCard { pointer-events: auto; }
 </aside>
 <aside class="drawer" id="notesDrawer" aria-label="Notifications" aria-hidden="true">
 	<div class="drawer-h"><h2>Notifications</h2><div style="display:flex;gap:8px;align-items:center"><button class="btn btn-ghost btn-sm" id="clearNotes" type="button">Clear all</button><button class="icon-btn" data-close aria-label="Close"><i data-i="x"></i></button></div></div>
-	<div class="drawer-b"><p style="margin:0 0 6px;font-size:13px;color:var(--ink-2)">Pin a message to keep it — “Clear all” removes only the others.</p><ul class="notes" id="notes"></ul></div>
+	<div class="drawer-b"><p style="margin:0 0 6px;font-size:13px;color:var(--ink-2)">Pin a message to keep it: “Clear all” removes only the others.</p><ul class="notes" id="notes"></ul></div>
 </aside>
 <aside class="drawer" id="casesDrawer" aria-label="Tricky situations" aria-hidden="true">
 	<div class="drawer-h"><h2>Tricky situations</h2><button class="icon-btn" data-close aria-label="Close"><i data-i="x"></i></button></div>
@@ -1537,7 +1537,7 @@ body.touring #tourCard { pointer-events: auto; }
 
 <div class="modal" id="modal" hidden><div class="box" role="dialog" aria-modal="true" aria-labelledby="modalTitle" id="modalBox"></div></div>
 <div class="toast" id="toast" role="status"></div>
-<div class="postit" id="postit" role="status" hidden><span class="pin"><i data-i="info"></i></span><div><b>This is a demo — relax.</b><span>Nothing you do here is booked, charged or sent anywhere. Airlines, hotels and prices are invented.</span></div><button type="button" id="postitX" aria-label="Got it">Got it</button></div>
+<div class="postit" id="postit" role="status" hidden><span class="pin"><i data-i="info"></i></span><div><b>This is a demo: relax.</b><span>Nothing you do here is booked, charged or sent anywhere. Airlines, hotels and prices are invented.</span></div><button type="button" id="postitX" aria-label="Got it">Got it</button></div>
 
 <button class="needs-you" id="needsYou" type="button"><span><i data-i="hand"></i> Otium is waiting for your OK</span><span class="ny-go">Show me <i data-i="arrow-right"></i></span></button>
 

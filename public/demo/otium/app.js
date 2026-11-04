@@ -126,7 +126,7 @@
 			renderTrip(); renderLog(); renderCase();
 			setStatus(S.status, tr.statusTxt);
 			const w = tr.wake; tr.wake = null; w?.();
-			if (tr.restored) { tr.restored = false; if (!S.progress?.done && S.plan && (S.status === "waiting" || S.status === "working")) { $("#notice").innerHTML = `<div class="notice resume-n">${ICON.info}<span>${t("You left while Otium was on this step. Nothing was paid or sent in the meantime.")}</span><button type="button" class="btn btn-primary btn-sm" id="resumeTrip">${t("Pick up where it stopped")}</button></div>`; $("#resumeTrip").onclick = resumeTrip; setStatus("idle", t("Paused — pick up when you’re ready")); } }
+			if (tr.restored) { tr.restored = false; if (!S.progress?.done && S.plan && (S.status === "waiting" || S.status === "working")) { $("#notice").innerHTML = `<div class="notice resume-n">${ICON.info}<span>${t("You left while Otium was on this step. Nothing was paid or sent in the meantime.")}</span><button type="button" class="btn btn-primary btn-sm" id="resumeTrip">${t("Pick up where it stopped")}</button></div>`; $("#resumeTrip").onclick = resumeTrip; setStatus("idle", t("Paused: pick up when you’re ready")); } }
 		}
 		show("trip");
 	}
@@ -605,7 +605,7 @@
 				const other = intent.city === "other";
 				s.detail(other ? t("{place} isn’t covered in this demo yet.", { place: esc(intent.askedPlace || t("That place")) }) : t("One thing I need before I start."));
 				setStatus("waiting", t("Waiting for you"));
-				const slot = s.slot(`<div class="card ask"><h4>${t(other ? "Pick one of these instead?" : "Where would you like to go?")}</h4><p>${t(other ? "Otium plans 32 cities for now. I won’t guess on your behalf." : "Pick a city — I’ll keep the rest of what you said.")}</p><div class="city-pick">${Object.keys(D.cities).slice(0, 8).map((k) => `<button data-choice="${k}">${pic(thumbOf(D.cities[k].photo), k)}<span>${D.cities[k].name}</span></button>`).join("")}</div></div>`);
+				const slot = s.slot(`<div class="card ask"><h4>${t(other ? "Pick one of these instead?" : "Where would you like to go?")}</h4><p>${t(other ? "Otium plans 32 cities for now. I won’t guess on your behalf." : "Pick a city: I’ll keep the rest of what you said.")}</p><div class="city-pick">${Object.keys(D.cities).slice(0, 8).map((k) => `<button data-choice="${k}">${pic(thumbOf(D.cities[k].photo), k)}<span>${D.cities[k].name}</span></button>`).join("")}</div></div>`);
 				const city = await decide(slot);
 				if (id !== S.run) throw new Stale();
 				intent.city = city; slot.innerHTML = "";
@@ -639,9 +639,9 @@
 			for (const a of D.airlines) { await beat(id, 380); s.sub(t("Checked {a}", { a })); }
 			const opts = flightOptions(p.city, S.origin, p.travelers);
 			const best = bestFlight(opts); p.flight = best.i;
-			if (!best.fits) s.sub(t("No flight matched every filter — picked the closest"));
+			if (!best.fits) s.sub(t("No flight matched every filter: picked the closest"));
 			await beat(id, 300);
-			s.set("done"); s.detail(t("Picked {a}, {d} — {cabin}, {kind}, cheapest that matches your filters. Two other options kept.", { a: esc(opts[p.flight].airline), d: opts[p.flight].dep, cabin: t(opts[p.flight].cabin).toLowerCase(), kind: t(opts[p.flight].kind).toLowerCase() }));
+			s.set("done"); s.detail(t("Picked {a}, {d}: {cabin}, {kind}, cheapest that matches your filters. Two other options kept.", { a: esc(opts[p.flight].airline), d: opts[p.flight].dep, cabin: t(opts[p.flight].cabin).toLowerCase(), kind: t(opts[p.flight].kind).toLowerCase() }));
 			S.progress.flights = "ready"; renderTrip();
 			log("Otium", t("Compared 3 flights, picked {a} {d}", { a: opts[p.flight].airline, d: opts[p.flight].dep }));
 			if (S.settings.autonomy === "all") await confirmChoice(id, s, "flight");
@@ -657,7 +657,7 @@
 			p.stay = pickStay(p);
 			await beat(id, 350);
 			const st = c.stays.find((x) => x.id === p.stay);
-			s.set("done"); s.detail(t("{name} in {area} — best rated that fits your cap.", { name: esc(st.name), area: esc(st.area) }));
+			s.set("done"); s.detail(t("{name} in {area}: best rated that fits your cap.", { name: esc(st.name), area: esc(st.area) }));
 			S.progress.stay = "ready"; renderTrip();
 			log("Otium", t("Picked {name}, {price}/night", { name: st.name, price: eur(st.nightly) }));
 			if (S.settings.autonomy === "all") await confirmChoice(id, s, "stay");
@@ -681,7 +681,7 @@
 			await beat(id, 500);
 			let k = costs(p);
 			while (k.total > p.cap) {
-				s.set("blocked"); setStatus("waiting", t("Stopped — over your budget cap"));
+				s.set("blocked"); setStatus("waiting", t("Stopped: over your budget cap"));
 				s.detail(t("This plan is {x} over your cap. I stopped instead of going over.", { x: `<b class="num">${eur(k.total - p.cap)}</b>` }));
 				const cheaper = c.stays.filter((x) => x.nightly < k.st.nightly).sort((a, b) => b.rating - a.rating)[0];
 				const choices = [];
@@ -692,7 +692,7 @@
 				const raise = roundLocal(k.total, 50, true);
 				choices.push(["cap", t("Raise my cap to {x}", { x: eur(raise) }), t("Keep the plan as it is"), 0]);
 				renderTrip();
-				const slot = s.slot(`<div class="card warn"><h4>${t("Over budget by {x}", { x: eur(k.total - p.cap) })}</h4><p>${t("Pick one — I won’t choose for you when it’s your money.")} <button class="linkish" data-help>${t("Or ask a person")}</button></p><div class="opts">${choices.map(([v, t, sm, d]) => `<button class="opt" data-choice="${v}"><span>${esc(t)}<small>${esc(sm)}</small></span>${d ? `<span class="diff down num">${d < 0 ? "−" : "+"}${eur(Math.abs(d))}</span>` : ""}</button>`).join("")}</div></div>`);
+				const slot = s.slot(`<div class="card warn"><h4>${t("Over budget by {x}", { x: eur(k.total - p.cap) })}</h4><p>${t("Pick one: I won’t choose for you when it’s your money.")} <button class="linkish" data-help>${t("Or ask a person")}</button></p><div class="opts">${choices.map(([v, t, sm, d]) => `<button class="opt" data-choice="${v}"><span>${esc(t)}<small>${esc(sm)}</small></span>${d ? `<span class="diff down num">${d < 0 ? "−" : "+"}${eur(Math.abs(d))}</span>` : ""}</button>`).join("")}</div></div>`);
 				const ch = await decide(slot);
 				if (id !== S.run) throw new Stale();
 				slot.innerHTML = "";
@@ -706,7 +706,7 @@
 				await beat(id, 400);
 				k = costs(p);
 			}
-			s.set("done"); s.detail(t("{x} all in — {y} under your cap.", { x: eur(k.total), y: `<b class="num">${eur(p.cap - k.total)}</b>` }));
+			s.set("done"); s.detail(t("{x} all in: {y} under your cap.", { x: eur(k.total), y: `<b class="num">${eur(p.cap - k.total)}</b>` }));
 			renderTrip();
 		}
 
@@ -728,7 +728,7 @@
 				if (ch === "profile") { goAccount(); await profileReady(); }
 				await beat(id, 0); // waits here if this trip was set aside meanwhile
 				S.progress.needDetails = false;
-				log("Otium", t("Details complete — back to the payment"));
+				log("Otium", t("Details complete: back to the payment"));
 			}
 			S.progress.needDetails = false;
 			for (;;) {
@@ -739,7 +739,7 @@
 				const dates = tripDates(p.nights);
 				const reprice = approvedAmount != null && k.hold !== approvedAmount;
 				const slot = s.slot(`<div class="card ask" role="group" aria-label="${t("Approve payment")}">
-					<h4>${t(reprice ? "The price changed — approve the new total?" : "Approve this payment?")}</h4>
+					<h4>${t(reprice ? "The price changed: approve the new total?" : "Approve this payment?")}</h4>
 					<div class="amount num">${eur(k.hold)} ${reprice ? `<span class="diff num">+${eur(k.hold - approvedAmount)}</span>` : ""}</div>
 					<ul class="what">
 						<li><span>${esc(k.fl.airline)} · ${k.fl.dep} · ${P(p.travelers, "1 seat", "{n} seats")}</span><span class="num">${eur(k.flights)}</span></li>
@@ -748,10 +748,10 @@
 						<li><span>${t("Paid with")}</span><span>${esc(cardLabel())}</span></li>${S.progress.coOk ? `<li class="co-ok"><span>${ICON.check} ${t("{n} approved", { n: esc(S.progress.coOk) })}</span><span>${t("Your OK is the last one")}</span></li>` : ""}
 					</ul>
 					<div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Approve {x}", { x: eur(k.hold) })}</button><button class="btn btn-ghost btn-sm" data-choice="edit">${t("Change something")}</button>${p.travelers > 1 && !S.progress.coOk ? `<button class="btn btn-ghost btn-sm" data-choice="co">${ic("user")}${t("Ask a co-traveller too")}</button>` : ""}<button class="btn btn-text btn-sm" data-choice="no">${t("Not now")}</button></div>
-					<p class="fine">${ICON.lock}<span>${t("Simulated payment — nothing is charged in this demo. Tickets for activities ({x}) are not part of this payment.", { x: eur(k.tickets) })}</span></p>
+					<p class="fine">${ICON.lock}<span>${t("Simulated payment: nothing is charged in this demo. Tickets for activities ({x}) are not part of this payment.", { x: eur(k.tickets) })}</span></p>
 				</div>`);
 				const auto = S.settings.autonomy === "limit" && !reprice && k.hold <= S.settings.autoLimit && !S.progress.coWait;
-				const ch = auto ? ($("#step-hold") && ($("#step-hold").dataset.auto = "1"), S.progress.autoPaid = true, slot.innerHTML = "", s.detail(t("Approved automatically: under your {x} limit (your setting). You can cancel it from this page.", { x: eur(S.settings.autoLimit) })), log("Otium", t("Auto-approved {x} — under your limit", { x: eur(k.hold) })), "yes") : await decide(slot);
+				const ch = auto ? ($("#step-hold") && ($("#step-hold").dataset.auto = "1"), S.progress.autoPaid = true, slot.innerHTML = "", s.detail(t("Approved automatically: under your {x} limit (your setting). You can cancel it from this page.", { x: eur(S.settings.autoLimit) })), log("Otium", t("Auto-approved {x}: under your limit", { x: eur(k.hold) })), "yes") : await decide(slot);
 				if (id !== S.run) throw new Stale();
 				if (ch === "co") {
 					const name = await new Promise((r) => modal(`<h3 id="modalTitle">${t("Who else should approve?")}</h3><p>${t("They get a link to this payment. Otium waits for both of you. Demo: nothing is sent.")}</p><div class="flds two"><label class="fld"><span>${t("Name")}</span><input id="coName" autocomplete="off"></label><label class="fld"><span>${t("Email")}</span><input id="coMail" type="email" autocomplete="off"></label></div><div class="row"><button class="btn btn-text btn-sm" data-m="cancel">${t("Cancel")}</button><button class="btn btn-primary btn-sm" data-m="ok">${t("Ask them")}</button></div>`, (res) => r(res === "ok" ? ($("#coName")?.value.trim() || t("Your travel partner")) : null)));
@@ -763,12 +763,12 @@
 				if (ch === "no") {
 					slot.innerHTML = `<div class="card"><h4>${t("Nothing booked.")}</h4><p>${t("Your plan is saved as a draft. Prices may change.")}</p><div class="row"><button class="btn btn-ghost btn-sm" data-choice="again">${t("Review it again")}</button><button class="btn btn-text btn-sm" data-choice="cheaper">${t("Find something cheaper")}</button></div></div>`;
 					s.set("skipped"); s.detail(t("You declined. No money moved."));
-					setStatus("waiting", t("Draft saved — nothing booked"));
+					setStatus("waiting", t("Draft saved: nothing booked"));
 					S.progress.pendingHold = false; renderTrip();
 					log("You", t("Declined the {x} payment", { x: eur(k.hold) }));
 					const n = await decide(slot);
 					if (id !== S.run) throw new Stale();
-					if (n === "cheaper") { p.cap = Math.max(fromLocal(200 * cur()[2]), roundLocal(costs(p).total * 0.8)); p.assumed.cap = false; log("You", t("Asked for cheaper — cap set to {x}", { x: eur(p.cap) })); renderUnderstood(); restartFrom("stay"); return; }
+					if (n === "cheaper") { p.cap = Math.max(fromLocal(200 * cur()[2]), roundLocal(costs(p).total * 0.8)); p.assumed.cap = false; log("You", t("Asked for cheaper: cap set to {x}", { x: eur(p.cap) })); renderUnderstood(); restartFrom("stay"); return; }
 					slot.innerHTML = ""; setStatus("working", t("Working on it…")); continue;
 				}
 				approvedAmount = k.hold;
@@ -780,14 +780,14 @@
 					await beat(id, 900);
 					S.progress.soldoutDone = true;
 					const nx = flightOptions(p.city, S.origin, p.travelers).filter((o) => o.i !== p.flight && o.kind === "Direct")[0];
-					s.set("blocked"); setStatus("waiting", t("A flight sold out — waiting for you"));
+					s.set("blocked"); setStatus("waiting", t("A flight sold out: waiting for you"));
 					s.detail(t("The {d} {a} flight sold out while I was holding it. Nothing was charged.", { d: k.fl.dep, a: esc(k.fl.airline) }));
-					log("Otium", t("{a} {d} sold out — nothing charged", { a: k.fl.airline, d: k.fl.dep }));
+					log("Otium", t("{a} {d} sold out: nothing charged", { a: k.fl.airline, d: k.fl.dep }));
 					const sl2 = s.slot(`<div class="card warn"><h4>${t("Plan B: {a} at {d}", { a: esc(nx.airline), d: nx.dep })}</h4><p>${t("Same day, direct. It costs more than what you approved, so I need you again.")} <button class="linkish" data-help>${t("Prefer a person?")}</button></p><div class="row"><button class="btn btn-amber btn-sm" data-choice="b">${t("Use plan B")}</button><button class="btn btn-text btn-sm" data-choice="stop">${t("Stop here")}</button></div></div>`);
 					const b = await decide(sl2);
 					if (id !== S.run) throw new Stale();
 					sl2.innerHTML = "";
-					if (b === "stop") { s.set("skipped"); s.detail(t("Stopped. Nothing booked.")); setStatus("waiting", t("Stopped — nothing booked")); return; }
+					if (b === "stop") { s.set("skipped"); s.detail(t("Stopped. Nothing booked.")); setStatus("waiting", t("Stopped: nothing booked")); return; }
 					p.flight = nx.i; renderTrip(); continue;
 				}
 				await beat(id, 600); s.sub(t("Holding {x}", { x: k.st.name }));
@@ -809,7 +809,7 @@
 			const s = addStep("share", t("Send traveller details to {a}", { a: k.fl.airline }), "ok");
 			s.set("ask"); setStatus("waiting", t("Waiting for your OK"));
 			s.detail(t("Airlines need names and passport numbers to issue tickets."));
-			const slot = s.slot(`<div class="card ask"><h4>${t("Share your details with {a}?", { a: esc(k.fl.airline) })}</h4>${p.travelers > 1 ? namesForm(p) : ""}<ul class="what"><li><span>${t("Full names")}</span><span>${esc(fullName())}${p.travelers > 1 ? ` +${p.travelers - 1}` : ""}</span></li>${ME.assist ? `<li><span>${t("Travel assistance")}</span><span>${t((ASSIST.find((a) => a[0] === ME.assist) || ["", "None"])[1])}</span></li>` : ""}<li><span>${t("Passport numbers")}</span><span>${t("From your profile")}</span></li><li><span>${t("Phone, for delay alerts")}</span><span>${t("Optional")}</span></li></ul><div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Share and issue tickets")}</button><button class="btn btn-ghost btn-sm" data-choice="noPhone">${t("Share without phone")}</button><button class="btn btn-text btn-sm" data-choice="later">${t("I’ll do it myself")}</button></div><p class="fine">${ICON.lock}<span>${t("Shared with the airline only, for this booking. Demo — no data is entered or sent.")}</span></p></div>`);
+			const slot = s.slot(`<div class="card ask"><h4>${t("Share your details with {a}?", { a: esc(k.fl.airline) })}</h4>${p.travelers > 1 ? namesForm(p) : ""}<ul class="what"><li><span>${t("Full names")}</span><span>${esc(fullName())}${p.travelers > 1 ? ` +${p.travelers - 1}` : ""}</span></li>${ME.assist ? `<li><span>${t("Travel assistance")}</span><span>${t((ASSIST.find((a) => a[0] === ME.assist) || ["", "None"])[1])}</span></li>` : ""}<li><span>${t("Passport numbers")}</span><span>${t("From your profile")}</span></li><li><span>${t("Phone, for delay alerts")}</span><span>${t("Optional")}</span></li></ul><div class="row"><button class="btn btn-amber btn-sm" data-choice="yes">${t("Share and issue tickets")}</button><button class="btn btn-ghost btn-sm" data-choice="noPhone">${t("Share without phone")}</button><button class="btn btn-text btn-sm" data-choice="later">${t("I’ll do it myself")}</button></div><p class="fine">${ICON.lock}<span>${t("Shared with the airline only, for this booking. Demo: no data is entered or sent.")}</span></p></div>`);
 			let ch;
 			for (;;) {
 				ch = await decide(slot); if (id !== S.run) throw new Stale();
@@ -834,7 +834,7 @@
 		await beat(id, 350);
 		const s = addStep("done", t("Trip ready"), null);
 		s.set("done"); s.detail(t("Everything is in the trip history, and every booking can be cancelled from this page."));
-		setStatus("done", t("Done — nothing else needs you"));
+		setStatus("done", t("Done: nothing else needs you"));
 		S.progress.done = true; renderTrip();
 		showDone();
 		watchPrices(id);
@@ -855,10 +855,10 @@
 			const ch = await decide(slot); if (id !== S.run) return; slot.innerHTML = "";
 			if (ch === "yes") {
 				const before = { ...S.held.stay }; S.held.stay.amount -= drop; S.held.stay.code = code();
-				w.set("done"); w.detail(t("Rebooked at the lower price. You saved {x}.", { x: eur(drop) })); log("You", t("Rebooked the stay — saved {x}", { x: eur(drop) }), "stay");
-				renderTrip(); toast(t("Rebooked — you saved {x}.", { x: eur(drop) }), t("Undo"), () => { S.held.stay = before; renderTrip(); w.detail(t("Back to your original booking.")); });
+				w.set("done"); w.detail(t("Rebooked at the lower price. You saved {x}.", { x: eur(drop) })); log("You", t("Rebooked the stay: saved {x}", { x: eur(drop) }), "stay");
+				renderTrip(); toast(t("Rebooked: you saved {x}.", { x: eur(drop) }), t("Undo"), () => { S.held.stay = before; renderTrip(); w.detail(t("Back to your original booking.")); });
 			} else { w.set("skipped"); w.detail(t("Kept your booking. Otium keeps watching.")); log("You", t("Kept the original stay price")); }
-			setStatus("done", t("Done — nothing else needs you"));
+			setStatus("done", t("Done: nothing else needs you"));
 		} catch {}
 	}
 	function restartFrom(stepKey) {
@@ -877,7 +877,7 @@
 	const waitEdit = () => new Promise((r) => (editResolve = r));
 	function failSafe() {
 		setTimeout(botNudge, 600);
-		setStatus("paused", t("Something went wrong — nothing was booked"));
+		setStatus("paused", t("Something went wrong: nothing was booked"));
 		$("#notice").innerHTML = `<div class="notice">${ICON.info}<span>${t("Otium hit an error and stopped. Nothing was booked or charged.")} <button class="btn btn-ghost btn-sm" id="retry">${t("Try again")}</button></span></div>`;
 		$("#retry").onclick = () => start(S.text, true);
 	}
@@ -915,7 +915,7 @@
 		const fact = (key, vals, cur, label) => dd("k", key, vals, cur, t(label), p.assumed[key] ? "assumed" : "");
 		const pref = (key, vals, label) => dd("p", key, vals, p.prefs[key], t(label), "pref");
 		const caps = [...new Set([...capList(), p.cap])].sort((a, b) => a - b);
-		box.innerHTML = `<div class="lbl"><span>${t("WHAT I UNDERSTOOD")}</span><span ${S.aiUsed ? "" : `title="${esc(t("Smart reading is offline right now, so Otium used basic matching. Check the details below — you can change any of them."))}"`}>${t(S.aiUsed ? "Read by AI" : "Basic matching")}</span></div>
+		box.innerHTML = `<div class="lbl"><span>${t("WHAT I UNDERSTOOD")}</span><span ${S.aiUsed ? "" : `title="${esc(t("Smart reading is offline right now, so Otium used basic matching. Check the details below: you can change any of them."))}"`}>${t(S.aiUsed ? "Read by AI" : "Basic matching")}</span></div>
 			<p>${esc(S.text)}</p>
 			<div class="facts">
 				${fact("city", Object.keys(D.cities).map((k) => [k, D.cities[k].name, D.cities[k].country]), p.city, "Destination")}
@@ -930,7 +930,7 @@
 				${pref("bags", [[0, t("Cabin bag only")], [1, t("+ checked bag")]], "Bags")}
 				${pref("time", [["any", t("Any time")], ["morning", t("Morning departure")], ["evening", t("Evening departure")]], "Departure time")}
 			</div>
-			${Object.values(p.assumed).some(Boolean) ? `<div class="legend">${t("Dashed = I assumed it. Tap any value to change it — I’ll re-plan.")}</div>` : ""}`;
+			${Object.values(p.assumed).some(Boolean) ? `<div class="legend">${t("Dashed = I assumed it. Tap any value to change it: I’ll re-plan.")}</div>` : ""}`;
 	}
 	function pickFact(kind, key, raw, label) {
 		if (kind === "b") { BUD[key] = +raw; renderBudget(Boolean($("#budgetOut").innerHTML)); return; }
@@ -1264,7 +1264,7 @@
 		b.innerHTML = ME.signedIn
 			? `<span class="av">${esc((ME.first[0] || ME.email[0] || "?").toUpperCase())}${esc((ME.last[0] || "").toUpperCase())}</span><span class="lbl">${esc(ME.first || t("My profile"))}</span>${done ? "" : '<span class="tdot" aria-hidden="true"></span>'}`
 			: `${ic("user")}<span class="lbl">${t("Sign in")}</span>`;
-		b.setAttribute("aria-label", ME.signedIn ? t(done ? "My profile" : "My profile — details missing") : t("Sign in"));
+		b.setAttribute("aria-label", ME.signedIn ? t(done ? "My profile" : "My profile: details missing") : t("Sign in"));
 		const h = $("#acctHint"); if (!h) return;
 		h.hidden = done;
 		h.innerHTML = done ? "" : `${ic(ME.signedIn ? "credit-card" : "user")}<span>${t(ME.signedIn ? "Finish your profile so Otium can pay the moment you approve." : "Create an account or sign in: Otium will fill in your details for you.")}</span>${ME.signedIn ? `<button type="button" class="btn btn-ghost btn-sm" data-acct>${t("Complete my profile")}</button>` : `<button type="button" class="btn btn-primary btn-sm" data-signup>${t("Sign up")}</button><button type="button" class="btn btn-ghost btn-sm" data-acct>${t("Sign in")}</button>`}`;
@@ -1317,7 +1317,7 @@
 	function renderProfile() {
 		const w = $("#profWrap"); if (!w) return;
 		$("#profSub").textContent = ME.signedIn ? ME.email : t("Sign in to save your details and card.");
-		if (!ME.signedIn) { w.innerHTML = `<div class="tempty">${ic("user")}<h3>${t("You’re not signed in")}</h3><p>${t("Sign in once — Otium fills in your details and card when it books.")}</p><button class="btn btn-primary" type="button" data-acct>${t("Sign in")}</button></div>`; return; }
+		if (!ME.signedIn) { w.innerHTML = `<div class="tempty">${ic("user")}<h3>${t("You’re not signed in")}</h3><p>${t("Sign in once: Otium fills in your details and card when it books.")}</p><button class="btn btn-primary" type="button" data-acct>${t("Sign in")}</button></div>`; return; }
 		const m = profileParts(); const n = Object.values(m).filter(Boolean).length;
 		const wt = waitingTrip();
 		const chip = (ok, label) => `<span class="pchip ${ok ? "ok" : ""}">${ic(ok ? "check" : "circle-dot")}${t(label)}</span>`;
@@ -1491,7 +1491,7 @@
 			<ul class="si-facts"><li>${ic(m.kind === "hotel" || m.kind === "guest" ? "bed-double" : "ruler")}<span>${size}</span></li><li>${ic("palette")}<span>${t("Design: {x}", { x: t(m.style) })}</span></li><li>${ic("sun")}<span>${esc(st.perk)}</span></li></ul>
 			<h4>${t("What’s included")}</h4><ul class="si-amen">${m.amen.map((a) => `<li>${ic(AMEN[a][0])}<span>${t(AMEN[a][1])}</span></li>`).join("")}</ul>
 			<div class="si-price"><div><b class="num">${eur(st.nightly)}</b> ${t("per night")}</div><span class="tag ${st.freeCancel ? "g" : "r"}">${t(st.freeCancel ? "Free cancellation" : "Non-refundable")}</span></div>
-			<p class="fine">${ICON.info}<span>${t("Fictional stay — photos are illustrative, from Pexels.")}</span></p>`;
+			<p class="fine">${ICON.info}<span>${t("Fictional stay: photos are illustrative, from Pexels.")}</span></p>`;
 		openGallery(items, 0, st.name, info);
 	}
 
@@ -1503,7 +1503,7 @@
 			["home", "search", t("Plan a trip")], ["explore", "compass", t("All destinations")],
 			TRIPS.length ? ["trips", "luggage", t("My trips ({n})", { n: TRIPS.length }), wait] : null,
 			["acct", "user", ME.signedIn ? t("My profile") : t("Sign in")],
-			["rules", "shield-check", t("What Otium may do")], ["notes", "bell", t("Notifications")], ["help", "circle-help", t("Help — talk to a human")],
+			["rules", "shield-check", t("What Otium may do")], ["notes", "bell", t("Notifications")], ["help", "circle-help", t("Help: talk to a human")],
 			["portfolio", "arrow-left", t("Back to portfolio")],
 		].filter(Boolean).map(([k, icn, lab, dot]) => `<li><button type="button" data-menu="${k}">${ic(icn, k === "portfolio" ? "dir" : "")}<span>${esc(lab)}</span>${dot ? '<span class="mdot" aria-hidden="true"></span>' : ""}</button></li>`).join("");
 		const wb = $("#menuBtn"); if (wb) wb.classList.toggle("has-dot", wait > 0);
@@ -1567,7 +1567,7 @@
 		${S.progress.done ? doneBanner(k) : ""}
 		${S.progress.cancelled && !S.progress.done ? `<div class="panel block draft-note"><b>${t("Bookings cancelled.")}</b> ${t("Your plan is kept as a draft.")} <button class="btn btn-primary btn-sm" data-rebook>${t("Book it again")}</button></div>` : ""}
 		<div class="panel budget">
-			<div class="budget-top"><div><b class="num">${k ? eur(k.total) : "—"}</b> <span>${t("estimated total")}</span></div><span class="num">${k ? (over ? `<span class="diff">${t("{x} over", { x: eur(k.total - p.cap) })}</span>` : t("{x} left under your cap", { x: eur(p.cap - k.total) })) : t("Calculating…")}</span></div>
+			<div class="budget-top"><div><b class="num">${k ? eur(k.total) : "–"}</b> <span>${t("estimated total")}</span></div><span class="num">${k ? (over ? `<span class="diff">${t("{x} over", { x: eur(k.total - p.cap) })}</span>` : t("{x} left under your cap", { x: eur(p.cap - k.total) })) : t("Calculating…")}</span></div>
 			<div class="meter${over ? " over" : ""}"><div class="fill" style="width:${k ? (k.total / scale) * 100 : 0}%"></div><div class="cap" style="left:${(p.cap / scale) * 100}%" data-l="${esc(t("Cap {x}", { x: eur(p.cap) }))}"></div></div>
 			${k ? `<div class="split num"><span><i style="background:${over ? "var(--rose)" : "var(--ok)"}"></i>${t("Flights {x}", { x: eur(k.flights) })}</span><span><i style="background:${over ? "#E58A99" : "#7CC9A1"}"></i>${t("Stay {x}", { x: eur(k.stay) })}</span>${k.tickets ? `<span><i style="background:var(--sand-2)"></i>${t("Tickets, est. {x}", { x: eur(k.tickets) })}</span>` : ""}</div>` : ""}
 		</div>
@@ -1589,7 +1589,7 @@
 	const hhmm = (n) => `${String(Math.floor(n / 60) % 24).padStart(2, "0")}:${String(n % 60).padStart(2, "0")}`;
 	const SLOTS = [[570, 750], [840, 1050], [1170, 1320]]; // 09:30–12:30, 14:00–17:30, 19:30–22:00
 	function dayPlan(i, c, p) {
-		if (!S.settings.activities) return [["", t("Free day — yours to plan")]];
+		if (!S.settings.activities) return [["", t("Free day: yours to plan")]];
 		const acts = c.days[Math.min(i, c.days.length - 1)];
 		const fl = flightOptions(p.city, S.origin, p.travelers)[p.flight] || flightOptions(p.city, S.origin, p.travelers)[0];
 		const dur = (() => { const m = String(fl.hours).match(/(\d+)h\s*(\d+)?/); return m ? +m[1] * 60 + (+m[2] || 0) : 150; })();
@@ -1621,7 +1621,7 @@
 	const openAlts = new Set(); // keeps "Other flights / stays" open across live re-renders
 	$("#tripCanvas").addEventListener("toggle", (e) => { const d = e.target.closest?.("[data-alts]"); if (d) openAlts[d.open ? "add" : "delete"](d.dataset.alts); }, true);
 	function airportInfo(f) {
-		const o = (D.origins.find(([n]) => n === S.origin) || ["", "—"])[1];
+		const o = (D.origins.find(([n]) => n === S.origin) || ["", "–"])[1];
 		const [hh, mm] = f.dep.split(":").map(Number); const m = (hh * 60 + mm - 120 + 1440) % 1440; const at = `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 		const close = (hh * 60 + mm - 45 + 1440) % 1440;
 		return `<dl class="fl-info"><div><dt>${t("Airport")}</dt><dd>${esc(on(S.origin))} ${o} · ${t("Terminal {n}", { n: 1 + f.i })}</dd></div><div><dt>${t("Be there by")}</dt><dd>${t("{t} (2 h before)", { t: at })}</dd></div><div><dt>${t("Check-in closes")}</dt><dd>${String(Math.floor(close / 60)).padStart(2, "0")}:${String(close % 60).padStart(2, "0")}</dd></div><div><dt>${t("Gate")}</dt><dd>${t("Shown 24 h before")}</dd></div></dl>`;
@@ -1631,7 +1631,7 @@
 	}
 	function altStays(c, p) {
 		if (S.held.stay || S.progress.done) return "";
-		return `<details class="toggle-alts" data-alts="stays"${(S.progress.editing && !S.progress.editPicked) || openAlts.has("stays") ? " open" : ""}><summary class="btn btn-text btn-sm">${t("Other stays ({n})", { n: c.stays.length - 1 })}</summary><div class="alts">${c.stays.map((s) => `<div class="alt-row"><button class="alt" data-stay="${s.id}" aria-pressed="${s.id === p.stay}"><span><b>${esc(s.name)}</b> · ${esc(s.area)} · ${ICON.star} ${s.rating}${s.freeCancel ? "" : t(" · non-refundable")}</span><span class="num">${eur(s.nightly * p.nights)}</span><span>${t(s.id === p.stay ? "Selected" : "Choose")}</span></button><button type="button" class="alt-pics" data-staypics="${s.id}" aria-label="${esc(t("Photos and details of {x}", { x: s.name }))}">${ic("images")}</button></div>`).join("")}</div></details>${S.progress.editing ? `<div class="row" style="margin-top:12px"><button class="btn btn-primary btn-sm" id="editDone">${t("Done — show me the new total")}</button></div>` : ""}`;
+		return `<details class="toggle-alts" data-alts="stays"${(S.progress.editing && !S.progress.editPicked) || openAlts.has("stays") ? " open" : ""}><summary class="btn btn-text btn-sm">${t("Other stays ({n})", { n: c.stays.length - 1 })}</summary><div class="alts">${c.stays.map((s) => `<div class="alt-row"><button class="alt" data-stay="${s.id}" aria-pressed="${s.id === p.stay}"><span><b>${esc(s.name)}</b> · ${esc(s.area)} · ${ICON.star} ${s.rating}${s.freeCancel ? "" : t(" · non-refundable")}</span><span class="num">${eur(s.nightly * p.nights)}</span><span>${t(s.id === p.stay ? "Selected" : "Choose")}</span></button><button type="button" class="alt-pics" data-staypics="${s.id}" aria-label="${esc(t("Photos and details of {x}", { x: s.name }))}">${ic("images")}</button></div>`).join("")}</div></details>${S.progress.editing ? `<div class="row" style="margin-top:12px"><button class="btn btn-primary btn-sm" id="editDone">${t("Done: show me the new total")}</button></div>` : ""}`;
 	}
 	// Trip ready: bring the page back up to the documents banner (tickets, voucher, invoice).
 	function showDone() {
@@ -1706,13 +1706,13 @@
 		const amt = parts.reduce((a, k) => a + (H[k]?.amount || 0), 0);
 		const title = t(what === "all" ? "Cancel all bookings?" : what === "flights" ? "Cancel the flight?" : "Cancel the stay?");
 		const before = parts.map((k) => (k === "flights" ? `${H.flights.airline} ${H.flights.dep}` : H.stay.name)).join(" + ");
-		modal(`<h3 id="modalTitle">${title}</h3><p>${lost ? t("The stay is non-refundable: {x} can’t be recovered.", { x: eur(lost) }) : t("Everything is refundable. Your plan stays here as a draft — you can approve it again.")}</p>
+		modal(`<h3 id="modalTitle">${title}</h3><p>${lost ? t("The stay is non-refundable: {x} can’t be recovered.", { x: eur(lost) }) : t("Everything is refundable. Your plan stays here as a draft: you can approve it again.")}</p>
 			<div class="ba"><div><b>${t("Now")}</b>${esc(before)} · ${t("{x} held", { x: eur(amt) })}</div><span class="arrow">${ICON.arrow}</span><div class="after"><b>${t("After")}</b>${t("Cancelled · {x} back", { x: eur(amt - lost) })}${lost ? t(" · {x} lost", { x: eur(lost) }) : ""}</div></div>
 			<div class="row"><button class="btn btn-ghost btn-sm" data-m="cancel">${t(parts.length > 1 ? "Keep them" : "Keep it")}</button><button class="btn btn-danger btn-sm" data-m="ok">${t(what === "all" ? "Cancel all" : "Cancel it")}</button></div>`, (r) => {
 			if (r !== "ok") return;
 			parts.forEach((k) => delete H[k]); if (!H.flights) delete H.data;
 			log("You", t(what === "all" ? "Cancelled all bookings" : what === "flights" ? "Cancelled the flight" : "Cancelled the stay"));
-			if (!H.flights && !H.stay) { S.progress.done = false; S.progress.cancelled = true; setStatus("waiting", t("Bookings cancelled — plan kept as a draft")); }
+			if (!H.flights && !H.stay) { S.progress.done = false; S.progress.cancelled = true; setStatus("waiting", t("Bookings cancelled: plan kept as a draft")); }
 			renderTrip(); toast(t(what === "all" ? "All bookings cancelled. Your plan is kept as a draft." : "Cancelled."));
 		});
 	});
@@ -1785,7 +1785,7 @@
 		const b = $("#notifBadge"); b.textContent = unread > 9 ? "9+" : unread; b.hidden = !unread;
 		const ul = $("#notes"); if (!ul) return;
 		const pinned = NOTES.filter((n) => n.pinned), rest = NOTES.filter((n) => !n.pinned);
-		const row = (n) => `<li class="${n.pinned ? "pinned" : ""}"><time>${n.t}</time><span>${esc(n.msg)}</span><span class="nb"><button type="button" data-pin="${n.id}" aria-pressed="${n.pinned}" aria-label="${t(n.pinned ? "Unpin" : "Keep")}" title="${t(n.pinned ? "Unpin" : "Keep — survives Clear all")}">${ICON.pin}</button><button type="button" data-del="${n.id}" aria-label="${t("Delete")}" title="${t("Delete")}">${ICON.x}</button></span></li>`;
+		const row = (n) => `<li class="${n.pinned ? "pinned" : ""}"><time>${n.t}</time><span>${esc(n.msg)}</span><span class="nb"><button type="button" data-pin="${n.id}" aria-pressed="${n.pinned}" aria-label="${t(n.pinned ? "Unpin" : "Keep")}" title="${t(n.pinned ? "Unpin" : "Keep: survives Clear all")}">${ICON.pin}</button><button type="button" data-del="${n.id}" aria-label="${t("Delete")}" title="${t("Delete")}">${ICON.x}</button></span></li>`;
 		ul.innerHTML = NOTES.length ? (pinned.length ? `<li class="grp">${t("Kept")}</li>${pinned.map(row).join("")}` : "") + (rest.length ? `<li class="grp">${t("Recent")}</li>${rest.map(row).join("")}` : "") : `<li class="empty">${t("No notifications yet. Messages that pop up at the bottom of the screen are kept here.")}</li>`;
 		$("#clearNotes").disabled = !rest.length;
 	}
@@ -1809,7 +1809,7 @@
 	const STATES = [
 		["normal", "Everything goes right", "A clear request. Watch Otium plan the trip, then stop twice: before it pays, and before it shares your details.", "A long weekend in Lisbon for two, food and viewpoints, under £900"],
 		["vague", "You don’t know where to go yet", "Otium asks one simple question instead of guessing or showing a long form.", "Somewhere warm next month"],
-		["outside", "A city Otium doesn’t cover", "It says so honestly and suggests places it can plan — it never pretends.", "A week in Tokyo for two"],
+		["outside", "A city Otium doesn’t cover", "It says so honestly and suggests places it can plan: it never pretends.", "A week in Tokyo for two"],
 		["overbudget", "The trip costs too much", "Otium stops at your budget cap and lets you choose how to save. It never decides with your money.", "Rome for 3 nights with my partner, museums"],
 		["soldout", "A flight sells out while booking", "Nothing is charged. Otium finds a plan B and asks again, because the price changed.", "Barcelona for 3 nights for two, beach and tapas, £1,200"],
 		["offline", "The AI is down", "Otium switches to basic matching and tells you to double-check what it understood.", "Amsterdam for 2 nights, solo, museums"],
@@ -1839,7 +1839,7 @@
 	const HELP_TEL = "+44 20 7946 0123"; // UK range reserved for fiction — never a real line
 	function openHelp() {
 		const p = S.plan; const ref = S.held.flights?.code || S.held.stay?.code;
-		modal(`<h3 id="modalTitle">${t("Talk to a human")}</h3><p>${t("Otium’s travel team can fix anything the agent can’t — 24/7, in English, French, Spanish, Italian and Hebrew.")}${ref ? `${t(" Have your booking code ready: ")}<b>${ref}</b>.` : ""}</p>
+		modal(`<h3 id="modalTitle">${t("Talk to a human")}</h3><p>${t("Otium’s travel team can fix anything the agent can’t: 24/7, in English, French, Spanish, Italian and Hebrew.")}${ref ? `${t(" Have your booking code ready: ")}<b>${ref}</b>.` : ""}</p>
 			<div class="help-list">
 				<a class="help-row" href="tel:${HELP_TEL.replace(/\s/g, "")}"><span class="pi" style="--i:#C2344C;--t:#FBEAED">${ICON.phone}</span><span><b>${t("Call us")}</b><small dir="ltr">${t("{tel} · average wait 2 min", { tel: HELP_TEL })}</small></span></a>
 				<button class="help-row" type="button" data-m="chat"><span class="pi" style="--i:#5146C9;--t:#ECEBFB">${ICON.chat}</span><span><b>${t("Chat with an agent")}</b><small>${t("A person joins this trip and sees what Otium did")}</small></span></button>
@@ -1868,9 +1868,9 @@
 	/* portfolio cases: say what to watch, then point at the moment it happens */
 	const WATCH = {
 		normal: "Otium plans on its own, then stops twice: before it pays, and before it shares your details. Watch for the amber cards on the left.",
-		vague: "Your request names no place. Instead of guessing, Otium asks one question — pick a city from the photos.",
+		vague: "Your request names no place. Instead of guessing, Otium asks one question: pick a city from the photos.",
 		outside: "You asked for Tokyo, which Otium doesn’t cover. It says so honestly and suggests cities it can plan.",
-		overbudget: "Your budget is set to £400 — too low for Rome. Otium stops at the cap instead of going over and asks how you want to save.",
+		overbudget: "Your budget is set to £400: too low for Rome. Otium stops at the cap instead of going over and asks how you want to save.",
 		soldout: "Approve the payment when asked: the flight will sell out during booking. Watch Otium charge nothing, find a plan B and ask again for the new price.",
 		offline: "The AI is switched off for this case. Otium falls back to simple matching and shows a warning so you double-check what it understood.",
 	};
@@ -1883,14 +1883,14 @@
 	}
 	function caseMoment() {
 		const b = $("#caseBanner"); if (b.hidden || b.querySelector(".moment")) return;
-		b.insertAdjacentHTML("beforeend", `<button type="button" class="moment">${ic("hand")} ${t("This is the moment — see the card")}</button>`);
+		b.insertAdjacentHTML("beforeend", `<button type="button" class="moment">${ic("hand")} ${t("This is the moment: see the card")}</button>`);
 		b.querySelector(".moment").onclick = goToCard;
 		setTimeout(goToCard, 350);
 	}
 	$("#pauseBtn").onclick = () => {
 		S.paused = !S.paused;
 		$("#pauseBtn").textContent = t(S.paused ? "Resume" : "Pause");
-		if (S.paused) { S._prev = [S.status, $("#agentStatus").textContent]; setStatus("paused", t("Paused — nothing happens until you resume")); log("You", t("Paused Otium")); }
+		if (S.paused) { S._prev = [S.status, $("#agentStatus").textContent]; setStatus("paused", t("Paused: nothing happens until you resume")); log("You", t("Paused Otium")); }
 		else { setStatus(...(S._prev || ["working", t("Working on it…")])); log("You", t("Resumed Otium")); S.resume?.(); S.resume = null; }
 	};
 
@@ -2154,8 +2154,8 @@
 		if (h.stay) sec.push({ k: "stay", title: T("Stay"), rows: [[T("Name"), st.name], [T("Area"), `${stEn.area}, ${c.name}`], [T("Check-in"), `${day(d.out)} · 15:00`], [T("Check-out"), `${day(d.back)} · 11:00`], [T("Guests"), String(p.travelers)], [T("Cancellation"), T(st.freeCancel ? "Free until 48 h before" : "Non-refundable")], [T("Booking"), h.stay.code]] });
 		if (S.settings.activities) sec.push({ k: "days", title: T("Your days"), rows: Array.from({ length: p.nights + 1 }, (_, i) => [T("Day {n}", { n: i + 1 }), dayPlan(i, c, p).map(([tm, x]) => `${tm ? tm + " " : ""}${en ? ({ [t("Arrive, check in")]: "Arrive, check in", [t("Head to the airport")]: "Head to the airport" }[x] || x) : x}`).join("\n")]) });
 		const money2 = (n) => (en ? `${cur()[0]} ${Math.round(n * cur()[1]).toLocaleString("en-GB")}` : eur(n));
-		sec.push({ k: "costs", title: T("Costs"), rows: [[T("Flights"), money2(k.flights)], [T("Stay"), money2(k.stay)], ...(k.tickets ? [[T("Activities (estimate)"), money2(k.tickets)]] : []), [T("Total"), money2(k.total)], [T("Budget cap"), money2(p.cap)], [T("Held and approved"), money2((h.flights?.amount || 0) + (h.stay?.amount || 0))], [T("Payment"), cardLabel() || "—"]] });
-		sec.push({ k: "contact", title: T("Contact"), rows: [[T("Lead traveller"), fullName() || "—"], [T("Email"), ME.email || "—"], [T("Phone"), ME.phone || "—"], [T("Need help?"), `${HELP_TEL} · help@otium.example (${T("fictional")})`]] });
+		sec.push({ k: "costs", title: T("Costs"), rows: [[T("Flights"), money2(k.flights)], [T("Stay"), money2(k.stay)], ...(k.tickets ? [[T("Activities (estimate)"), money2(k.tickets)]] : []), [T("Total"), money2(k.total)], [T("Budget cap"), money2(p.cap)], [T("Held and approved"), money2((h.flights?.amount || 0) + (h.stay?.amount || 0))], [T("Payment"), cardLabel() || "–"]] });
+		sec.push({ k: "contact", title: T("Contact"), rows: [[T("Lead traveller"), fullName() || "–"], [T("Email"), ME.email || "–"], [T("Phone"), ME.phone || "–"], [T("Need help?"), `${HELP_TEL} · help@otium.example (${T("fictional")})`]] });
 		return { title: `${c.name} · ${day(d.out)} – ${day(d.back)}`, sec, photo: c.photo, place: c.name };
 	}
 	function renderSummary() {
@@ -2192,11 +2192,11 @@
 	/* ---------------- guided tour: the whole idea in about a minute ---------------- */
 	const TOUR = { on: false, i: 0, timer: null };
 	const TOUR_STEPS = [
-		["Describe a trip in your own words", "Otium reads the request with AI and shows what it understood — anything it assumed is dashed, so you can change it."],
+		["Describe a trip in your own words", "Otium reads the request with AI and shows what it understood: anything it assumed is dashed, so you can change it."],
 		["It searches on its own", "Flights, a stay and your days are compared automatically. Each step says “Automatic” or “Needs you”, and tells you why it chose."],
 		["It stops before paying", "Spending money always waits for you. Change something and No are as visible as Yes. You can also ask a co-traveller to approve."],
-		["It asks again before sharing your details", "Names and passports go to the airline only after a second, separate OK — paying and sharing personal data are different consents."],
-		["Booked — and still in your hands", "Tickets, invoice, seats and a full summary are ready. Every booking can be cancelled from this page, and the history keeps a receipt of every action."],
+		["It asks again before sharing your details", "Names and passports go to the airline only after a second, separate OK: paying and sharing personal data are different consents."],
+		["Booked: and still in your hands", "Tickets, invoice, seats and a full summary are ready. Every booking can be cancelled from this page, and the history keeps a receipt of every action."],
 		["It keeps working for you", "After booking, Otium watches prices. If your stay gets cheaper, it comes back and asks before rebooking. You set how much it can do alone in Permissions."],
 	];
 	function tourCard(i, actions = "") {
@@ -2209,7 +2209,7 @@
 	function endTour(silent) {
 		TOUR.on = false; clearInterval(TOUR.timer); tourHL(null); document.body.classList.remove("touring");
 		const el = $("#tourCard"); if (el) { el.classList.remove("on"); setTimeout(() => (el.hidden = true), 250); }
-		if (!silent) toast(t("Tour ended. Everything stays — plan your own trip whenever you like."));
+		if (!silent) toast(t("Tour ended. Everything stays: plan your own trip whenever you like."));
 	}
 	async function startTour(auto) {
 		if (TOUR.on) return; TOUR.on = true; TOUR.i = 0; TOUR.auto = auto === true; document.body.classList.add("touring");
@@ -2300,9 +2300,9 @@
 	}
 	function fixNames() {
 		const ob = $("#originBtn"), wb = $("#whenBtn"), lb = $("#langBtn");
-		if (ob) ob.setAttribute("aria-label", `${$("#originVal").textContent} — ${t("Departure city")}`);
-		if (wb) wb.setAttribute("aria-label", `${$("#whenVal").textContent} — ${t("Travel dates")}`);
-		if (lb) lb.setAttribute("aria-label", `${$("#langCode").textContent} — ${t("Language")}`);
+		if (ob) ob.setAttribute("aria-label", `${$("#originVal").textContent}: ${t("Departure city")}`);
+		if (wb) wb.setAttribute("aria-label", `${$("#whenVal").textContent}: ${t("Travel dates")}`);
+		if (lb) lb.setAttribute("aria-label", `${$("#langCode").textContent}: ${t("Language")}`);
 	}
 	function syncInert() { document.querySelectorAll(".drawer").forEach((d) => { const h = d.getAttribute("aria-hidden") === "true"; d.inert = h; }); }
 	let PREV_RATE = 1;
@@ -2319,7 +2319,7 @@
 		if (prev !== I.lang) retranslateTrips(prev);
 		if (S.plan) { renderUnderstood(); renderTrip(); }
 		renderTripsNav(); renderLog(); renderNotes(); botLabels(); renderBot(); renderAcct(); renderMenu(); if (!$("#profile").hidden) renderProfile();
-		fixNames(); document.title = t("Otium — Trips planned for you, decided by you");
+		fixNames(); document.title = t("Otium: Trips planned for you, decided by you");
 	}
 
 	/* ---------------- boot ---------------- */

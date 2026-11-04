@@ -267,7 +267,7 @@
 	function verify(items, chunks, lang) {
 		const byId = Object.fromEntries(chunks.map((c) => [c.id, c])), kept = [], removed = [];
 		for (const it of items || []) {
-			let text = String(it?.text || "").replace(/[*#`]/g, "").replace(/\s+[—–]\s+/g, ", ").replace(/[\s,;:(\[]*\b(?:cite[sd]?|c\d{1,4}(?:\s*,\s*c\d{1,4})*)\b[)\]]?\s*([.!?]?)\s*$/i, "$1").trim(); if (!text) continue;
+			let text = String(it?.text || "").replace(/[*#`]/g, "").replace(/\s+[: –]\s+/g, ", ").replace(/[\s,;:(\[]*\b(?:cite[sd]?|c\d{1,4}(?:\s*,\s*c\d{1,4})*)\b[)\]]?\s*([.!?]?)\s*$/i, "$1").trim(); if (!text) continue;
 			const value = String(it?.value || "").replace(/[*#`]/g, "").trim().slice(0, 60);
 			if (!/[.!?…:”"״)]$/.test(text)) text += ".";
 			const cites = [...new Set((Array.isArray(it.cite) ? it.cite : [it.cite]).map(String).filter((id) => byId[id]))];

@@ -412,7 +412,7 @@
 				const kcal = session ? trainK : restK;
 				const picks = slots.map((s, k) => {
 					let pool = MEALS[s].filter((m) => allowed(m, p.diet, p.ex, p.dis));
-					if (!pool.length) pool = [["Custom meal — ask Priya (dietitian) for a swap", MEALS[s][0][1], MEALS[s][0][2], ""]];
+					if (!pool.length) pool = [["Custom meal: ask Priya (dietitian) for a swap", MEALS[s][0][1], MEALS[s][0][2], ""]];
 					return [s, pool[((w * 7 + d) * (k + 2) + k + w + (p.seed || 0) * 3) % pool.length]];
 				});
 				const base = picks.reduce((t, [, m]) => t + m[1], 0);
@@ -990,11 +990,11 @@
 			reply: () => {
 				const t = tier();
 				if (!t) return {
-					text: "You're not a member yet. Basic is $149/month, Signature $259 and Elite $549 — Elite adds personal training, the club doctor, physio and a weekly plan. No contracts.",
+					text: "You're not a member yet. Basic is $149/month, Signature $259 and Elite $549: Elite adds personal training, the club doctor, physio and a weekly plan. No contracts.",
 					chips: [{ label: "See memberships", href: BASE + "index.html#membership", primary: true }, { label: "Get a free guest pass", href: BASE + "contact.html" }]
 				};
 				return {
-					text: `You're on ${t} ($${TIERS[t]}/month). Basic is $149, Signature $259 and Elite $549 — Elite adds personal training, the club doctor, physio and a weekly plan. I can't change your plan myself; you stay in control of anything involving billing.`,
+					text: `You're on ${t} ($${TIERS[t]}/month). Basic is $149, Signature $259 and Elite $549: Elite adds personal training, the club doctor, physio and a weekly plan. I can't change your plan myself; you stay in control of anything involving billing.`,
 					chips: [{ label: "Change my plan", href: here("#membership-status"), primary: true }, { label: "What does Elite include?", ask: "What does Elite include?" }]
 				};
 			}
@@ -1198,7 +1198,7 @@
 			sim.error = false;
 			$('[data-sim="error"]').setAttribute("aria-pressed", "false");
 			wrap.innerHTML = "";
-			wrap.appendChild(noteEl({ kind: "err", text: "Coach couldn't reach the server. Your message is safe — nothing was lost." }));
+			wrap.appendChild(noteEl({ kind: "err", text: "Coach couldn't reach the server. Your message is safe: nothing was lost." }));
 			const r = chipRow([]);
 			const retry = document.createElement("button");
 			retry.type = "button"; retry.className = "cx-chip primary"; retry.textContent = "Try again";
@@ -1225,7 +1225,7 @@
 				const offline = err && err.code === 503;
 				wrap.appendChild(noteEl({ kind: "err", text: offline
 					? "Live answers aren't switched on for this site yet. I can still build programs, compare memberships and suggest classes."
-					: "Coach couldn't reach the AI service. Your message is safe — nothing was lost." }));
+					: "Coach couldn't reach the AI service. Your message is safe: nothing was lost." }));
 				const dOff = demosFor(userText, "");
 				if (dOff.length) { const b2 = document.createElement("div"); b2.className = "cx-bubble"; b2.innerHTML = demoGroup(dOff); wrap.appendChild(b2); animateDemos(); }
 				const r = chipRow(offline ? starterChips().slice(2, 3) : []);
@@ -1308,7 +1308,7 @@
 			b.setAttribute("aria-pressed", "true"); other.setAttribute("aria-pressed", "false");
 			const old = wrap.querySelector(".cx-fb"); if (old) old.remove();
 			const f = document.createElement("div"); f.className = "cx-fb";
-			if (good) { f.textContent = "Thanks — that helps Coach learn what works."; wrap.appendChild(f); return; }
+			if (good) { f.textContent = "Thanks: that helps Coach learn what works."; wrap.appendChild(f); return; }
 			f.textContent = "What went wrong?";
 			const r = chipRow([]);
 			["Not accurate", "Too generic", "Not what I asked"].forEach((l) => {
