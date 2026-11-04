@@ -21,6 +21,8 @@ export interface AILabProject {
 		micro: string[];
 		interactions: string[];
 		constraints: string[];
+		/** Optional stylesheet with the demo's self-hosted fonts, loaded so the typography samples show the real faces. */
+		fontCss?: string;
 	};
 	/** Gallery images (root-relative paths under /public). */
 	gallery: string[];
@@ -39,6 +41,9 @@ export interface AILabProject {
 		states: string[];
 		decisions: Array<{ title: string; body: string }>;
 	};
+	/** Optional next steps: ideas planned but not built yet, shown as their own
+	 * section after the screenshots, labelled as upcoming. */
+	nextSteps?: Array<{ title: string; body: string }>;
 	/** Thumbnail image for the AI Lab home section card. */
 	thumbnail: string;
 	/** Accent color hint for the card overlay (hex, optional). */
@@ -53,6 +58,100 @@ export interface AILabProject {
 // `portfolio-colophon` card stays LAST, always — it is the site itself, not
 // one of the experiments, so it closes the row rather than opening it.
 export const aiLabProjects: AILabProject[] = [
+	{
+		slug: 'margin',
+		title: 'Margin',
+		subtitle: 'An AI reader that explains any document and shows you where it says it.',
+		eyebrow: 'Documents · 2026',
+		shortDesc:
+			'A fictional AI reader for contracts, letters and terms of use. Drop a PDF or a Word file, paste a link or some text: Margin explains what matters in plain words and points to the exact passage behind every point. Ten languages, Hebrew in RTL.',
+		intro: `Margin is a fictional AI reader I designed and built end-to-end. It starts from a moment everyone knows: a contract, a lawyer’s letter or a page of terms lands in front of you, and you sign or scroll past it without really knowing what you agreed to.
+
+Margin reads the document and answers the questions you would ask a friend who knows the subject: what is in my favour, what could work against me, what must I not miss, which dates and amounts matter. Then you can ask your own questions. Every point comes with “Where it says it”, which opens the exact passage, highlighted, on the right page.
+
+The hard part of an AI reader is trust, so the design is built around one rule: a point you cannot check should not be shown. Each answer must cite a passage that was actually sent to the model, and every number in it must appear in that passage, or the point is removed before you see it. Files are read in your browser; only the useful passages go to the AI. The demo runs on a fictional contract, and nothing it says is legal advice.`,
+		aiFeature: {
+			eyebrow: 'AI UX · Grounded answers',
+			title: 'Every answer points to its source',
+			lead: 'Margin sends the relevant passages of the document to an open model (Llama 3.3 on Cloudflare Workers AI) and asks for short points, each one tied to the passages it comes from. The interface then checks every point against those passages before showing it. The reader never has to take the AI’s word for it: one tap shows the original text.',
+			tryUrl: '/demo/margin/?sample=1',
+			tryLabel: 'Try it on a sample contract',
+			states: ['PDF and Word files, a link or pasted text', 'Several files, one report section each', 'Report in five groups: in short, in your favour, against you, watch out, key numbers', 'Where it says it: the passage highlighted on its page', 'Points removed when no source or a wrong number', 'Questions about the document, with sources', 'Not in the document: says so instead of guessing', 'Suggested questions', 'Listen and copy', 'Machine translation of a passage, the original stays the reference', 'Numbers written the local way (68 000 € in French)', 'Daily free AI allowance shown, with reset time', 'Allowance used up: a clear message, nothing lost', 'AI offline or slow: retry without losing the files', 'Sign in or create a demo account', 'My analyses: saved, reopened read-only, deleted with undo', 'Sign out with undo', 'Ten languages from one menu, Hebrew in RTL'],
+			decisions: [
+				{ title: 'No source, no point', body: 'Every point must cite a passage that was sent, and every number in it must appear in that passage. A point that fails either test is removed before it reaches the screen, and the report says how many were removed.' },
+				{ title: 'Answers you can check in one tap', body: '“Where it says it” sits at the end of every point. It opens the original passage in place, highlighted, with its page number, so checking costs one tap instead of a search through the file.' },
+				{ title: 'Five questions people really ask', body: 'Instead of a generic summary, the report answers what a reader wants to know before signing: what it is, what is in my favour, what could work against me, what I must not miss, and the key dates and amounts.' },
+				{ title: 'Read in the browser, send only what is needed', body: 'PDF and Word files are opened in the browser. Only the passages useful for the report or the question go to the AI, and nothing is stored on a server. A link is fetched once, only to read the page.' },
+				{ title: 'Say “not in the document”', body: 'When a question has no answer in the text, Margin says so plainly instead of filling the gap with general knowledge. An honest “I can’t find it” keeps the other answers credible.' },
+				{ title: 'Your language, the original’s authority', body: 'The interface, the report and the answers follow the language chosen in one menu. A cited passage can be machine translated, but the highlighted original stays visible and is what counts.' },
+				{ title: 'Numbers that cannot be misread', body: 'Amounts are rewritten the way the reader’s language writes them, so “68,000” is never read as 68 in French or German. The check against the source still uses the original figure.' },
+				{ title: 'A limit shown, not hidden', body: 'The demo runs on a free daily AI allowance shared by all visitors. The page shows what is left and when it renews, in the visitor’s own time zone, so running out is expected, not a surprise.' },
+				{ title: 'Keep your analyses', body: 'With a demo account, every finished analysis is saved in My analyses: the points and the cited passages as text, never the files. Saved analyses open read-only, and deleting or signing out can be undone.' },
+				{ title: 'What I left out on purpose', body: 'Voice questions, photos with text recognition and spreadsheets were built, then removed: voice failed silently on some browsers, and photos and tables made the sources harder to check. Fewer formats that always keep the promise was the better design.' },
+				{ title: 'How I would test it', body: 'Moderated sessions with 6 to 8 people per round, each reading a real contract of their own type. I would measure how often people open “Where it says it”, whether they can find a risky clause faster than with the file alone, and a short trust score before and after checking a source.' },
+			],
+		},
+		designSystem: {
+			fontCss: '/demo/margin/fonts/fonts.css',
+			colors: [
+				{ name: 'Paper', hex: '#F6F5F1', role: 'Canvas: a warm page, like a printed document' },
+				{ name: 'Ink', hex: '#141414', role: 'Type · main buttons · key numbers' },
+				{ name: 'Marker', hex: '#FFE15A', role: 'Highlighted passage: the source behind a point' },
+				{ name: 'Link blue', hex: '#1F5FAD', role: 'Where it says it · links' },
+				{ name: 'In your favour', hex: '#22A06B', role: 'Green dot · checked · allowance left' },
+				{ name: 'Against you', hex: '#E5484D', role: 'Red dot · errors · allowance used up' },
+				{ name: 'Watch out', hex: '#E8920C', role: 'Amber dot · deadlines and conditions' },
+			],
+			typography: [
+				{ family: 'Geist', weights: '400 · 500 · 600 · 700', role: 'Interface · headings · body', sample: 'Read it once. Understand it all.' },
+				{ family: 'Heebo', weights: '400 · 500 · 700', role: 'Hebrew, right-to-left', sample: 'קוראים פעם אחת. מבינים הכול.' },
+			],
+			micro: [
+				'One icon set everywhere: Lucide, thin strokes, no filled shapes',
+				'A coloured dot per group, the text always stays dark',
+				'The cited passage opens in place, highlighted like a marker on paper',
+				'A small bar shows the daily AI allowance, green, then amber, then red',
+				'Messages stay on screen long enough to read, and stay while hovered',
+				'Concentric corners: inner radius plus padding equals outer radius',
+			],
+			interactions: [
+				'Drop files, paste a link or paste text, from one screen',
+				'Report per file, with Listen, Copy and Clear',
+				'Questions with suggested prompts, answers with sources',
+				'Language menu that switches the interface and the next answers',
+				'Sign in or create an account, as in Otium, with a demo account',
+				'My analyses: open read-only, delete with undo',
+			],
+			constraints: [
+				'Plain HTML, CSS and JavaScript: no framework, no bundler, no CDN',
+				'PDF.js and Mammoth open files in the browser, fonts are self-hosted',
+				'Ten languages from one string table, Hebrew in RTL',
+				'A fictional contract as the sample: no real names or brands',
+				'Not legal advice: the report says it, the terms say it',
+				'Tested in a headless browser: full flow, ten languages, five screen widths from 320 to 1440 px',
+			],
+		},
+		nextSteps: [
+			{ title: 'Margin where you already read', body: 'A browser extension: select a clause on any page, right-click “Explain in Margin”, and the text opens in Margin, ready to analyse. Reading a document and understanding it would become the same gesture.' },
+		],
+		gallery: [
+			'/lab-assets/margin/report.webp',
+			'/lab-assets/margin/source.webp',
+			'/lab-assets/margin/answer.webp',
+			'/lab-assets/margin/home.webp',
+			'/lab-assets/margin/my-analyses.webp',
+			'/lab-assets/margin/sign-in.webp',
+		],
+		mobileGallery: [
+			'/lab-assets/margin/m-report.webp',
+			'/lab-assets/margin/m-source.webp',
+			'/lab-assets/margin/m-answer.webp',
+			'/lab-assets/margin/m-my-analyses.webp',
+		],
+		demoUrl: '/demo/margin/',
+		thumbnail: '/lab-assets/margin/thumbnail.jpg',
+		accent: '#1F5FAD',
+	},
 	{
 		slug: 'otium',
 		title: 'Otium',
