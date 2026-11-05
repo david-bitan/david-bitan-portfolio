@@ -294,6 +294,8 @@ p.sec-sub { margin: 0 0 14px; color: var(--ink-2); font-size: 14.5px; }
 .plot { position: relative; min-height: 30px; }
 .big { font: 600 clamp(28px, 3vw, 36px)/1.1 var(--sans); letter-spacing: -.025em; margin: 2px 0 0; font-variant-numeric: tabular-nums; }
 .big.pos { color: var(--ok); }
+.card.kpi .big { color: var(--accent); } /* the four key figures pop in lime (dark theme) */
+[data-theme="light"] .card.kpi .big { color: var(--ink); } /* light theme: lime would be too pale to read */
 .delta { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; font-size: 13.5px; color: var(--ink-2); flex-wrap: wrap; }
 .delta b { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; color: var(--ink); background: var(--surface-2); border-radius: 999px; padding: 2px 8px; }
 .delta b .i { width: 14px; height: 14px; }
