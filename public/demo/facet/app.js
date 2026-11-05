@@ -449,7 +449,7 @@
 			<header class="rh"><div><h1>${esc(A.name)}</h1>
 				<div class="meta"><span>${ic("calendar")}${esc(t("{a} to {b}", { a: dLong(S.data.from), b: dLong(all[0].d) }))}</span><span>${ic("receipt-text")}${esc(t("{n} lines", { n: num(all.length) }))}</span><span class="ok">${ic("check")}${esc(t("Saved in My analyses"))}</span></div></div>
 				<button type="button" class="btn" data-go="#/new">${ic("upload")}<span class="lbl">${esc(t("Another file"))}</span></button></header>
-			<form class="ask" id="askF" autocomplete="off"><span class="lead">${ic("sparkles")}</span><label class="sr" for="askQ">${esc(t("Ask a question about your money"))}</label><input id="askQ" maxlength="300" placeholder="${esc(t(innerWidth < 640 ? "Ask a question about your money" : "Ask a question, for example: how much do I spend on restaurants each month?"))}"><button class="btn btn-p" type="submit">${ic("arrow-right", "flip-ic")}<span>${esc(t("Ask"))}</span></button></form>
+			<form class="ask" id="askF" autocomplete="off"><span class="lead">${ic("sparkles")}</span><label class="sr" for="askQ">${esc(t("Ask a question about your money"))}</label><input id="askQ" maxlength="300" placeholder="${esc(t(innerWidth < 640 ? "Ask a question about your money" : "Ask a question, for example: how much do I spend on restaurants each month?"))}"><button class="btn btn-p" type="submit"><span>${esc(t("Ask"))}</span>${ic("arrow-right", "flip-ic")}</button></form>
 			<ul class="chips" aria-label="${esc(t("Questions you can ask"))}">${chips(rec).map((c, i) => `<li><button type="button" data-chip="${i}" data-en="${esc(c[1])}">${esc(c[0])}</button></li>`).join("")}</ul>
 			<div id="views"></div>
 			<div class="rep">

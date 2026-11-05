@@ -509,8 +509,8 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14.5px; font-varia
 .qa .card { background: var(--bg); }
 
 /* side panel with the lines (slides in from the end side) */
-.ov.sheet { place-items: stretch end; padding: 0; }
-.sh { position: relative; width: min(560px, 100%); height: 100%; background: var(--surface); border-inline-start: 1px solid var(--line-2); box-shadow: var(--shadow); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 500ms var(--open); }
+.ov.sheet { place-items: stretch end; padding: 0; overflow: hidden; }
+.sh { position: relative; width: min(560px, 100%); height: 100vh; height: 100dvh; background: var(--surface); border-inline-start: 1px solid var(--line-2); box-shadow: var(--shadow); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 500ms var(--open); }
 [dir="rtl"] .sh { transform: translateX(-100%); }
 .ov.sheet.on .sh { transform: none; }
 .ov.sheet.off .sh { transition-duration: 400ms; }
@@ -522,7 +522,7 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14.5px; font-varia
 .sh-f .search input { height: 36px; } .sh-f .search .i { top: 9px; }
 .sh-sum { display: flex; justify-content: space-between; gap: 12px; padding: 12px 20px; font-size: 14px; color: var(--ink-2); border-bottom: 1px solid var(--line); }
 .sh-sum b { color: var(--ink); font-variant-numeric: tabular-nums; } .sh-sum b.in { color: var(--ok); }
-.sh-b { flex: 1; overflow-y: auto; padding: 4px 20px 20px; overscroll-behavior: contain; }
+.sh-b { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 20px 20px; overscroll-behavior: contain; }
 
 /* drop zone while reading */
 .drop.busy { border-style: solid; border-color: var(--accent); background: var(--accent-soft); cursor: progress; }
@@ -554,6 +554,15 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14.5px; font-varia
 .airev li { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; background: var(--surface-2); border-radius: var(--r-lg); padding: 8px 8px 8px 12px; min-width: 0; }
 .airev li b { font-weight: 500; flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 .airev .btn { justify-self: start; }
+
+/* scrollbars of the inner scroll areas (lines panel, column check table, overlays): visible, lime, 10 px */
+@supports (-moz-appearance: none) { .sh-b, .cc-t, .ov { scrollbar-width: auto; scrollbar-color: var(--accent) var(--surface-2); } } /* Firefox; Chrome and Edge use the rules below (their length follows the amount of content) */
+.sh-b::-webkit-scrollbar, .cc-t::-webkit-scrollbar, .ov::-webkit-scrollbar { width: 10px; height: 10px; }
+.sh-b::-webkit-scrollbar-track, .cc-t::-webkit-scrollbar-track, .ov::-webkit-scrollbar-track { background: var(--surface-2); border-radius: 999px; }
+.sh-b::-webkit-scrollbar-thumb, .cc-t::-webkit-scrollbar-thumb, .ov::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 999px; border: 2px solid var(--surface-2); }
+.sh-b::-webkit-scrollbar-thumb:hover, .cc-t::-webkit-scrollbar-thumb:hover { background: var(--accent-hover); }
+/* the language menu fits its words instead of a fixed width */
+[data-lang] + .menu { min-width: 0; width: max-content; }
 
 .skel { background: linear-gradient(90deg, var(--surface-2) 0%, var(--hover) 50%, var(--surface-2) 100%); background-size: 200% 100%; animation: sh 1.4s linear infinite; border-radius: var(--r-md); }
 @keyframes sh { to { background-position: -200% 0; } }
