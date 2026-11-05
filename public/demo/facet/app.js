@@ -26,7 +26,7 @@
 	const qs = new URLSearchParams(location.search);
 	S.lang = [qs.get("lang"), store.get("facet-lang", null)].map((l) => String(l || "").slice(0, 2)).find((l) => I.LANGS.some((x) => x[0] === l)) || "en"; // English unless the person chose another language
 	/* the last two words of a sentence stay together: never one word alone on the last line, in any language */
-	function t(k, p) { let s = (I.dict[S.lang] && I.dict[S.lang][k]) || k; if (p) s = s.replace(/\{(\w+)\}/g, (m, n) => (p[n] ?? m)); return s.split(/\s+/).length >= 4 && !/<[^>]+$/.test(s) ? s.replace(/ ([^ <>]+)$/, "\u00a0$1") : s; }
+	function t(k, p) { let s = (I.dict[S.lang] && I.dict[S.lang][k]) || k; if (p) s = s.replace(/\{(\w+)\}/g, (m, n) => (p[n] ?? m)); return s.split(/\s+/).length >= 3 && !/<[^>]+$/.test(s) ? s.replace(/ ([^ <>]+)$/, "\u00a0$1") : s; }
 	const catName = (id) => (id === "other" ? t("To check") : t(I.CAT_NAMES[id] || id));
 	function title(x) { if (!x) return ""; if (typeof x === "string") return x; const p = { ...(x.p || {}) }; if (p.cat) p.cat = catName(p.cat); if (p.cats) p.cats = String(p.cats).split(",").map(catName).join(", "); return t(x.k, p); }
 	const locale = () => I.LOCALE[S.lang] || S.lang;
@@ -53,11 +53,12 @@
 	addEventListener("hashchange", route);
 	function route() {
 		closeMenu(); drawer(false);
+		if (S.acct && $("#authOv")) closeAuth(true);
 		const h = location.hash || "#/";
 		if (!S.acct && !/^#\/(signin|signup)?$/.test(h)) return go("#/signin");
 		if (S.acct && /^#\/(signin|signup)?$/.test(h)) return go("#/new");
-		if (h === "#/" ) return landing();
-		if (h === "#/signin" || h === "#/signup") { S.focusAuth = true; return landing(h.slice(2)); }
+		if (h === "#/") { if ($(".pub") && $("#authOv")) return closeAuth(); return landing(); }
+		if (h === "#/signin" || h === "#/signup") { if ($(".pub")) return openAuth(h.slice(2)); return landing(h.slice(2)); }
 		if (h === "#/analyses") return shell("saved");
 		const m = h.match(/^#\/a\/(\w+)/);
 		if (m) { if (!S.A || S.A.id !== m[1]) { const a = savedList().find((x) => x.id === m[1]); if (!a) return go("#/analyses"); load(a); } return shell("report"); }
@@ -80,28 +81,53 @@
 	/* page change inside the app: the new content fades in and rises a little (the sidebar stays still) */
 	const enter = (el) => { if (!el || reduced()) return; el.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 450, easing: "cubic-bezier(0.22, 0.61, 0.36, 1)" }); };
 
-	/* ---------------- landing: the pitch on the left, sign in / create an account on the right ---------------- */
-	function landing(tab = "signup") {
-		document.title = t(tab === "signin" ? "Sign in" : "Create an account") + " · Facet";
-		view(`<div class="pub"><header class="pub-top"><span class="sp"></span>${langBtn()}${themeBtn()}<button type="button" class="btn btn-g" data-tab-go="signin">${ic("log-in")}<span class="lbl">${esc(t("Sign in"))}</span></button></header>
+	/* ---------------- landing: top bar (logo, sign in, create an account), pitch + illustration, 3 steps ---------------- */
+	function landing(tab) {
+		document.title = t("Facet · drop a bank statement, see where your money goes");
+		view(`<div class="pub"><header class="pub-top">${logo("a")}<span class="sp"></span>${langBtn()}${themeBtn()}<button type="button" class="btn btn-g" data-open-auth="signin" aria-label="${esc(t("Sign in"))}">${ic("log-in")}<span class="lbl">${esc(t("Sign in"))}</span></button><button type="button" class="btn btn-p hide-m" data-open-auth="signup">${esc(t("Create an account"))}</button></header>
 		<main class="land">
-			<div class="hero"><div class="hero-t">
-				<span class="brand">${logo("span")}</span>
+			<div class="hero"><div>
 				<h1>${t("Drop your bank statement. <em>See where your money goes.</em>")}</h1>
 				<p class="lede">${esc(t("Facet reads the file your bank gives you, sorts every line, finds your subscriptions and the expenses that stand out, and builds the full picture. Then you ask for any other view."))}</p>
+				<div class="cta"><button type="button" class="btn btn-p" data-open-auth="signup">${ic("upload")}${esc(t("Analyse a statement"))}</button><button type="button" class="btn" data-open-auth="signin">${ic("eye")}${esc(t("Try it with a sample"))}</button></div>
 				<ul class="formats" aria-label="${esc(t("Reads"))}"><li class="lead">${esc(t("Reads"))}</li>${[["file-spreadsheet", "Excel"], ["file-text", "CSV"], ["file", "PDF"], ["file-text", "Word"], ["file-text", t("Text")]].map(([i, n]) => `<li>${ic(i)}${esc(n)}</li>`).join("")}</ul>
-				<p class="tip-s">${ic("eye")}<span>${esc(t("No statement at hand? Use the demo account: three sample statements are ready to try."))}</span></p>
-			</div>${authCard(tab)}</div>
-			<div class="how-wrap">${heroArt()}<ol class="how">
+			</div>${heroArt()}</div>
+			<ol class="how">
 				<li><h3>${esc(t("Drop the file"))}</h3><p>${esc(t("The export from your bank's website, a PDF statement or your own budget sheet. Several files at once is fine."))}</p></li>
 				<li><h3>${esc(t("It is read on your device"))}</h3><p>${esc(t("Dates, labels and amounts are found in your browser. Each merchant is sorted into a category, and you can correct any of them."))}</p></li>
 				<li><h3>${esc(t("Get the full picture"))}</h3><p>${esc(t("Spending by category, month by month, regular payments, unusual expenses. Every figure opens on the lines of your file it comes from."))}</p></li>
-			</ol></div>
+			</ol>
 			<div class="trust">${ic("lock")}<p>${t("<b>Your file stays in your browser.</b> Only the names of merchants Facet does not recognise are sent to the AI to sort them: never an amount, a date or an account number. Nothing is kept on a server.")}</p></div>
 		</main>${footer()}</div>`);
+		$$("[data-open-auth]").forEach((x) => x.addEventListener("click", () => go("#/" + x.dataset.openAuth)));
+		if (tab) openAuth(tab); else closeAuth(true);
+	}
+
+	/* ---------------- the account panel: an overlay over the page, blurred backdrop, animated in and out ---------------- */
+	let lastFocus = null;
+	function openAuth(tab) {
+		let ov = $("#authOv");
+		if (ov) { switchTab(tab); return; }
+		lastFocus = document.activeElement;
+		document.body.insertAdjacentHTML("beforeend", `<div class="ov" id="authOv"><div class="ov-bg" data-close></div><div class="ov-box" role="dialog" aria-modal="true" aria-labelledby="authTitle">${authCard(tab)}</div></div>`);
+		ov = $("#authOv"); document.body.style.overflow = "hidden";
+		ov.querySelector("[data-close]").addEventListener("click", () => go("#/"));
+		ov.querySelector(".ov-x").addEventListener("click", () => go("#/"));
 		bindAuth(tab);
-		$$("[data-tab-go]").forEach((x) => x.addEventListener("click", () => { switchTab(x.dataset.tabGo); $("#authCard").scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "center" }); }));
-		if (S.focusAuth) { S.focusAuth = false; requestAnimationFrame(() => { $("#authCard").scrollIntoView({ block: "center" }); $("#authF input")?.focus({ preventScroll: true }); }); }
+		requestAnimationFrame(() => ov.classList.add("on"));
+		setTimeout(() => $("#authF input")?.focus({ preventScroll: true }), reduced() ? 0 : 120);
+		ov.addEventListener("keydown", (e) => {
+			if (e.key === "Escape" && !open) { e.preventDefault(); go("#/"); }
+			if (e.key === "Tab") { const f = $$('button, input, a[href]', ov.querySelector(".ov-box")).filter((x) => !x.disabled && x.offsetParent); if (!f.length) return; const i = f.indexOf(document.activeElement); if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); } }
+		});
+	}
+	function closeAuth(now) {
+		const ov = $("#authOv"); if (!ov) return;
+		document.body.style.overflow = "";
+		if (now || reduced()) { ov.remove(); return; }
+		ov.classList.remove("on"); ov.classList.add("off");
+		setTimeout(() => ov.remove(), 400);
+		lastFocus?.focus?.({ preventScroll: true });
 	}
 
 	/* hero illustration: a statement turning into the analysis (drawn, no photo; same marks as the real charts) */
@@ -118,7 +144,7 @@
 
 	/* ---------------- sign in / create an account (a card on the landing page) ---------------- */
 	function authCard(tab) {
-		return `<section class="auth-card" id="authCard" aria-label="${esc(t("Your account"))}">
+		return `<section class="auth-card" id="authCard"><button type="button" class="icon-btn ov-x" aria-label="${esc(t("Close"))}">${ic("x")}</button>
 			<div class="tabs" role="tablist" data-on="${tab === "signup" ? "up" : "in"}"><span class="pill" aria-hidden="true"></span><button type="button" role="tab" id="tab-in" aria-controls="authBody" aria-selected="${tab !== "signup"}" data-tab="signin">${esc(t("Sign in"))}</button><button type="button" role="tab" id="tab-up" aria-controls="authBody" aria-selected="${tab === "signup"}" data-tab="signup">${esc(t("Create an account"))}</button></div>
 			<div class="auth-body" id="authBody" role="tabpanel">${authForm(tab)}</div>
 			<p class="demo-note">${ic("info")}<span>${esc(t("This is a demo: no e-mail is sent and the password is not checked or kept. The account only exists in this browser."))}</span></p>
@@ -128,11 +154,11 @@
 		const e = S.authErr || {}; S.authErr = {};
 		const f = (id, label, type = "text", ac = "") => `<div class="field"><label for="${id}">${esc(t(label))}</label><div class="in"><input id="${id}" name="${id}" type="${type}" autocomplete="${ac}" ${e[id] ? 'aria-invalid="true" aria-describedby="' + id + '-e"' : ""}>${type === "password" ? `<button type="button" class="icon-btn eye" data-eye aria-label="${esc(t("Show the password"))}">${ic("eye")}</button>` : ""}</div>${e[id] ? `<p class="err" id="${id}-e">${esc(t(e[id]))}</p>` : ""}</div>`;
 		const demo = `<div class="or">${esc(t("or"))}</div><button class="btn" type="button" data-demo>${ic("user")}${esc(t("Use the demo account (Camille Martin)"))}</button>`;
-		return tab === "signup" ? `<form id="authF" novalidate data-tab="signup"><h2>${esc(t("Create your account"))}</h2><p class="sub">${esc(t("Your analyses are kept in this account, in this browser."))}</p>
+		return tab === "signup" ? `<form id="authF" novalidate data-tab="signup"><h2 id="authTitle">${esc(t("Create your account"))}</h2><p class="sub">${esc(t("Your analyses are kept in this account, in this browser."))}</p>
 				<div class="row2">${f("first", "First name", "text", "given-name")}${f("last", "Last name", "text", "family-name")}</div>
 				${f("email", "E-mail", "email", "email")}${f("pw", "Password (8 characters or more)", "password", "new-password")}
 				<button class="btn btn-p" type="submit">${esc(t("Create my account"))}</button>${demo}</form>`
-			: `<form id="authF" novalidate data-tab="signin"><h2>${esc(t("Welcome back"))}</h2><p class="sub">${esc(t("Sign in to see your analyses or start a new one."))}</p>
+			: `<form id="authF" novalidate data-tab="signin"><h2 id="authTitle">${esc(t("Welcome back"))}</h2><p class="sub">${esc(t("Sign in to see your analyses or start a new one."))}</p>
 				${f("email", "E-mail", "email", "email")}${f("pw", "Password", "password", "current-password")}
 				<button class="btn btn-p" type="submit">${ic("log-in")}${esc(t("Sign in"))}</button>${demo}</form>`;
 	}
@@ -142,7 +168,7 @@
 		const keep = { email: $("#authF [name=email]")?.value || "" };
 		tabs.dataset.on = tab === "signup" ? "up" : "in";
 		$$("[role=tab]", tabs).forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === tab));
-		history.replaceState(null, "", "#/" + tab); document.title = t(tab === "signin" ? "Sign in" : "Create an account") + " · Facet";
+		history.replaceState(null, "", "#/" + tab);
 		const from = body.getBoundingClientRect().height;
 		body.innerHTML = authForm(tab); bindAuth(tab, keep);
 		if (reduced()) return;
@@ -181,21 +207,20 @@
 		const list = savedList(), a = S.acct, init = ((a.first || "?")[0] + (a.last || "")[0] || "").toUpperCase();
 		const titles = { upload: "New analysis", saved: "My analyses", report: S.A ? S.A.name : "" };
 		document.title = (page === "report" && S.A ? S.A.name : t(titles[page])) + " · Facet";
-		view(`<div class="mtop">${logo()}${themeBtn()}<button type="button" class="icon-btn" id="burger" aria-label="${esc(t("Menu"))}" aria-expanded="false" aria-controls="side">${ic("menu")}</button></div>
+		view(`<div class="mtop">${logo()}${langBtn()}${themeBtn()}<button type="button" class="icon-btn" id="burger" aria-label="${esc(t("Menu"))}" aria-expanded="false" aria-controls="side">${ic("menu")}</button></div>
 		<div class="shell">
 			<aside class="side" id="side" aria-label="${esc(t("Menu"))}">
 				${logo("button", 'data-go="#/new"')}
 				<button type="button" class="btn btn-p new" data-go="#/new">${ic("plus")}${esc(t("New analysis"))}</button>
 				<ul class="nav"><li><button type="button" data-go="#/analyses" ${page === "saved" ? 'aria-current="page"' : ""}>${ic("layers")}${esc(t("My analyses"))}<span class="count">${list.length}</span></button>
-					${list.length ? `<ul class="recent">${list.slice(0, 6).map((x) => `<li><button type="button" data-go="#/a/${x.id}" ${S.A?.id === x.id && page === "report" ? 'aria-current="true"' : ""} title="${esc(x.name)}">${esc(x.name)}</button></li>`).join("")}</ul>` : ""}</li></ul>
+					${list.length ? `<ul class="recent">${list.slice(0, 5).map((x) => `<li><button type="button" data-go="#/a/${x.id}" ${S.A?.id === x.id && page === "report" ? 'aria-current="true"' : ""} title="${esc(x.name)}">${esc(x.name)}</button></li>`).join("")}${list.length > 5 ? `<li><button type="button" class="all" data-go="#/analyses">${esc(t("See all ({n})", { n: list.length }))}</button></li>` : ""}</ul>` : ""}</li></ul>
 				<div class="grow"></div>
 				<div class="side-foot">
 					<div class="theme" role="group" aria-label="${esc(t("Theme"))}"><span class="pill" aria-hidden="true"></span><button type="button" data-theme-set="dark" aria-pressed="${S.theme === "dark"}">${ic("moon")}${esc(t("Dark"))}</button><button type="button" data-theme-set="light" aria-pressed="${S.theme === "light"}">${ic("sun")}${esc(t("Light"))}</button></div>
-					<div class="dd" style="display:flex;justify-content:flex-start">${langBtn()}</div>
 					<div class="me"><button type="button" id="meBtn" aria-haspopup="listbox" aria-expanded="false"><span class="av" aria-hidden="true">${esc(init)}</span><span class="who"><b>${esc(((a.first || "") + " " + (a.last || "")).trim())}</b><small>${esc(a.email)}</small></span>${ic("chevron-down", "chev")}</button><ul class="menu" role="listbox" tabindex="-1" hidden></ul></div>
 				</div>
 			</aside>
-			<main class="main" id="main" tabindex="-1"></main>
+			<div class="mainw"><div class="topbar"><nav class="crumbs" aria-label="${esc(t("You are here"))}">${page === "report" && S.A ? `<button type="button" data-go="#/analyses">${esc(t("My analyses"))}</button>${ic("chevron-right", "flip-ic")}<span>${esc(S.A.name)}</span>` : `<span>${esc(t(titles[page]))}</span>`}</nav><span class="sp"></span>${langBtn()}</div><main class="main" id="main" tabindex="-1"></main></div>
 		</div><div class="scrim" id="scrim" hidden></div>`);
 		$("#meBtn").addEventListener("click", (e) => { e.stopPropagation(); menu($("#meBtn"), $("#meBtn").nextElementSibling, [{ k: "saved", label: t("My analyses"), icon: "layers" }, { k: "out", label: t("Sign out"), icon: "log-out" }], (x) => (x.k === "out" ? signOut() : go("#/analyses"))); });
 		$("#burger").addEventListener("click", () => drawer(!$("#side").classList.contains("open")));
@@ -245,6 +270,8 @@
 	/* ---------------- analyse: read, classify, ask the AI about unknown merchants, build ---------------- */
 	async function analyse(files) {
 		if (S.busy) return; S.busy = true;
+		const dz = $("#drop"); // the drop zone answers at once: a loader while the files are read
+		if (dz) { dz.classList.add("busy"); dz.innerHTML = `<span class="ic"><span class="spin big"></span></span><b>${esc(t("Reading {f}", { f: files.map((f) => f.name).join(", ") }))}</b><span>${esc(t("This takes a few seconds."))}</span>`; await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))); await wait(450); }
 		const steps = [["read", "Reading the files"], ["cols", "Finding dates, labels and amounts"], ["sort", "Sorting each merchant into a category"], ["ai", "Asking the AI about merchants it did not recognise"], ["build", "Building your analysis"]];
 		$("#main").innerHTML = `<header><h1>${esc(t("Reading your statement"))}</h1><p>${esc(files.map((f) => f.name).join(", "))}</p></header><ol class="steps" id="steps" aria-live="polite">${steps.map(([k, l]) => `<li data-s="${k}"><span class="st"><span class="dotw"></span></span><div>${esc(t(l))}<small></small></div></li>`).join("")}</ol>`;
 		enter($("#main"));
@@ -291,7 +318,7 @@
 
 	/* an analysis becomes the engine's data: merchants rebuilt, "today" = the end of the file */
 	function load(A) {
-		S.A = A; S.open = {}; S.pick = {}; S.past = []; S.q = ""; S.txN = 40; S.txFilter = "all";
+		S.A = A; S.open = {}; S.pick = {}; S.past = []; S.q = ""; S.txN = 40; S.txFilter = "all"; S.f = { per: "all", cats: [], min: 0 };
 		const tx = A.tx.map((x) => ({ ...x, m: C.merchant(x.label) }));
 		tx.forEach((x) => (x.k = x.m.toLowerCase()));
 		const last = tx[0]?.d || new Date().toISOString().slice(0, 10), ld = E.parse(last), endM = new Date(ld.getFullYear(), ld.getMonth() + 1, 0);
@@ -305,6 +332,35 @@
 		store.set(savedKey(), list);
 	}
 
+	/* filters for the whole analysis: period, categories, minimum amount. They narrow the spending lines; money in stays for the period. */
+	function fdata() {
+		const D = S.data, f = S.f || { per: "all", cats: [], min: 0 }, T = E.parse(D.today);
+		let from = D.from, to = D.today;
+		if (/^\d{4}-\d{2}$/.test(f.per)) { const [y, m] = f.per.split("-").map(Number); from = f.per + "-01"; to = `${f.per}-${String(new Date(y, m, 0).getDate()).padStart(2, "0")}`; if (to > D.today) to = D.today; }
+		else if (f.per === "last_3_months" || f.per === "last_6_months") { const n = f.per === "last_3_months" ? 3 : 6, d = new Date(T.getFullYear(), T.getMonth() - n + 1, 1); from = d.toISOString().slice(0, 7) + "-01"; if (from < D.from) from = D.from; }
+		const tx = D.tx.filter((x) => x.d >= from && x.d <= to && (x.a > 0 || ((!f.cats.length || f.cats.includes(x.c)) && -x.a >= (f.min || 0))));
+		const last = new Date(+to.slice(0, 4), +to.slice(5, 7), 0);
+		return { ...D, tx, from, today: to, full: D.full || to.slice(8) === String(last.getDate()) };
+	}
+	const filtered = () => S.f && (S.f.per !== "all" || S.f.cats.length || S.f.min);
+	function filterBar() {
+		const f = S.f, D = S.data, months = [...new Set(D.tx.map((x) => x.d.slice(0, 7)))].sort().reverse();
+		const perLabel = f.per === "all" ? t("The whole file") : /^\d{4}-/.test(f.per) ? dt(f.per + "-01", { month: "long", year: "numeric" }) : t(PRESET_NAMES[f.per]);
+		const catLabel = !f.cats.length ? t("All categories") : f.cats.length === 1 ? catName(f.cats[0]) : t("{n} categories", { n: f.cats.length });
+		const minLabel = f.min ? t("Over {v}", { v: money0(f.min) }) : t("Any amount");
+		const dd = (id, icon, label, on) => `<div class="dd"><button type="button" class="fbtn ${on ? "on" : ""}" id="${id}" aria-haspopup="listbox" aria-expanded="false">${ic(icon)}<span>${esc(label)}</span>${ic("chevron-down", "chev")}</button><ul class="menu" role="listbox" tabindex="-1" hidden></ul></div>`;
+		return `<div class="filters" role="group" aria-label="${esc(t("Filter the analysis"))}"><span class="f-lead">${ic("layers")}${esc(t("Filter"))}</span>${dd("fPer", "calendar", perLabel, f.per !== "all")}${dd("fCat", "chart-pie", catLabel, f.cats.length)}${dd("fMin", "receipt-text", minLabel, f.min)}${filtered() ? `<button type="button" class="btn btn-sm btn-g" id="fReset">${ic("rotate-ccw")}${esc(t("Reset"))}</button>` : ""}<span class="sp"></span><span class="f-n">${esc(t("{n} lines", { n: num(fdata().tx.length) }))}</span></div>`;
+		void months;
+	}
+	function bindFilters() {
+		const D = S.data, f = S.f, months = [...new Set(D.tx.map((x) => x.d.slice(0, 7)))].sort().reverse(), nM = months.length;
+		const apply = () => { S.txN = 40; report(false); };
+		$("#fPer").addEventListener("click", (e) => { e.stopPropagation(); menu($("#fPer"), $("#fPer").nextElementSibling, [{ v: "all", label: t("The whole file") }, ...(nM > 3 ? [{ v: "last_3_months", label: t("Last 3 months") }] : []), ...(nM > 6 ? [{ v: "last_6_months", label: t("Last 6 months") }] : []), ...months.map((m) => ({ v: m, label: dt(m + "-01", { month: "long", year: "numeric" }) }))].map((x) => ({ ...x, on: x.v === f.per })), (x) => { f.per = x.v; apply(); }); });
+		$("#fCat").addEventListener("click", (e) => { e.stopPropagation(); menu($("#fCat"), $("#fCat").nextElementSibling, [{ v: "", label: t("All categories"), on: !f.cats.length }, ...CATS.concat("other").filter((c) => D.tx.some((x) => x.c === c)).map((c) => ({ v: c, label: catName(c), dot: col(c), on: f.cats.includes(c), check: true }))], (x) => { if (!x.v) f.cats = []; else f.cats = f.cats.includes(x.v) ? f.cats.filter((c) => c !== x.v) : f.cats.concat(x.v); apply(); }); });
+		$("#fMin").addEventListener("click", (e) => { e.stopPropagation(); menu($("#fMin"), $("#fMin").nextElementSibling, [0, 10, 50, 100, 500].map((v) => ({ v, label: v ? t("Over {v}", { v: money0(v) }) : t("Any amount"), on: v === f.min })), (x) => { f.min = x.v; apply(); }); });
+		$("#fReset")?.addEventListener("click", () => { S.f = { per: "all", cats: [], min: 0 }; apply(); });
+	}
+
 	/* undo: every change (category, view added or removed, block changed) can be taken back */
 	function snap() { S.past.push(JSON.stringify({ views: S.A.views, cats: S.data.tx.map((x) => [x.c, x.how]) })); if (S.past.length > 50) S.past.shift(); }
 	function undo() {
@@ -315,11 +371,14 @@
 
 	/* ---------------- the report ---------------- */
 	function report(first) {
-		const A = S.A, D = S.data, tx = D.tx, main = $("#main"); if (!A || !main) return;
+		const A = S.A, main = $("#main"); if (!A || !main) return;
+		const FD = (S.fd = fdata()), D = FD, tx = FD.tx, all = S.data.tx;
+		if (!tx.length) S.f = { per: "all", cats: [], min: 0 };
 		const spend = tx.filter((x) => x.a < 0), inc = tx.filter((x) => x.a > 0);
-		const todo = tx.filter((x) => x.c === "other"), months = E.range({ preset: "all" }, D).months;
-		const rec = C.recurring(tx.map((x) => ({ ...x }))), odd = C.unusual(tx, rec);
-		const counts = ["file", "rule", "ai", "you"].map((k) => [k, tx.filter((x) => x.how === k).length]);
+		const todo = all.filter((x) => x.c === "other"), months = E.range({ preset: "all" }, D).months;
+		const ids = new Set(tx.map((x) => x.id));
+		const rec = C.recurring(all.map((x) => ({ ...x }))).map((r) => ({ ...r, tx: r.tx.filter((x) => ids.has(x.id)) })).filter((r) => r.tx.length), odd = C.unusual(all, C.recurring(all.map((x) => ({ ...x })))).filter((o) => ids.has(o.t.id));
+		const counts = ["file", "rule", "ai", "you"].map((k) => [k, all.filter((x) => x.how === k).length]);
 		const allP = { preset: "all" };
 		const blocks = [
 			{ kind: "kpi", title: { k: "Money out" }, measure: "spend", period: allP, compare: false },
@@ -335,13 +394,15 @@
 		const r0 = E.range(allP, D);
 		main.innerHTML = `
 			<header class="rh"><div><h1>${esc(A.name)}</h1>
-				<div class="meta"><span>${ic("calendar")}${esc(t("{a} to {b}", { a: dLong(D.from), b: dLong(tx[0].d) }))}</span><span>${ic("receipt-text")}${esc(t("{n} lines", { n: num(tx.length) }))}</span><span class="ok">${ic("check")}${esc(t("Saved in My analyses"))}</span></div></div>
+				<div class="meta"><span>${ic("calendar")}${esc(t("{a} to {b}", { a: dLong(S.data.from), b: dLong(all[0].d) }))}</span><span>${ic("receipt-text")}${esc(t("{n} lines", { n: num(all.length) }))}</span><span class="ok">${ic("check")}${esc(t("Saved in My analyses"))}</span></div></div>
 				<button type="button" class="btn" data-go="#/new">${ic("upload")}<span class="lbl">${esc(t("Another file"))}</span></button></header>
-			<form class="ask" id="askF" autocomplete="off"><span class="lead">${ic("sparkles")}</span><label class="sr" for="askQ">${esc(t("Ask for another view"))}</label><input id="askQ" maxlength="300" placeholder="${esc(t(innerWidth < 640 ? "Ask for another view" : "Ask for another view, for example: restaurants month by month"))}"><button class="btn btn-p" type="submit">${esc(t("Build"))}</button></form>
-			<ul class="chips">${chips(rec).map((c, i) => `<li><button type="button" data-chip="${i}">${esc(c)}</button></li>`).join("")}</ul>
+			<form class="ask" id="askF" autocomplete="off"><span class="lead">${ic("sparkles")}</span><label class="sr" for="askQ">${esc(t("Ask a question about your money"))}</label><input id="askQ" maxlength="300" placeholder="${esc(t(innerWidth < 640 ? "Ask a question about your money" : "Ask a question, for example: how much do I spend on restaurants each month?"))}"><button class="btn btn-p" type="submit">${ic("arrow-right", "flip-ic")}<span>${esc(t("Ask"))}</span></button></form>
+			<ul class="chips" aria-label="${esc(t("Questions you can ask"))}">${chips(rec).map((c, i) => `<li><button type="button" data-chip="${i}" data-en="${esc(c[1])}">${esc(c[0])}</button></li>`).join("")}</ul>
 			<div id="views"></div>
-			${readBox(A, counts, todo)}
-			<section class="sect"><h2>${esc(t("Overview"))}</h2><p class="sub">${esc(t("The whole file: {r}.", { r: rangeLabel(r0) }))}</p><div class="grid" id="g-kpi"></div></section>
+			<div class="rep">
+			<div class="rep-main">
+			<div class="fwrap">${filterBar()}</div>
+			<section class="sect first"><h2>${esc(t("Overview"))}</h2><p class="sub">${esc(filtered() ? t("Filtered: {r}.", { r: rangeLabel(r0) }) : t("The whole file: {r}.", { r: rangeLabel(r0) }))}</p><div class="grid" id="g-kpi"></div></section>
 			<section class="sect"><h2>${esc(t("Where the money goes"))}</h2><div class="grid" id="g-where"></div></section>
 			<section class="sect"><h2>${esc(t("Worth knowing"))}</h2><div class="ins" id="ins"></div></section>
 			<section class="sect"><h2>${esc(t("Regular payments"))}</h2><p class="sub">${esc(rec.length ? t("Found because the same amount goes to the same place at a steady rhythm.") : t("No payment repeats at a steady rhythm in this file."))}</p><div class="grid" id="g-rec"></div></section>
@@ -351,26 +412,32 @@
 				<div class="tools-row"><div class="search">${ic("search")}<label class="sr" for="txQ">${esc(t("Search"))}</label><input id="txQ" placeholder="${esc(t("Search a merchant or a label"))}" value="${esc(S.q)}"></div>
 				<div class="dd"><button type="button" class="btn" id="txF" aria-haspopup="listbox" aria-expanded="false">${ic("layers")}<span>${esc(S.txFilter === "all" ? t("All categories") : catName(S.txFilter))}</span>${ic("chevron-down", "chev")}</button><ul class="menu" role="listbox" tabindex="-1" hidden></ul></div></div>
 				<div class="alltx" id="alltx"></div></section>
+			</div>
+			<aside class="rep-side" aria-label="${esc(t("Your file"))}">${readBox(A, counts, todo)}${preview(A)}</aside>
+			</div>
 			${footer()}`;
 		const anim = !!first;
 		fill("#g-kpi", blocks, anim); fill("#g-where", where, anim); fill("#g-top", top, anim);
-		insights(rec); recBlock(rec, anim); oddBlock(odd, anim); views(anim); allTx();
+		insights(rec); recBlock(rec, anim); oddBlock(odd, anim); views(anim); allTx(); bindFilters();
 		$("#askF").addEventListener("submit", (e) => { e.preventDefault(); const v = $("#askQ").value.trim(); if (v) ask(v); });
-		$$("[data-chip]").forEach((b) => b.addEventListener("click", () => ask(b.textContent, true)));
+		$$("[data-chip]").forEach((b) => b.addEventListener("click", () => ask(b.textContent, true, b.dataset.en)));
 		$("#txQ").addEventListener("input", (e) => { S.q = e.target.value; S.txN = 40; allTx(); });
 		$("#txF").addEventListener("click", (e) => { e.stopPropagation(); menu($("#txF"), $("#txF").nextElementSibling, [{ k: "all", label: t("All categories"), on: S.txFilter === "all" }, ...CATS.concat("income", "other").map((c) => ({ k: c, label: catName(c) + ` (${num(tx.filter((x) => x.c === c).length)})`, dot: col(c), on: S.txFilter === c }))], (x) => { S.txFilter = x.k; S.txN = 40; $("#txF span").textContent = x.k === "all" ? t("All categories") : catName(x.k); allTx(); }); });
-		$("#readBtn")?.addEventListener("click", () => { S.open.read = !S.open.read; $("#readBtn").setAttribute("aria-expanded", S.open.read); slide($("#readIn"), S.open.read); });
-		$("#toCheck")?.addEventListener("click", () => { S.txFilter = "other"; S.txN = 40; allTx(); $("#txF span").textContent = catName("other"); $("#all").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" }); });
+		$("#pvAll")?.addEventListener("click", () => lines(t("All lines"), S.data.tx, ""));
+		$("#readBtn")?.addEventListener("click", () => { S.open.read = !($("#readBtn").getAttribute("aria-expanded") === "true"); $("#readBtn").setAttribute("aria-expanded", S.open.read); slide($("#readIn"), S.open.read); });
+		$("#toCheck")?.addEventListener("click", () => { S.f = { per: "all", cats: [], min: 0 }; report(false); S.txFilter = "other"; S.txN = 40; allTx(); $("#txF span").textContent = catName("other"); $("#all").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" }); });
 	}
 	const rangeLabel = (R) => t("{a} to {b}", { a: dShort(R.from), b: dLong(R.to) });
 	function chips(rec) {
 		const topCat = CATS.map((c) => [c, S.data.tx.filter((x) => x.c === c && x.a < 0).reduce((a, x) => a - x.a, 0)]).filter((x) => x[0] !== "home").sort((a, b) => b[1] - a[1])[0]?.[0] || "groceries";
-		return [t("{cat} month by month", { cat: catName(topCat) }), t("My biggest expenses"), t("Which day of the week do I spend the most?"), rec.length ? t("My subscriptions") : t("Money in and out")];
+		// shown in the person's language; the local reader gets the English wording (it reads English and French words)
+		const q = (k, p) => [t(k, p), (k.replace(/\{(\w+)\}/g, (m, n) => (n === "cat" ? I.CAT_NAMES[topCat] : m)))];
+		return [q("How much do I spend on {cat} each month?", { cat: catName(topCat).toLowerCase() }), q("What are my biggest expenses?"), q("Which day of the week do I spend the most?"), rec.length ? q("How much do my subscriptions cost?") : q("How much money came in and went out?")];
 	}
 	function readBox(A, counts, todo) {
 		const n = Object.fromEntries(counts), files = A.files.filter((f) => f.found);
-		return `<div class="read"><button type="button" id="readBtn" aria-expanded="${S.open.read ? "true" : "false"}">${ic("scan-search")}<div><b>${esc(t("What Facet read"))}</b><br><span>${esc(t("{n} lines from {f}", { n: num(S.data.tx.length), f: files.map((f) => f.name).join(", ") }))}${todo.length ? " · " : ""}</span>${todo.length ? `<span class="badge warn">${esc(t("{n} to check", { n: num(todo.length) }))}</span>` : `<span class="ok"> · ${esc(t("everything sorted"))}</span>`}</div>${ic("chevron-down", "chev")}</button>
-			<div id="readIn" ${S.open.read ? "" : "hidden"}><div class="read-in">
+		return `<div class="read"><button type="button" id="readBtn" aria-expanded="${S.open.read || innerWidth >= 1280 ? "true" : "false"}">${ic("scan-search")}<div><b>${esc(t("What Facet read"))}</b><br><span>${esc(t("{n} lines from {f}", { n: num(S.data.tx.length), f: files.map((f) => f.name).join(", ") }))}${todo.length ? " · " : ""}</span>${todo.length ? `<span class="badge warn">${esc(t("{n} to check", { n: num(todo.length) }))}</span>` : `<span class="ok"> · ${esc(t("everything sorted"))}</span>`}</div>${ic("chevron-down", "chev")}</button>
+			<div id="readIn" ${S.open.read || innerWidth >= 1280 ? "" : "hidden"}><div class="read-in">
 				${A.files.map((f) => `<div class="fl"><h4>${ic(f.kind === "pdf" ? "file" : f.kind === "xlsx" ? "file-spreadsheet" : "file-text")}${esc(f.name)}</h4><p>${f.found ? esc(t("{n} lines read", { n: num(f.found) })) + (f.skipped ? esc(" · " + t("{n} lines left aside (balances, totals, lines without an amount)", { n: num(f.skipped) })) : "") + (f.pages ? esc(" · " + t("{n} pages", { n: f.pages })) : "") : esc(t("Nothing could be read from this file."))}</p>
 					${f.cols ? `<ul class="cols">${f.cols.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>` : f.lines ? `<ul class="cols"><li>${esc(f.dc ? t("Read from the PDF layout: date at the start of the line, amount under Debit or Credit") : t("Read line by line: a date at the start, the amount at the end"))}</li></ul>` : ""}
 					${f.pos ? `<p>${esc(t("Every amount was positive: they are counted as spending."))}</p>` : ""}</div>`).join("")}
@@ -381,9 +448,18 @@
 			</div></div></div>`;
 	}
 
+	/* the file itself, as Facet read it: the first lines with their line number, like a spreadsheet */
+	function preview(A) {
+		const f = A.files.find((x) => x.found), rows = S.data.tx.filter((x) => x.src?.file === f?.name).slice().sort((a, b) => (typeof a.src.line === "number" && typeof b.src.line === "number" ? a.src.line - b.src.line : a.d < b.d ? -1 : 1)).slice(0, 9);
+		if (!f) return "";
+		return `<section class="pv"><h3>${ic(f.kind === "pdf" ? "file" : f.kind === "xlsx" ? "file-spreadsheet" : "file-text")}<span>${esc(f.name)}</span></h3><p class="per">${esc(t("The first lines, as read from your file"))}</p>
+			<div class="pv-doc"><table><tbody>${rows.map((x) => `<tr><th>${esc(typeof x.src.line === "number" ? x.src.line : x.src.line.replace("p. ", "p"))}</th><td>${esc(x.d.split("-").reverse().join("/"))}</td><td class="pl">${esc(x.label)}</td><td class="pa ${x.a > 0 ? "in" : ""}">${esc(new Intl.NumberFormat(locale(), { minimumFractionDigits: 2 }).format(x.a))}</td></tr>`).join("")}</tbody></table></div>
+			<button type="button" class="btn btn-sm" id="pvAll">${ic("receipt-text")}${esc(t("See every line"))}</button></section>`;
+	}
+
 	/* insight cards: sentences with computed numbers, never written by the AI */
 	function insights(rec) {
-		const D = S.data, tx = D.tx, out = [];
+		const D = S.fd || S.data, tx = D.tx, out = [];
 		const perMonth = rec.reduce((a, r) => a + (r.every === "month" ? r.amount : r.every === "week" ? (r.amount * 52) / 12 : r.amount / 12), 0);
 		if (rec.length) out.push({ icon: "repeat", h: t("Regular payments"), v: t("{v} a month", { v: money0(perMonth) }), p: t("{n} payments come back on their own, about {y} a year.", { n: rec.length, y: money0(perMonth * 12) }) });
 		// biggest change between the last 3 full months and the 3 before
@@ -396,7 +472,7 @@
 			const ch = CATS.map((c) => ({ c, a: avg(c, recent), b: avg(c, before) })).map((x) => ({ ...x, d: x.a - x.b })).filter((x) => x.b > 0).sort((p, q) => Math.abs(q.d) - Math.abs(p.d))[0];
 			if (ch && Math.abs(ch.d) >= 15) out.push({ icon: ch.d > 0 ? "trending-up" : "trending-down", h: t("{cat}: the biggest change", { cat: catName(ch.c) }), v: (ch.d > 0 ? "+" : "−") + t("{v} a month", { v: money0(Math.abs(ch.d)) }), p: t("{a} a month over the last 3 months, against {b} the 3 months before.", { a: money0(ch.a), b: money0(ch.b) }) });
 		}
-		if (out.length < 2) { const sp = tx.filter((x) => x.a < 0), tot = sp.reduce((a, x) => a - x.a, 0) || 1, big = CATS.map((c) => [c, sp.filter((x) => x.c === c).reduce((a, x) => a - x.a, 0)]).sort((a, b) => b[1] - a[1])[0]; out.push({ icon: CAT_ICON[big[0]], h: t("Your largest category"), v: pct(big[1] / tot), p: t("{cat} takes {p} of your spending: {v}.", { cat: catName(big[0]), p: pct(big[1] / tot), v: money0(big[1]) }) }); }
+		if (out.length < 2 && (S.f?.cats.length || 0) !== 1) { const sp = tx.filter((x) => x.a < 0), tot = sp.reduce((a, x) => a - x.a, 0) || 1, big = CATS.map((c) => [c, sp.filter((x) => x.c === c).reduce((a, x) => a - x.a, 0)]).sort((a, b) => b[1] - a[1])[0]; out.push({ icon: CAT_ICON[big[0]], h: t("Your largest category"), v: pct(big[1] / tot), p: t("{cat} takes {p} of your spending: {v}.", { cat: catName(big[0]), p: pct(big[1] / tot), v: money0(big[1]) }) }); }
 		const small = tx.filter((x) => x.a < 0 && -x.a < 10);
 		if (small.length >= 5) out.push({ icon: "coffee", h: t("Small purchases"), v: money0(small.reduce((a, x) => a - x.a, 0)), p: t("{n} purchases under {l} each add up to this.", { n: num(small.length), l: money0(10) }) });
 		const inc = tx.filter((x) => x.a > 0).reduce((a, x) => a + x.a, 0), net = tx.reduce((a, x) => a + x.a, 0);
@@ -423,10 +499,10 @@
 	const srcLabel = (x) => (typeof x.src?.line === "number" ? t("{f}, line {l}", { f: x.src.file, l: x.src.line }).replace(/ (\d+)$/, "\u00a0$1") : `${x.src?.file}, ${x.src?.line}`);
 
 	/* ---------------- views built from a request (AI, or the local reader as a fallback) ---------------- */
-	async function ask(text, chip) {
+	async function ask(text, chip, en) {
 		if (S.busy) return; S.busy = true;
 		const box = $("#views"), D = S.data;
-		box.insertAdjacentHTML("afterbegin", `<div class="views-h" id="vload"><span class="spin"></span><span>${esc(t("Building: {q}", { q: text }))}</span></div>`);
+		box.insertAdjacentHTML("afterbegin", `<div class="views-h" id="vload"><span class="spin"></span><span>${esc(t("Looking for the answer: {q}", { q: text }))}</span></div>`);
 		let spec = null, src = "ai", reason = "";
 		if (!chip) {
 			try {
@@ -437,7 +513,7 @@
 				else reason = j.error === "daily_limit" ? "limit" : "offline";
 			} catch { reason = "offline"; }
 		}
-		if (!spec) { src = chip ? "chip" : "local"; spec = E.clean(RD.read(text, { t: (k, p) => ({ k, p }), today: D.today }), D); }
+		if (!spec) { src = chip ? "chip" : "local"; spec = E.clean(RD.read(en || text, { t: (k, p) => ({ k, p }), today: D.today }), D); }
 		await wait(200);
 		S.busy = false; $("#vload")?.remove();
 		if (!spec) return toast(t("Facet only knows this file. Ask about spending, categories, merchants or a period."));
@@ -445,12 +521,24 @@
 		$("#askQ").value = ""; views(true);
 		$("#views").scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" });
 	}
+	/* the answer to a question, in one sentence, computed from the first block (the AI never writes a figure) */
+	function answer(spec) {
+		const b = spec.blocks[0]; if (!b) return "";
+		const r = E.run(b, S.data), name = title(b.title);
+		if (b.kind === "kpi") return t("{what}: {v}.", { what: name || t("Answer"), v: val(b, r.total) });
+		if (!r.list.length) return t("Nothing in this period.");
+		if (b.by === "transaction") { const x = r.rows[0]?.tx[0]; return x ? t("The largest is {m}: {v}, on {d}.", { m: x.m, v: money(Math.abs(x.a)), d: dLong(x.d) }) : ""; }
+		const rows = (r.rows || []).filter((x) => x.key !== "_other"), top = rows.slice().sort((a, b2) => b2.value - a.value)[0]; if (!top) return "";
+		if (E.TIME.includes(b.by)) return t("Highest: {g}, with {v}. Total: {t}.", { g: keyLabel(b, top.key, true), v: val(b, top.value), t: val(b, r.total) });
+		return t("{g} comes first, with {v}.", { g: keyLabel(b, top.key, true), v: val(b, top.value) });
+	}
 	function views(anim) {
 		const box = $("#views"); box.innerHTML = "";
 		S.A.views.forEach((v, vi) => {
 			const by = v.src === "ai" ? `<span class="src-by">${ic("sparkles")}${esc(t("Layout chosen by the AI"))}</span>` : v.src === "chip" ? `<span class="src-by">${ic("check")}${esc(t("Suggestion, built without AI"))}</span>` : v.src === "edit" ? `<span class="src-by">${ic("check")}${esc(t("Changed by you"))}</span>` : `<span class="src-by warn">${ic("info")}${esc(t(v.reason === "limit" ? "AI budget spent today: simple local reader" : "AI not reachable: simple local reader"))}</span>`;
 			const wrap = document.createElement("section"); wrap.className = "sect"; wrap.style.marginTop = vi ? "28px" : "20px";
-			wrap.innerHTML = `<div class="views-h" style="margin:0"><h2 style="font-size:17px;text-transform:none;letter-spacing:-.01em;color:var(--ink)">${esc(title(v.spec.title) || v.label)}</h2>${by}<span class="sp"></span><button type="button" class="btn btn-sm btn-g" data-rm="${vi}">${ic("x")}${esc(t("Remove"))}</button></div><div class="grid"></div>`;
+			wrap.className = "qa";
+			wrap.innerHTML = `<div class="qa-h"><div class="qa-q">${ic("sparkles")}<span>${esc(v.label)}</span></div><span class="sp"></span>${by}<button type="button" class="btn btn-sm btn-g" data-rm="${vi}">${ic("x")}<span class="lbl">${esc(t("Remove"))}</span></button></div><p class="qa-a">${esc(answer(v.spec))}</p><div class="grid"></div>`;
 			box.appendChild(wrap);
 			const spans = layout(v.spec.blocks), g = wrap.querySelector(".grid");
 			v.spec.blocks.forEach((b, i) => g.appendChild(card(b, `v${v.id}-${i}`, spans[i], anim && vi === 0, i, { view: vi, block: i })));
@@ -489,7 +577,7 @@
 		return el;
 	}
 	function card(b, key, span, anim, i, edit) {
-		const D = S.data, res = E.run(b, D), R = res.R;
+		const D = edit ? S.data : S.fd || S.data, res = E.run(b, D), R = res.R;
 		const filt = b.filter?.categories && !["income", "net"].includes(b.measure) ? b.filter.categories.map(catName).join(", ") : "";
 		const per = [b.period.preset === "all" ? "" : t(PRESET_NAMES[b.period.preset] || "Chosen period"), rangeLabel(R), filt, (b.filter?.merchants || []).join(", ")].filter(Boolean).join(" · ");
 		const el = cardShell(title(b.title) || t("View"), per, span, anim, i);
@@ -529,38 +617,54 @@
 		return CH.hbars(plot, rows, o);
 	}
 
-	/* the file lines behind any block: date, merchant, the raw label and where it is in the file */
+	/* the file lines behind any block open in a side panel (nothing pushes the page down), with their own filters */
 	function addSources(el, key, res, o) {
 		const n = res.list.length; if (!n) return;
-		el.insertAdjacentHTML("beforeend", `<div class="src"><button type="button" aria-expanded="${S.open[key] ? "true" : "false"}">${ic("receipt-text")}<span>${esc(t(n === 1 ? "See the line" : "See the {n} lines", { n: num(n) }))}</span>${ic("chevron-down", "chev")}</button><div class="src-b" ${S.open[key] ? "" : "hidden"}><div class="src-in">${srcList(key, res, o)}</div></div></div>`);
-		const sb = el.querySelector(".src > button");
-		sb.addEventListener("click", () => { S.open[key] = !S.open[key]; sb.setAttribute("aria-expanded", S.open[key]); slide(el.querySelector(".src-b"), S.open[key]); });
-		el.querySelector(".src").addEventListener("click", (e) => {
-			if (e.target.closest("[data-more]")) { S.pick[key] = { ...(S.pick[key] || {}), n: (S.pick[key]?.n || 10) + 20 }; el.querySelector(".src-in").innerHTML = srcList(key, res, o); }
-			if (e.target.closest("[data-clear]")) { S.pick[key] = null; el.querySelector(".src-in").innerHTML = srcList(key, res, o); }
-		});
+		el.insertAdjacentHTML("beforeend", `<div class="src"><button type="button" aria-haspopup="dialog">${ic("receipt-text")}<span>${esc(t(n === 1 ? "See the line" : "See the {n} lines", { n: num(n) }))}</span>${ic("chevron-right", "chev flip-ic")}</button></div>`);
+		el.querySelector(".src > button").addEventListener("click", () => lines(el.querySelector("h3").textContent, res.list, el.querySelector(".per")?.textContent || ""));
 	}
-	function srcList(key, res, o) {
-		const pk = S.pick[key] || {}, row = pk.row != null && res.rows ? res.rows[pk.row] : null;
-		const list = (row ? row.tx : res.list).slice().sort((x, y) => (x.d < y.d ? 1 : -1)), show = pk.n || 10;
-		return (row ? `<p class="src-f">${esc(t("Only: {g}", { g: o.label(row) }))} <button type="button" data-clear>${ic("x")}${esc(t("Show all"))}</button></p>` : "") +
-			`<ul class="tx">${list.slice(0, show).map((x) => txLi(x)).join("")}</ul>` + (list.length > show ? `<p class="tx-more"><button type="button" class="btn btn-sm" data-more>${ic("plus")}${esc(t("Show {n} more", { n: num(Math.min(20, list.length - show)) }))}</button></p>` : "");
-	}
+	function pickRow(el, key, res, r, o) { const row = res.rows[r]; if (row) lines(el.querySelector("h3").textContent, row.tx, o.label(row)); }
 	const txLi = (x) => `<li><span class="d">${esc(dShort(x.d))}</span><span class="m"><b><i class="dot" style="background:${col(x.c)}"></i><span>${esc(x.m)}</span></b><small title="${esc(x.label)}">${esc(x.label)} · ${esc(srcLabel(x))}</small></span><span class="a ${x.a > 0 ? "in" : ""}">${esc((x.a > 0 ? "+" : "") + money(x.a))}</span></li>`;
-	function pickRow(el, key, res, r, o) {
-		S.pick[key] = { row: r }; const box = el.querySelector(".src-in"); if (box) box.innerHTML = srcList(key, res, o);
-		if (!S.open[key]) { S.open[key] = true; el.querySelector(".src > button").setAttribute("aria-expanded", "true"); slide(el.querySelector(".src-b"), true); }
+	function lines(h, list, sub) {
+		const L = { q: "", c: "all", sort: "new", n: 30 };
+		document.querySelector("#linesOv")?.remove();
+		document.body.insertAdjacentHTML("beforeend", `<div class="ov sheet" id="linesOv"><div class="ov-bg" data-close></div><div class="sh" role="dialog" aria-modal="true" aria-labelledby="shT">
+			<div class="sh-h"><div><h2 id="shT">${esc(h)}</h2>${sub ? `<p class="per">${esc(sub)}</p>` : ""}</div><button type="button" class="icon-btn" data-close aria-label="${esc(t("Close"))}">${ic("x")}</button></div>
+			<div class="sh-f"><div class="search">${ic("search")}<label class="sr" for="shQ">${esc(t("Search"))}</label><input id="shQ" placeholder="${esc(t("Search a merchant or a label"))}"></div>
+				<div class="dd"><button type="button" class="fbtn" id="shC" aria-haspopup="listbox" aria-expanded="false">${ic("chart-pie")}<span>${esc(t("All categories"))}</span>${ic("chevron-down", "chev")}</button><ul class="menu" role="listbox" tabindex="-1" hidden></ul></div>
+				<div class="dd"><button type="button" class="fbtn" id="shS" aria-haspopup="listbox" aria-expanded="false">${ic("calendar")}<span>${esc(t("Newest first"))}</span>${ic("chevron-down", "chev")}</button><ul class="menu" role="listbox" tabindex="-1" hidden></ul></div></div>
+			<div class="sh-sum" id="shSum"></div><div class="sh-b" id="shB"></div></div></div>`);
+		const ov = $("#linesOv"), last = document.activeElement; document.body.style.overflow = "hidden";
+		const close = () => { document.body.style.overflow = ""; if (reduced()) ov.remove(); else { ov.classList.remove("on"); ov.classList.add("off"); setTimeout(() => ov.remove(), 400); } last?.focus?.({ preventScroll: true }); };
+		const SORTS = { new: "Newest first", old: "Oldest first", big: "Largest first", small: "Smallest first" };
+		const draw = () => {
+			const q = L.q.trim().toLowerCase();
+			let r = list.filter((x) => (L.c === "all" || x.c === L.c) && (!q || x.m.toLowerCase().includes(q) || x.label.toLowerCase().includes(q)));
+			r = r.slice().sort((a, b) => (L.sort === "new" ? (a.d < b.d ? 1 : -1) : L.sort === "old" ? (a.d < b.d ? -1 : 1) : L.sort === "big" ? Math.abs(b.a) - Math.abs(a.a) : Math.abs(a.a) - Math.abs(b.a)));
+			const tot = r.reduce((a, x) => a + x.a, 0);
+			$("#shSum").innerHTML = `<span>${esc(t("{n} lines", { n: num(r.length) }))}</span><b class="${tot > 0 ? "in" : ""}">${esc((tot > 0 ? "+" : "") + money(tot))}</b>`;
+			$("#shB").innerHTML = r.length ? `<ul class="tx">${r.slice(0, L.n).map(txLi).join("")}</ul>${r.length > L.n ? `<p class="tx-more"><button type="button" class="btn btn-sm" id="shMore">${ic("plus")}${esc(t("Show {n} more", { n: num(Math.min(30, r.length - L.n)) }))}</button></p>` : ""}` : `<p class="empty">${esc(t("No line matches."))}</p>`;
+			$("#shMore")?.addEventListener("click", () => { L.n += 30; draw(); });
+		};
+		draw();
+		$$("[data-close]", ov).forEach((x) => x.addEventListener("click", close));
+		$("#shQ").addEventListener("input", (e) => { L.q = e.target.value; L.n = 30; draw(); });
+		const cats = CATS.concat("income", "other").filter((c) => list.some((x) => x.c === c));
+		$("#shC").addEventListener("click", (e) => { e.stopPropagation(); menu($("#shC"), $("#shC").nextElementSibling, [{ v: "all", label: t("All categories"), on: L.c === "all" }, ...cats.map((c) => ({ v: c, label: catName(c), dot: col(c), on: L.c === c }))], (x) => { L.c = x.v; L.n = 30; $("#shC span").textContent = x.v === "all" ? t("All categories") : catName(x.v); draw(); }); });
+		$("#shS").addEventListener("click", (e) => { e.stopPropagation(); menu($("#shS"), $("#shS").nextElementSibling, Object.entries(SORTS).map(([v, l]) => ({ v, label: t(l), on: L.sort === v })), (x) => { L.sort = x.v; $("#shS span").textContent = t(SORTS[x.v]); draw(); }); });
+		ov.addEventListener("keydown", (e) => { if (e.key === "Escape" && !open) { e.preventDefault(); close(); } });
+		requestAnimationFrame(() => ov.classList.add("on")); setTimeout(() => $("#shQ").focus({ preventScroll: true }), reduced() ? 0 : 150);
 	}
 
 	/* ---------------- all lines, with the category you can change ---------------- */
 	function allTx() {
-		const box = $("#alltx"), q = S.q.trim().toLowerCase(), D = S.data;
+		const box = $("#alltx"), q = S.q.trim().toLowerCase(), D = S.fd || S.data;
 		const list = D.tx.filter((x) => (S.txFilter === "all" || x.c === S.txFilter) && (!q || x.m.toLowerCase().includes(q) || x.label.toLowerCase().includes(q)));
 		if (!list.length) { box.innerHTML = `<p class="empty">${esc(t("No line matches."))}</p>`; return; }
 		box.innerHTML = `<table><tbody>${list.slice(0, S.txN).map((x) => `<tr><td class="d">${esc(dShort(x.d))}</td><td class="l"><b>${esc(x.m)}</b><small>${esc(x.label)} · ${esc(srcLabel(x))}</small></td><td class="k">${x.a < 0 ? `<div class="dd"><button type="button" class="catb ${x.c === "other" ? "todo" : ""}" data-tx="${x.id}" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t("Category of {m}: {c}. Change", { m: x.m, c: catName(x.c) }))}"><i class="dot" style="background:${col(x.c)}"></i>${esc(catName(x.c))}${x.how === "ai" ? ` <small>${esc(t("AI"))}</small>` : ""}${ic("chevron-down", "chev")}</button><ul class="menu" role="listbox" tabindex="-1" hidden></ul></div>` : `<span class="catb" style="cursor:default"><i class="dot" style="background:${col("income")}"></i>${esc(catName("income"))}</span>`}</td><td class="a ${x.a > 0 ? "in" : ""}">${esc((x.a > 0 ? "+" : "") + money(x.a))}</td></tr>`).join("")}</tbody></table>${list.length > S.txN ? `<p class="tx-more" style="padding-bottom:12px"><button type="button" class="btn btn-sm" id="txMore">${ic("plus")}${esc(t("Show {n} more", { n: num(Math.min(40, list.length - S.txN)) }))}</button></p>` : ""}`;
 		$("#txMore")?.addEventListener("click", () => { S.txN += 40; allTx(); });
 		$$("[data-tx]", box).forEach((b) => b.addEventListener("click", (e) => {
-			e.stopPropagation(); const x = D.tx.find((y) => y.id === b.dataset.tx), same = D.tx.filter((y) => y.k === x.k && y.a < 0);
+			e.stopPropagation(); const x = D.tx.find((y) => y.id === b.dataset.tx), same = S.data.tx.filter((y) => y.k === x.k && y.a < 0);
 			menu(b, b.nextElementSibling, CATS.map((c) => ({ c, label: catName(c), dot: col(c), on: c === x.c })), (o) => {
 				if (o.c === x.c && same.every((y) => y.c === o.c)) return;
 				snap(); same.forEach((y) => { y.c = o.c; y.how = "you"; }); persist(); report(false);
@@ -572,9 +676,12 @@
 	/* ---------------- my analyses ---------------- */
 	function saved() {
 		const list = savedList();
+		const q = (S.sq || "").trim().toLowerCase(), shown = list.filter((x) => !q || x.name.toLowerCase().includes(q));
 		$("#main").innerHTML = `<header><h1>${esc(t("My analyses"))}</h1><p>${esc(t("Kept in this browser, in your account."))}</p></header>
-			<ul class="saved">${list.length ? list.map((x) => `<li><div><b>${esc(x.name)}</b><small>${esc(new Date(x.at).toLocaleString(locale(), { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }))} · ${esc(t("{n} lines", { n: num(x.tx.length) }))}</small></div><button type="button" class="btn btn-sm" data-go="#/a/${x.id}">${ic("eye")}${esc(t("Open"))}</button><button type="button" class="btn btn-sm btn-g" data-del="${x.id}" aria-label="${esc(t("Delete"))} ${esc(x.name)}">${ic("trash-2")}${esc(t("Delete"))}</button></li>`).join("") : `<li class="none">${esc(t("No analysis yet. Drop a statement or try a sample to start."))} <button type="button" class="btn btn-p btn-sm" data-go="#/new">${ic("plus")}${esc(t("New analysis"))}</button></li>`}</ul>${footer()}`;
+			${list.length > 3 ? `<div class="tools-row"><div class="search">${ic("search")}<label class="sr" for="sQ">${esc(t("Search"))}</label><input id="sQ" placeholder="${esc(t("Search an analysis"))}" value="${esc(S.sq || "")}"></div></div>` : ""}
+			<ul class="saved">${list.length && !shown.length ? `<li class="none">${esc(t("No analysis matches."))}</li>` : ""}${list.length ? shown.map((x) => `<li><div><b>${esc(x.name)}</b><small>${esc(new Date(x.at).toLocaleString(locale(), { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }))} · ${esc(t("{n} lines", { n: num(x.tx.length) }))}</small></div><button type="button" class="btn btn-sm" data-go="#/a/${x.id}">${ic("eye")}${esc(t("Open"))}</button><button type="button" class="btn btn-sm btn-g" data-del="${x.id}" aria-label="${esc(t("Delete"))} ${esc(x.name)}">${ic("trash-2")}${esc(t("Delete"))}</button></li>`).join("") : `<li class="none">${esc(t("No analysis yet. Drop a statement or try a sample to start."))} <button type="button" class="btn btn-p btn-sm" data-go="#/new">${ic("plus")}${esc(t("New analysis"))}</button></li>`}</ul>${footer()}`;
 		bindCommon($("#main"));
+		$("#sQ")?.addEventListener("input", (e) => { S.sq = e.target.value; const pos = e.target.selectionStart; saved(); const i = $("#sQ"); i.focus(); i.setSelectionRange(pos, pos); });
 		$$("[data-del]").forEach((b) => b.addEventListener("click", () => {
 			const all = savedList(), i = all.findIndex((x) => x.id === b.dataset.del), gone = all.splice(i, 1)[0];
 			store.set(savedKey(), all); if (S.A?.id === gone.id) S.A = null; shell("saved");
@@ -596,7 +703,8 @@
 	function menu(btn, list, items, onPick) {
 		if (open && open.list === list) return closeMenu(true);
 		closeMenu();
-		list.innerHTML = items.map((x, i) => `<li role="option" tabindex="-1" data-i="${i}" aria-selected="${x.on ? "true" : "false"}">${x.icon ? ic(x.icon) : ""}${x.dot ? `<i class="dot" style="background:${x.dot}"></i>` : ""}<span>${esc(x.label)}</span></li>`).join("");
+		list.innerHTML = items.map((x, i) => `<li role="option" tabindex="-1" data-i="${i}" aria-selected="${x.on ? "true" : "false"}" ${x.check ? 'class="chk"' : ""}>${x.check ? `<span class="box">${x.on ? ic("check") : ""}</span>` : ""}${x.icon ? ic(x.icon) : ""}${x.dot ? `<i class="dot" style="background:${x.dot}"></i>` : ""}<span>${esc(x.label)}</span></li>`).join("");
+		if (items.some((x) => x.check)) list.setAttribute("aria-multiselectable", "true");
 		btn.setAttribute("aria-expanded", "true"); open = { btn, list, onPick, items }; slide(list, true);
 		(list.querySelector('[aria-selected="true"]') || list.firstElementChild)?.focus({ preventScroll: true });
 	}

@@ -56,7 +56,7 @@
 		const blocks = [];
 		let title;
 
-		if (has(s, ["revenu", "salaire", "gagne", "income", "salary", "earn", "rentree", "solde", "reste", "left over", "save", "epargn", "economis"])) {
+		if (has(s, ["revenu", "salaire", "gagne", "income", "salary", "earn", "rentree", "solde", "reste", "left over", "save", "epargn", "economis", "came in", "money in", "went out"])) {
 			title = t("Money in and out");
 			blocks.push({ kind: "kpi", title: t("Money in"), measure: "income", period: per }, { kind: "kpi", title: t("Money out"), measure: "spend", period: per }, { kind: "kpi", title: t("What is left"), measure: "net", period: per });
 			blocks.push({ kind: "line", title: t("Money in, month by month"), measure: "income", by: "month", period: long ? per : year });
