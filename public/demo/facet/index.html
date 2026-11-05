@@ -461,7 +461,7 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14.5px; font-varia
 /* report: main column + the file on the right (wide screens) */
 .rep { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; margin: 8px 0 0; }
 .rep-main { min-width: 0; container-type: inline-size; container-name: repm; }
-@container repm (max-width: 860px) { .card.kpi { grid-column: span 6 !important; } }
+@container repm (max-width: 920px) { .card.kpi { grid-column: span 6 !important; } }
 @container repm (max-width: 420px) { .card.kpi { grid-column: span 12 !important; } }
 .how-c { grid-template-columns: repeat(auto-fit, minmax(min(130px, 100%), 1fr)) !important; }
 .rep-side.stick { position: sticky; }
@@ -484,7 +484,7 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14.5px; font-varia
 .pv .btn { justify-self: start; }
 
 /* filters: one sticky row above the analysis */
-.fwrap { position: sticky; top: 61px; z-index: 20; margin: 0; padding: 8px 0; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: var(--r-xl); }
+.fwrap { position: sticky; top: var(--tbh, 61px); z-index: 20; margin: 0; padding: 8px 0; background: var(--bg); box-shadow: 0 0 0 100vmax var(--bg); clip-path: inset(0 -24px 0 -100vmax); } /* solid, square, glued under the top bar; its colour runs to the left edge and over the gap, not over the right column */
 .filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .f-lead { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-3); font-size: 13.5px; margin-inline-end: 4px; }
 .f-lead .i { width: 15px; height: 15px; }
@@ -582,7 +582,7 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14.5px; font-varia
 	.mtop .logo { margin-inline-end: auto; }
 	.main { padding: 24px 24px 48px; }
 	.topbar { display: none; }
-	.fwrap { top: 61px; }
+	.fwrap { top: var(--tbh, 61px); }
 	.mtop .dd .btn span { display: none; }
 	.mtop .me-btn .who, .mtop .me-btn .chev { display: none; }
 	.mtop .me-btn { padding: 2px; }

@@ -488,9 +488,11 @@
 	/* wide screens: the right column starts level with the Overview cards, then follows the scroll (only when it fits the screen) */
 	function alignSide() {
 		const side = $(".rep-side"), main = $(".rep-main"), kpi = $("#g-kpi"), fw = $(".fwrap"); if (!side || !main || !kpi) return;
+		document.documentElement.style.setProperty("--tbh", ($(".topbar")?.offsetHeight || $(".mtop")?.offsetHeight || 61) + "px");
 		if (innerWidth < 1280) { side.style.marginTop = side.style.top = ""; side.classList.remove("stick"); return; }
 		side.style.marginTop = Math.max(0, Math.round(kpi.getBoundingClientRect().top - main.getBoundingClientRect().top)) + "px";
-		const top = ($(".topbar")?.offsetHeight || 0) + (fw ? fw.offsetHeight : 0) + 12;
+		const tb = $(".topbar")?.offsetHeight || 0; document.documentElement.style.setProperty("--tbh", tb + "px");
+		const top = tb + 8; // level with the filters inside their bar
 		side.style.top = top + "px";
 		side.classList.toggle("stick", side.offsetHeight <= innerHeight - top - 16);
 	}
