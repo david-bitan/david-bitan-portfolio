@@ -20,7 +20,7 @@
 	const CAT_ICON = { home: "house", groceries: "shopping-basket", dining: "utensils", transport: "tram-front", subscriptions: "repeat", leisure: "ticket", health: "heart-pulse", shopping: "shopping-bag", other: "circle-help", income: "wallet" };
 	const col = (id) => COL[S.theme][id] || COL[S.theme].other;
 
-	const S = { lang: "en", theme: document.documentElement.dataset.theme || "dark", acct: null, A: null, data: null, open: {}, pick: {}, past: [], q: "", txN: 40, txFilter: "all", busy: false, authErr: {} };
+	const S = { smHide: store.get("facet-samples-hidden", false), lang: "en", theme: document.documentElement.dataset.theme || "dark", acct: null, A: null, data: null, open: {}, pick: {}, past: [], q: "", txN: 40, txFilter: "all", busy: false, authErr: {} };
 
 	/* ---------------- language ---------------- */
 	const qs = new URLSearchParams(location.search);
@@ -251,10 +251,12 @@
 			<input type="file" id="file" class="sr" multiple accept=".csv,.xlsx,.xlsm,.xls,.pdf,.docx,.txt,.tsv,text/csv,application/pdf">
 			<p class="priv">${ic("lock")}<span>${esc(t("Read in your browser. Only unknown merchant names go to the AI, without amounts, dates or account numbers."))}</span></p>
 			${S.fail ? failBox(S.fail) : ""}
-			<h2 class="sec">${esc(t("No statement at hand? Try a sample"))}</h2><p class="sec-sub">${esc(t("Three invented statements in three formats. Open one here, or download it to drop it yourself."))}</p>
-			<ul class="samples">${SAMPLES.map((s, i) => `<li><div class="sm-b"><span class="ft">${ic(s.icon)}${s.kind}</span><h3>${esc(t(s.name))}</h3><p>${esc(t(s.desc))}</p></div><div class="acts"><button type="button" class="btn btn-sm" data-sample="${i}">${ic("scan-search")}${esc(t("Analyse"))}</button><a class="btn btn-sm btn-g" href="samples/${s.file}" download>${ic("download")}${esc(t("Download"))}</a></div></li>`).join("")}</ul>
+			<div class="sec-row"><h2 class="sec">${esc(t("No statement at hand? Try a sample"))}</h2><button type="button" class="btn btn-sm btn-g" id="smTog" aria-expanded="${S.smHide ? "false" : "true"}" aria-controls="smBox"><span>${esc(t(S.smHide ? "Show the samples" : "Hide the samples"))}</span>${ic("chevron-down", "chev")}</button></div>
+			<div id="smBox" ${S.smHide ? "hidden" : ""}><div class="sm-in"><p class="sec-sub">${esc(t("Three invented statements in three formats. Open one here, or download it to drop it yourself."))}</p>
+			<ul class="samples">${SAMPLES.map((s, i) => `<li><div class="sm-b"><span class="ft">${ic(s.icon)}${s.kind}</span><h3>${esc(t(s.name))}</h3><p>${esc(t(s.desc))}</p></div><div class="acts"><button type="button" class="btn btn-sm" data-sample="${i}">${ic("scan-search")}${esc(t("Analyse"))}</button><a class="btn btn-sm btn-g" href="samples/${s.file}" download>${ic("download")}${esc(t("Download"))}</a></div></li>`).join("")}</ul></div></div>
 			${footer()}`;
 		S.fail = null;
+		$("#smTog").addEventListener("click", () => { S.smHide = !S.smHide; store.set("facet-samples-hidden", S.smHide); const b = $("#smTog"); b.setAttribute("aria-expanded", !S.smHide); b.querySelector("span").textContent = t(S.smHide ? "Show the samples" : "Hide the samples"); slide($("#smBox"), !S.smHide); });
 		const drop = $("#drop"), inp = $("#file");
 		inp.addEventListener("change", () => inp.files.length && analyse([...inp.files]));
 		["dragenter", "dragover"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
