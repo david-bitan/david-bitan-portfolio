@@ -64,7 +64,7 @@ export const aiLabProjects: AILabProject[] = [
 		subtitle: 'Drop a bank statement, see where your money goes, then ask anything.',
 		eyebrow: 'Personal finance · 2026',
 		shortDesc:
-			'A fictional money app: drop the statement your bank gives you (Excel, CSV, PDF or Word) and Facet reads it in your browser, sorts every line and builds the full analysis. Then you ask questions in plain words. Ten languages, Hebrew in RTL.',
+			'A fictional money app: drop the statement your bank gives you (Excel, CSV, PDF or Word) and Facet reads it in your browser, sorts every line and builds the full analysis. Then you ask questions in plain words. Seven languages, Hebrew in RTL.',
 		intro: `Facet is a fictional personal finance app I designed and built end-to-end. It starts from a file almost everyone has and almost nobody reads: the statement your bank lets you download. Facet turns it into an answer to the question behind it, where does my money go?
 
 You drop the file, or several. Facet finds the dates, labels and amounts on its own, whatever the format: a French bank's CSV with semicolons and decimal commas, an Excel budget sheet, a PDF statement with debit and credit columns. When it is not sure how to read a table, it asks: a preview of the file with a choice above each column, and the number of lines found updating as you go. Every merchant is then sorted into a category, first with the categories written in the file, then with common words, and only then with the AI.
@@ -76,7 +76,7 @@ The report builds itself: money in and out, spending by category and month by mo
 			lead: 'Facet uses an open model (Llama 3.3 on Cloudflare Workers AI) for two narrow jobs: sorting merchant names it does not recognise, and turning a question into a description of the screen that answers it (which blocks, which period, which filters). The model never sees an amount and never writes one. Every number is computed in the browser from the lines of the file, so an answer can always be traced back to its source.',
 			tryUrl: '/demo/facet/',
 			tryLabel: 'Try it with a sample statement',
-			states: ['Excel, CSV, PDF, Word or text, several files at once', 'Column check when a table is unclear', 'Merchants sorted by the AI, shown for review', 'Lines left to check, fixed in one tap', 'Report: overview, where the money goes, worth knowing, regular payments', 'Question answered in one sentence plus charts', 'Lines behind any figure, with search and sort', 'Filters for period, categories and amount', 'Free AI used up: simpler reader, figures still exact', 'Dark and light themes, ten languages, Hebrew in RTL'],
+			states: ['Excel, CSV, PDF, Word or text, several files at once', 'Column check when a table is unclear', 'Merchants sorted by the AI, shown for review', 'Lines left to check, fixed in one tap', 'Report: overview, where the money goes, worth knowing, regular payments', 'Question answered in one sentence plus charts', 'Lines behind any figure, with search and sort', 'Filters for period, categories and amount', 'Free AI used up: simpler reader, figures still exact', 'Dark and light themes, seven languages, Hebrew in RTL'],
 			decisions: [
 				{ title: 'No figure from the model', body: 'The AI only describes the screen: blocks, periods, filters. The page drops anything it does not understand and computes every total itself, so the model cannot invent an amount, even when it misreads the question.' },
 				{ title: 'Every number opens its lines', body: '"See the lines" sits under every figure and chart. It opens a side panel with the exact lines of the file, their line number or page, and a search, a category filter and a sort, so checking a number costs one tap.' },
@@ -128,7 +128,7 @@ The report builds itself: money in and out, spending by category and month by mo
 				'Free plans only: a daily AI budget, and a local reader as a fallback',
 				'Invented sample statements, merchants and account holder',
 				'Not financial advice: Facet describes, it does not recommend',
-				'Tested in a headless browser: 13 screen sizes in portrait and landscape, ten languages, dark and light',
+				'Tested in a headless browser: 13 screen sizes in portrait and landscape, seven languages, dark and light',
 			],
 		},
 		nextSteps: [

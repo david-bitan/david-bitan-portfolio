@@ -85,12 +85,12 @@
 	/* ---------------- landing: top bar (logo, sign in, create an account), pitch + illustration, 3 steps ---------------- */
 	function landing(tab) {
 		document.title = t("Facet · drop a bank statement, see where your money goes");
-		view(`<div class="site"><header class="site-top">${logo("a")}<span class="sp"></span>${langBtn()}${themeBtn()}<button type="button" class="btn btn-g" data-open-auth="signin" aria-label="${esc(t("Sign in"))}">${ic("log-in")}<span class="lbl">${esc(t("Sign in"))}</span></button><button type="button" class="btn btn-p hide-m" data-open-auth="signup">${esc(t("Create an account"))}</button></header>
+		view(`<div class="site"><header class="site-top">${logo("a")}<span class="sp"></span>${themeBtn()}${langBtn()}<button type="button" class="btn btn-g" data-open-auth="signin" aria-label="${esc(t("Sign in"))}">${ic("log-in")}<span class="lbl">${esc(t("Sign in"))}</span></button><button type="button" class="btn btn-p hide-m" data-open-auth="signup">${esc(t("Create an account"))}</button></header>
 		<main class="land">
 			<div class="hero"><div>
 				<h1>${t("Drop your bank statement. <em>See where your money goes.</em>")}</h1>
 				<p class="lede">${esc(t("Facet reads the file your bank gives you, sorts every line, finds your subscriptions and the expenses that stand out, and builds the full picture. Then you ask for any other view."))}</p>
-				<div class="cta"><button type="button" class="btn btn-p" data-open-auth="signup">${ic("upload")}${esc(t("Analyse a statement"))}</button><button type="button" class="btn" data-open-auth="signin">${ic("eye")}${esc(t("Try it with a sample"))}</button></div>
+				<div class="cta"><button type="button" class="btn btn-p" data-open-auth="signup">${ic("upload")}${esc(t("Analyse a statement"))}</button></div>
 				<ul class="formats" aria-label="${esc(t("Reads"))}"><li class="lead">${esc(t("Reads"))}</li>${[["file-spreadsheet", "Excel"], ["file-text", "CSV"], ["file", "PDF"], ["file-text", "Word"], ["file-text", t("Text")]].map(([i, n]) => `<li>${ic(i)}${esc(n)}</li>`).join("")}</ul>
 			</div>${heroArt()}</div>
 			<ol class="how">
