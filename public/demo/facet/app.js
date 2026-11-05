@@ -24,7 +24,7 @@
 
 	/* ---------------- language ---------------- */
 	const qs = new URLSearchParams(location.search);
-	S.lang = [qs.get("lang"), store.get("facet-lang", null), ...(navigator.languages || [])].map((l) => String(l || "").slice(0, 2)).find((l) => I.LANGS.some((x) => x[0] === l)) || "en";
+	S.lang = [qs.get("lang"), store.get("facet-lang", null)].map((l) => String(l || "").slice(0, 2)).find((l) => I.LANGS.some((x) => x[0] === l)) || "en"; // English unless the person chose another language
 	/* the last two words of a sentence stay together: never one word alone on the last line, in any language */
 	function t(k, p) { let s = (I.dict[S.lang] && I.dict[S.lang][k]) || k; if (p) s = s.replace(/\{(\w+)\}/g, (m, n) => (p[n] ?? m)); return s.split(/\s+/).length >= 4 && !/<[^>]+$/.test(s) ? s.replace(/ ([^ <>]+)$/, "\u00a0$1") : s; }
 	const catName = (id) => (id === "other" ? t("To check") : t(I.CAT_NAMES[id] || id));
@@ -57,7 +57,7 @@
 		if (!S.acct && !/^#\/(signin|signup)?$/.test(h)) return go("#/signin");
 		if (S.acct && /^#\/(signin|signup)?$/.test(h)) return go("#/new");
 		if (h === "#/" ) return landing();
-		if (h === "#/signin" || h === "#/signup") return auth(h.slice(2));
+		if (h === "#/signin" || h === "#/signup") { S.focusAuth = true; return landing(h.slice(2)); }
 		if (h === "#/analyses") return shell("saved");
 		const m = h.match(/^#\/a\/(\w+)/);
 		if (m) { if (!S.A || S.A.id !== m[1]) { const a = savedList().find((x) => x.id === m[1]); if (!a) return go("#/analyses"); load(a); } return shell("report"); }
@@ -65,36 +65,43 @@
 	}
 
 	/* ---------------- shared pieces ---------------- */
-	const logo = (tag = "button", attrs = "") => `<${tag} class="logo" ${tag === "a" ? 'href="#/"' : 'type="button"'} ${attrs} aria-label="Facet"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#0D0E10" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 18v-6M12 18V6M18 18v-4"/></svg></span><b>Facet</b></${tag}>`;
+	const logo = (tag = "button", attrs = "") => `<${tag} class="logo" ${tag === "a" ? 'href="#/"' : tag === "button" ? 'type="button"' : ""} ${attrs} ${tag === "span" ? "" : 'aria-label="Facet"'}><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#0D0E10" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 18v-6M12 18V6M18 18v-4"/></svg></span><b>Facet</b></${tag}>`;
 	const langBtn = () => `<div class="dd"><button type="button" class="btn btn-g btn-sm" data-lang aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t("Language"))}">${ic("globe")}<span>${S.lang.toUpperCase()}</span>${ic("chevron-down", "chev")}</button><ul class="menu" role="listbox" tabindex="-1" hidden></ul></div>`;
 	const themeBtn = () => `<button type="button" class="icon-btn" data-theme-toggle aria-label="${esc(t(S.theme === "dark" ? "Light theme" : "Dark theme"))}" title="${esc(t(S.theme === "dark" ? "Light theme" : "Dark theme"))}">${ic(S.theme === "dark" ? "sun" : "moon")}</button>`;
 	const footer = () => `<footer class="foot"><span>${esc(t("A fictional product by David Bitan for his AI Lab. The sample statements, Camille Martin and every merchant in them are invented."))}</span><a href="/#ai-lab">${esc(t("More AI Lab projects"))}</a></footer>`;
-	function setTheme(th) { S.theme = th; document.documentElement.dataset.theme = th; store.set("facet-theme", th); route(); }
+	function setTheme(th) { S.theme = th; document.documentElement.dataset.theme = th; store.set("facet-theme", th); S.quiet = true; route(); }
 	function bindCommon(root) {
-		$$("[data-lang]", root).forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); menu(b, b.nextElementSibling, I.LANGS.map(([c, n]) => ({ code: c, label: n, on: c === S.lang })), (x) => { S.lang = x.code; store.set("facet-lang", x.code); document.documentElement.lang = x.code; route(); }); }));
+		$$("[data-lang]", root).forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); menu(b, b.nextElementSibling, I.LANGS.map(([c, n]) => ({ code: c, label: n, on: c === S.lang })), (x) => { S.lang = x.code; store.set("facet-lang", x.code); document.documentElement.lang = x.code; S.quiet = true; route(); }); }));
 		$$("[data-theme-toggle]", root).forEach((b) => b.addEventListener("click", () => setTheme(S.theme === "dark" ? "light" : "dark")));
 		$$("[data-theme-set]", root).forEach((b) => b.addEventListener("click", () => b.dataset.themeSet !== S.theme && setTheme(b.dataset.themeSet)));
 		$$("[data-go]", root).forEach((b) => b.addEventListener("click", () => go(b.dataset.go)));
 	}
-	const view = (html) => { $("#app").innerHTML = html; document.documentElement.lang = S.lang; bindCommon($("#app")); };
+	const view = (html) => { $("#app").innerHTML = html; document.documentElement.lang = S.lang; document.documentElement.dir = I.RTL.includes(S.lang) ? "rtl" : "ltr"; bindCommon($("#app")); };
+	/* page change inside the app: the new content fades in and rises a little (the sidebar stays still) */
+	const enter = (el) => { if (!el || reduced()) return; el.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 450, easing: "cubic-bezier(0.22, 0.61, 0.36, 1)" }); };
 
-	/* ---------------- landing ---------------- */
-	function landing() {
-		document.title = t("Facet · drop a bank statement, see where your money goes");
-		view(`<header class="pub-top">${logo("a")}<span class="sp"></span>${langBtn()}${themeBtn()}<button type="button" class="btn btn-g hide-m" data-go="#/signin">${esc(t("Sign in"))}</button><button type="button" class="btn show-m btn-sm" data-go="#/signin" aria-label="${esc(t("Sign in"))}">${ic("log-in")}<span class="lbl">${esc(t("Sign in"))}</span></button><button type="button" class="btn btn-p" data-go="#/signup">${esc(t("Create an account"))}</button></header>
+	/* ---------------- landing: the pitch on the left, sign in / create an account on the right ---------------- */
+	function landing(tab = "signup") {
+		document.title = t(tab === "signin" ? "Sign in" : "Create an account") + " · Facet";
+		view(`<div class="pub"><header class="pub-top"><span class="sp"></span>${langBtn()}${themeBtn()}<button type="button" class="btn btn-g" data-tab-go="signin">${ic("log-in")}<span class="lbl">${esc(t("Sign in"))}</span></button></header>
 		<main class="land">
-			<div class="hero"><div>
-			<h1>${t("Drop your bank statement. <em>See where your money goes.</em>")}</h1>
-			<p class="lede">${esc(t("Facet reads the file your bank gives you, sorts every line, finds your subscriptions and the expenses that stand out, and builds the full picture. Then you ask for any other view."))}</p>
-			<div class="cta"><button type="button" class="btn btn-p" data-go="#/signup">${ic("upload")}${esc(t("Analyse a statement"))}</button><button type="button" class="btn" data-go="#/signin">${ic("eye")}${esc(t("Try it with a sample"))}</button></div>
-			<ul class="formats">${[["file-spreadsheet", "Excel (.xlsx)"], ["file-text", "CSV"], ["file", "PDF"], ["file-text", "Word (.docx)"], ["file-text", t("Text")]].map(([i, n]) => `<li>${ic(i)}${esc(n)}</li>`).join("")}</ul></div>${heroArt()}</div>
-			<ol class="how">
+			<div class="hero"><div class="hero-t">
+				<span class="brand">${logo("span")}</span>
+				<h1>${t("Drop your bank statement. <em>See where your money goes.</em>")}</h1>
+				<p class="lede">${esc(t("Facet reads the file your bank gives you, sorts every line, finds your subscriptions and the expenses that stand out, and builds the full picture. Then you ask for any other view."))}</p>
+				<ul class="formats" aria-label="${esc(t("Reads"))}"><li class="lead">${esc(t("Reads"))}</li>${[["file-spreadsheet", "Excel"], ["file-text", "CSV"], ["file", "PDF"], ["file-text", "Word"], ["file-text", t("Text")]].map(([i, n]) => `<li>${ic(i)}${esc(n)}</li>`).join("")}</ul>
+				<p class="tip-s">${ic("eye")}<span>${esc(t("No statement at hand? Use the demo account: three sample statements are ready to try."))}</span></p>
+			</div>${authCard(tab)}</div>
+			<div class="how-wrap">${heroArt()}<ol class="how">
 				<li><h3>${esc(t("Drop the file"))}</h3><p>${esc(t("The export from your bank's website, a PDF statement or your own budget sheet. Several files at once is fine."))}</p></li>
 				<li><h3>${esc(t("It is read on your device"))}</h3><p>${esc(t("Dates, labels and amounts are found in your browser. Each merchant is sorted into a category, and you can correct any of them."))}</p></li>
 				<li><h3>${esc(t("Get the full picture"))}</h3><p>${esc(t("Spending by category, month by month, regular payments, unusual expenses. Every figure opens on the lines of your file it comes from."))}</p></li>
-			</ol>
+			</ol></div>
 			<div class="trust">${ic("lock")}<p>${t("<b>Your file stays in your browser.</b> Only the names of merchants Facet does not recognise are sent to the AI to sort them: never an amount, a date or an account number. Nothing is kept on a server.")}</p></div>
-		</main>${footer()}`);
+		</main>${footer()}</div>`);
+		bindAuth(tab);
+		$$("[data-tab-go]").forEach((x) => x.addEventListener("click", () => { switchTab(x.dataset.tabGo); $("#authCard").scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "center" }); }));
+		if (S.focusAuth) { S.focusAuth = false; requestAnimationFrame(() => { $("#authCard").scrollIntoView({ block: "center" }); $("#authF input")?.focus({ preventScroll: true }); }); }
 	}
 
 	/* hero illustration: a statement turning into the analysis (drawn, no photo; same marks as the real charts) */
@@ -109,30 +116,49 @@
 		</div>`;
 	}
 
-	/* ---------------- sign in / create an account ---------------- */
-	function auth(tab) {
-		document.title = t(tab === "signup" ? "Create an account" : "Sign in") + " · Facet";
-		const e = S.authErr; S.authErr = {};
-		const f = (id, label, type = "text", ac = "", extra = "") => `<div class="field"><label for="${id}">${esc(t(label))}</label><div class="in"><input id="${id}" name="${id}" type="${type}" autocomplete="${ac}" ${e[id] ? 'aria-invalid="true" aria-describedby="' + id + '-e"' : ""} ${extra}>${type === "password" ? `<button type="button" class="icon-btn eye" data-eye aria-label="${esc(t("Show the password"))}">${ic("eye")}</button>` : ""}</div>${e[id] ? `<p class="err" id="${id}-e">${esc(t(e[id]))}</p>` : ""}</div>`;
-		view(`<header class="pub-top">${logo("a")}<span class="sp"></span>${langBtn()}${themeBtn()}</header>
-		<main class="auth"><div class="auth-card">
-			<div class="tabs" role="tablist" data-on="${tab === "signup" ? "up" : "in"}"><span class="pill" aria-hidden="true"></span><button type="button" role="tab" aria-selected="${tab !== "signup"}" data-go="#/signin">${esc(t("Sign in"))}</button><button type="button" role="tab" aria-selected="${tab === "signup"}" data-go="#/signup">${esc(t("Create an account"))}</button></div>
-			${tab === "signup" ? `<form id="authF" novalidate><h1>${esc(t("Create your account"))}</h1><p class="sub">${esc(t("Your analyses are kept in this account, in this browser."))}</p>
+	/* ---------------- sign in / create an account (a card on the landing page) ---------------- */
+	function authCard(tab) {
+		return `<section class="auth-card" id="authCard" aria-label="${esc(t("Your account"))}">
+			<div class="tabs" role="tablist" data-on="${tab === "signup" ? "up" : "in"}"><span class="pill" aria-hidden="true"></span><button type="button" role="tab" id="tab-in" aria-controls="authBody" aria-selected="${tab !== "signup"}" data-tab="signin">${esc(t("Sign in"))}</button><button type="button" role="tab" id="tab-up" aria-controls="authBody" aria-selected="${tab === "signup"}" data-tab="signup">${esc(t("Create an account"))}</button></div>
+			<div class="auth-body" id="authBody" role="tabpanel">${authForm(tab)}</div>
+			<p class="demo-note">${ic("info")}<span>${esc(t("This is a demo: no e-mail is sent and the password is not checked or kept. The account only exists in this browser."))}</span></p>
+		</section>`;
+	}
+	function authForm(tab) {
+		const e = S.authErr || {}; S.authErr = {};
+		const f = (id, label, type = "text", ac = "") => `<div class="field"><label for="${id}">${esc(t(label))}</label><div class="in"><input id="${id}" name="${id}" type="${type}" autocomplete="${ac}" ${e[id] ? 'aria-invalid="true" aria-describedby="' + id + '-e"' : ""}>${type === "password" ? `<button type="button" class="icon-btn eye" data-eye aria-label="${esc(t("Show the password"))}">${ic("eye")}</button>` : ""}</div>${e[id] ? `<p class="err" id="${id}-e">${esc(t(e[id]))}</p>` : ""}</div>`;
+		const demo = `<div class="or">${esc(t("or"))}</div><button class="btn" type="button" data-demo>${ic("user")}${esc(t("Use the demo account (Camille Martin)"))}</button>`;
+		return tab === "signup" ? `<form id="authF" novalidate data-tab="signup"><h2>${esc(t("Create your account"))}</h2><p class="sub">${esc(t("Your analyses are kept in this account, in this browser."))}</p>
 				<div class="row2">${f("first", "First name", "text", "given-name")}${f("last", "Last name", "text", "family-name")}</div>
 				${f("email", "E-mail", "email", "email")}${f("pw", "Password (8 characters or more)", "password", "new-password")}
-				<button class="btn btn-p" type="submit">${esc(t("Create my account"))}</button>
-				<div class="or">${esc(t("or"))}</div><button class="btn" type="button" data-demo>${ic("user")}${esc(t("Use the demo account (Camille Martin)"))}</button></form>`
-			: `<form id="authF" novalidate><h1>${esc(t("Welcome back"))}</h1><p class="sub">${esc(t("Sign in to see your analyses or start a new one."))}</p>
+				<button class="btn btn-p" type="submit">${esc(t("Create my account"))}</button>${demo}</form>`
+			: `<form id="authF" novalidate data-tab="signin"><h2>${esc(t("Welcome back"))}</h2><p class="sub">${esc(t("Sign in to see your analyses or start a new one."))}</p>
 				${f("email", "E-mail", "email", "email")}${f("pw", "Password", "password", "current-password")}
-				<button class="btn btn-p" type="submit">${ic("log-in")}${esc(t("Sign in"))}</button>
-				<div class="or">${esc(t("or"))}</div><button class="btn" type="button" data-demo>${ic("user")}${esc(t("Use the demo account (Camille Martin)"))}</button></form>`}
-			<p class="demo-note">${ic("info")}<span>${esc(t("This is a demo: no e-mail is sent and the password is not checked or kept. The account only exists in this browser."))}</span></p>
-		</div></main>${footer()}`);
-		const F = $("#authF");
-		F.querySelectorAll("input").forEach((x) => x.value = S.authVals?.[x.name] || ""); S.authVals = null;
-		F.querySelector("[aria-invalid]")?.focus() || F.querySelector("input").focus();
-		$$("[data-eye]").forEach((b) => b.addEventListener("click", () => { const i = b.previousElementSibling, show = i.type === "password"; i.type = show ? "text" : "password"; b.setAttribute("aria-label", t(show ? "Hide the password" : "Show the password")); b.innerHTML = ic(show ? "lock" : "eye"); }));
-		$("[data-demo]").addEventListener("click", () => signIn({ ...DEMO, name: DEMO.first }));
+				<button class="btn btn-p" type="submit">${ic("log-in")}${esc(t("Sign in"))}</button>${demo}</form>`;
+	}
+	/* switching tab: the pill slides and the card's height opens or closes smoothly to the new form (500 ms, same curve as the menus) */
+	function switchTab(tab) {
+		const body = $("#authBody"), tabs = $("#authCard .tabs"); if (!body || tabs.dataset.on === (tab === "signup" ? "up" : "in")) return;
+		const keep = { email: $("#authF [name=email]")?.value || "" };
+		tabs.dataset.on = tab === "signup" ? "up" : "in";
+		$$("[role=tab]", tabs).forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === tab));
+		history.replaceState(null, "", "#/" + tab); document.title = t(tab === "signin" ? "Sign in" : "Create an account") + " · Facet";
+		const from = body.getBoundingClientRect().height;
+		body.innerHTML = authForm(tab); bindAuth(tab, keep);
+		if (reduced()) return;
+		const to = body.getBoundingClientRect().height;
+		body.style.overflow = "hidden";
+		body.animate([{ height: from + "px" }, { height: to + "px" }], { duration: to >= from ? 500 : 400, easing: "cubic-bezier(0.22, 0.61, 0.36, 1)" }).onfinish = () => (body.style.overflow = "");
+		$("#authF").animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 450, easing: "cubic-bezier(0.22, 0.61, 0.36, 1)" });
+	}
+	function bindAuth(tab, keep) {
+		const F = $("#authF"); if (!F) return;
+		const vals = keep || S.authVals || {}; S.authVals = null;
+		F.querySelectorAll("input").forEach((x) => (x.value = vals[x.name] || ""));
+		const bad = F.querySelector("[aria-invalid]"); if (bad) bad.focus({ preventScroll: true });
+		$$("#authCard [data-tab]").forEach((b) => (b.onclick = () => switchTab(b.dataset.tab)));
+		$$("[data-eye]", F).forEach((b) => b.addEventListener("click", () => { const i = b.previousElementSibling, show = i.type === "password"; i.type = show ? "text" : "password"; b.setAttribute("aria-label", t(show ? "Hide the password" : "Show the password")); b.innerHTML = ic(show ? "lock" : "eye"); }));
+		F.querySelector("[data-demo]").addEventListener("click", () => signIn({ ...DEMO, name: DEMO.first }));
 		F.addEventListener("submit", (ev) => {
 			ev.preventDefault();
 			const v = Object.fromEntries(new FormData(F)), err = {}, mail = String(v.email || "").trim();
@@ -145,9 +171,8 @@
 				if (!v.pw) err.pw = "Enter your password.";
 				if (!err.email && !accounts()[mail.toLowerCase()]) err.email = "No account uses this e-mail in this browser. Create one, or use the demo account.";
 			}
-			if (Object.keys(err).length) { S.authErr = err; S.authVals = { ...v, pw: "" }; return auth(tab); }
-			const a = tab === "signup" ? { first: v.first.trim(), last: String(v.last || "").trim(), email: mail } : accounts()[mail.toLowerCase()];
-			signIn(a);
+			if (Object.keys(err).length) { S.authErr = err; $("#authBody").innerHTML = authForm(tab); return bindAuth(tab, { ...v, pw: "" }); }
+			signIn(tab === "signup" ? { first: v.first.trim(), last: String(v.last || "").trim(), email: mail } : accounts()[mail.toLowerCase()]);
 		});
 	}
 
@@ -178,6 +203,7 @@
 		if (page === "upload") upload();
 		if (page === "saved") saved();
 		if (page === "report") report(true);
+		if (!S.quiet) enter($("#main")); S.quiet = false;
 		$("#main").focus({ preventScroll: true }); scrollTo(0, 0);
 	}
 	function drawer(open) {
@@ -221,6 +247,7 @@
 		if (S.busy) return; S.busy = true;
 		const steps = [["read", "Reading the files"], ["cols", "Finding dates, labels and amounts"], ["sort", "Sorting each merchant into a category"], ["ai", "Asking the AI about merchants it did not recognise"], ["build", "Building your analysis"]];
 		$("#main").innerHTML = `<header><h1>${esc(t("Reading your statement"))}</h1><p>${esc(files.map((f) => f.name).join(", "))}</p></header><ol class="steps" id="steps" aria-live="polite">${steps.map(([k, l]) => `<li data-s="${k}"><span class="st"><span class="dotw"></span></span><div>${esc(t(l))}<small></small></div></li>`).join("")}</ol>`;
+		enter($("#main"));
 		const step = (k, state, note) => { const li = $(`[data-s="${k}"]`); if (!li) return; li.className = state; li.querySelector(".st").innerHTML = state === "on" ? '<span class="spin"></span>' : state === "done" ? ic("circle-check") : '<span class="dotw"></span>'; if (note != null) li.querySelector("small").textContent = note; };
 		try {
 			step("read", "on");
