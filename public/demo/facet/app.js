@@ -714,8 +714,8 @@
 			r = r.slice().sort((a, b) => (L.sort === "new" ? (a.d < b.d ? 1 : -1) : L.sort === "old" ? (a.d < b.d ? -1 : 1) : L.sort === "big" ? Math.abs(b.a) - Math.abs(a.a) : Math.abs(a.a) - Math.abs(b.a)));
 			const tot = r.reduce((a, x) => a + x.a, 0);
 			$("#shSum").innerHTML = `<span>${esc(t("{n} lines", { n: num(r.length) }))}</span><b class="${tot > 0 ? "in" : ""}">${esc((tot > 0 ? "+" : "") + money(tot))}</b>`;
-			$("#shB").innerHTML = r.length ? `<ul class="tx">${r.slice(0, L.n).map(txLi).join("")}</ul>${r.length > L.n ? `<p class="tx-more"><button type="button" class="btn btn-sm" id="shMore">${ic("plus")}${esc(t("Show {n} more", { n: num(Math.min(30, r.length - L.n)) }))}</button></p>` : ""}` : `<p class="empty">${esc(t("No line matches."))}</p>`;
-			$("#shMore")?.addEventListener("click", () => { L.n += 30; draw(); });
+			$("#shB").innerHTML = r.length ? `<ul class="tx">${r.slice(0, L.n).map(txLi).join("")}</ul>${r.length > L.n ? `<p class="tx-more"><button type="button" class="btn btn-sm" id="shMore">${ic("plus")}${esc(t("Show all"))} (${num(r.length)})</button></p>` : ""}` : `<p class="empty">${esc(t("No line matches."))}</p>`;
+			$("#shMore")?.addEventListener("click", () => { L.n = Infinity; draw(); });
 		};
 		draw();
 		$$("[data-close]", ov).forEach((x) => x.addEventListener("click", close));
