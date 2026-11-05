@@ -28,7 +28,7 @@
 	const ready = () => S.docs.filter((d) => !d.loading && d.words >= 30);
 
 	/* ---------------- language ---------------- */
-	let startLang = "en"; try { startLang = localStorage.getItem("margin-lang") || (navigator.language || "en").slice(0, 2); } catch {}
+	let startLang = "en"; try { startLang = localStorage.getItem("margin-lang") || "en"; /* English unless the visitor chose another language */ } catch {}
 	I.set(startLang);
 	function setLang(l) {
 		I.set(l); try { localStorage.setItem("margin-lang", I.lang); } catch {}
@@ -238,7 +238,7 @@
 	async function callApi(body, ms = 45000) {
 		const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), ms);
 		try {
-			const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: ctl.signal });
+			const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...body, sample: S.docs.length > 0 && S.docs.every((d) => d.sample) }), signal: ctl.signal });
 			const j = await r.json().catch(() => ({})); if (j.quota) { S.quota = j.quota; renderQuota(); }
 			if (r.status === 429 && j.error === "daily_limit") { const e = new Error("daily_limit"); e.limit = true; throw e; }
 			if (!r.ok) throw new Error(j.detail || j.error || "HTTP " + r.status);
@@ -477,7 +477,7 @@
 	const PER = 500; // about one report
 	const resetAt = () => (S.quota ? new Date(S.quota.reset).toLocaleTimeString(I.lang, { hour: "2-digit", minute: "2-digit" }) + " " + t("(your local time)") : ""); // the visitor's own clock, wherever they are
 	const quotaOut = () => Boolean(S.quota && S.quota.limit - S.quota.used < PER * 0.6);
-	const limitMsg = () => t("This demo has used all of today’s free AI. It comes back at {time}.", { time: resetAt() || "00:00 UTC" });
+	const limitMsg = () => t("Today’s free AI is used up. Margin uses Meta’s Llama 3.3 model through Cloudflare’s free Workers AI service, and its daily allowance comes back at {time}. Nothing is charged.", { time: resetAt() || "00:00 UTC" });
 	function renderQuota() {
 		const q = S.quota;
 		for (const el of [$("#quota1"), $("#quota2")]) {
@@ -719,4 +719,26 @@
 	S.page = 1; initLang(); setLang(I.lang); loadQuota(); renderAcct();
 	window.MARGIN_DEBUG = S;
 	if (new URLSearchParams(location.search).get("sample")) openSample(); // link from the case study
+})();
+
+/* No word alone on the last line, in every language: the last two words of each sentence are kept together,
+ * unless together they no longer fit (big titles on small screens): then the line breaks normally. Re-checked on resize. */
+(function () {
+	const SEL = "h1,h2,h3,h4,p,li,td,small,figcaption,blockquote,dd,dt,label,button";
+	const orig = new Map(); let q = 0, rz = 0;
+	function fix() {
+		q = 0;
+		document.querySelectorAll(SEL).forEach((el) => {
+			const len = String(el.textContent.length); if (el.dataset.nw === len) return;
+			el.dataset.nw = len;
+			if (el.textContent.trim().split(/\s+/).length < 4) return;
+			const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let last = null, n; while ((n = w.nextNode())) if (n.data.trim()) last = n;
+			if (!last || !/ \S+\s*$/.test(last.data)) return;
+			const before = last.data; last.data = before.replace(/ (\S+\s*)$/, "\u00a0$1");
+			if (el.scrollWidth > el.clientWidth + 1) last.data = before; else orig.set(last, before);
+		});
+	}
+	new MutationObserver(() => { if (!q) q = requestAnimationFrame(fix); }).observe(document.documentElement, { subtree: true, childList: true, characterData: true });
+	addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { for (const [node, text] of orig) node.data = text; orig.clear(); document.querySelectorAll("[data-nw]").forEach((e) => delete e.dataset.nw); fix(); }, 200); });
+	if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fix); else fix();
 })();

@@ -1368,16 +1368,16 @@ window.MARGIN_I18N = (() => {
 	  "id": "Saya tidak bisa mengubah suara Anda menjadi teks. Silakan coba lagi.",
 	  "he": "לא הצלחתי להפוך את הקול לטקסט. נסו שוב."
 	 },
-	 "This demo has used all of today’s free AI. It comes back at {time}.": {
-	  "fr": "Cette démo a utilisé toute l’IA gratuite du jour. Elle revient à {time}.",
-	  "es": "Esta demo ha usado toda la IA gratuita de hoy. Vuelve a las {time}.",
-	  "pt": "Esta demo usou toda a IA gratuita de hoje. Ela volta às {time}.",
-	  "de": "Diese Demo hat die kostenlose KI für heute aufgebraucht. Sie ist um {time} wieder da.",
-	  "it": "Questa demo ha esaurito l’IA gratuita di oggi. Torna alle {time}.",
-	  "ru": "Эта демоверсия израсходовала весь бесплатный ИИ на сегодня. Он снова будет доступен в {time}.",
-	  "tr": "Bu demo bugünkü ücretsiz yapay zekânın tamamını kullandı. Saat {time}’de geri gelir.",
-	  "id": "Demo ini sudah memakai semua AI gratis hari ini. AI tersedia lagi pukul {time}.",
-	  "he": "ההדגמה ניצלה את כל ה־AI החינמי של היום. הוא יחזור בשעה {time}."
+	 "Today’s free AI is used up. Margin uses Meta’s Llama 3.3 model through Cloudflare’s free Workers AI service, and its daily allowance comes back at {time}. Nothing is charged.": {
+	  "fr": "L’IA gratuite du jour est épuisée. Margin utilise le modèle Llama 3.3 de Meta via le service gratuit Workers AI de Cloudflare, et son quota revient à {time}. Rien n’est facturé.",
+	  "es": "La IA gratuita de hoy se ha agotado. Margin usa el modelo Llama 3.3 de Meta a través del servicio gratuito Workers AI de Cloudflare, y su cuota vuelve a las {time}. No se cobra nada.",
+	  "pt": "A IA gratuita de hoje esgotou-se. O Margin usa o modelo Llama 3.3 da Meta através do serviço gratuito Workers AI da Cloudflare, e a quota diária volta às {time}. Nada é cobrado.",
+	  "de": "Die kostenlose KI für heute ist aufgebraucht. Margin nutzt das Modell Llama 3.3 von Meta über den kostenlosen Dienst Workers AI von Cloudflare, das Tageskontingent ist um {time} wieder da. Es fallen keine Kosten an.",
+	  "it": "L’IA gratuita di oggi è esaurita. Margin usa il modello Llama 3.3 di Meta tramite il servizio gratuito Workers AI di Cloudflare, e la quota giornaliera torna alle {time}. Non si paga nulla.",
+	  "ru": "Бесплатный ИИ на сегодня израсходован. Margin использует модель Llama 3.3 от Meta через бесплатный сервис Workers AI от Cloudflare, дневной лимит снова будет доступен в {time}. Плата не взимается.",
+	  "tr": "Bugünkü ücretsiz yapay zekâ tükendi. Margin, Meta’nın Llama 3.3 modelini Cloudflare’in ücretsiz Workers AI hizmetiyle kullanır; günlük kota saat {time}’de yenilenir. Hiçbir ücret alınmaz.",
+	  "id": "AI gratis hari ini sudah habis. Margin memakai model Llama 3.3 dari Meta melalui layanan gratis Workers AI dari Cloudflare, dan kuota hariannya kembali pukul {time}. Tidak ada biaya.",
+	  "he": "ה־AI החינמי של היום נגמר. Margin משתמש במודל Llama 3.3 של Meta דרך השירות החינמי Workers AI של Cloudflare, והמכסה היומית חוזרת בשעה {time}. שום דבר לא מחויב."
 	 },
 	 "Free demo: almost used up for today (about {n} analyses left). It comes back at {time}.": {
 	  "fr": "Démo gratuite : presque épuisée pour aujourd’hui (environ {n} analyses restantes). Elle revient à {time}.",

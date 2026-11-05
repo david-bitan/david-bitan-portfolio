@@ -1894,7 +1894,8 @@
 			grid-template-areas:
 				"time name"
 				"time coach"
-				"spots action";
+				"spots spots"
+				"action action";
 			row-gap: 12px;
 			column-gap: 14px;
 			align-items: start;
@@ -1931,6 +1932,8 @@
 		.step-card:hover, .pill:hover, .day-tab:hover:not(.active) { transform: none; }
 		.studio-card:hover .studio-media img { transform: none; }
 	}
+	/* very small phones: long uppercase words must fit the column */
+	@media (max-width: 360px) { .h2 { font-size: 28px; } .section .head { grid-template-columns: minmax(0, 1fr); } }
 </style>
 
 <!-- Pre-hide reveal blocks BEFORE first paint. JS flips the class as soon as it runs. -->

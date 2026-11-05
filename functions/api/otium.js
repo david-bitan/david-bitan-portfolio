@@ -15,7 +15,9 @@
  * endpoint answers 503 and the page falls back to its local parser.
  */
 
+import { budget, neurons, limitResponse } from "../_lib/budget.js";
 const MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+const OTIUM_BUDGET = 1500; // neurons a day (see functions/_lib/budget.js)
 const CITIES = ["telaviv", "jerusalem", "lisbon", "rome", "barcelona", "amsterdam", "athens", "copenhagen", "porto", "seville", "valencia", "granada", "palma", "florence", "venice", "naples", "palermo", "nice", "valletta", "santorini", "prague", "budapest", "krakow", "dubrovnik", "split", "istanbul", "marrakech", "reykjavik", "edinburgh", "stockholm", "tallinn", "bruges"];
 
 const SYSTEM = `You read short travel requests and extract fields. Reply with ONE JSON object and nothing else.
@@ -72,7 +74,7 @@ Rules:
 - Questions unrelated to travel: say kindly in one sentence that you help with trips.
 Then on a final separate line write exactly: ACTION: <one of ${ACTIONS.join(", ")}> — the single most useful button to show (pending = scroll to the card waiting for the traveller's decision; human = contact the travel team).`;
 
-async function chat(body, env) {
+async function chat(body, env, B) {
 	const LANG = { en: "English", fr: "French", es: "Spanish", it: "Italian", he: "Hebrew" }[body?.lang] || "English";
 	const msgs = (Array.isArray(body?.messages) ? body.messages : [])
 		.filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
@@ -84,6 +86,7 @@ async function chat(body, env) {
 		max_tokens: 380,
 		temperature: 0.4,
 	});
+	await B?.spend(neurons(out, BOT.length + ctx.length + 1500));
 	let text = (typeof out?.response === "string" ? out.response : JSON.stringify(out?.response ?? "")).trim();
 	let action = "none";
 	const m = text.match(/\n?\s*ACTION:\s*([a-z_]+)\s*$/i);
@@ -100,7 +103,9 @@ export async function onRequestPost({ request, env }) {
 	if (!env.AI) return bad(503, "ai_not_configured");
 	let body;
 	try { body = await request.json(); } catch { return bad(400, "invalid_json"); }
-	if (body?.mode === "chat") { try { return await chat(body, env); } catch { return bad(502, "model_error"); } }
+	const B = budget(env, "otium", OTIUM_BUDGET), q = await B.quota();
+	if (q && q.used + 60 > q.limit) return limitResponse(q, CORS);
+	if (body?.mode === "chat") { try { return await chat(body, env, B); } catch { return bad(502, "model_error"); } }
 	const text = typeof body?.text === "string" ? body.text.trim().slice(0, 400) : "";
 	const LANG = { en: "English", fr: "French", es: "Spanish", it: "Italian", he: "Hebrew" }[body?.lang] || "English";
 	if (!text) return bad(400, "empty_request");
@@ -110,6 +115,7 @@ export async function onRequestPost({ request, env }) {
 			max_tokens: 220,
 			temperature: 0.1,
 		});
+		await B.spend(neurons(out, SYSTEM.length + text.length));
 		// Workers AI may hand back the JSON already parsed, or as text (sometimes inside ``` fences).
 		const raw = out?.response;
 		let obj = raw && typeof raw === "object" ? raw : null;

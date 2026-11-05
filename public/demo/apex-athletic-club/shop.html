@@ -2027,6 +2027,8 @@
 		.icon-badge.pop { animation: none; }
 		.drawer-panel { transition: none; }
 	}
+	/* very small phones: long uppercase words must fit the column */
+	@media (max-width: 360px) { .h2 { font-size: 28px; } .section .head { grid-template-columns: minmax(0, 1fr); } }
 </style>
 
 <!-- Pre-hide reveal blocks BEFORE first paint. JS flips the class as soon as it runs. -->

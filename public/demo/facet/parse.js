@@ -83,9 +83,16 @@
 		M.order = order; M.head = head.map((c) => String(c ?? ""));
 		return { M, body };
 	}
-	function fromTable(rows, file) {
-		const hi = headerRow(rows), { M, body } = mapColumns(rows, hi), tx = [], at = new Map(rows.map((r, i) => [r, i + 1])); let skipped = 0;
-		if (M.date == null || (M.amount == null && M.debit == null && M.credit == null)) return { tx, skipped: body.length, M, fail: true };
+	/* ov: columns chosen by the person ({ hi, date, label, amount, debit, credit, cat }), when Facet guessed wrong */
+	function fromTable(rows, file, ov) {
+		let hi, M, body;
+		if (ov) {
+			hi = ov.hi; body = rows.slice(hi + 1).filter((r) => r.some((c) => String(c ?? "").trim()));
+			M = { ...ov, head: hi >= 0 ? rows[hi].map((c) => String(c ?? "")) : [], order: dateOrder(body.slice(0, 300).map((r) => r[ov.date])) };
+		} else { hi = headerRow(rows); ({ M, body } = mapColumns(rows, hi)); }
+		M.hi = hi;
+		const tx = [], at = new Map(rows.map((r, i) => [r, i + 1])); let skipped = 0;
+		if (M.date == null || (M.amount == null && M.debit == null && M.credit == null)) return { tx, skipped: body.length, M, fail: true, rows };
 		body.forEach((r, k) => {
 			const d = date(r[M.date], M.order);
 			let a = M.amount != null ? amount(r[M.amount]) : null;
@@ -96,7 +103,16 @@
 		});
 		// a sheet where every amount is positive and there is one amount column: they are spending
 		if (M.amount != null && tx.length && tx.every((t) => t.a > 0)) { tx.forEach((t) => (t.a = -t.a)); M.allPositive = true; }
-		return { tx, skipped, M };
+		return { tx, skipped, M, rows };
+	}
+
+	/* currency: the symbol or code that appears most in the file (euro when nothing says otherwise) */
+	function currency(text) {
+		const c = { EUR: 0, USD: 0, GBP: 0, ILS: 0, CHF: 0 }, s = String(text).slice(0, 200000);
+		c.EUR += (s.match(/€|\bEUR\b/g) || []).length; c.USD += (s.match(/\$|\bUSD\b/g) || []).length; c.GBP += (s.match(/£|\bGBP\b/g) || []).length;
+		c.ILS += (s.match(/₪|\bILS\b|\bNIS\b|ש"ח/g) || []).length; c.CHF += (s.match(/\bCHF\b/g) || []).length;
+		const best = Object.entries(c).sort((a, b) => b[1] - a[1])[0];
+		return best[1] ? best[0] : null;
 	}
 
 	function csvRows(text) {
@@ -198,10 +214,10 @@
 	/* ---------------- one file ---------------- */
 	async function readFile(f) {
 		const name = f.name, ext = (name.split(".").pop() || "").toLowerCase();
-		const res = (kind, r, note) => ({ kind, ...r, note });
+		const res = (kind, r, note) => ({ kind, ...r, note, cur: currency(r.rows ? r.rows.slice(0, 400).map((x) => x.join(" ")).join("\n") : (r.text || "")) });
 		if (ext === "xls") return { kind: "xls", tx: [], skipped: 0, fail: "xls" };
 		if (ext === "xlsx" || ext === "xlsm") return res("xlsx", fromTable(await xlsxRows(await f.arrayBuffer()), name));
-		if (ext === "pdf") { const { lines, cols, pages } = await pdfLines(await f.arrayBuffer()); const r = fromLines(lines, name, cols); return res("pdf", r, { pages }); }
+		if (ext === "pdf") { const { lines, cols, pages } = await pdfLines(await f.arrayBuffer()); const r = fromLines(lines, name, cols); r.text = lines.map((l) => l.text).join("\n"); return res("pdf", r, { pages }); }
 		if (ext === "docx") {
 			const html = (await mammoth.convertToHtml({ arrayBuffer: await f.arrayBuffer() })).value, doc = new DOMParser().parseFromString(html, "text/html");
 			const tables = [...doc.querySelectorAll("table")];
@@ -212,16 +228,20 @@
 		if (text.includes("�")) text = new TextDecoder("windows-1252").decode(await f.arrayBuffer());
 		const rows = csvRows(text);
 		if (rows) { const r = fromTable(rows, name); if (r.tx.length) return res(ext === "csv" ? "csv" : "txt", r); }
-		return res("txt", fromLines(text.split(/\r?\n/).map((t) => ({ text: t })), name));
+		const r = fromLines(text.split(/\r?\n/).map((t) => ({ text: t })), name); r.text = text; if (rows && !r.tx.length) r.rows = rows; // nothing found: keep the table so the person can pick the columns
+		return res(ext === "csv" ? "csv" : "txt", r);
 	}
 
 	async function read(files) {
 		const out = { tx: [], files: [] };
 		for (const f of files) {
 			let r; try { r = await readFile(f); } catch (e) { r = { kind: "?", tx: [], skipped: 0, fail: "broken" }; console.warn(e); }
-			out.files.push({ name: f.name, kind: r.kind, found: r.tx.length, skipped: r.skipped, fail: r.fail || (r.tx.length ? null : "none"), M: r.M, pages: r.note?.pages });
+			out.files.push({ name: f.name, kind: r.kind, found: r.tx.length, skipped: r.skipped, fail: r.fail || (r.tx.length ? null : "none"), M: r.M, pages: r.note?.pages, rows: r.rows, cur: r.cur, tx: r.tx });
 			out.tx.push(...r.tx);
 		}
+		return finish(out);
+	}
+	function finish(out) {
 		// the same line in two files (two overlapping statements) is counted once
 		const seen = new Set(); out.dupes = 0;
 		out.tx = out.tx.filter((t) => { const k = t.d + "|" + t.a + "|" + norm(t.label); if (seen.has(k)) { out.dupes++; return false; } seen.add(k); return true; });
@@ -229,5 +249,13 @@
 		return out;
 	}
 
-	window.FACET_PARSE = { read, amount, date };
+	/* read a table again with the columns the person chose; rebuilds the merged result */
+	function retable(out, name, ov) {
+		const f = out.files.find((x) => x.name === name), r = fromTable(f.rows, name, ov);
+		Object.assign(f, { found: r.tx.length, skipped: r.skipped, fail: r.fail || (r.tx.length ? null : "none"), M: r.M, tx: r.tx });
+		out.tx = out.files.flatMap((x) => x.tx || []);
+		return finish(out);
+	}
+
+	window.FACET_PARSE = { read, retable, amount, date };
 })();

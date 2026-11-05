@@ -2281,5 +2281,28 @@ html.reserve-lock { overflow: hidden; }
     });
   })();
 </script>
+<script>
+/* No word alone on the last line, in every language: the last two words of each sentence are kept together,
+ * unless together they no longer fit (big titles on small screens): then the line breaks normally. Re-checked on resize. */
+(function () {
+	const SEL = "h1,h2,h3,h4,p,li,td,small,figcaption,blockquote,dd,dt,label,button";
+	const orig = new Map(); let q = 0, rz = 0;
+	function fix() {
+		q = 0;
+		document.querySelectorAll(SEL).forEach((el) => {
+			const len = String(el.textContent.length); if (el.dataset.nw === len) return;
+			el.dataset.nw = len;
+			if (el.textContent.trim().split(/\s+/).length < 4) return;
+			const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let last = null, n; while ((n = w.nextNode())) if (n.data.trim()) last = n;
+			if (!last || !/ \S+\s*$/.test(last.data)) return;
+			const before = last.data; last.data = before.replace(/ (\S+\s*)$/, "\u00a0$1");
+			if (el.scrollWidth > el.clientWidth + 1) last.data = before; else orig.set(last, before);
+		});
+	}
+	new MutationObserver(() => { if (!q) q = requestAnimationFrame(fix); }).observe(document.documentElement, { subtree: true, childList: true, characterData: true });
+	addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { for (const [node, text] of orig) node.data = text; orig.clear(); document.querySelectorAll("[data-nw]").forEach((e) => delete e.dataset.nw); fix(); }, 200); });
+	if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fix); else fix();
+})();
+</script>
 </body>
 </html>

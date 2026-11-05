@@ -10,6 +10,8 @@
  * its scripted replies.
  */
 
+import { budget, limitResponse, RATE_IN, RATE_OUT } from "../_lib/budget.js";
+const COACH_BUDGET = 1000; // neurons a day (see functions/_lib/budget.js)
 const MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 const MAX_TURNS = 10;
 const MAX_CHARS = 1200;
@@ -71,6 +73,11 @@ export async function onRequestPost({ request, env }) {
 		.slice(-MAX_TURNS)
 		.map((m) => ({ role: m.role, content: m.content.slice(0, MAX_CHARS) }));
 	if (!messages.length || messages[messages.length - 1].role !== "user") return bad(400, "no_user_message");
+	// the answer streams, so its exact size is unknown: count the prompt plus a typical answer (400 tokens)
+	const B = budget(env, "coach", COACH_BUDGET), q = await B.quota();
+	const cost = (systemPrompt(body.context).length + messages.reduce((a, m) => a + m.content.length, 0)) / 3.5 * RATE_IN + 400 * RATE_OUT;
+	if (q && q.used + cost > q.limit) return limitResponse(q);
+	await B.spend(cost);
 
 	try {
 		const stream = await env.AI.run(MODEL, {

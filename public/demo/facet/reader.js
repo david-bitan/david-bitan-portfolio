@@ -42,10 +42,34 @@
 	const catsIn = (s) => Object.keys(CATW).filter((c) => has(s, CATW[c]));
 	const kindIn = (s) => Object.keys(KINDW).find((k) => has(s, KINDW[k])) || null;
 
+	/* other languages: a few key words are turned into their English equivalent, then read like the rest */
+	const XL = [
+		[["restaurante", "ristorant", "gaststatt", "essen gehen", "ресторан", "кафе", "restoran", "lokanta", "rumah makan", "מסעד", "בית קפה"], "restaurant"],
+		[["supermercado", "supermercat", "mercado", "lebensmittel", "einkauf", "supermarkt", "spesa", "alimentari", "продукт", "супермаркет", "market", "bakkal", "belanja", "sembako", "סופר", "מכולת", "קניות אוכל"], "groceries"],
+		[["alquiler", "aluguel", "renda", "miete", "affitto", "аренд", "квартир", "kira", "sewa", "שכירות", "דיור"], "rent"],
+		[["transporte", "trasport", "verkehr", "fahrt", "транспорт", "такси", "ulasim", "taksi", "transportasi", "תחבור", "מונית"], "transport"],
+		[["suscrip", "assinatura", "abbonament", "abonnement", "abos", "подписк", "abonelik", "langganan", "מנוי"], "subscription"],
+		[["ocio", "lazer", "freizeit", "svago", "tempo libero", "досуг", "развлеч", "eglence", "hiburan", "פנאי", "בילוי"], "leisure"],
+		[["salud", "saude", "gesundheit", "salute", "farmacia", "apotheke", "здоров", "аптек", "saglik", "eczane", "kesehatan", "apotek", "בריאות", "בית מרקחת"], "health"],
+		[["compras", "ropa", "roupa", "kleidung", "abbigliamento", "одежд", "покупк", "alisveris", "giyim", "pakaian", "ביגוד"], "shopping"],
+		[["este mes", "este mês", "diesen monat", "questo mese", "этот месяц", "в этом месяце", "bu ay", "bulan ini", "החודש"], "this month"],
+		[["mes pasado", "mes passado", "letzten monat", "mese scorso", "прошлом месяце", "прошлый месяц", "gecen ay", "bulan lalu", "בחודש שעבר"], "last month"],
+		[["cada mes", "cada mês", "por mes", "por mês", "pro monat", "jeden monat", "ogni mese", "al mese", "каждый месяц", "в месяц", "her ay", "aylik", "setiap bulan", "per bulan", "כל חודש", "בחודש"], "per month"],
+		[["ano", "jahr", "anno", "год", "yil", "tahun", "שנה"], "year"],
+		[["semana", "wochentag", "settimana", "день недели", "haftanin", "hari apa", "יום בשבוע"], "day of the week"],
+		[["mayores gastos", "maiores despesas", "grossten ausgaben", "spese piu grandi", "крупн", "en buyuk", "terbesar", "הגדול"], "biggest"],
+		[["ingreso", "receita", "einnahm", "entrat", "доход", "gelir", "pemasukan", "הכנס", "משכורת"], "income"],
+		[["evolucion", "evolucao", "entwicklung", "andamento", "динамик", "изменен", "degisim", "perkembangan", "מגמה", "שינוי"], "trend"],
+		[["barras", "balken", "barre", "столб", "cubuk", "batang", "עמודות"], "bars"],
+		[["linea", "linha", "linie", "linea", "линия", "график", "cizgi", "garis", "קו"], "line"],
+		[["tabla", "tabela", "tabelle", "tabella", "таблиц", "tablo", "tabel", "טבלה"], "table"],
+	];
+	const toEn = (s) => s + " " + XL.filter(([ws]) => ws.some((w) => s.includes(norm(w)))).map(([, en]) => en).join(" ");
+
 	/* ctx: { t, today, prev (current spec), sel (selected block index) }. t(key, params) returns { k, p }: titles are translated when shown,
 	 * so they follow the language switch; params "cat" and "cats" hold category ids. */
 	function read(text, ctx) {
-		const s = norm(text), t = ctx.t, P = period(s, ctx.today), cats = catsIn(s), kind = kindIn(s);
+		const s = toEn(norm(text)), t = ctx.t, P = period(s, ctx.today), cats = catsIn(s), kind = kindIn(s);
 		const words = s.split(/\s+/).filter(Boolean).length;
 		const refining = ctx.prev && (words <= 4 || has(s, ["plutot", "instead", "seulement", "uniquement", "only", "juste", "just", "sans", "without", "except", "en barres", "en courbe", "en camembert", "en tableau", "as a", "mets", "change", "passe", "switch", "make it", "fais"]));
 		if (refining && (P || cats.length || kind)) return refine(ctx.prev, { P, cats, kind, without: has(s, ["sans", "without", "except", "hors"]), sel: ctx.sel });

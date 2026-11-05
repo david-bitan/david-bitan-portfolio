@@ -1142,6 +1142,7 @@
 			body: JSON.stringify({ messages: convo.slice(-10), context: contextPayload() })
 		});
 		if (res.status === 503) { const e = new Error("not_configured"); e.code = 503; throw e; }
+		if (res.status === 429) { const e = new Error("daily_limit"); e.code = 429; throw e; }
 		if (!res.ok || !res.body) throw new Error("http_" + res.status);
 		const reader = res.body.getReader(), dec = new TextDecoder();
 		let buf = "", text = "";
@@ -1222,8 +1223,11 @@
 			} catch (err) {
 				if (cancelFlag || (err && err.name === "AbortError")) { bubble.classList.remove("cx-caret"); return stopped(wrap, !!bubble.textContent); }
 				wrap.innerHTML = "";
-				const offline = err && err.code === 503;
-				wrap.appendChild(noteEl({ kind: "err", text: offline
+				const offline = err && err.code === 503, limit = err && err.code === 429;
+				const back = (() => { const d = new Date(); d.setUTCHours(24, 0, 0, 0); return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }); })();
+				wrap.appendChild(noteEl({ kind: "err", text: limit
+					? `Today's free AI is used up. Coach uses Meta's Llama 3.3 model through Cloudflare's free Workers AI service, and its daily allowance comes back at ${back}. Until then I can still build programs, compare memberships and suggest classes. Nothing is charged.`
+					: offline
 					? "Live answers aren't switched on for this site yet. I can still build programs, compare memberships and suggest classes."
 					: "Coach couldn't reach the AI service. Your message is safe: nothing was lost." }));
 				const dOff = demosFor(userText, "");
@@ -1461,4 +1465,26 @@
 
 	restore();
 	if (/[?&]coach=open/.test(location.search)) open();
+})();
+
+/* No word alone on the last line, in every language: the last two words of each sentence are kept together,
+ * unless together they no longer fit (big titles on small screens): then the line breaks normally. Re-checked on resize. */
+(function () {
+	const SEL = "h1,h2,h3,h4,p,li,td,small,figcaption,blockquote,dd,dt,label,button";
+	const orig = new Map(); let q = 0, rz = 0;
+	function fix() {
+		q = 0;
+		document.querySelectorAll(SEL).forEach((el) => {
+			const len = String(el.textContent.length); if (el.dataset.nw === len) return;
+			el.dataset.nw = len;
+			if (el.textContent.trim().split(/\s+/).length < 4) return;
+			const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let last = null, n; while ((n = w.nextNode())) if (n.data.trim()) last = n;
+			if (!last || !/ \S+\s*$/.test(last.data)) return;
+			const before = last.data; last.data = before.replace(/ (\S+\s*)$/, "\u00a0$1");
+			if (el.scrollWidth > el.clientWidth + 1) last.data = before; else orig.set(last, before);
+		});
+	}
+	new MutationObserver(() => { if (!q) q = requestAnimationFrame(fix); }).observe(document.documentElement, { subtree: true, childList: true, characterData: true });
+	addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { for (const [node, text] of orig) node.data = text; orig.clear(); document.querySelectorAll("[data-nw]").forEach((e) => delete e.dataset.nw); fix(); }, 200); });
+	if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fix); else fix();
 })();

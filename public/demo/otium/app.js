@@ -406,12 +406,14 @@
 		if (month == null && /next month|le mois prochain|mois prochain|el (próximo|proximo) mes|il mese prossimo|mese prossimo|בחודש הבא/.test(s)) month = (new Date().getMonth() + 1) % 12;
 		return { city, askedPlace, nights, travelers, budget, interests, pace, cabin, bags, time, month, note: "" };
 	}
+	const resetTime = () => { const d = new Date(); d.setUTCHours(24, 0, 0, 0); return d.toLocaleTimeString(document.documentElement.lang || undefined, { hour: "2-digit", minute: "2-digit" }); };
 	async function understand(text) {
 		if (S.scenario === "offline") return { intent: localParse(text), ai: false };
 		const ask = async (ms) => {
 			const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), ms);
 			try {
 				const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, lang: I.lang }), signal: ctl.signal });
+				if (r.status === 429) { const e = new Error("daily_limit"); e.limit = true; throw e; }
 				if (!r.ok) throw new Error(`HTTP ${r.status}`);
 				const j = await r.json(); if (!j.intent) throw new Error("empty");
 				return j;
@@ -419,14 +421,14 @@
 		};
 		try {
 			// the 70B model can take a while on a cold start: wait longer, and try twice before giving up
-			let j; try { j = await ask(15000); } catch (e) { if (e.name === "AbortError") throw e; console.warn("Otium AI, first try:", e.message); j = await ask(10000); }
+			let j; try { j = await ask(15000); } catch (e) { if (e.name === "AbortError" || e.limit) throw e; console.warn("Otium AI, first try:", e.message); j = await ask(10000); }
 			// Belt and braces: the model may miss a number that is plainly in the text.
 			const loc = localParse(text); const i = j.intent;
 			for (const k of ["nights", "travelers", "budget"]) if (i[k] == null && loc[k] != null) i[k] = loc[k]; if (loc.budget != null) i.budget = loc.budget; // the number as typed, in the page currency: the model may convert it
 			Object.assign(i, { cabin: loc.cabin, bags: loc.bags, time: loc.time, month: loc.month });
 			if (!i.city && loc.city) { i.city = loc.city; i.askedPlace = loc.askedPlace; }
 			return { intent: i, ai: true };
-		} catch (e) { console.warn("Otium AI unavailable, basic matching used:", e.message); return { intent: localParse(text), ai: false }; }
+		} catch (e) { console.warn("Otium AI unavailable, basic matching used:", e.message); S.aiLimit = Boolean(e.limit); return { intent: localParse(text), ai: false }; }
 	}
 
 	/* ---------------- run engine ---------------- */
@@ -915,7 +917,7 @@
 		const fact = (key, vals, cur, label) => dd("k", key, vals, cur, t(label), p.assumed[key] ? "assumed" : "");
 		const pref = (key, vals, label) => dd("p", key, vals, p.prefs[key], t(label), "pref");
 		const caps = [...new Set([...capList(), p.cap])].sort((a, b) => a - b);
-		box.innerHTML = `<div class="lbl"><span>${t("WHAT I UNDERSTOOD")}</span><span ${S.aiUsed ? "" : `title="${esc(t("Smart reading is offline right now, so Otium used basic matching. Check the details below: you can change any of them."))}"`}>${t(S.aiUsed ? "Read by AI" : "Basic matching")}</span></div>
+		box.innerHTML = `<div class="lbl"><span>${t("WHAT I UNDERSTOOD")}</span><span ${S.aiUsed ? "" : `title="${esc(t("Smart reading is offline right now, so Otium used basic matching. Check the details below: you can change any of them."))}"`}>${t(S.aiUsed ? "Read by AI" : S.aiLimit ? "Free AI used up today" : "Basic matching")}</span></div>${!S.aiUsed && S.aiLimit ? `<p class="ai-lim">${esc(t("Today’s free AI is used up: Otium uses Meta’s Llama 3.3 model through Cloudflare’s free Workers AI service, and its daily allowance comes back at {time}. Until then, Otium reads your request with basic matching: check the details below. Prices and plans stay exact, and nothing is charged.", { time: resetTime() }))}</p>` : ""}
 			<p>${esc(S.text)}</p>
 			<div class="facts">
 				${fact("city", Object.keys(D.cities).map((k) => [k, D.cities[k].name, D.cities[k].country]), p.city, "Destination")}
@@ -1203,12 +1205,13 @@
 				const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, signal: ctl.signal,
 					body: JSON.stringify({ mode: "chat", lang: I.lang, context: botContext(), messages: BOT.msgs.filter((m) => m.by === "user" || !m.local || m === BOT.msgs[0]).slice(-8).map((m) => ({ role: m.by === "user" ? "user" : "assistant", content: m.text })) }) });
 				clearTimeout(to);
+				if (r.status === 429) BOT.limit = true;
 				if (r.ok) { const j = await r.json(); if (typeof j.reply === "string" && j.reply.trim()) { reply = j.reply.trim().slice(0, 900); action = BOT_ACTIONS[j.action] ? j.action : null; } }
 			} catch { /* AI unreachable: honest scripted answer below */ }
 		}
 		BOT.ai = reply != null;
 		// Never pretend: without the model, say so before the scripted answer.
-		BOT.msgs.push(reply ? { by: "bot", text: reply, action } : { by: "bot", text: `${t("My AI can’t be reached right now, so here is the basic answer:")} ${lt || t("I can help with dates, budget, bags, payment, cancelling, or finding a person. What is blocking you?")}`, action: la || "human", local: true });
+		BOT.msgs.push(reply ? { by: "bot", text: reply, action } : { by: "bot", text: `${BOT.limit ? t("Today’s free AI is used up (Meta’s Llama 3.3 model, through Cloudflare’s free Workers AI service). It comes back at {time}. Until then, here is the basic answer:", { time: resetTime() }) : t("My AI can’t be reached right now, so here is the basic answer:")} ${lt || t("I can help with dates, budget, bags, payment, cancelling, or finding a person. What is blocking you?")}`, action: la || "human", local: true });
 		BOT.busy = false; renderBot();
 	}
 	let botTimer = null;
@@ -2338,4 +2341,26 @@
 	if (q.get("video")) setTimeout(openVideo, 500);
 	if (q.get("state")) { const st = STATES.find((x) => x[0] === q.get("state")); if (st) { $("#ask").value = st[3]; start(st[3], false, st[0], st); } }
 	else if (q.get("q")) { $("#ask").value = q.get("q"); start(q.get("q")); }
+})();
+
+/* No word alone on the last line, in every language: the last two words of each sentence are kept together,
+ * unless together they no longer fit (big titles on small screens): then the line breaks normally. Re-checked on resize. */
+(function () {
+	const SEL = "h1,h2,h3,h4,p,li,td,small,figcaption,blockquote,dd,dt,label,button";
+	const orig = new Map(); let q = 0, rz = 0;
+	function fix() {
+		q = 0;
+		document.querySelectorAll(SEL).forEach((el) => {
+			const len = String(el.textContent.length); if (el.dataset.nw === len) return;
+			el.dataset.nw = len;
+			if (el.textContent.trim().split(/\s+/).length < 4) return;
+			const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let last = null, n; while ((n = w.nextNode())) if (n.data.trim()) last = n;
+			if (!last || !/ \S+\s*$/.test(last.data)) return;
+			const before = last.data; last.data = before.replace(/ (\S+\s*)$/, "\u00a0$1");
+			if (el.scrollWidth > el.clientWidth + 1) last.data = before; else orig.set(last, before);
+		});
+	}
+	new MutationObserver(() => { if (!q) q = requestAnimationFrame(fix); }).observe(document.documentElement, { subtree: true, childList: true, characterData: true });
+	addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { for (const [node, text] of orig) node.data = text; orig.clear(); document.querySelectorAll("[data-nw]").forEach((e) => delete e.dataset.nw); fix(); }, 200); });
+	if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fix); else fix();
 })();

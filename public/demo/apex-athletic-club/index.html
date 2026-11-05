@@ -1119,6 +1119,7 @@
 		align-items: center;
 	}
 	.cta-final .h1 { text-transform: uppercase; }
+	@media (max-width: 420px) { .cta-final .h1 { font-size: 32px; } }
 	.cta-final .h1 .accent { color: var(--pink); }
 	.cta-final .side {
 		display: flex;
@@ -2017,6 +2018,8 @@
 	@media (max-width: 480px) {
 		.auth-paths { grid-template-columns: 1fr; }
 	}
+	/* very small phones: long uppercase words must fit the column */
+	@media (max-width: 360px) { .h2 { font-size: 28px; } .section .head { grid-template-columns: minmax(0, 1fr); } }
 </style>
 
 <!-- Pre-hide reveal blocks BEFORE first paint to avoid a flash of visible

@@ -59,6 +59,100 @@ export interface AILabProject {
 // one of the experiments, so it closes the row rather than opening it.
 export const aiLabProjects: AILabProject[] = [
 	{
+		slug: 'facet',
+		title: 'Facet',
+		subtitle: 'Drop a bank statement, see where your money goes, then ask anything.',
+		eyebrow: 'Personal finance · 2026',
+		shortDesc:
+			'A fictional money app: drop the statement your bank gives you (Excel, CSV, PDF or Word) and Facet reads it in your browser, sorts every line and builds the full analysis. Then you ask questions in plain words. Ten languages, Hebrew in RTL.',
+		intro: `Facet is a fictional personal finance app I designed and built end-to-end. It starts from a file almost everyone has and almost nobody reads: the statement your bank lets you download. Facet turns it into an answer to the question behind it, where does my money go?
+
+You drop the file, or several. Facet finds the dates, labels and amounts on its own, whatever the format: a French bank's CSV with semicolons and decimal commas, an Excel budget sheet, a PDF statement with debit and credit columns. When it is not sure how to read a table, it asks: a preview of the file with a choice above each column, and the number of lines found updating as you go. Every merchant is then sorted into a category, first with the categories written in the file, then with common words, and only then with the AI.
+
+The report builds itself: money in and out, spending by category and month by month, regular payments found from their rhythm, the expenses that stand out. Above it, a question field: ask "how much do I spend on restaurants each month?" and Facet answers in one sentence, with the charts that show it. Every figure on the page opens the exact lines of your file it comes from.`,
+		aiFeature: {
+			eyebrow: 'AI UX · Generated interface',
+			title: 'The AI picks the screen, the code computes the numbers',
+			lead: 'Facet uses an open model (Llama 3.3 on Cloudflare Workers AI) for two narrow jobs: sorting merchant names it does not recognise, and turning a question into a description of the screen that answers it (which blocks, which period, which filters). The model never sees an amount and never writes one. Every number is computed in the browser from the lines of the file, so an answer can always be traced back to its source.',
+			tryUrl: '/demo/facet/',
+			tryLabel: 'Try it with a sample statement',
+			states: ['Excel, CSV, PDF, Word or text, several files at once', 'Column check when a table is unclear', 'Merchants sorted by the AI, shown for review', 'Lines left to check, fixed in one tap', 'Report: overview, where the money goes, worth knowing, regular payments', 'Question answered in one sentence plus charts', 'Lines behind any figure, with search and sort', 'Filters for period, categories and amount', 'Free AI used up: simpler reader, figures still exact', 'Dark and light themes, ten languages, Hebrew in RTL'],
+			decisions: [
+				{ title: 'No figure from the model', body: 'The AI only describes the screen: blocks, periods, filters. The page drops anything it does not understand and computes every total itself, so the model cannot invent an amount, even when it misreads the question.' },
+				{ title: 'Every number opens its lines', body: '"See the lines" sits under every figure and chart. It opens a side panel with the exact lines of the file, their line number or page, and a search, a category filter and a sort, so checking a number costs one tap.' },
+				{ title: 'Ask before guessing the columns', body: 'When a table has no header or leaves many lines aside, Facet shows a preview with a choice above each column and counts the lines found as you change them. Reading a stranger\'s file wrong is the fastest way to lose trust.' },
+				{ title: 'Rules first, the AI last', body: 'Categories written in the file come first, then common words in English and French, and only the merchants left go to the AI. Fewer calls, faster results, and the AI\'s choices are listed right after the analysis so they can be confirmed or corrected.' },
+				{ title: 'Your file stays on your device', body: 'Files are opened in the browser: Excel without any library, PDF with PDF.js, Word with Mammoth. Only unknown merchant names are sent to the AI, never an amount, a date or an account number.' },
+				{ title: 'A question field, not a chatbot', body: 'People ask about their money, they do not want to chat. One field at the top, suggested questions written from the file itself, and an answer in one sentence above the charts. Each answer can be removed or changed, with undo.' },
+				{ title: 'Correct once, everything follows', body: 'Changing the category of one line moves every line from that merchant, and every chart, total and insight updates. One undo takes it back.' },
+				{ title: 'When the free AI runs out', body: 'The demo has a small daily allowance. When it is spent, nothing breaks: a simpler local reader answers, unknown merchants wait in "To check", and a short note says why and when the AI comes back, in the visitor\'s own time.' },
+				{ title: 'What I left out on purpose', body: 'No connection to a real bank, no budgets to fill in, no score or judgement on spending. The app describes, it does not lecture, and it never needs more than the file you chose to give it.' },
+				{ title: 'How I would test it', body: 'Moderated sessions with 6 to 8 people per round, each bringing an export from their own bank. I would measure how many files read correctly without the column check, how often people open the lines behind a figure, and whether they can answer three questions about their month faster than in their banking app.' },
+			],
+		},
+		designSystem: {
+			fontCss: '/demo/facet/fonts/fonts.css',
+			colors: [
+				{ name: 'Night', hex: '#0D0E10', role: 'Canvas in the dark theme, the default' },
+				{ name: 'Surface', hex: '#17191C', role: 'Cards, panels and menus' },
+				{ name: 'Ink', hex: '#EEEFF1', role: 'Type and key figures' },
+				{ name: 'Lime', hex: '#C5F06A', role: 'Brand · main buttons · active filters' },
+				{ name: 'Focus blue', hex: '#5B9BEA', role: 'Fields being typed in · keyboard focus' },
+				{ name: 'Money in', hex: '#4CC38A', role: 'Income · sorted · confirmed' },
+				{ name: 'To check', hex: '#F0B44C', role: 'Lines waiting for a category · notes' },
+			],
+			typography: [
+				{ family: 'IBM Plex Sans', weights: '400 · 500 · 600 · 700', role: 'Interface · headings · figures', sample: 'See where your money goes.' },
+				{ family: 'IBM Plex Mono', weights: '400 · 500', role: 'File lines, labels as the bank wrote them', sample: 'CARTE X4821 12/10 CAFE ARDOISE' },
+				{ family: 'Heebo', weights: '400 · 500 · 600 · 700', role: 'Hebrew, right-to-left', sample: 'רואים לאן הולך הכסף.' },
+			],
+			micro: [
+				'One icon set everywhere: Lucide, thin strokes, no filled shapes',
+				'Category colours from a palette checked for colour blindness, in fixed order',
+				'Squircle corners where the browser supports them, radii kept concentric',
+				'Charts drawn by hand in SVG: thin bars, a tooltip on every mark, the month not over shown dashed',
+				'Everything that opens slides in: menus, panels, the sign-in overlay',
+				'The lines of the file always in mono, as the bank wrote them',
+			],
+			interactions: [
+				'Sign in or create an account in an overlay, or use the demo account',
+				'Drop files or try one of three sample statements',
+				'Column check with a live count of lines found',
+				'Question field with suggestions, answers with undo',
+				'Filters for period, categories and amount above the whole report',
+				'Side panel with the lines behind any figure',
+			],
+			constraints: [
+				'Plain HTML, CSS and JavaScript: no framework, no bundler, no CDN',
+				'Files read in the browser; Excel opened without a library',
+				'Free plans only: a daily AI budget, and a local reader as a fallback',
+				'Invented sample statements, merchants and account holder',
+				'Not financial advice: Facet describes, it does not recommend',
+				'Tested in a headless browser: 13 screen sizes in portrait and landscape, ten languages, dark and light',
+			],
+		},
+		nextSteps: [
+			{ title: 'A month in review', body: 'At the end of each month, Facet would compare the new statement with the previous ones and point out what changed: a new subscription, a category that grew, a payment that stopped.' },
+		],
+		gallery: [
+			'/lab-assets/facet/report.webp',
+			'/lab-assets/facet/answer.webp',
+			'/lab-assets/facet/lines.webp',
+			'/lab-assets/facet/columns.webp',
+			'/lab-assets/facet/home.webp',
+			'/lab-assets/facet/sign-in.webp',
+		],
+		mobileGallery: [
+			'/lab-assets/facet/m-report.webp',
+			'/lab-assets/facet/m-answer.webp',
+			'/lab-assets/facet/m-lines.webp',
+			'/lab-assets/facet/m-home.webp',
+		],
+		demoUrl: '/demo/facet/',
+		thumbnail: '/lab-assets/facet/thumbnail.jpg',
+		accent: '#C5F06A',
+	},
+	{
 		slug: 'margin',
 		title: 'Margin',
 		subtitle: 'An AI reader that explains any document and shows you where it says it.',

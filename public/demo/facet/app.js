@@ -30,9 +30,10 @@
 	const catName = (id) => (id === "other" ? t("To check") : t(I.CAT_NAMES[id] || id));
 	function title(x) { if (!x) return ""; if (typeof x === "string") return x; const p = { ...(x.p || {}) }; if (p.cat) p.cat = catName(p.cat); if (p.cats) p.cats = String(p.cats).split(",").map(catName).join(", "); return t(x.k, p); }
 	const locale = () => I.LOCALE[S.lang] || S.lang;
-	const money = (v) => new Intl.NumberFormat(locale(), { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
-	const money0 = (v) => new Intl.NumberFormat(locale(), { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(v);
-	const moneyShort = (v) => new Intl.NumberFormat(locale(), { style: "currency", currency: "EUR", notation: v >= 10000 ? "compact" : "standard", maximumFractionDigits: v >= 10000 ? 1 : 0 }).format(v);
+	const cur = () => S.A?.cur || "EUR";
+	const money = (v) => new Intl.NumberFormat(locale(), { style: "currency", currency: cur(), minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+	const money0 = (v) => new Intl.NumberFormat(locale(), { style: "currency", currency: cur(), maximumFractionDigits: 0 }).format(v);
+	const moneyShort = (v) => new Intl.NumberFormat(locale(), { style: "currency", currency: cur(), notation: v >= 10000 ? "compact" : "standard", maximumFractionDigits: v >= 10000 ? 1 : 0 }).format(v);
 	const num = (v) => new Intl.NumberFormat(locale(), { maximumFractionDigits: 0 }).format(v);
 	const pct = (v) => new Intl.NumberFormat(locale(), { style: "percent", maximumFractionDigits: 0 }).format(v);
 	const dt = (s, o) => E.parse(s).toLocaleDateString(locale(), o);
@@ -69,7 +70,7 @@
 	const logo = (tag = "button", attrs = "") => `<${tag} class="logo" ${tag === "a" ? 'href="#/"' : tag === "button" ? 'type="button"' : ""} ${attrs} ${tag === "span" ? "" : 'aria-label="Facet"'}><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#0D0E10" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 18v-6M12 18V6M18 18v-4"/></svg></span><b>Facet</b></${tag}>`;
 	const langBtn = () => `<div class="dd"><button type="button" class="btn btn-g btn-sm" data-lang aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t("Language"))}">${ic("globe")}<span>${S.lang.toUpperCase()}</span>${ic("chevron-down", "chev")}</button><ul class="menu" role="listbox" tabindex="-1" hidden></ul></div>`;
 	const themeBtn = () => `<button type="button" class="icon-btn" data-theme-toggle aria-label="${esc(t(S.theme === "dark" ? "Light theme" : "Dark theme"))}" title="${esc(t(S.theme === "dark" ? "Light theme" : "Dark theme"))}">${ic(S.theme === "dark" ? "sun" : "moon")}</button>`;
-	const footer = () => `<footer class="foot"><span>${esc(t("A fictional product by David Bitan for his AI Lab. The sample statements, Camille Martin and every merchant in them are invented."))}</span><a href="/#ai-lab">${esc(t("More AI Lab projects"))}</a></footer>`;
+	const footer = () => `<footer class="foot"><span>${esc(t("A fictional product by David Bitan for his AI Lab. The sample statements, Camille Martin and every merchant in them are invented."))}</span><a href="/lab/facet">${esc(t("How it was designed"))}</a></footer>`;
 	function setTheme(th) { S.theme = th; document.documentElement.dataset.theme = th; store.set("facet-theme", th); S.quiet = true; route(); }
 	function bindCommon(root) {
 		$$("[data-lang]", root).forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); menu(b, b.nextElementSibling, I.LANGS.map(([c, n]) => ({ code: c, label: n, on: c === S.lang })), (x) => { S.lang = x.code; store.set("facet-lang", x.code); document.documentElement.lang = x.code; S.quiet = true; route(); }); }));
@@ -274,15 +275,25 @@
 		if (S.busy) return; S.busy = true;
 		const dz = $("#drop"); // the drop zone answers at once: a loader while the files are read
 		if (dz) { dz.classList.add("busy"); dz.innerHTML = `<span class="ic"><span class="spin big"></span></span><b>${esc(t("Reading {f}", { f: files.map((f) => f.name).join(", ") }))}</b><span>${esc(t("This takes a few seconds."))}</span>`; await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))); await wait(450); }
-		const steps = [["read", "Reading the files"], ["cols", "Finding dates, labels and amounts"], ["sort", "Sorting each merchant into a category"], ["ai", "Asking the AI about merchants it did not recognise"], ["build", "Building your analysis"]];
-		$("#main").innerHTML = `<header><h1>${esc(t("Reading your statement"))}</h1><p>${esc(files.map((f) => f.name).join(", "))}</p></header><ol class="steps" id="steps" aria-live="polite">${steps.map(([k, l]) => `<li data-s="${k}"><span class="st"><span class="dotw"></span></span><div>${esc(t(l))}<small></small></div></li>`).join("")}</ol>`;
-		enter($("#main"));
-		const step = (k, state, note) => { const li = $(`[data-s="${k}"]`); if (!li) return; li.className = state; li.querySelector(".st").innerHTML = state === "on" ? '<span class="spin"></span>' : state === "done" ? ic("circle-check") : '<span class="dotw"></span>'; if (note != null) li.querySelector("small").textContent = note; };
+		let step = stepsView(files);
 		try {
 			step("read", "on");
 			const r = await P.read(files);
 			step("read", "done", t("{n} files, {l} lines with a date and an amount", { n: files.length, l: num(r.tx.length) }).replace(/^1 files/, t("1 file")));
+			// Facet was not sure how to read a table (no header, many lines left aside, nothing found): the person picks the columns
+			const unsure = r.files.filter((f) => f.rows && f.rows.length > 2 && (f.fail || f.M?.hi === -1 || (f.skipped > 3 && f.skipped > f.found * 0.25)));
+			for (const f of unsure) if (!(await checkCols(r, f.name))) { S.busy = false; return upload(); }
+			if (unsure.length) { step = stepsView(files); }
+			S.lastRead = { r, files };
 			if (!r.tx.length) { S.busy = false; S.fail = r.files.filter((f) => f.fail); return go("#/new"), upload(); }
+			await finishAnalysis(r, files, null, step);
+		} catch (e) { console.error(e); S.busy = false; S.fail = files.map((f) => ({ name: f.name, fail: "broken" })); upload(); }
+	}
+	/* classify, ask the AI about unknown merchants, build and save; keepId: the same analysis read again with new columns */
+	async function finishAnalysis(r, files, keepId, step) {
+		if (!step) { const st = stepsView(files); step = st; }
+		try {
+			step("read", "done");
 			step("cols", "on"); await wait(350);
 			const fileNotes = r.files.filter((f) => f.found).map((f) => f.M?.lines ? (f.M.cols ? t("debit and credit columns found") : t("read line by line")) : t("columns: {c}", { c: colNames(f).join(", ") }));
 			step("cols", "done", fileNotes.join(" · "));
@@ -301,17 +312,50 @@
 					if (res.ok && j.map) { C.applyAI(r.tx, j.map); ai.ok = Object.keys(j.map).length; } else ai.reason = j.error === "daily_limit" ? "limit" : "offline";
 				} catch { ai.reason = "offline"; }
 				const left = new Set(r.tx.filter((x) => x.c === "other").map((x) => x.m)).size;
-				step("ai", "done", ai.reason ? t(ai.reason === "limit" ? "Today's AI budget is spent: {n} merchants are left for you to check" : "The AI could not be reached: {n} merchants are left for you to check", { n: left }) : t("{a} merchants sorted, {b} left for you to check", { a: ai.ok, b: left }));
+				step("ai", "done", ai.reason ? t(ai.reason === "limit" ? "Today's free AI is used up: {n} merchants are left for you to check" : "The AI could not be reached: {n} merchants are left for you to check", { n: left }) : t("{a} merchants sorted, {b} left for you to check", { a: ai.ok, b: left }));
 			} else step("ai", "done", t("Not needed: every merchant was recognised"));
 			step("build", "on"); await wait(300);
-			const A = { id: Date.now().toString(36), at: new Date().toISOString(), name: files.length === 1 ? files[0].name : t("{n} files", { n: files.length }), names: files.map((f) => f.name), lang: S.lang, ai, dupes: r.dupes,
+			const curs = r.files.map((f) => f.cur).filter(Boolean), cur = curs.sort((a, b) => curs.filter((x) => x === b).length - curs.filter((x) => x === a).length)[0] || "EUR";
+			const A = { id: keepId || Date.now().toString(36), at: new Date().toISOString(), cur, aiChecked: false, name: files.length === 1 ? files[0].name : t("{n} files", { n: files.length }), names: files.map((f) => f.name), lang: S.lang, ai, dupes: r.dupes,
 				files: r.files.map((f) => ({ name: f.name, kind: f.kind, found: f.found, skipped: f.skipped, fail: f.fail, cols: f.M?.lines ? null : colNames(f), lines: !!f.M?.lines, dc: !!f.M?.cols, pos: !!f.M?.allPositive, pages: f.pages })),
 				tx: r.tx.map((x) => ({ id: x.id, d: x.d, label: x.label, a: x.a, c: x.c, how: x.how, src: x.src })), views: [] };
-			const list = savedList(); list.unshift(A);
+			const list = savedList().filter((x) => x.id !== A.id); list.unshift(A);
 			while (!store.set(savedKey(), list) && list.length > 1) list.pop(); // browser storage full: the oldest analyses make room
+			S.lastRead = { r, files, id: A.id };
 			load(A); step("build", "done"); await wait(250);
-			S.busy = false; go("#/a/" + A.id);
+			S.busy = false; if (location.hash === "#/a/" + A.id) route(); else go("#/a/" + A.id);
 		} catch (e) { console.error(e); S.busy = false; S.fail = files.map((f) => ({ name: f.name, fail: "broken" })); upload(); }
+	}
+	function stepsView(files) {
+		const steps = [["read", "Reading the files"], ["cols", "Finding dates, labels and amounts"], ["sort", "Sorting each merchant into a category"], ["ai", "Asking the AI about merchants it did not recognise"], ["build", "Building your analysis"]];
+		$("#main").innerHTML = `<header><h1>${esc(t("Reading your statement"))}</h1><p>${esc(files.map((f) => f.name).join(", "))}</p></header><ol class="steps" id="steps" aria-live="polite">${steps.map(([k, l]) => `<li data-s="${k}"><span class="st"><span class="dotw"></span></span><div>${esc(t(l))}<small></small></div></li>`).join("")}</ol>`;
+		enter($("#main"));
+		return (k, state, note) => { const li = $(`[data-s="${k}"]`); if (!li) return; li.className = state; li.querySelector(".st").innerHTML = state === "on" ? '<span class="spin"></span>' : state === "done" ? ic("circle-check") : '<span class="dotw"></span>'; if (note != null) li.querySelector("small").textContent = note; };
+	}
+
+	/* "Check the columns": a preview of the table with a choice above each column, and the number of lines it gives, live */
+	function checkCols(r, name) {
+		return new Promise((resolve) => {
+			const f = r.files.find((x) => x.name === name), M = f.M || {}, rows = f.rows, hi = M.hi ?? -1;
+			const n = Math.max(...rows.slice(0, 60).map((x) => x.length));
+			const ROLES = [["", "Not used"], ["date", "Date"], ["label", "Label"], ["amount", "Amount"], ["debit", "Money out (debit)"], ["credit", "Money in (credit)"], ["cat", "Category"]];
+			const ov = { hi, date: M.date, label: M.label, amount: M.amount, debit: M.debit, credit: M.credit, cat: M.cat };
+			const roleOf = (i) => (ROLES.find(([k]) => k && ov[k] === i) || ROLES[0])[0];
+			const body = rows.slice(hi + 1).filter((x) => x.some((c) => String(c ?? "").trim())).slice(0, 7);
+			const cell = (v) => (typeof v === "number" && v > 20000 && v < 80000 && (roleOf(0) === "date" || true) ? String(v) : String(v ?? ""));
+			const render = () => {
+				const test = P.retable(r, name, ov), ff = test.files.find((x) => x.name === name);
+				$("#main").innerHTML = `<header><h1>${esc(t("Check the columns"))}</h1><p>${esc(t("Facet is not sure how to read {f}. Tell it which column holds what: the number of lines found updates as you go.", { f: name }))}</p></header>
+				<div class="cc"><div class="cc-t"><table><thead><tr>${Array.from({ length: n }, (_, i) => `<th><div class="dd"><button type="button" class="fbtn ${roleOf(i) ? "on" : ""}" data-col="${i}" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t("Column {n}", { n: i + 1 }))}"><span>${esc(t(ROLES.find(([k]) => k === roleOf(i))[1]))}</span>${ic("chevron-down", "chev")}</button><ul class="menu" role="listbox" tabindex="-1" hidden></ul></div>${hi >= 0 ? `<small>${esc(String(rows[hi][i] ?? ""))}</small>` : ""}</th>`).join("")}</tr></thead>
+				<tbody>${body.map((x) => `<tr>${Array.from({ length: n }, (_, i) => `<td class="${roleOf(i) ? "on" : ""}">${esc(cell(x[i]))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+				<div class="cc-f"><span class="${ff.found ? "ok" : "warn"}">${ic(ff.found ? "circle-check" : "triangle-alert")}${esc(ff.found ? t("{n} lines with a date and an amount", { n: num(ff.found) }) : t("No line found yet: choose at least a date and an amount."))}</span><span class="sp"></span>
+				<button type="button" class="btn" id="ccNo">${esc(t("Cancel"))}</button><button type="button" class="btn btn-p" id="ccOk" ${ff.found ? "" : "disabled"}>${ic("check")}${esc(t("Read with these columns"))}</button></div></div>`;
+				$$("[data-col]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); const i = +b.dataset.col; menu(b, b.nextElementSibling, ROLES.map(([k, l]) => ({ k, label: t(l), on: roleOf(i) === k })), (x) => { for (const [k] of ROLES) if (k && ov[k] === i) ov[k] = undefined; if (x.k) { ov[x.k] = i; if (x.k === "amount") ov.debit = ov.credit = undefined; if (x.k === "debit" || x.k === "credit") ov.amount = undefined; } render(); }); }));
+				$("#ccNo").addEventListener("click", () => resolve(false));
+				$("#ccOk").addEventListener("click", () => resolve(true));
+			};
+			render(); enter($("#main"));
+		});
 	}
 	function colNames(f) {
 		const M = f.M || {}, h = M.head || [], nm = (i, fb) => (i != null ? (h[i] ? `“${h[i]}”` : t(fb)) : null);
@@ -403,13 +447,13 @@
 			<div id="views"></div>
 			<div class="rep">
 			<div class="rep-main">
+			${aiReview(A)}
 			<div class="fwrap">${filterBar()}</div>
 			<section class="sect first"><h2>${esc(t("Overview"))}</h2><p class="sub">${esc(filtered() ? t("Filtered: {r}.", { r: rangeLabel(r0) }) : t("The whole file: {r}.", { r: rangeLabel(r0) }))}</p><div class="grid" id="g-kpi"></div></section>
 			<section class="sect"><h2>${esc(t("Where the money goes"))}</h2><div class="grid" id="g-where"></div></section>
-			<section class="sect"><h2>${esc(t("Worth knowing"))}</h2><div class="ins" id="ins"></div></section>
+			<section class="sect"><h2>${esc(t("Worth knowing"))}</h2><div class="ins" id="ins"></div><div class="grid" id="g-odd"></div></section>
 			<section class="sect"><h2>${esc(t("Regular payments"))}</h2><p class="sub">${esc(rec.length ? t("Found because the same amount goes to the same place at a steady rhythm.") : t("No payment repeats at a steady rhythm in this file."))}</p><div class="grid" id="g-rec"></div></section>
-			<section class="sect"><h2>${esc(t("Expenses that stand out"))}</h2><div class="grid" id="g-odd"></div></section>
-			<section class="sect"><h2>${esc(t("Merchants"))}</h2><div class="grid" id="g-top"></div></section>
+
 			<section class="sect" id="all"><h2>${esc(t("All lines"))}</h2><p class="sub">${esc(t("Change a category and every figure above follows."))}</p>
 				<div class="tools-row"><div class="search">${ic("search")}<label class="sr" for="txQ">${esc(t("Search"))}</label><input id="txQ" placeholder="${esc(t("Search a merchant or a label"))}" value="${esc(S.q)}"></div>
 				<div class="dd"><button type="button" class="btn" id="txF" aria-haspopup="listbox" aria-expanded="false">${ic("layers")}<span>${esc(S.txFilter === "all" ? t("All categories") : catName(S.txFilter))}</span>${ic("chevron-down", "chev")}</button><ul class="menu" role="listbox" tabindex="-1" hidden></ul></div></div>
@@ -419,12 +463,16 @@
 			</div>
 			${footer()}`;
 		const anim = !!first;
-		fill("#g-kpi", blocks, anim); fill("#g-where", where, anim); fill("#g-top", top, anim);
+		fill("#g-kpi", blocks, anim); fill("#g-where", where.concat(top), anim);
 		insights(rec); recBlock(rec, anim); oddBlock(odd, anim); views(anim); allTx(); bindFilters();
 		$("#askF").addEventListener("submit", (e) => { e.preventDefault(); const v = $("#askQ").value.trim(); if (v) ask(v); });
 		$$("[data-chip]").forEach((b) => b.addEventListener("click", () => ask(b.textContent, true, b.dataset.en)));
 		$("#txQ").addEventListener("input", (e) => { S.q = e.target.value; S.txN = 40; allTx(); });
 		$("#txF").addEventListener("click", (e) => { e.stopPropagation(); menu($("#txF"), $("#txF").nextElementSibling, [{ k: "all", label: t("All categories"), on: S.txFilter === "all" }, ...CATS.concat("income", "other").map((c) => ({ k: c, label: catName(c) + ` (${num(tx.filter((x) => x.c === c).length)})`, dot: col(c), on: S.txFilter === c }))], (x) => { S.txFilter = x.k; S.txN = 40; $("#txF span").textContent = x.k === "all" ? t("All categories") : catName(x.k); allTx(); }); });
+		$$("[data-fixcols]").forEach((b) => b.addEventListener("click", async () => { const L = S.lastRead; if (await checkCols(L.r, b.dataset.fixcols)) { S.busy = true; await finishAnalysis(L.r, L.files, L.id); } else route(); }));
+		$("#aiOk")?.addEventListener("click", () => { S.A.aiChecked = true; persist(); slide($("#aiRev"), false); });
+		$$("[data-airev]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); const k = b.dataset.airev, same = S.data.tx.filter((y) => y.k === k && y.a < 0), x = same[0];
+			menu(b, b.nextElementSibling, CATS.map((c) => ({ c, label: catName(c), dot: col(c), on: c === x.c })), (o) => { if (o.c === x.c) return; snap(); same.forEach((y) => { y.c = o.c; y.how = "you"; }); persist(); report(false); toast(t("{m}: {n} lines moved to {c}.", { m: x.m, n: same.length, c: catName(o.c) }), t("Undo"), undo); }); }));
 		$("#pvAll")?.addEventListener("click", () => lines(t("All lines"), S.data.tx, ""));
 		$("#readBtn")?.addEventListener("click", () => { S.open.read = !($("#readBtn").getAttribute("aria-expanded") === "true"); $("#readBtn").setAttribute("aria-expanded", S.open.read); slide($("#readIn"), S.open.read); });
 		$("#toCheck")?.addEventListener("click", () => { S.f = { per: "all", cats: [], min: 0 }; report(false); S.txFilter = "other"; S.txN = 40; allTx(); $("#txF span").textContent = catName("other"); $("#all").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" }); });
@@ -442,12 +490,23 @@
 			<div id="readIn" ${S.open.read || innerWidth >= 1280 ? "" : "hidden"}><div class="read-in">
 				${A.files.map((f) => `<div class="fl"><h4>${ic(f.kind === "pdf" ? "file" : f.kind === "xlsx" ? "file-spreadsheet" : "file-text")}${esc(f.name)}</h4><p>${f.found ? esc(t("{n} lines read", { n: num(f.found) })) + (f.skipped ? esc(" · " + t("{n} lines left aside (balances, totals, lines without an amount)", { n: num(f.skipped) })) : "") + (f.pages ? esc(" · " + t("{n} pages", { n: f.pages })) : "") : esc(t("Nothing could be read from this file."))}</p>
 					${f.cols ? `<ul class="cols">${f.cols.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>` : f.lines ? `<ul class="cols"><li>${esc(f.dc ? t("Read from the PDF layout: date at the start of the line, amount under Debit or Credit") : t("Read line by line: a date at the start, the amount at the end"))}</li></ul>` : ""}
-					${f.pos ? `<p>${esc(t("Every amount was positive: they are counted as spending."))}</p>` : ""}</div>`).join("")}
+					${f.pos ? `<p>${esc(t("Every amount was positive: they are counted as spending."))}</p>` : ""}
+					${S.lastRead?.id === A.id && S.lastRead.r.files.find((x) => x.name === f.name)?.rows ? `<p><button type="button" class="btn btn-sm" data-fixcols="${esc(f.name)}">${ic("pencil")}${esc(t("Wrong columns? Fix them"))}</button></p>` : ""}</div>`).join("")}
 				${A.dupes ? `<p class="sub">${esc(t("{n} lines appeared in two files and are counted once.", { n: A.dupes }))}</p>` : ""}
 				<div class="how-c"><div><b>${num(n.file)}</b><small>${esc(t("sorted with your file's categories"))}</small></div><div><b>${num(n.rule)}</b><small>${esc(t("sorted with common words"))}</small></div><div><b>${num(n.ai)}</b><small>${esc(t("sorted by the AI"))}</small></div><div class="${todo.length ? "warn" : ""}"><b>${num(todo.length)}</b><small>${esc(t("to check"))}${n.you ? " · " + esc(t("{n} changed by you", { n: num(n.you) })) : ""}</small></div></div>
-				${A.ai?.reason ? `<p class="sub">${esc(t(A.ai.reason === "limit" ? "Today's AI budget was spent during this analysis." : "The AI could not be reached during this analysis."))}</p>` : ""}
+				${A.ai?.reason ? `<p class="sub">${esc(A.ai.reason === "limit" ? limitNote() : t("The AI could not be reached during this analysis."))}</p>` : ""}
 				${todo.length ? `<p><button type="button" class="btn btn-sm" id="toCheck">${ic("pencil")}${esc(t("Check the {n} lines", { n: num(todo.length) }))}</button></p>` : ""}
 			</div></div></div>`;
+	}
+
+	/* right after an analysis: the merchants the AI sorted, to confirm or correct in one look */
+	function aiReview(A) {
+		if (A.aiChecked) return "";
+		const g = new Map(); for (const x of S.data.tx) if (x.how === "ai") (g.get(x.k) || g.set(x.k, []).get(x.k)).push(x);
+		if (!g.size) return "";
+		return `<div id="aiRev"><section class="airev"><div class="airev-h">${ic("sparkles")}<div><h2>${esc(t("The AI sorted {n} merchants. Do they look right?", { n: g.size }))}</h2><p class="per">${esc(t("Change any category: every line from that merchant follows."))}</p></div></div>
+			<ul>${[...g.values()].map((l) => `<li><b>${esc(l[0].m)}</b><span class="per">${esc(t(l.length === 1 ? "1 line" : "{n} lines", { n: num(l.length) }))}</span><div class="dd"><button type="button" class="catb" data-airev="${esc(l[0].k)}" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t("Category of {m}: {c}. Change", { m: l[0].m, c: catName(l[0].c) }))}"><i class="dot" style="background:${col(l[0].c)}"></i>${esc(catName(l[0].c))}${ic("chevron-down", "chev")}</button><ul class="menu" role="listbox" tabindex="-1" hidden></ul></div></li>`).join("")}</ul>
+			<button type="button" class="btn btn-sm btn-p" id="aiOk">${ic("check")}${esc(t("Everything looks right"))}</button></section></div>`;
 	}
 
 	/* the file itself, as Facet read it: the first lines with their line number, like a spreadsheet */
@@ -509,7 +568,7 @@
 		if (!chip) {
 			try {
 				const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 20000);
-				const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, signal: ctl.signal, body: JSON.stringify({ request: text, lang: S.lang, today: D.today, from: D.from, merchants: D.merchants.slice(0, 60) }) });
+				const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, signal: ctl.signal, body: JSON.stringify({ request: text, lang: S.lang, currency: cur(), today: D.today, from: D.from, merchants: D.merchants.slice(0, 60) }) });
 				clearTimeout(tm); const j = await r.json().catch(() => ({}));
 				if (r.ok && j.spec) { if (Array.isArray(j.spec.blocks) && !j.spec.blocks.length) { S.busy = false; $("#vload")?.remove(); return toast(t("Facet only knows this file. Ask about spending, categories, merchants or a period.")); } spec = E.clean(j.spec, D); if (!spec) reason = "unreadable"; }
 				else reason = j.error === "daily_limit" ? "limit" : "offline";
@@ -523,6 +582,9 @@
 		$("#askQ").value = ""; views(true);
 		$("#views").scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" });
 	}
+	/* shown where the AI would have acted, only when the day's free allowance is spent */
+	const resetAt = () => { const d = new Date(); d.setUTCHours(24, 0, 0, 0); return d.toLocaleTimeString(locale(), { hour: "2-digit", minute: "2-digit" }); };
+	const limitNote = () => t("Facet uses Meta's Llama 3.3 model through Cloudflare's free Workers AI service. Today's free allowance is used up: it comes back at {time}. Until then, answers come from a simpler reader, the figures stay exact, and nothing is charged.", { time: resetAt() });
 	/* the answer to a question, in one sentence, computed from the first block (the AI never writes a figure) */
 	function answer(spec) {
 		const b = spec.blocks[0]; if (!b) return "";
@@ -537,10 +599,10 @@
 	function views(anim) {
 		const box = $("#views"); box.innerHTML = "";
 		S.A.views.forEach((v, vi) => {
-			const by = v.src === "ai" ? `<span class="src-by">${ic("sparkles")}${esc(t("Layout chosen by the AI"))}</span>` : v.src === "chip" ? `<span class="src-by">${ic("check")}${esc(t("Suggestion, built without AI"))}</span>` : v.src === "edit" ? `<span class="src-by">${ic("check")}${esc(t("Changed by you"))}</span>` : `<span class="src-by warn">${ic("info")}${esc(t(v.reason === "limit" ? "AI budget spent today: simple local reader" : "AI not reachable: simple local reader"))}</span>`;
+			const by = v.src === "ai" ? `<span class="src-by">${ic("sparkles")}${esc(t("Layout chosen by the AI"))}</span>` : v.src === "chip" ? `<span class="src-by">${ic("check")}${esc(t("Suggestion, built without AI"))}</span>` : v.src === "edit" ? `<span class="src-by">${ic("check")}${esc(t("Changed by you"))}</span>` : `<span class="src-by warn">${ic("info")}${esc(t(v.reason === "limit" ? "Today's free AI is used up: simple local reader" : "AI not reachable: simple local reader"))}</span>`;
 			const wrap = document.createElement("section"); wrap.className = "sect"; wrap.style.marginTop = vi ? "28px" : "20px";
 			wrap.className = "qa";
-			wrap.innerHTML = `<div class="qa-h"><div class="qa-q">${ic("sparkles")}<span>${esc(v.label)}</span></div><span class="sp"></span>${by}<button type="button" class="btn btn-sm btn-g" data-rm="${vi}">${ic("x")}<span class="lbl">${esc(t("Remove"))}</span></button></div><p class="qa-a">${esc(answer(v.spec))}</p><div class="grid"></div>`;
+			wrap.innerHTML = `<div class="qa-h"><div class="qa-q">${ic("sparkles")}<span>${esc(v.label)}</span></div><span class="sp"></span>${by}<button type="button" class="btn btn-sm btn-g" data-rm="${vi}">${ic("x")}<span class="lbl">${esc(t("Remove"))}</span></button></div><p class="qa-a">${esc(answer(v.spec))}</p>${v.reason === "limit" ? `<p class="per lim">${esc(limitNote())}</p>` : ""}<div class="grid"></div>`;
 			box.appendChild(wrap);
 			const spans = layout(v.spec.blocks), g = wrap.querySelector(".grid");
 			v.spec.blocks.forEach((b, i) => g.appendChild(card(b, `v${v.id}-${i}`, spans[i], anim && vi === 0, i, { view: vi, block: i })));

@@ -10,11 +10,11 @@
  */
 const MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-allow-headers": "content-type" };
-const LANG = { en: "English", fr: "French", es: "Spanish", de: "German", he: "Hebrew" };
+const LANG = { en: "English", fr: "French", es: "Spanish", pt: "Portuguese", de: "German", it: "Italian", ru: "Russian", tr: "Turkish", id: "Indonesian", he: "Hebrew" };
 
-/* Workers AI gives this account 10,000 free neurons a day, shared by every demo. Facet keeps under FACET_BUDGET (about 35 requests, about 65 neurons each).
+/* Workers AI gives this account 10,000 free neurons a day, shared by every demo. Facet keeps under FACET_BUDGET (about 40 questions).
  * When it is spent, the page switches to its local reader, so the demo keeps working. */
-const FACET_BUDGET = 2500, COST = 160;
+const FACET_BUDGET = 1500, COST = 60;
 const RATE_IN = 26668 / 1e6, RATE_OUT = 204805 / 1e6;
 const dayKey = () => "facet:used:" + new Date().toISOString().slice(0, 10);
 function nextReset() { const d = new Date(); d.setUTCHours(24, 0, 0, 0); return d.toISOString(); }
@@ -30,7 +30,7 @@ async function spend(env, n) {
 
 const PROMPT = `You design the screen of a personal finance app. The person asks something about their own current account in plain words; you answer with a SCREEN DESCRIPTION in JSON, never with prose and never with numbers. The app computes every number itself.
 
-Data available: the bank transactions the person uploaded, from FROM to TODAY, in euros. Each transaction has a date, a merchant, a category and an amount (spending or money in).
+Data available: the bank transactions the person uploaded, from FROM to TODAY, in the currency given as CURRENCY. Each transaction has a date, a merchant, a category and an amount (spending or money in).
 Categories (use these ids only): home (rent, energy, insurance), groceries, dining (restaurants, cafes), transport, subscriptions (streaming, phone, internet, gym), leisure (cinema, books, outings, holidays), health, shopping (clothes, electronics). Money in (salary, refunds) is not a category: use measure "income".
 
 A screen is {"title": "...", "blocks": [block, ...]}, 1 to 6 blocks, the most useful first. A block:
@@ -92,7 +92,7 @@ export async function onRequestPost({ request, env }) {
 	const prev = body.prev && typeof body.prev === "object" ? JSON.stringify(body.prev).slice(0, 3500) : "";
 	const user = [
 		`TODAY: ${String(body.today || "").slice(0, 10)}   FROM: ${String(body.from || "").slice(0, 10)}`,
-		`OUTPUT LANGUAGE: ${LANG[body.lang] || "English"}`,
+		`OUTPUT LANGUAGE: ${LANG[body.lang] || "English"}`, `CURRENCY: ${String(body.currency || "EUR").slice(0, 3)}`,
 		`MERCHANTS: ${merchants.join(" | ")}`,
 		prev ? `PREVIOUS SCREEN: ${prev}` : "",
 		prev && Number.isInteger(body.sel) ? `SELECTED: block ${body.sel} (0 = first)` : "",

@@ -50,6 +50,7 @@ Format: {"points": [{"text": "one simple sentence", "cite": ["c1"]}]}
 4 to 8 points, in the order of the document.` },
 };
 
+async function hash(s) { const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(b)].slice(0, 16).map((x) => x.toString(16).padStart(2, "0")).join(""); }
 function bad(status, msg, detail) {
 	return new Response(JSON.stringify(detail ? { error: msg, detail } : { error: msg }), { status, headers: { "content-type": "application/json", ...CORS } });
 }
@@ -95,7 +96,7 @@ const clean = (arr, ids) => (Array.isArray(arr) ? arr : []).slice(0, 8)
 /* Daily budget. Workers AI gives this account 10,000 free "neurons" a day, shared by every demo (Margin, Otium, APEX Coach)
  * and reset at 00:00 UTC. Margin keeps itself under MARGIN_BUDGET, counted in a KV namespace bound as MARGIN_KV.
  * Without that binding, Margin still works; it just can't show what's left. */
-const MARGIN_BUDGET = 6000;
+const MARGIN_BUDGET = 3000; // see functions/_lib/budget.js for how the 10,000 free neurons are shared
 const COST = { report: 500, ask: 300, summary: 450, simple: 400, translate: 80 };
 const RATE_IN = 26668 / 1e6, RATE_OUT = 204805 / 1e6;
 const dayKey = () => "used:" + new Date().toISOString().slice(0, 10);
@@ -116,10 +117,15 @@ export async function onRequestPost({ request, env }) {
 	let body;
 	try { body = await request.json(); } catch { return bad(400, "invalid_json"); }
 	if (body?.mode === "fetch") return fetchPage(body.url);
+	/* The sample contract: its answers are kept in KV, so every visitor who opens it gets them at once, for 0 neurons
+	 * (and even when the day's budget is spent). Only for the sample: a visitor's own document is never stored. */
+	const ck = body?.sample === true && env.MARGIN_KV ? "margin:sample:" + (await hash(JSON.stringify([body.mode, body.lang, body.question || "", (body.passages || []).map((p) => p.text)]))) : null;
+	if (ck) { try { const hit = await env.MARGIN_KV.get(ck); if (hit) return new Response(hit, { headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS } }); } catch {} }
 	const q = await quota(env), cost = COST[body?.mode] || COST.ask;
 	if (q && q.used + cost > q.limit) return new Response(JSON.stringify({ error: "daily_limit", quota: q }), { status: 429, headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS } });
 	const meter = { n: 0 };
 	const res = await handle(body, env, meter);
+	if (ck && res.ok) { try { await env.MARGIN_KV.put(ck, await res.clone().text(), { expirationTtl: 60 * 86400 }); } catch {} }
 	if (!q) return res;
 	await spend(env, meter.n);
 	let j = {}; try { j = await res.clone().json(); } catch { return res; }
