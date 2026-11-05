@@ -21,7 +21,7 @@
 [data-theme="light"] {
 	--bg: #F3F4F1; --side: #FFFFFF; --surface: #FFFFFF; --surface-2: #F1F2EF; --hover: #ECEDE9; --line: #E1E3DE; --line-2: #CACDC6;
 	--ink: #121314; --ink-2: #4A4D52; --ink-3: #6C7077;
-	--accent: #C5F06A; --accent-hover: #B5E650; --on-accent: #0D0E10; --accent-text: #3F6A06; --accent-soft: #EEF8D9;
+	--accent: #C5F06A; --accent-hover: #B5E650; --on-accent: #0D0E10; --accent-text: #121314; --accent-soft: #EEF8D9; /* light theme: lime only as a fill (buttons, marker), never as text colour */
 	--focus: #2F6FB5; --ok: #187A4F; --ok-soft: #E4F3EB; --warn: #8A5300; --warn-soft: #FBEFD9;
 	--tip: #121314; --tip-ink: #FFFFFF; --shadow: 0 20px 50px rgba(0, 0, 0, .14);
 	color-scheme: light;
@@ -88,6 +88,7 @@ p, li, small, td { text-wrap: pretty; }
 @media (max-width: 1100px) { .hero { grid-template-columns: 1fr; } .art { display: none; } }
 .land h1 { font: 700 clamp(36px, 6vw, 68px)/1.02 var(--sans); letter-spacing: -.04em; max-width: 900px; }
 .land h1 em { font-style: normal; color: var(--accent-text); }
+[data-theme="light"] .land h1 em { background: linear-gradient(transparent 60%, var(--accent) 60%, var(--accent) 90%, transparent 90%); -webkit-box-decoration-break: clone; box-decoration-break: clone; padding: 0 .04em; } /* a highlighter stroke, like the lime buttons */
 .land .lede { font-size: clamp(17px, 2vw, 20px); color: var(--ink-2); max-width: 660px; margin: 20px 0 0; }
 .land .cta { display: flex; gap: 10px; flex-wrap: wrap; margin: 32px 0 0; }
 .land .cta .btn { height: 48px; padding: 0 22px; font-size: 15.5px; }
@@ -216,6 +217,8 @@ p, li, small, td { text-wrap: pretty; }
 h2.sec { font-size: 18px; font-weight: 600; margin: 0; letter-spacing: -.01em; }
 .sec-row { display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; margin: 40px 0 0; }
 .sm-in { padding-top: 4px; }
+h2.sec.hl { color: var(--accent); } /* dark: lime, like the hero line */
+[data-theme="light"] h2.sec.hl { color: var(--ink); } [data-theme="light"] h2.sec.hl span { background: linear-gradient(transparent 60%, var(--accent) 60%, var(--accent) 90%, transparent 90%); -webkit-box-decoration-break: clone; box-decoration-break: clone; padding: 0 .04em; }
 p.sec-sub { margin: 0 0 14px; color: var(--ink-2); font-size: 14.5px; }
 .samples { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr)); gap: 12px; list-style: none; margin: 0; padding: 0; }
 .samples li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 8px 8px 8px; display: flex; flex-direction: column; }

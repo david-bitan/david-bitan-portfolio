@@ -26,7 +26,7 @@
 	const qs = new URLSearchParams(location.search);
 	S.lang = [qs.get("lang"), store.get("facet-lang", null)].map((l) => String(l || "").slice(0, 2)).find((l) => I.LANGS.some((x) => x[0] === l)) || "en"; // English unless the person chose another language
 	/* the last two words of a sentence stay together: never one word alone on the last line, in any language */
-	function t(k, p) { let s = (I.dict[S.lang] && I.dict[S.lang][k]) || k; if (p) s = s.replace(/\{(\w+)\}/g, (m, n) => (p[n] ?? m)); return s.split(/\s+/).length >= 3 && !/<[^>]+$/.test(s) ? s.replace(/ ([^ <>]+)$/, "\u00a0$1") : s; }
+	function t(k, p) { let s = (I.dict[S.lang] && I.dict[S.lang][k]) || k; if (p) s = s.replace(/\{(\w+)\}/g, (m, n) => (p[n] ?? m)); if (S.lang === "fr") s = s.replace(/ ([?:!;»])/g, "\u00a0$1").replace(/« /g, "«\u00a0"); /* French: no line break before ? : ! ; */ return s.split(/\s+/).length >= 3 && !/<[^>]+$/.test(s) ? s.replace(/ ([^ <>]+)$/, "\u00a0$1") : s; }
 	const catName = (id) => (id === "other" ? t("To check") : t(I.CAT_NAMES[id] || id));
 	function title(x) { if (!x) return ""; if (typeof x === "string") return x; const p = { ...(x.p || {}) }; if (p.cat) p.cat = catName(p.cat); if (p.cats) p.cats = String(p.cats).split(",").map(catName).join(", "); return t(x.k, p); }
 	const locale = () => I.LOCALE[S.lang] || S.lang;
@@ -252,7 +252,7 @@
 			<input type="file" id="file" class="sr" multiple accept=".csv,.xlsx,.xlsm,.xls,.pdf,.docx,.txt,.tsv,text/csv,application/pdf">
 			<p class="priv">${ic("lock")}<span>${esc(t("Read in your browser. Only unknown merchant names go to the AI, without amounts, dates or account numbers."))}</span></p>
 			${S.fail ? failBox(S.fail) : ""}
-			<div class="sec-row"><h2 class="sec">${esc(t("No statement at hand? Try a sample"))}</h2><button type="button" class="btn btn-sm btn-g" id="smTog" aria-expanded="${S.smHide ? "false" : "true"}" aria-controls="smBox"><span>${esc(t(S.smHide ? "Show the samples" : "Hide the samples"))}</span>${ic("chevron-down", "chev")}</button></div>
+			<div class="sec-row"><h2 class="sec hl"><span>${esc(t("No statement at hand? Try a sample"))}</span></h2><button type="button" class="btn btn-sm btn-g" id="smTog" aria-expanded="${S.smHide ? "false" : "true"}" aria-controls="smBox"><span>${esc(t(S.smHide ? "Show the samples" : "Hide the samples"))}</span>${ic("chevron-down", "chev")}</button></div>
 			<div id="smBox" ${S.smHide ? "hidden" : ""}><div class="sm-in"><p class="sec-sub">${esc(t("Three invented statements in three formats. Open one here, or download it to drop it yourself."))}</p>
 			<ul class="samples">${SAMPLES.map((s, i) => `<li><div class="sm-b"><span class="ft">${ic(s.icon)}${s.kind}</span><h3>${esc(t(s.name))}</h3><p>${esc(t(s.desc))}</p></div><div class="acts"><button type="button" class="btn btn-sm" data-sample="${i}">${ic("scan-search")}${esc(t("Analyse"))}</button><a class="btn btn-sm btn-g" href="samples/${s.file}" download>${ic("download")}${esc(t("Download"))}</a></div></li>`).join("")}</ul></div></div>
 			${footer()}`;
