@@ -1,0 +1,5 @@
+Plume uses these third-party components, each under its own licence (full texts in vendor/ and fonts/):
+- Lucide icons 1.69.0, ISC: vendor/lucide-LICENSE.txt.
+- Bricolage Grotesque (The Bricolage Grotesque Project Authors), SIL Open Font License 1.1: fonts/BricolageGrotesque-OFL.txt.
+- Inter (The Inter Project Authors), SIL Open Font License 1.1: fonts/Inter-OFL.txt.
+Every illustration is original, drawn for Plume. Plume, Léa Moreau and every price on this page are invented.
