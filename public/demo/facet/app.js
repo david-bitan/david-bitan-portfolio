@@ -323,11 +323,21 @@
 			S.busy = false; if (location.hash === "#/a/" + A.id) route(); else go("#/a/" + A.id);
 		} catch (e) { console.error(e); S.busy = false; S.fail = files.map((f) => ({ name: f.name, fail: "broken" })); upload(); }
 	}
+	/* the reading screen: a lime progress bar, one row per step, the active row lit, done steps ticked in lime */
 	function stepsView(files) {
 		const steps = [["read", "Reading the files"], ["cols", "Finding dates, labels and amounts"], ["sort", "Sorting each merchant into a category"], ["ai", "Asking the AI about merchants it did not recognise"], ["build", "Building your analysis"]];
-		$("#main").innerHTML = `<header><h1>${esc(t("Reading your statement"))}</h1><p>${esc(files.map((f) => f.name).join(", "))}</p></header><ol class="steps" id="steps" aria-live="polite">${steps.map(([k, l]) => `<li data-s="${k}"><span class="st"><span class="dotw"></span></span><div>${esc(t(l))}<small></small></div></li>`).join("")}</ol>`;
+		$("#main").innerHTML = `<header><h1>${esc(t("Reading your statement"))}</h1><p>${esc(files.map((f) => f.name).join(", "))}</p></header>
+			<section class="steps-card"><div class="prog" role="progressbar" aria-label="${esc(t("Reading your statement"))}" aria-valuemin="0" aria-valuemax="${steps.length}" aria-valuenow="0"><span id="progBar"></span></div>
+			<ol class="steps" id="steps" aria-live="polite">${steps.map(([k, l], i) => `<li data-s="${k}"><span class="st"><span class="num">${i + 1}</span></span><div>${esc(t(l))}<small></small></div></li>`).join("")}</ol></section>`;
 		enter($("#main"));
-		return (k, state, note) => { const li = $(`[data-s="${k}"]`); if (!li) return; li.className = state; li.querySelector(".st").innerHTML = state === "on" ? '<span class="spin"></span>' : state === "done" ? ic("circle-check") : '<span class="dotw"></span>'; if (note != null) li.querySelector("small").textContent = note; };
+		return (k, state, note) => {
+			const li = $(`[data-s="${k}"]`); if (!li) return; li.className = state;
+			const i = steps.findIndex((x) => x[0] === k);
+			li.querySelector(".st").innerHTML = state === "on" ? '<span class="spin"></span>' : state === "done" ? `<span class="tick">${ic("check")}</span>` : `<span class="num">${i + 1}</span>`;
+			if (note != null) li.querySelector("small").textContent = note;
+			const done = $$("#steps li.done").length + ($$("#steps li.on").length ? 0.5 : 0), bar = $("#progBar");
+			if (bar) { bar.style.width = (done / steps.length) * 100 + "%"; bar.parentElement.setAttribute("aria-valuenow", Math.floor(done)); }
+		};
 	}
 
 	/* "Check the columns": a preview of the table with a choice above each column, and the number of lines it gives, live */

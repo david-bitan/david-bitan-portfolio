@@ -21,7 +21,7 @@
 [data-theme="light"] {
 	--bg: #F3F4F1; --side: #FFFFFF; --surface: #FFFFFF; --surface-2: #F1F2EF; --hover: #ECEDE9; --line: #E1E3DE; --line-2: #CACDC6;
 	--ink: #121314; --ink-2: #4A4D52; --ink-3: #6C7077;
-	--accent: #8CC43A; --accent-hover: #7DB52C; --on-accent: #0D0E10; --accent-text: #121314; --accent-soft: #E8F3D8; --accent-title: #8CC43A; /* light theme: a lime between the dark theme's and a readable green; small text stays ink */
+	--accent: #ADDE56; --accent-hover: #9FD246; --on-accent: #0D0E10; --accent-text: #121314; --accent-soft: #EDF7DD; --accent-title: #121314; /* titles stay ink in the light theme: the lime is too pale to read on light grey */ /* light theme: a lime between the dark theme's and a readable green; small text stays ink */
 	--focus: #2F6FB5; --ok: #187A4F; --ok-soft: #E4F3EB; --warn: #8A5300; --warn-soft: #FBEFD9;
 	--tip: #121314; --tip-ink: #FFFFFF; --shadow: 0 20px 50px rgba(0, 0, 0, .14);
 	color-scheme: light;
@@ -232,14 +232,21 @@ p.sec-sub { margin: 0 0 14px; color: var(--ink-2); font-size: 14.5px; }
 .samples .acts .btn { flex: 1; }
 
 /* reading */
-.steps { list-style: none; margin: 28px 0 0; padding: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-xl); max-width: 680px; }
-.steps li { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: var(--r-lg); color: var(--ink-3); transition: color .3s; }
-.steps li.on, .steps li.done { color: var(--ink); }
-.steps .st { width: 22px; height: 22px; flex: none; display: grid; place-items: center; margin-top: 1px; }
-.steps .st .i { width: 18px; height: 18px; color: var(--ok); }
-.steps small { display: block; color: var(--ink-3); font-size: 13.5px; }
-.spin { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line-2); border-top-color: var(--accent); animation: rot .8s linear infinite; }
-.dotw { width: 8px; height: 8px; border-radius: 50%; background: var(--line-2); }
+.steps-card { margin: 28px 0 0; max-width: 680px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 8px; }
+.prog { height: 6px; border-radius: 999px; background: var(--surface-2); margin: 8px 8px 4px; overflow: hidden; }
+.prog span { display: block; height: 100%; width: 0; border-radius: 999px; background: var(--accent); transition: width 600ms var(--open); }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.steps li { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: var(--r-lg); color: var(--ink-3); transition: color .3s, background .3s; }
+.steps li.on { background: var(--accent-soft); color: var(--ink); }
+.steps li.done { color: var(--ink); }
+.steps .st { width: 26px; height: 26px; flex: none; display: grid; place-items: center; }
+.steps .num { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--line-2); display: grid; place-items: center; font: 500 12.5px var(--mono); color: var(--ink-3); }
+.steps .tick { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; animation: pop 400ms var(--open) both; }
+.steps .tick .i { width: 15px; height: 15px; color: var(--on-accent); stroke-width: 3; }
+.steps li.on .spin { width: 22px; height: 22px; }
+[data-theme="light"] .steps li.on .spin { border-top-color: var(--ink); }
+.steps small { display: block; color: var(--ink-2); font-size: 13.5px; margin-top: 2px; }
+.spin { width: 18px; height: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line-2); border-top-color: var(--accent); animation: rot .8s linear infinite; }
 @keyframes rot { to { transform: rotate(360deg); } }
 .alert { display: flex; gap: 12px; align-items: flex-start; margin: 20px 0 0; padding: 16px 18px; border-radius: var(--r-xl); background: var(--warn-soft); border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); max-width: 760px; }
 .alert .i { color: var(--warn); margin-top: 2px; }
@@ -465,7 +472,7 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14.5px; font-varia
 .pv .per { margin: -6px 0 0; }
 .pv-doc { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
 .pv-doc table { width: 100%; border-collapse: collapse; table-layout: fixed; font: 400 11.5px/1.3 var(--mono); }
-.pv-doc th { width: 30px; text-align: end; color: var(--ink-3); font-weight: 400; background: var(--surface-2); padding: 6px 6px; border-inline-end: 1px solid var(--line); }
+.pv-doc th { width: 30px; text-align: end; color: var(--ink-2); font-weight: 400; background: var(--surface-2); padding: 6px 6px; border-inline-end: 1px solid var(--line); }
 .pv-doc td { padding: 6px; border-bottom: 1px solid var(--line); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink-2); }
 .pv-doc td:first-of-type { width: 74px; }
 .pv-doc .pa { width: 70px; text-align: end; color: var(--ink); }
@@ -605,7 +612,7 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14.5px; font-varia
 /* Squircle corners (like Figma's corner smoothing) where the browser supports them; radii stay concentric (24 = 16 + 8, 16 = 12 + 4) */
 @supports (corner-shape: squircle) {
 	:root { --r-xl: 28px; --r-lg: 20px; --r-md: 12px; --r-sm: 6px; }
-	.ov-box, .cc, .cc-t, .airev, .airev li, .qa, .pv, .pv-doc, .fbtn, .btn, .icon-btn, .card, .in-c, .fl, .how li, .trust, .auth-card, .tabs, .tabs button, .tabs .pill, .theme, .theme button, .theme .pill, .field input, .drop, .drop .ic, .samples li, .steps, .steps li, .alert, .read, .read > button, .ask, .menu, .menu li, .ctl, .ctl button, .how-c div, .in-c .ic, .alltx, .search input, .saved li, .toast, .toast button, .nav button, .me > button, .logo .mk, .art-doc, .art-out, .tip, .src > button, .hb li, .lg li, .dot, .mtop .icon-btn { corner-shape: squircle; }
+	.steps-card, .steps li, .ov-box, .cc, .cc-t, .airev, .airev li, .qa, .pv, .pv-doc, .fbtn, .btn, .icon-btn, .card, .in-c, .fl, .how li, .trust, .auth-card, .tabs, .tabs button, .tabs .pill, .theme, .theme button, .theme .pill, .field input, .drop, .drop .ic, .samples li, .steps, .steps li, .alert, .read, .read > button, .ask, .menu, .menu li, .ctl, .ctl button, .how-c div, .in-c .ic, .alltx, .search input, .saved li, .toast, .toast button, .nav button, .me > button, .logo .mk, .art-doc, .art-out, .tip, .src > button, .hb li, .lg li, .dot, .mtop .icon-btn { corner-shape: squircle; }
 	.card, .in-c, .auth-card, .read, .alltx, .drop, .ask, .saved li, .trust, .how li, .samples li, .steps, .alert, .art-doc, .art-out { border-radius: var(--r-xl); }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; transition-duration: 1ms !important; } }
