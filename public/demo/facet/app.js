@@ -57,8 +57,8 @@
 		const h = location.hash || "#/";
 		if (!S.acct && !/^#\/(signin|signup)?$/.test(h)) return go("#/signin");
 		if (S.acct && /^#\/(signin|signup)?$/.test(h)) return go("#/new");
-		if (h === "#/") { if ($(".pub") && $("#authOv")) return closeAuth(); return landing(); }
-		if (h === "#/signin" || h === "#/signup") { if ($(".pub")) return openAuth(h.slice(2)); return landing(h.slice(2)); }
+		if (h === "#/") { if ($(".site") && $("#authOv")) return closeAuth(); return landing(); }
+		if (h === "#/signin" || h === "#/signup") { if ($(".site")) return openAuth(h.slice(2)); return landing(h.slice(2)); }
 		if (h === "#/analyses") return shell("saved");
 		const m = h.match(/^#\/a\/(\w+)/);
 		if (m) { if (!S.A || S.A.id !== m[1]) { const a = savedList().find((x) => x.id === m[1]); if (!a) return go("#/analyses"); load(a); } return shell("report"); }
@@ -84,7 +84,7 @@
 	/* ---------------- landing: top bar (logo, sign in, create an account), pitch + illustration, 3 steps ---------------- */
 	function landing(tab) {
 		document.title = t("Facet · drop a bank statement, see where your money goes");
-		view(`<div class="pub"><header class="pub-top">${logo("a")}<span class="sp"></span>${langBtn()}${themeBtn()}<button type="button" class="btn btn-g" data-open-auth="signin" aria-label="${esc(t("Sign in"))}">${ic("log-in")}<span class="lbl">${esc(t("Sign in"))}</span></button><button type="button" class="btn btn-p hide-m" data-open-auth="signup">${esc(t("Create an account"))}</button></header>
+		view(`<div class="site"><header class="site-top">${logo("a")}<span class="sp"></span>${langBtn()}${themeBtn()}<button type="button" class="btn btn-g" data-open-auth="signin" aria-label="${esc(t("Sign in"))}">${ic("log-in")}<span class="lbl">${esc(t("Sign in"))}</span></button><button type="button" class="btn btn-p hide-m" data-open-auth="signup">${esc(t("Create an account"))}</button></header>
 		<main class="land">
 			<div class="hero"><div>
 				<h1>${t("Drop your bank statement. <em>See where your money goes.</em>")}</h1>

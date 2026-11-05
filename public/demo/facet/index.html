@@ -70,11 +70,11 @@ p, li, small, td { text-wrap: pretty; }
 .logo b { font: 700 20px/1 var(--sans); letter-spacing: -.02em; }
 
 /* ---------- public pages (landing, sign in) ---------- */
-.pub-top { width: 100%; max-width: 1200px; margin: 0 auto; padding: 18px 24px; display: flex; align-items: center; gap: 8px; }
-.pub-top .sp { flex: 1; }
+.site-top { width: 100%; max-width: 1200px; margin: 0 auto; padding: 18px 24px; display: flex; align-items: center; gap: 8px; }
+.site-top .sp { flex: 1; }
 .land { width: 100%; max-width: 1200px; margin: 0 auto; padding: 48px 24px 0; }
-.pub { min-height: 100vh; display: flex; flex-direction: column; }
-.pub .foot { margin-top: auto; }
+.site { min-height: 100vh; display: flex; flex-direction: column; }
+.site .foot { margin-top: auto; }
 .hero { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 48px; align-items: center; }
 .art { position: relative; height: 360px; }
 .art-doc { position: absolute; left: 0; top: 10px; width: 68%; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 20px; box-shadow: var(--shadow); transform: rotate(-3deg); }
@@ -543,10 +543,10 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14.5px; font-varia
 	.main { padding: 20px 16px 40px; }
 	.filters .f-lead, .filters .f-n { display: none; }
 	.fbtn { padding: 0 10px; }
-	.pub-top, .land, .foot { padding-left: 16px; padding-right: 16px; }
-	.pub-top .hide-m { display: none; }
-	.pub-top .chev { display: none; }
-	.pub-top { gap: 4px; }
+	.site-top, .land, .foot { padding-left: 16px; padding-right: 16px; }
+	.site-top .hide-m { display: none; }
+	.site-top .chev { display: none; }
+	.site-top { gap: 4px; }
 	.land { padding-top: 28px; }
 	.card { padding: 16px; }
 	.card-h { margin: -8px -8px 10px 0; } .card-h > .hd { padding-top: 8px; }
@@ -564,7 +564,7 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14.5px; font-varia
 	.row2 { grid-template-columns: 1fr; }
 	.rh .btn .lbl { display: none; }
 }
-@media (max-width: 360px) { .pub-top .btn .lbl { display: none; } }
+@media (max-width: 360px) { .site-top .btn .lbl { display: none; } }
 @media (max-height: 640px) { .ov { place-items: start center; } }
 @media (max-width: 420px) { .how-c { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 400px) { .card.kpi { grid-column: span 12 !important; } .tb th, .tb td { padding-left: 4px; padding-right: 4px; } .tb td { font-size: 13.5px; } }
