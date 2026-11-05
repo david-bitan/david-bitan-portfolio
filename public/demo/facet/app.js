@@ -208,22 +208,18 @@
 		const list = savedList(), a = S.acct, init = ((a.first || "?")[0] + (a.last || "")[0] || "").toUpperCase();
 		const titles = { upload: "New analysis", saved: "My analyses", report: S.A ? S.A.name : "" };
 		document.title = (page === "report" && S.A ? S.A.name : t(titles[page])) + " · Facet";
-		view(`<div class="mtop">${logo()}${langBtn()}${themeBtn()}<button type="button" class="icon-btn" id="burger" aria-label="${esc(t("Menu"))}" aria-expanded="false" aria-controls="side">${ic("menu")}</button></div>
+		const me = (id) => `<div class="dd me"><button type="button" class="me-btn" id="${id}" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t("Your account"))}: ${esc(((a.first || "") + " " + (a.last || "")).trim())}"><span class="av" aria-hidden="true">${esc(init)}</span><span class="who"><b>${esc(a.first || "")}</b></span>${ic("chevron-down", "chev")}</button><ul class="menu" role="listbox" tabindex="-1" hidden></ul></div>`;
+		view(`<div class="mtop">${logo()}${themeBtn()}${langBtn()}${me("meBtnM")}<button type="button" class="icon-btn" id="burger" aria-label="${esc(t("Menu"))}" aria-expanded="false" aria-controls="side">${ic("menu")}</button></div>
 		<div class="shell">
 			<aside class="side" id="side" aria-label="${esc(t("Menu"))}">
 				${logo("button", 'data-go="#/new"')}
 				<button type="button" class="btn btn-p new" data-go="#/new">${ic("plus")}${esc(t("New analysis"))}</button>
 				<ul class="nav"><li><button type="button" data-go="#/analyses" ${page === "saved" ? 'aria-current="page"' : ""}>${ic("layers")}${esc(t("My analyses"))}<span class="count">${list.length}</span></button>
 					${list.length ? `<ul class="recent">${list.slice(0, 5).map((x) => `<li><button type="button" data-go="#/a/${x.id}" ${S.A?.id === x.id && page === "report" ? 'aria-current="true"' : ""} title="${esc(x.name)}">${esc(x.name)}</button></li>`).join("")}${list.length > 5 ? `<li><button type="button" class="all" data-go="#/analyses">${esc(t("See all ({n})", { n: list.length }))}</button></li>` : ""}</ul>` : ""}</li></ul>
-				<div class="grow"></div>
-				<div class="side-foot">
-					<div class="theme" role="group" aria-label="${esc(t("Theme"))}"><span class="pill" aria-hidden="true"></span><button type="button" data-theme-set="dark" aria-pressed="${S.theme === "dark"}">${ic("moon")}${esc(t("Dark"))}</button><button type="button" data-theme-set="light" aria-pressed="${S.theme === "light"}">${ic("sun")}${esc(t("Light"))}</button></div>
-					<div class="me"><button type="button" id="meBtn" aria-haspopup="listbox" aria-expanded="false"><span class="av" aria-hidden="true">${esc(init)}</span><span class="who"><b>${esc(((a.first || "") + " " + (a.last || "")).trim())}</b><small>${esc(a.email)}</small></span>${ic("chevron-down", "chev")}</button><ul class="menu" role="listbox" tabindex="-1" hidden></ul></div>
-				</div>
 			</aside>
-			<div class="mainw"><div class="topbar"><nav class="crumbs" aria-label="${esc(t("You are here"))}">${page === "report" && S.A ? `<button type="button" data-go="#/analyses">${esc(t("My analyses"))}</button>${ic("chevron-right", "flip-ic")}<span>${esc(S.A.name)}</span>` : `<span>${esc(t(titles[page]))}</span>`}</nav><span class="sp"></span>${langBtn()}</div><main class="main" id="main" tabindex="-1"></main></div>
+			<div class="mainw"><div class="topbar"><nav class="crumbs" aria-label="${esc(t("You are here"))}">${page === "report" && S.A ? `<button type="button" data-go="#/analyses">${esc(t("My analyses"))}</button>${ic("chevron-right", "flip-ic")}<span>${esc(S.A.name)}</span>` : `<span>${esc(t(titles[page]))}</span>`}</nav><span class="sp"></span>${themeBtn()}${langBtn()}${me("meBtn")}</div><main class="main" id="main" tabindex="-1"></main></div>
 		</div><div class="scrim" id="scrim" hidden></div>`);
-		$("#meBtn").addEventListener("click", (e) => { e.stopPropagation(); menu($("#meBtn"), $("#meBtn").nextElementSibling, [{ k: "saved", label: t("My analyses"), icon: "layers" }, { k: "out", label: t("Sign out"), icon: "log-out" }], (x) => (x.k === "out" ? signOut() : go("#/analyses"))); });
+		["meBtn", "meBtnM"].forEach((id) => { const b = $("#" + id); b.addEventListener("click", (e) => { e.stopPropagation(); menu(b, b.nextElementSibling, [{ k: "saved", label: t("My analyses"), icon: "layers" }, { k: "out", label: t("Sign out"), icon: "log-out" }], (x) => (x.k === "out" ? signOut() : go("#/analyses"))); }); });
 		$("#burger").addEventListener("click", () => drawer(!$("#side").classList.contains("open")));
 		$("#scrim").addEventListener("click", () => drawer(false));
 		if (page === "upload") upload();
