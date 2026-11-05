@@ -477,12 +477,22 @@
 		$("#txQ").addEventListener("input", (e) => { S.q = e.target.value; S.txN = 40; allTx(); });
 		$("#txF").addEventListener("click", (e) => { e.stopPropagation(); menu($("#txF"), $("#txF").nextElementSibling, [{ k: "all", label: t("All categories"), on: S.txFilter === "all" }, ...CATS.concat("income", "other").map((c) => ({ k: c, label: catName(c) + ` (${num(tx.filter((x) => x.c === c).length)})`, dot: col(c), on: S.txFilter === c }))], (x) => { S.txFilter = x.k; S.txN = 40; $("#txF span").textContent = x.k === "all" ? t("All categories") : catName(x.k); allTx(); }); });
 		$$("[data-fixcols]").forEach((b) => b.addEventListener("click", async () => { const L = S.lastRead; if (await checkCols(L.r, b.dataset.fixcols)) { S.busy = true; await finishAnalysis(L.r, L.files, L.id); } else route(); }));
-		$("#aiOk")?.addEventListener("click", () => { S.A.aiChecked = true; persist(); slide($("#aiRev"), false); });
+		$("#aiOk")?.addEventListener("click", () => { S.A.aiChecked = true; persist(); slide($("#aiRev"), false); setTimeout(alignSide, reduced() ? 0 : 450); });
 		$$("[data-airev]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); const k = b.dataset.airev, same = S.data.tx.filter((y) => y.k === k && y.a < 0), x = same[0];
 			menu(b, b.nextElementSibling, CATS.map((c) => ({ c, label: catName(c), dot: col(c), on: c === x.c })), (o) => { if (o.c === x.c) return; snap(); same.forEach((y) => { y.c = o.c; y.how = "you"; }); persist(); report(false); toast(t("{m}: {n} lines moved to {c}.", { m: x.m, n: same.length, c: catName(o.c) }), t("Undo"), undo); }); }));
 		$("#pvAll")?.addEventListener("click", () => lines(t("All lines"), S.data.tx, ""));
-		$("#readBtn")?.addEventListener("click", () => { S.open.read = !($("#readBtn").getAttribute("aria-expanded") === "true"); $("#readBtn").setAttribute("aria-expanded", S.open.read); slide($("#readIn"), S.open.read); });
+		$("#readBtn")?.addEventListener("click", () => { S.open.read = !($("#readBtn").getAttribute("aria-expanded") === "true"); $("#readBtn").setAttribute("aria-expanded", S.open.read); slide($("#readIn"), S.open.read); setTimeout(alignSide, reduced() ? 0 : 520); });
+		requestAnimationFrame(alignSide);
 		$("#toCheck")?.addEventListener("click", () => { S.f = { per: "all", cats: [], min: 0 }; report(false); S.txFilter = "other"; S.txN = 40; allTx(); $("#txF span").textContent = catName("other"); $("#all").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" }); });
+	}
+	/* wide screens: the right column starts level with the Overview cards, then follows the scroll (only when it fits the screen) */
+	function alignSide() {
+		const side = $(".rep-side"), main = $(".rep-main"), kpi = $("#g-kpi"), fw = $(".fwrap"); if (!side || !main || !kpi) return;
+		if (innerWidth < 1280) { side.style.marginTop = side.style.top = ""; side.classList.remove("stick"); return; }
+		side.style.marginTop = Math.max(0, Math.round(kpi.getBoundingClientRect().top - main.getBoundingClientRect().top)) + "px";
+		const top = ($(".topbar")?.offsetHeight || 0) + (fw ? fw.offsetHeight : 0) + 12;
+		side.style.top = top + "px";
+		side.classList.toggle("stick", side.offsetHeight <= innerHeight - top - 16);
 	}
 	const rangeLabel = (R) => t("{a} to {b}", { a: dShort(R.from), b: dLong(R.to) });
 	function chips(rec) {
@@ -493,8 +503,8 @@
 	}
 	function readBox(A, counts, todo) {
 		const n = Object.fromEntries(counts), files = A.files.filter((f) => f.found);
-		return `<div class="read"><button type="button" id="readBtn" aria-expanded="${S.open.read || innerWidth >= 1280 ? "true" : "false"}">${ic("scan-search")}<div><b>${esc(t("What Facet read"))}</b><br><span>${esc(t("{n} lines from {f}", { n: num(S.data.tx.length), f: files.map((f) => f.name).join(", ") }))}${todo.length ? " · " : ""}</span>${todo.length ? `<span class="badge warn">${esc(t("{n} to check", { n: num(todo.length) }))}</span>` : `<span class="ok"> · ${esc(t("everything sorted"))}</span>`}</div>${ic("chevron-down", "chev")}</button>
-			<div id="readIn" ${S.open.read || innerWidth >= 1280 ? "" : "hidden"}><div class="read-in">
+		return `<div class="read"><button type="button" id="readBtn" aria-expanded="${S.open.read ? "true" : "false"}">${ic("scan-search")}<div><b>${esc(t("What Facet read"))}</b><br><span>${esc(t("{n} lines from {f}", { n: num(S.data.tx.length), f: files.map((f) => f.name).join(", ") }))}${todo.length ? " · " : ""}</span>${todo.length ? `<span class="badge warn">${esc(t("{n} to check", { n: num(todo.length) }))}</span>` : `<span class="ok"> · ${esc(t("everything sorted"))}</span>`}</div>${ic("chevron-down", "chev")}</button>
+			<div id="readIn" ${S.open.read ? "" : "hidden"}><div class="read-in">
 				${A.files.map((f) => `<div class="fl"><h4>${ic(f.kind === "pdf" ? "file" : f.kind === "xlsx" ? "file-spreadsheet" : "file-text")}${esc(f.name)}</h4><p>${f.found ? esc(t("{n} lines read", { n: num(f.found) })) + (f.skipped ? esc(" · " + t("{n} lines left aside (balances, totals, lines without an amount)", { n: num(f.skipped) })) : "") + (f.pages ? esc(" · " + t("{n} pages", { n: f.pages })) : "") : esc(t("Nothing could be read from this file."))}</p>
 					${f.cols ? `<ul class="cols">${f.cols.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>` : f.lines ? `<ul class="cols"><li>${esc(f.dc ? t("Read from the PDF layout: date at the start of the line, amount under Debit or Credit") : t("Read line by line: a date at the start, the amount at the end"))}</li></ul>` : ""}
 					${f.pos ? `<p>${esc(t("Every amount was positive: they are counted as spending."))}</p>` : ""}
@@ -809,7 +819,7 @@
 		el.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => el.classList.remove("on"), 6000);
 	}
 	let rz, lw = innerWidth;
-	addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { if (innerWidth !== lw) { lw = innerWidth; if (innerWidth > 960) drawer(false); if (S.A && /^#\/a\//.test(location.hash)) report(false); } }, 150); });
+	addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { if (innerWidth !== lw) { lw = innerWidth; if (innerWidth > 960) drawer(false); if (S.A && /^#\/a\//.test(location.hash)) report(false); } else alignSide(); }, 150); });
 
 	route();
 })();
