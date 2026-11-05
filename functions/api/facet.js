@@ -1,6 +1,9 @@
 /**
  * Facet: POST /api/facet
- * { request, lang, today, from, merchants: [...], prev?: spec, sel?: index } → { spec }
+ * view     { request, lang, today, from, merchants: [...], prev?: spec, sel?: index } → { spec }
+ * classify { mode: "classify", merchants: ["Nonna Ruche", ...] } → { map: { "Nonna Ruche": "dining", ... } }
+ *          only merchant names the page's own rules did not recognise; never an amount, a date or an account number.
+ *          The answer is cached in KV under a hash of the list, so the sample files cost nothing after the first time.
  * The model only describes WHICH screen to build (blocks, periods, filters). It never sees an amount and never writes one:
  * the page computes every number from the transactions and drops anything it does not understand. Nothing is stored.
  * Same Workers AI binding ("AI") as the other demos. Daily budget counted in the MARGIN_KV namespace, under its own key.
@@ -27,7 +30,7 @@ async function spend(env, n) {
 
 const PROMPT = `You design the screen of a personal finance app. The person asks something about their own current account in plain words; you answer with a SCREEN DESCRIPTION in JSON, never with prose and never with numbers. The app computes every number itself.
 
-Data available: one current account, transactions from FROM to TODAY, in euros. Each transaction has a date, a merchant, a category and an amount (spending or money in).
+Data available: the bank transactions the person uploaded, from FROM to TODAY, in euros. Each transaction has a date, a merchant, a category and an amount (spending or money in).
 Categories (use these ids only): home (rent, energy, insurance), groceries, dining (restaurants, cafes), transport, subscriptions (streaming, phone, internet, gym), leisure (cinema, books, outings, holidays), health, shopping (clothes, electronics). Money in (salary, refunds) is not a category: use measure "income".
 
 A screen is {"title": "...", "blocks": [block, ...]}, 1 to 6 blocks, the most useful first. A block:
@@ -52,9 +55,35 @@ function parse(raw) {
 	try { return JSON.parse(txt.slice(a, b + 1)); } catch { return null; }
 }
 
+const CATS = ["home", "groceries", "dining", "transport", "subscriptions", "leisure", "health", "shopping"];
+const CLASSIFY = `You sort merchant names from a bank statement into spending categories. For each name, pick the most likely category id:
+home (rent, energy, water, home insurance, furniture, DIY), groceries (supermarkets, food shops, bakeries), dining (restaurants, cafes, bars, takeaway), transport (public transport, taxi, fuel, parking, trains, flights), subscriptions (streaming, music, phone, internet, gym, cloud storage, software), leisure (cinema, books, concerts, museums, games, hotels, holidays), health (pharmacy, doctors, dentist, optician), shopping (clothes, electronics, home goods, department stores, online shops).
+Use the words of the name (in any language) and what such a business usually is. If you really cannot tell, use "other".
+Reply with ONE JSON object mapping each name exactly as given to its id, for example {"Nonna Ruche": "dining"}, and nothing else.`;
+async function hash(s) { const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(b)].slice(0, 12).map((x) => x.toString(16).padStart(2, "0")).join(""); }
+
+async function classify(body, env) {
+	const names = [...new Set((Array.isArray(body.merchants) ? body.merchants : []).map((m) => String(m).replace(/\d{4,}/g, "").trim().slice(0, 48)).filter(Boolean))].slice(0, 120);
+	if (!names.length) return Response.json({ map: {} }, { headers: CORS });
+	const ck = "facet:cls:" + (await hash(names.slice().sort().join("|")));
+	if (env.MARGIN_KV) { try { const hit = await env.MARGIN_KV.get(ck); if (hit) return new Response(JSON.stringify({ map: JSON.parse(hit), cached: true }), { headers: { "content-type": "application/json", ...CORS } }); } catch {} }
+	const q = await quota(env), cost = 40 + names.length * 4;
+	if (q && q.used + cost > q.limit) return bad(429, "daily_limit", { quota: q });
+	let r;
+	try { r = await env.AI.run(MODEL, { messages: [{ role: "system", content: CLASSIFY }, { role: "user", content: JSON.stringify(names) }], max_tokens: Math.min(2500, 60 + names.length * 18), temperature: 0 }); }
+	catch (e) { return bad(502, "ai_error", { detail: String(e?.message || e).slice(0, 200) }); }
+	const u = r?.usage || {}, n = (+u.prompt_tokens || (CLASSIFY.length + names.join().length) / 3.5) * RATE_IN + (+u.completion_tokens || String(r?.response ?? "").length / 3.5) * RATE_OUT;
+	await spend(env, n);
+	const raw = parse(r?.response) || {}, map = {};
+	for (const nm of names) { const v = String(raw[nm] ?? "").toLowerCase(); if (CATS.includes(v)) map[nm] = v; }
+	if (env.MARGIN_KV && Object.keys(map).length) { try { await env.MARGIN_KV.put(ck, JSON.stringify(map), { expirationTtl: 60 * 86400 }); } catch {} }
+	return new Response(JSON.stringify({ map, quota: q ? { ...q, used: Math.min(q.limit, Math.round(q.used + n)) } : null }), { headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS } });
+}
+
 export async function onRequestPost({ request, env }) {
 	if (!env.AI) return bad(503, "ai_not_configured");
 	let body; try { body = await request.json(); } catch { return bad(400, "bad_json"); }
+	if (body?.mode === "classify") return classify(body, env);
 	const req = String(body?.request || "").slice(0, 300).trim();
 	if (!req) return bad(400, "empty");
 	const q = await quota(env);

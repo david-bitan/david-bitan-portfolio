@@ -1,0 +1,7 @@
+Facet uses these third-party components, each under its own licence (full texts in vendor/ and fonts/):
+- pdf.js (Mozilla Foundation), Apache License 2.0: vendor/pdfjs-LICENSE.txt. Used with isEvalSupported: false.
+- mammoth.js (Michael Williamson), BSD 2-Clause: vendor/mammoth-LICENSE.txt.
+- Lucide icons, ISC: vendor/lucide-LICENSE.txt.
+- IBM Plex Sans and IBM Plex Mono (IBM Corp.), SIL Open Font License 1.1: fonts/IBMPlex-OFL.txt.
+Excel files are read without a library (the browser's own unzip and XML parser).
+The sample statements in samples/ are invented; scripts/facet-samples in the repository rebuilds them.

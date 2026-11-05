@@ -134,11 +134,13 @@
 		if (TIME.includes(b.by)) {
 			// the current month or week is not over yet: flagged so the chart shows it as "in progress", not as a drop
 			const T = parse(data.today), curKey = b.by === "month" ? data.today.slice(0, 7) : b.by === "week" ? ymd(monday(T)) : null;
-			if (curKey && R.to === data.today) rows.forEach((r) => { if (r.key === curKey) r.partial = true; });
+			if (curKey && R.to === data.today && !data.full) rows.forEach((r) => { if (r.key === curKey) r.partial = true; });
 			return { ...out, rows };
 		}
 		rows = rows.filter((r) => r.value !== 0).sort((x, y) => y.value - x.value);
 		const cap = b.kind === "donut" ? 6 : b.limit;
+		// merchants: "Others" would be a sum of dozens of places, not a merchant; the list just stops, with the count left
+		if (b.by === "merchant" && b.kind !== "donut") { out.more = Math.max(0, rows.length - cap); return { ...out, rows: rows.slice(0, cap) }; }
 		if (rows.length > cap + 1) { const rest = rows.slice(cap), tx = rest.flatMap((r) => r.tx); rows = rows.slice(0, cap).concat({ key: "_other", tx, value: r2(value(b.measure, tx, R.months)), n: rest.length }); }
 		return { ...out, rows };
 	}
