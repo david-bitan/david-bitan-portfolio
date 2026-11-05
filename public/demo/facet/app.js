@@ -213,9 +213,10 @@
 		<div class="shell">
 			<aside class="side" id="side" aria-label="${esc(t("Menu"))}">
 				${logo("button", 'data-go="#/new"')}
-				<button type="button" class="btn btn-p new" data-go="#/new">${ic("plus")}${esc(t("New analysis"))}</button>
 				<ul class="nav"><li><button type="button" data-go="#/analyses" ${page === "saved" ? 'aria-current="page"' : ""}>${ic("layers")}${esc(t("My analyses"))}<span class="count">${list.length}</span></button>
 					${list.length ? `<ul class="recent">${list.slice(0, 5).map((x) => `<li><button type="button" data-go="#/a/${x.id}" ${S.A?.id === x.id && page === "report" ? 'aria-current="true"' : ""} title="${esc(x.name)}">${esc(x.name)}</button></li>`).join("")}${list.length > 5 ? `<li><button type="button" class="all" data-go="#/analyses">${esc(t("See all ({n})", { n: list.length }))}</button></li>` : ""}</ul>` : ""}</li></ul>
+				<div class="grow"></div>
+				<button type="button" class="btn btn-p new side-new" data-go="#/new">${ic("plus")}${esc(t("New analysis"))}</button>
 			</aside>
 			<div class="mainw"><div class="topbar"><nav class="crumbs" aria-label="${esc(t("You are here"))}">${page === "report" && S.A ? `<button type="button" data-go="#/analyses">${esc(t("My analyses"))}</button>${ic("chevron-right", "flip-ic")}<span>${esc(S.A.name)}</span>` : `<span>${esc(t(titles[page]))}</span>`}</nav><span class="sp"></span>${themeBtn()}${langBtn()}${me("meBtn")}</div><main class="main" id="main" tabindex="-1"></main></div>
 		</div><div class="scrim" id="scrim" hidden></div>`);
