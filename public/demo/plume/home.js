@@ -99,7 +99,7 @@ const applyTexts = () => {
 	themeLabel();
 	document.title = lang === "fr" ? "Plume · l’assurance qui se lit en une minute" : "Plume · insurance you can read in a minute";
 };
-const renderAll = () => { applyTexts(); $$("[data-pfrom]").forEach(el => { el.textContent = t("pc.from", { p: money(PR[el.dataset.pfrom].base * .82, true) }); }); renderExamples(); renderAnswer(cur.key, cur.text, false); renderCalc(false); renderTrack(); renderPause(); renderFaq(); emLabel(); paintIcons(); requestAnimationFrame(() => glueAll()); };
+const renderAll = () => { applyTexts(); $$("[data-pfrom]").forEach(el => { el.textContent = t("pc.from", { p: money(Math.floor(PR[el.dataset.pfrom].base * .82)) }); }); renderExamples(); renderAnswer(cur.key, cur.text, false); renderCalc(false); renderTrack(); renderPause(); renderFaq(); emLabel(); paintIcons(); requestAnimationFrame(() => glueAll()); };
 
 /* Theme */
 const themeLabel = () => { const b = $("#themeBtn"); b.setAttribute("aria-label", t(D.dataset.theme === "dark" ? "theme.light" : "theme.dark")); };

@@ -22,7 +22,7 @@
 [data-contrast="high"] { --ink-2: var(--ink); --ink-3: var(--ink); --line: var(--line-2); }
 [data-theme="light"][data-contrast="high"] { --line-2: #8E88A8; --accent: #4220D9; --accent-text: #3A1BC4; }
 [data-theme="dark"][data-contrast="high"] { --line-2: #6E6890; }
-:root { --r-xl: 28px; --r-lg: 20px; --r-md: 12px; --r-sm: 6px; --ease: cubic-bezier(0.22, 0.61, 0.36, 1); --fs: 16px; }
+:root { --r-xl: 28px; --r-lg: 20px; --r-md: 12px; --r-sm: 6px; --ease: cubic-bezier(0.22, 0.61, 0.36, 1); --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --fs: 16px; }
 [data-size="l"] { --fs: 18px; }
 [data-size="xl"] { --fs: 20px; }
 
@@ -457,3 +457,22 @@ input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.12); }
 }
 [data-motion="off"] *, [data-motion="off"] *::before, [data-motion="off"] *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
 [data-motion="off"] { scroll-behavior: auto; }
+
+/* ---- Finishing pass: press feedback, hover only where a pointer hovers, comfortable touch targets ---- */
+.btn, .pcard, .chooser button, .ex button, .tool-btn, .seg button, .tabs button, .disc, .switch, .acc-q, .toast button { -webkit-tap-highlight-color: transparent; }
+.btn { transition: background-color .2s ease, transform .16s var(--ease-out), box-shadow .2s ease; }
+.btn:active { transform: scale(.97); box-shadow: none; }
+.pcard:active, .ex button:active, .tool-btn:active, .seg button:active, .tabs button:active { transform: scale(.97); }
+.pcard { transition: border-color .25s ease, box-shadow .25s ease, transform .2s var(--ease-out); }
+.btn:hover, .pcard:hover { transform: none; box-shadow: none; }
+@media (hover: hover) and (pointer: fine) {
+	.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -10px var(--accent); }
+	.btn:active { transform: scale(.97); box-shadow: none; }
+	.pcard:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+	.pcard:active { transform: scale(.98); }
+}
+.ex button { min-height: 44px; padding: 10px 16px; }
+.disc { min-height: 44px; }
+.switch { position: relative; }
+.switch::after { content: ""; position: absolute; inset: -8px -4px; }
+@media (pointer: coarse) { .tool-btn { height: 44px; } .tool-btn.icon-only { width: 44px; } .seg { grid-template-columns: repeat(3, 48px); } .seg button { height: 40px; } }

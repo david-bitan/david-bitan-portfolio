@@ -42,23 +42,24 @@ new MutationObserver(knob).observe(D, { attributes: true, attributeFilter: ["dat
 
 /* ---------- hero: the street settles, feathers drift in, three of them colour a detail ---------- */
 function hero(svg) {
+	const k = svg.viewBox.baseVal.width / 3540;   /* drawing units per reference unit */
 	const feas = $$(".h-fea", svg), acc = { cat: $(".a-cat", svg), tag: $(".a-tag", svg), dog: $(".a-dog", svg) };
 	const T = (x, y, r = 0, s = 1) => `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${r.toFixed(1)}deg) scale(${s})`;
 	const show = () => { feas.forEach(f => f.style.opacity = 1); Object.values(acc).forEach(a => a && a.classList.add("lit")); };
 	/* living background: clouds drift, smoke rises, a bird glides; durations never line up */
 	const ambient = () => {
-		loop($(".h-cla", svg), [{ transform: "translateX(0)" }, { transform: "translateX(60px)" }], 21000);
-		loop($(".h-clb", svg), [{ transform: "translateX(0)" }, { transform: "translateX(-50px)" }], 26000);
-		loop($(".h-smoke", svg), [{ transform: "translateY(0)", opacity: .55 }, { transform: "translateY(-18px)", opacity: 1 }], 4300);
-		loop($(".h-bird", svg), [{ transform: "translate(0,0)" }, { transform: "translate(70px,-16px)" }], 9000);
-		feas.forEach((f, i) => loop(f, [{ transform: T(0, 0) }, { transform: T(i % 2 ? 10 : -10, -16, i % 2 ? 4 : -4) }], [4200, 5600, 3800, 4900][i % 4], 200 * i));
+		loop($(".h-cla", svg), [{ transform: "translateX(0)" }, { transform: `translateX(${60 * k}px)` }], 21000);
+		loop($(".h-clb", svg), [{ transform: "translateX(0)" }, { transform: `translateX(${-50 * k}px)` }], 26000);
+		loop($(".h-smoke", svg), [{ transform: "translateY(0)", opacity: .55 }, { transform: `translateY(${-18 * k}px)`, opacity: 1 }], 4300);
+		loop($(".h-bird", svg), [{ transform: "translate(0,0)" }, { transform: `translate(${70 * k}px,${-16 * k}px)` }], 9000);
+		feas.forEach((f, i) => loop(f, [{ transform: T(0, 0) }, { transform: T((i % 2 ? 10 : -10) * k, -16 * k, i % 2 ? 4 : -4) }], [4200, 5600, 3800, 4900][i % 4], 200 * i));
 	};
 	if (still()) { show(); return; }
 	/* sky feathers: fall in an arc, sway less and less, slow down before they stop */
 	feas.forEach((f, i) => {
 		const dir = i % 2 ? -1 : 1, n = 40, fr = [];
 		for (let k = 0; k <= n; k++) { const t = k / n, e = 1 - Math.pow(1 - t, 2.2), calm = 1 - t;
-			fr.push({ transform: T(Math.sin(t * Math.PI * 3.2) * 70 * calm * dir, -520 * (1 - e), Math.sin(t * Math.PI * 3.2 + .5) * 26 * calm), opacity: Math.min(1, t * 5), offset: t }); }
+			fr.push({ transform: T(Math.sin(t * Math.PI * 3.2) * 70 * k * calm * dir, -520 * k * (1 - e), Math.sin(t * Math.PI * 3.2 + .5) * 26 * calm), opacity: Math.min(1, t * 5), offset: t }); }
 		const a = f.animate(fr, { duration: 4200 + i * 300, delay: 600 + i * 260, easing: "linear", fill: "backwards" });
 		a.onfinish = () => { f.style.opacity = 1; if (i === feas.length - 1) ambient(); };
 		f.style.opacity = 1;
@@ -66,27 +67,31 @@ function hero(svg) {
 	/* three small feathers float down onto the cat's collar, the luggage tag and the dog's collar */
 	const src = feas[0]; if (!src) return show();
 	const [cx, cy] = src.dataset.c.split(",").map(Number);
-	const TARGETS = [["tag", 588, 960], ["cat", 364, 1046], ["dog", 1319, 986]];
+	const ctr = el => { const b = el.getBBox(); return [b.x + b.width / 2, b.y + b.height / 2 - 14 * k]; };
+	const TARGETS = ["tag", "cat", "dog"].filter(n => acc[n]).map(n => [n, ...ctr(acc[n])]);
 	TARGETS.forEach(([k, x, y], i) => {
 		const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", "lander");
 		g.innerHTML = `<g transform="translate(${-cx} ${-cy})">${src.innerHTML}</g>`; svg.appendChild(g);
-		const fr = [], n = 36, x0 = x + (i % 2 ? 140 : -140);
+		const fr = [], n = 36, x0 = x + (i % 2 ? 140 : -140) * k;
 		for (let s = 0; s <= n; s++) { const t = s / n, e = 1 - Math.pow(1 - t, 1.8), calm = 1 - t;
-			fr.push({ transform: T(x0 + (x - x0) * t + Math.sin(t * Math.PI * 2.4) * 40 * calm, y - 760 * (1 - e), 20 + Math.sin(t * Math.PI * 2.4) * 30 * calm, .32), opacity: t < .1 ? t * 10 : 1, offset: t }); }
+			fr.push({ transform: T(x0 + (x - x0) * t + Math.sin(t * Math.PI * 2.4) * 40 * k * calm, y - 760 * k * (1 - e), 20 + Math.sin(t * Math.PI * 2.4) * 30 * calm, .32), opacity: t < .1 ? t * 10 : 1, offset: t }); }
 		const a = g.animate(fr, { duration: 3600, delay: 2600 + i * 700, easing: "linear", fill: "both" });
 		a.onfinish = () => {
 			const ac = acc[k]; if (ac) ac.classList.add("lit");
-			g.animate([{ transform: T(x, y, 20, .32), opacity: 1 }, { transform: T(x + 6, y - 10, 34, .26), opacity: 0 }], { duration: 900, easing: EASE, fill: "forwards" }).onfinish = () => g.remove();
+			g.animate([{ transform: T(x, y, 20, .32), opacity: 1 }, { transform: T(x + 6 * k, y - 10 * k, 34, .26), opacity: 0 }], { duration: 900, easing: EASE, fill: "forwards" }).onfinish = () => g.remove();
 		};
 	});
 	/* depth: the layers drift a little with the pointer (desktop only) */
 	const hs = svg.closest(".hero");
 	if (hs && matchMedia("(hover: hover) and (pointer: fine)").matches) {
 		const L = [[".h-soft, .h-cla, .h-clb, .h-smoke", 4], [".h-ink, .h-acc", 8], [".h-fea", 16]];
-		let raf; hs.addEventListener("pointermove", e => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => {
-			if (still()) return; const r = hs.getBoundingClientRect(), px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
-			L.forEach(([sel, k]) => $$(sel, svg).forEach(el => el.style.translate = `${(-px * k).toFixed(1)}px ${(-py * k * .6).toFixed(1)}px`)); }); });
-		hs.addEventListener("pointerleave", () => L.forEach(([sel]) => $$(sel, svg).forEach(el => el.style.translate = "")));
+		let tx = 0, ty = 0, cx2 = 0, cy2 = 0, run = false;
+		const els = L.map(([sel, f]) => [$$(sel, svg), f]);
+		const tick = () => { cx2 += (tx - cx2) * .08; cy2 += (ty - cy2) * .08;
+			els.forEach(([list, f]) => list.forEach(el => el.style.translate = `${(-cx2 * f).toFixed(2)}px ${(-cy2 * f * .6).toFixed(2)}px`));
+			if (Math.abs(tx - cx2) > .001 || Math.abs(ty - cy2) > .001) requestAnimationFrame(tick); else run = false; };
+		hs.addEventListener("pointermove", e => { if (still()) return; const r = hs.getBoundingClientRect(); tx = (e.clientX - r.left) / r.width - .5; ty = (e.clientY - r.top) / r.height - .5; if (!run) { run = true; requestAnimationFrame(tick); } });
+		hs.addEventListener("pointerleave", () => { tx = 0; ty = 0; if (!run) { run = true; requestAnimationFrame(tick); } });
 	}
 }
 
