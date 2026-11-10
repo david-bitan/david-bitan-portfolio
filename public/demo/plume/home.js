@@ -172,6 +172,8 @@ const setProduct = (k, from) => {
 	movePill($("#prTabs"));
 	if (changed) renderCalc(from !== "init");
 };
+/* hero tiles: one tap goes straight to the price of that product */
+$$(".chooser button").forEach(b => b.addEventListener("click", () => { setProduct(b.dataset.product); $("#price").scrollIntoView({ behavior: motionOff() ? "auto" : "smooth" }); }));
 roving($(".chooser"), "button", "aria-checked", b => setProduct(b.dataset.product));
 roving($("#prTabs"), "button", "aria-selected", b => setProduct(b.dataset.product));
 $$("a[data-product]").forEach(a => a.addEventListener("click", () => setProduct(a.dataset.product)));

@@ -85,7 +85,7 @@ p, li, small, td { text-wrap: pretty; }
 .art-out { position: absolute; right: 0; bottom: 0; width: 62%; background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-xl); padding: 20px; box-shadow: var(--shadow); display: grid; grid-template-columns: 120px 1fr; gap: 18px; align-items: end; animation: rise 700ms var(--open) 900ms both; }
 .art-dn path { animation: pop 700ms var(--open) both; transform-origin: 70px 70px; } .art-bars rect { animation: grow 700ms var(--open) both; transform-box: fill-box; transform-origin: bottom; }
 .art-dn, .art-bars { width: 100%; height: auto; display: block; }
-@media (max-width: 1100px) { .hero { grid-template-columns: 1fr; } .art { display: none; } }
+@media (max-width: 1100px) { .hero { grid-template-columns: minmax(0, 1fr); } .art { display: none; } }
 .land h1 { font: 700 clamp(36px, 6vw, 68px)/1.02 var(--sans); letter-spacing: -.04em; max-width: 900px; }
 .land h1 em { font-style: normal; color: var(--accent-text); display: block; text-wrap: balance; } /* "See where your money goes." on its own two balanced lines */
 [data-theme="light"] .land h1 em { color: var(--accent-title); }
@@ -440,6 +440,17 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14.5px; font-varia
 .catb.todo { border-color: color-mix(in srgb, var(--warn) 50%, transparent); color: var(--warn); }
 .catb small { font-size: 11px; color: var(--ink-3); }
 .alltx .menu { max-height: none; }
+.dd.open { z-index: 45; }
+.menu.up { top: auto; bottom: calc(100% + 6px); }
+/* bottom sheet (phones, small tablets, short landscape screens) */
+.sheet-bg { position: fixed; inset: 0; z-index: 80; background: rgba(8, 9, 11, .5); opacity: 0; transition: opacity 400ms var(--open); }
+.sheet-bg.on { opacity: 1; transition-duration: 500ms; }
+.menu.sheet { position: fixed; z-index: 81; inset: auto 8px calc(8px + env(safe-area-inset-bottom)) 8px; top: auto; min-width: 0; max-width: 560px; margin: 0 auto; width: auto; padding: 22px 8px 8px; display: block; border-radius: var(--r-xl); max-height: calc(100dvh - 24px); overflow-y: auto; }
+.menu.sheet::before { content: ""; position: absolute; top: 8px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: var(--line-2); }
+.menu.sheet li { min-height: 48px; padding: 12px 14px; font-size: 16px; white-space: normal; border-radius: var(--r-lg); }
+@media (max-height: 500px) { .menu.sheet:has(> li:nth-child(6)) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 4px; max-width: 720px; } }
+/* short screens: long filter lists fold into two columns instead of running off the screen (no inner scroll) */
+@media (max-height: 760px) { .filters .menu:has(> li:nth-child(8)) { display: grid; grid-template-columns: repeat(2, minmax(0, max-content)); column-gap: 4px; max-width: calc(100vw - 32px); } .filters .menu:has(> li:nth-child(8)) li { white-space: normal; } }
 .alltx .menu .apply { border-top: 1px solid var(--line); margin-top: 4px; padding-top: 10px; font-size: 13px; color: var(--ink-2); display: flex; gap: 8px; align-items: center; }
 .empty { color: var(--ink-3); padding: 20px 0; text-align: center; }
 
@@ -484,7 +495,8 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14.5px; font-varia
 .pv .btn { justify-self: start; }
 
 /* filters: one sticky row above the analysis */
-.fwrap { position: sticky; top: var(--tbh, 61px); z-index: 20; margin: 0; padding: 8px 0; background: var(--bg); box-shadow: 0 0 0 100vmax var(--bg); clip-path: inset(0 -24px 0 -100vmax); } /* solid, square, glued under the top bar; its colour runs to the left edge and over the gap, not over the right column */
+.fwrap { position: sticky; top: var(--tbh, 61px); z-index: 25; margin: 0; padding: 8px 0; background: var(--bg); }
+.fwrap::before { content: ""; position: absolute; z-index: -1; top: 0; bottom: 0; inset-inline-start: -100vmax; inset-inline-end: -24px; background: var(--bg); pointer-events: none; } /* solid, square, glued under the top bar; its colour runs to the left edge and over the gap, not over the right column */
 .filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .f-lead { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-3); font-size: 13.5px; margin-inline-end: 4px; }
 .f-lead .i { width: 15px; height: 15px; }
@@ -621,6 +633,57 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14.5px; font-varia
 @media (max-height: 640px) { .ov { place-items: start center; } }
 @media (max-width: 420px) { .how-c { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 400px) { .card.kpi { grid-column: span 12 !important; } .tb th, .tb td { padding-left: 4px; padding-right: 4px; } .tb td { font-size: 13.5px; } }
+/* Touch screens (phones and tablets, portrait and landscape): mobile-app comfort, consistent spacing */
+@media (max-width: 960px), (pointer: coarse) {
+	.btn, .btn-sm, .fbtn, .icon-btn { min-height: 44px; }
+	.icon-btn { min-width: 44px; }
+	.me-btn { min-height: 44px; min-width: 44px; }
+	.catb { min-height: 36px; }
+	.grid { gap: 16px; }
+}
+@media (max-width: 640px) {
+	.main { padding: 24px 16px 48px; }
+	.card { padding: 20px 18px; }
+	.card-h { margin: -8px -8px 12px 0; }
+	.src { margin: auto -18px -20px; } .src > button { padding: 14px 18px; } .src-in { padding: 0 18px 18px; }
+	/* full-width actions; two buttons on one row share the width */
+	.land .cta { display: grid; grid-template-columns: minmax(0, 1fr); }
+	.land .cta .btn, .drop .btn, .tx-more .btn, .ask .btn-p { width: 100%; justify-content: center; }
+	.samples .acts .btn-g { border: 1px solid var(--line-2); }
+	.rh > .btn { width: 100%; justify-content: center; }
+	.rh .btn .lbl { display: inline !important; }
+	.samples .acts { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; }
+	.samples li { padding: 12px; }
+	.saved li { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 8px; padding: 18px; }
+	.saved li > .btn:only-of-type { grid-column: 1 / -1; }
+	.saved li > .btn-g { border: 1px solid var(--line-2); }
+	.chips button { min-height: 40px; }
+	.saved li > div { grid-column: 1 / -1; }
+	.saved li > .btn { width: 100%; justify-content: center; }
+	/* filters: equal columns, labels shortened with an ellipsis rather than wrapping unevenly */
+	.filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+	.filters > .dd .fbtn { width: 100%; justify-content: flex-start; }
+	.filters > .dd .fbtn > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: start; }
+	.filters > .dd:nth-last-child(1 of .dd):nth-child(odd of .dd), .filters > button { grid-column: 1 / -1; }
+	.filters .sp { display: none; }
+	.fwrap { padding: 12px 0; }
+	/* lists: more air between rows, easier to tap */
+	.alltx tr { padding: 14px 0; gap: 6px 12px; }
+	.ex, .chips { gap: 8px; }
+	.views-h { margin-top: 32px; }
+	.sec-row { margin-top: 32px; }
+}
+.main { overflow-x: clip; }
+@media (max-width: 380px) {
+	.mtop { gap: 2px; padding-left: 12px; padding-right: 12px; }
+	.mtop .icon-btn, .mtop .me-btn, .mtop .dd .btn { min-width: 40px; min-height: 40px; }
+	.mtop .dd .btn { padding: 0 8px; } .mtop .dd .btn .chev { display: none; }
+	.samples .acts { grid-auto-flow: row; }
+}
+.lg-n { min-width: 0; overflow-wrap: anywhere; }
+/* longer words (Russian, German): a slightly smaller title, so the last line never holds one word */
+:lang(ru) .land h1, :lang(de) .land h1 { font-size: clamp(32px, 5vw, 58px); }
+@media (max-width: 360px) { :lang(ru) .land h1, :lang(de) .land h1 { font-size: 28px; } }
 /* Squircle corners (like Figma's corner smoothing) where the browser supports them; radii stay concentric (24 = 16 + 8, 16 = 12 + 4) */
 @supports (corner-shape: squircle) {
 	:root { --r-xl: 28px; --r-lg: 20px; --r-md: 12px; --r-sm: 6px; }

@@ -783,15 +783,33 @@
 		a.onfinish = () => { if (el._a !== a) return; el._a = null; el.style.height = el.style.overflow = ""; if (!open) el.hidden = true; };
 	}
 	let open = null;
+	const sheetMode = () => matchMedia("(max-width: 640px), (max-height: 500px)").matches;
 	function menu(btn, list, items, onPick) {
 		if (open && open.list === list) return closeMenu(true);
 		closeMenu();
 		list.innerHTML = items.map((x, i) => `<li role="option" tabindex="-1" data-i="${i}" aria-selected="${x.on ? "true" : "false"}" ${x.check ? 'class="chk"' : ""}>${x.check ? `<span class="box">${x.on ? ic("check") : ""}</span>` : ""}${x.icon ? ic(x.icon) : ""}${x.dot ? `<i class="dot" style="background:${x.dot}"></i>` : ""}<span>${esc(x.label)}</span></li>`).join("");
 		if (items.some((x) => x.check)) list.setAttribute("aria-multiselectable", "true");
-		btn.setAttribute("aria-expanded", "true"); open = { btn, list, onPick, items }; slide(list, true);
+		btn.setAttribute("aria-expanded", "true"); open = { btn, list, onPick, items };
+		/* open above everything: lift the menu's box, and open upwards when there is no room below */
+		const host = btn.closest(".dd"); host?.classList.add("open"); list.classList.remove("up");
+		/* phones, small tablets and short landscape screens: the menu opens as a bottom sheet, like a mobile app */
+		if (sheetMode()) {
+			clearTimeout(list._back); if (!list._home) list._home = { parent: list.parentNode, next: list.nextSibling };
+			document.body.appendChild(list); list.classList.add("sheet");
+			let bg = $("#sheetBg"); if (!bg) { bg = document.createElement("div"); bg.id = "sheetBg"; bg.className = "sheet-bg"; document.body.appendChild(bg); }
+			bg.hidden = false; requestAnimationFrame(() => bg.classList.add("on"));
+			slide(list, true); (list.querySelector('[aria-selected="true"]') || list.firstElementChild)?.focus({ preventScroll: true }); return;
+		}
+		list.hidden = false; const lh = list.getBoundingClientRect().height, br = btn.getBoundingClientRect(); list.hidden = true;
+		const fw = btn.closest(".fwrap");
+		if (fw && br.bottom + 6 + lh > innerHeight - 8) { const stuck = parseFloat(getComputedStyle(fw).top) || 0, d = fw.getBoundingClientRect().top - stuck; if (d > 1) scrollBy({ top: d, behavior: reduced() ? "auto" : "smooth" }); }
+		if (br.bottom + 6 + lh > innerHeight - 8 && br.top - 6 - lh > (/^(sticky|fixed)$/.test(getComputedStyle(btn.closest(".fwrap, .topbar, .mtop") || document.body).position) ? 1e9 : 8)) list.classList.add("up");
+		slide(list, true);
 		(list.querySelector('[aria-selected="true"]') || list.firstElementChild)?.focus({ preventScroll: true });
 	}
-	function closeMenu(focus) { if (!open) return; const { btn, list } = open; open = null; btn.setAttribute("aria-expanded", "false"); slide(list, false); if (focus) btn.focus(); }
+	function closeMenu(focus) { if (!open) return; const { btn, list } = open; open = null; const host = btn.closest(".dd"); setTimeout(() => { if (!open || open.btn !== btn) host?.classList.remove("open"); }, 420);
+		if (list._home) { const bg = $("#sheetBg"); if (bg) { bg.classList.remove("on"); setTimeout(() => { if (!open || !open.list.classList.contains("sheet")) bg.hidden = true; }, 400); }
+			list._back = setTimeout(() => { if (open && open.list === list) return; const h = list._home; list._home = null; list.classList.remove("sheet"); if (h.parent.isConnected) h.parent.insertBefore(list, h.next && h.next.parentNode === h.parent ? h.next : null); else list.remove(); }, reduced() ? 0 : 420); } btn.setAttribute("aria-expanded", "false"); slide(list, false); if (focus) btn.focus(); }
 	document.addEventListener("click", (e) => {
 		if (!open) return;
 		const li = e.target.closest("li[role=option]");
@@ -822,6 +840,16 @@
 	}
 	let rz, lw = innerWidth;
 	addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { if (innerWidth !== lw) { lw = innerWidth; if (innerWidth > 960) drawer(false); if (S.A && /^#\/a\//.test(location.hash)) report(false); } else alignSide(); }, 150); });
+
+	/* no single word alone on the last line: glue the last two words, unless that makes the line overflow */
+	const glue = (el) => {
+		const tn = [...el.childNodes].reverse().find((n) => n.nodeType === 3 && n.nodeValue.trim()); if (!tn) return;
+		const v = tn.nodeValue, i = v.trimEnd().lastIndexOf(" "); if (i < 1 || v.trim().split(/\s+/).length < 3) return;
+		const w0 = el.getBoundingClientRect().width, pw = el.parentElement ? el.parentElement.clientWidth : 1e9; tn.nodeValue = v.slice(0, i) + "\u00A0" + v.slice(i + 1); if (el.scrollWidth > el.clientWidth + 1 || el.getBoundingClientRect().width > w0 + 1 || el.scrollWidth > pw + 1) tn.nodeValue = v;
+	};
+	let gl; const glueAll = () => { cancelAnimationFrame(gl); gl = requestAnimationFrame(() => $$("h1, h2, h3, h4, main p, .ov p, .site p").forEach((el) => { if (!el.closest("table, .alltx")) glue(el); })); };
+	new MutationObserver(glueAll).observe(document.body, { childList: true, subtree: true });
+	document.fonts?.ready.then(glueAll); let glt; addEventListener("resize", () => { clearTimeout(glt); glt = setTimeout(glueAll, 200); });
 
 	route();
 })();
