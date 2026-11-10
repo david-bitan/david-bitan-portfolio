@@ -21,7 +21,7 @@ const S = {
 en: {
 	skip: "Skip to content", "nav.label": "Main", "nav.claims": "Claims", "lang.label": "Language", "theme.dark": "Dark theme", "theme.light": "Light theme", menu: "Menu",
 	"p.home": "Home", "p.car": "Car", "p.pet": "Pet", "p.travel": "Travel", "cta.price": "Check my price", undo: "Undo",
-	"hero.kicker": "Home · Car · Pet · Travel", "hero.title": "Insurance you can read in a minute.", "hero.sub": "Cover explained in plain words. AI makes it fast, and a real person is always one tap away.", "hero.choose": "What would you like to insure?", "hero.fine": "No paperwork. Cancel anytime, in two taps.",
+	"hero.kicker": "Home · Car · Pet · Travel", "pc.eyebrow": "Four kinds of cover", "pc.title": "What would you like to protect?", "pc.from": "from {p}/month", "hero.title": "Insurance you can read in a minute.", "hero.sub": "Cover explained in plain words. AI makes it fast, and a real person is always one tap away.", "hero.choose": "What would you like to insure?", "hero.fine": "No paperwork. Cancel anytime, in two taps.",
 	"cov.eyebrow": "Am I covered?", "cov.title": "Ask before it happens, not after.", "cov.sub": "Describe a situation in your own words. Plume tells you if you would be covered, how much you would get, and why.", "cov.label": "Describe a situation", "cov.ph": "My bike was stolen outside the station", "cov.ask": "Ask", "cov.try": "Or try one:",
 	"cov.pay": "You get", "cov.ded": "Deductible", "cov.when": "Paid within", "cov.why": "Why", "cov.foot": "Example answers for a fictional policy.", "cov.you": "You asked",
 	"v.yes": "Covered", "v.part": "Partly covered", "v.no": "Not covered", "v.person": "A person will check",
@@ -49,7 +49,7 @@ en: {
 fr: {
 	skip: "Aller au contenu", "nav.label": "Principal", "nav.claims": "Sinistres", "lang.label": "Langue", "theme.dark": "Thème sombre", "theme.light": "Thème clair", menu: "Menu",
 	"p.home": "Habitation", "p.car": "Auto", "p.pet": "Animaux", "p.travel": "Voyage", "cta.price": "Voir mon prix", undo: "Annuler",
-	"hero.kicker": "Habitation · Auto · Animaux · Voyage", "hero.title": "L’assurance qui se lit en une minute.", "hero.sub": "Vos garanties expliquées avec des mots simples. L’IA va vite, et une vraie personne reste toujours à un geste.", "hero.choose": "Que voulez-vous assurer ?", "hero.fine": "Zéro paperasse. Résiliable à tout moment, en deux gestes.",
+	"hero.kicker": "Habitation · Auto · Animaux · Voyage", "pc.eyebrow": "Quatre assurances", "pc.title": "Que voulez-vous protéger ?", "pc.from": "dès {p}/mois", "hero.title": "L’assurance qui se lit en une minute.", "hero.sub": "Vos garanties expliquées avec des mots simples. L’IA va vite, et une vraie personne reste toujours à un geste.", "hero.choose": "Que voulez-vous assurer ?", "hero.fine": "Zéro paperasse. Résiliable à tout moment, en deux gestes.",
 	"cov.eyebrow": "Suis-je couvert ?", "cov.title": "Posez la question avant, pas après.", "cov.sub": "Décrivez une situation avec vos mots. Plume vous dit si vous seriez couvert, combien vous toucheriez, et pourquoi.", "cov.label": "Décrivez une situation", "cov.ph": "On m’a volé mon vélo devant la gare", "cov.ask": "Demander", "cov.try": "Ou essayez :",
 	"cov.pay": "Vous touchez", "cov.ded": "Franchise", "cov.when": "Payé sous", "cov.why": "Pourquoi", "cov.foot": "Réponses d’exemple pour un contrat fictif.", "cov.you": "Votre question",
 	"v.yes": "Couvert", "v.part": "En partie couvert", "v.no": "Pas couvert", "v.person": "Une personne va vérifier",
@@ -99,7 +99,7 @@ const applyTexts = () => {
 	themeLabel();
 	document.title = lang === "fr" ? "Plume · l’assurance qui se lit en une minute" : "Plume · insurance you can read in a minute";
 };
-const renderAll = () => { applyTexts(); renderExamples(); renderAnswer(cur.key, cur.text, false); renderCalc(false); renderTrack(); renderPause(); renderFaq(); emLabel(); paintIcons(); requestAnimationFrame(() => glueAll()); };
+const renderAll = () => { applyTexts(); $$("[data-pfrom]").forEach(el => { el.textContent = t("pc.from", { p: money(PR[el.dataset.pfrom].base * .82, true) }); }); renderExamples(); renderAnswer(cur.key, cur.text, false); renderCalc(false); renderTrack(); renderPause(); renderFaq(); emLabel(); paintIcons(); requestAnimationFrame(() => glueAll()); };
 
 /* Theme */
 const themeLabel = () => { const b = $("#themeBtn"); b.setAttribute("aria-label", t(D.dataset.theme === "dark" ? "theme.light" : "theme.dark")); };
@@ -311,7 +311,7 @@ $("#msgLea").addEventListener("click", () => { const n = $("#leaNote"); n.textCo
 let paused = false;
 const renderPause = () => {
 	const s = $("#pauseState"); s.textContent = paused ? t("pa.off", { a: money(4), b: money(34) }) : t("pa.on", { a: money(34) });
-	s.classList.toggle("paused", paused); $("#pauseSw").setAttribute("aria-checked", String(paused));
+	glue(s); s.classList.toggle("paused", paused); $("#pauseSw").setAttribute("aria-checked", String(paused));
 };
 let toastTimer;
 const setPause = (v, withToast) => {

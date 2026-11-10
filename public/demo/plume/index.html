@@ -59,59 +59,27 @@ try { const p = JSON.parse(localStorage.getItem("plume-prefs") || "{}"); const d
 
 <!-- HERO -->
 <section class="hero">
-	<div class="wrap hero-in">
-		<div class="hero-txt">
-			<p class="kicker"><span class="dot"></span><span data-t="hero.kicker">Home · Car · Pet · Travel</span></p>
-			<h1 data-t="hero.title">Insurance you can read in a minute.</h1>
-			<p class="lead" data-t="hero.sub">Cover explained in plain words. AI makes it fast, and a real person is always one tap away.</p>
-			<div class="chooser" role="radiogroup" aria-label="What would you like to insure?" data-t-aria="hero.choose">
-				<button type="button" role="radio" aria-checked="true" data-product="home"><i data-i="house"></i><span data-t="p.home">Home</span></button>
-				<button type="button" role="radio" aria-checked="false" data-product="car" tabindex="-1"><i data-i="car"></i><span data-t="p.car">Car</span></button>
-				<button type="button" role="radio" aria-checked="false" data-product="pet" tabindex="-1"><i data-i="dog"></i><span data-t="p.pet">Pet</span></button>
-				<button type="button" role="radio" aria-checked="false" data-product="travel" tabindex="-1"><i data-i="plane"></i><span data-t="p.travel">Travel</span></button>
-			</div>
-			<div class="hero-cta">
-				<a class="btn btn-lg" id="heroCta" href="#price"><span data-t="cta.price">Check my price</span><i data-i="arrow-right"></i></a>
-				<p class="fine" data-t="hero.fine">No paperwork. Cancel anytime, in two taps.</p>
-			</div>
+	<div class="wrap hero-txt">
+		<p class="kicker"><span class="dot"></span><span data-t="hero.kicker">Home · Car · Pet · Travel</span></p>
+		<h1 data-t="hero.title">Insurance you can read in a minute.</h1>
+		<p class="lead" data-t="hero.sub">Cover explained in plain words. AI makes it fast, and a real person is always one tap away.</p>
+		<div class="hero-cta">
+			<a class="btn btn-lg" id="heroCta" href="#price"><span data-t="cta.price">Check my price</span><i data-i="arrow-right"></i></a>
+			<p class="fine" data-t="hero.fine">No paperwork. Cancel anytime, in two taps.</p>
 		</div>
-		<div class="hero-art" aria-hidden="true">
-			<svg class="ill" viewBox="0 0 600 470" id="heroIll">
-				<g class="cloud c1"><path class="d" style="--i:9" d="M70 132c-12 0-20-8-18-18 2-9 11-14 20-11 3-12 15-19 27-15 8 3 13 9 14 17 9-2 17 4 17 13 0 8-6 14-14 14H70z"/></g>
-				<g class="cloud c2"><path class="d" style="--i:10" d="M430 70c-9 0-15-6-13-13 1-7 8-11 15-9 2-9 11-14 20-11 6 2 10 7 11 13 7-1 13 3 13 10 0 6-5 10-11 10h-35z"/></g>
-				<path class="d trail" style="--i:8" d="M330 196c40-44 92-70 150-82"/>
-				<g class="plane"><path class="d" style="--i:8" d="M482 112l38-15c8-3 14 4 8 9l-30 22-12 2 4-8-14-2z"/><path class="d" style="--i:8" d="M500 104l-10-14h-8l6 18"/></g>
-				<g class="feather"><path class="d fill-a" style="--i:7" d="M232 132c6-30 26-52 58-64-4 32-22 54-58 64z"/><path class="d acc" style="--i:7" d="M232 132l40-44M248 113l-6-10M258 102l-4-12M262 112l12 1M252 122l12 2"/></g>
-				<path class="d" style="--i:0" d="M24 392c120-10 300-12 552-2"/>
-				<path class="d soft" style="--i:6" d="M70 420h60M380 424h120M200 430h40"/>
-				<g class="house">
-					<path class="d" style="--i:1" d="M176 390V262M324 390V262"/>
-					<path class="d" style="--i:1" d="M156 274l94-84 94 84"/>
-					<path class="d" style="--i:2" d="M292 226v-34h22v54"/>
-					<rect class="d fill-a win" style="--i:3" x="196" y="290" width="34" height="34" rx="6"/>
-					<rect class="d fill-a win w2" style="--i:3" x="272" y="290" width="34" height="34" rx="6"/>
-					<path class="d" style="--i:3" d="M213 290v34M196 307h34M289 290v34M272 307h34"/>
-					<path class="d" style="--i:4" d="M234 390v-46c0-9 7-16 16-16s16 7 16 16v46"/>
-					<path class="d" style="--i:4" d="M258 362h.01"/>
-				</g>
-				<path class="smoke d soft" style="--i:5" d="M303 186c-9-9 9-16 0-26s9-17 0-27"/>
-				<g class="tree"><path class="d" style="--i:4" d="M392 390v-64M392 352l-14-12M392 340l12-10"/><path class="d fill-m" style="--i:5" d="M392 252c24 0 40 17 40 38 0 22-17 38-40 38s-40-16-40-38c0-21 16-38 40-38z"/></g>
-				<g class="car">
-					<path class="d" style="--i:5" d="M434 378v-20c0-7 5-12 12-12h14l22-24h58l24 24h6c7 0 12 5 12 12v20"/>
-					<path class="d" style="--i:6" d="M474 378h48M434 378h8M574 378h8"/>
-					<path class="d fill-a" style="--i:6" d="M490 340l12-12h18v12h-30zM528 328h10l12 12h-22z"/>
-					<g class="wheel"><circle class="d" style="--i:6" cx="458" cy="380" r="14"/><path class="d" style="--i:6" d="M458 372v16"/></g>
-					<g class="wheel w-b"><circle class="d" style="--i:6" cx="538" cy="380" r="14"/><path class="d" style="--i:6" d="M538 372v16"/></g>
-				</g>
-				<g class="dog">
-					<path class="d" style="--i:3" d="M80 390c-3-24 3-42 19-50 12-6 26-4 32 4"/>
-					<path class="d" style="--i:3" d="M133 346c3 14 3 30-1 44M118 390v-16"/>
-					<path class="d fill-a" style="--i:2" d="M124 330c0-11 8-19 18-19 9 0 15 6 17 13 7 0 12 3 12 8s-5 8-12 8h-6c-3 5-8 7-13 7-9 0-16-7-16-17z"/>
-					<path class="d" style="--i:2" d="M132 314c-9 0-13 10-9 21 2 5 7 5 9 0"/>
-					<path class="d" style="--i:2" d="M146 323h.01M170 331h.01"/>
-					<path class="d tail" style="--i:3" d="M82 384c-14-2-20-14-16-26"/>
-				</g>
-			</svg>
+	</div>
+	<div class="hero-scene"><div class="art-slot hero-art" data-art="hero" style="aspect-ratio:3540/1238" aria-hidden="true"></div></div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="sec cover" id="cover">
+	<div class="wrap">
+		<div class="sec-head center reveal"><p class="eyebrow" data-t="pc.eyebrow">Four kinds of cover</p><h2 data-t="pc.title">What would you like to protect?</h2></div>
+		<div class="pcards chooser" role="radiogroup" aria-label="What would you like to insure?" data-t-aria="hero.choose">
+			<button type="button" class="pcard reveal" role="radio" aria-checked="true" data-product="home"><span class="pc-art"><div class="art-slot " data-art="c_home" style="aspect-ratio:525/354" aria-hidden="true"></div></span><span class="pc-n" data-t="p.home">home</span><span class="pc-p" data-pfrom="home"></span></button>
+			<button type="button" class="pcard reveal" role="radio" aria-checked="false" data-product="car" tabindex="-1"><span class="pc-art"><div class="art-slot " data-art="c_car" style="aspect-ratio:546/226" aria-hidden="true"></div></span><span class="pc-n" data-t="p.car">car</span><span class="pc-p" data-pfrom="car"></span></button>
+			<button type="button" class="pcard reveal" role="radio" aria-checked="false" data-product="pet" tabindex="-1"><span class="pc-art"><div class="art-slot " data-art="c_pet" style="aspect-ratio:486/329" aria-hidden="true"></div></span><span class="pc-n" data-t="p.pet">pet</span><span class="pc-p" data-pfrom="pet"></span></button>
+			<button type="button" class="pcard reveal" role="radio" aria-checked="false" data-product="travel" tabindex="-1"><span class="pc-art"><div class="art-slot " data-art="c_travel" style="aspect-ratio:296/348" aria-hidden="true"></div></span><span class="pc-n" data-t="p.travel">travel</span><span class="pc-p" data-pfrom="travel"></span></button>
 		</div>
 	</div>
 </section>
@@ -120,6 +88,7 @@ try { const p = JSON.parse(localStorage.getItem("plume-prefs") || "{}"); const d
 <section class="sec covered" id="covered">
 	<div class="wrap two">
 		<div class="sec-head reveal">
+			<div class="art-slot spot spot-l" data-art="covered" style="aspect-ratio:785/619" aria-hidden="true"></div>
 			<p class="eyebrow" data-t="cov.eyebrow">Am I covered?</p>
 			<h2 data-t="cov.title">Ask before it happens, not after.</h2>
 			<p class="lead" data-t="cov.sub">Describe a situation in your own words. Plume tells you if you would be covered, how much you would get, and why.</p>
@@ -179,9 +148,9 @@ try { const p = JSON.parse(localStorage.getItem("plume-prefs") || "{}"); const d
 			<h2 data-t="how.title">Covered before your coffee gets cold.</h2>
 		</div>
 		<ol class="steps">
-			<li class="reveal"><span class="n">1</span><span class="s-ic"><i data-i="message-circle"></i></span><h3 data-t="how.1t">Tell us about you</h3><p data-t="how.1p">A few questions, one at a time, in plain words. No forms to decode.</p></li>
-			<li class="reveal"><span class="n">2</span><span class="s-ic"><i data-i="sliders-horizontal"></i></span><h3 data-t="how.2t">Shape your cover</h3><p data-t="how.2p">Pick what matters to you and see the price, and the payout, change live.</p></li>
-			<li class="reveal"><span class="n">3</span><span class="s-ic"><i data-i="shield-check"></i></span><h3 data-t="how.3t">You are covered</h3><p data-t="how.3p">Your policy starts right away, with a one-page summary anyone can read.</p></li>
+			<li class="reveal"><span class="n">1</span><span class="s-art"><div class="art-slot " data-art="phone" style="aspect-ratio:318/547" aria-hidden="true"></div></span><h3 data-t="how.1t">Tell us about you</h3><p data-t="how.1p">A few questions, one at a time, in plain words. No forms to decode.</p></li>
+			<li class="reveal"><span class="n">2</span><span class="s-art"><div class="art-slot " data-art="price" style="aspect-ratio:694/520" aria-hidden="true"></div></span><h3 data-t="how.2t">Shape your cover</h3><p data-t="how.2p">Pick what matters to you and see the price, and the payout, change live.</p></li>
+			<li class="reveal"><span class="n">3</span><span class="s-art"><div class="art-slot " data-art="door" style="aspect-ratio:429/504" aria-hidden="true"></div></span><h3 data-t="how.3t">You are covered</h3><p data-t="how.3p">Your policy starts right away, with a one-page summary anyone can read.</p></li>
 		</ol>
 	</div>
 </section>
@@ -193,6 +162,7 @@ try { const p = JSON.parse(localStorage.getItem("plume-prefs") || "{}"); const d
 			<p class="eyebrow" data-t="cl.eyebrow">Claims</p>
 			<h2 data-t="cl.title">Follow your claim like a parcel.</h2>
 			<p class="lead" data-t="cl.sub">Every step, who is handling it, and what happens next. No more wondering whether anyone has read your file.</p>
+			<div class="spot-claim"><div class="art-slot " data-art="lea" style="aspect-ratio:460/607" aria-hidden="true"></div><div class="art-slot " data-art="parcel" style="aspect-ratio:351/408" aria-hidden="true"></div></div>
 			<button class="btn btn-ghost" type="button" id="replay"><i data-i="rotate-ccw"></i><span data-t="cl.replay">Replay the example</span></button>
 		</div>
 		<div class="track reveal" id="track">
@@ -215,6 +185,7 @@ try { const p = JSON.parse(localStorage.getItem("plume-prefs") || "{}"); const d
 <section class="sec trust">
 	<div class="wrap">
 		<div class="sec-head center reveal">
+			<div class="art-slot spot spot-c" data-art="aih" style="aspect-ratio:759/581" aria-hidden="true"></div>
 			<p class="eyebrow" data-t="ai.eyebrow">AI, with people in charge</p>
 			<h2 data-t="ai.title">AI makes it fast. People make the calls.</h2>
 		</div>
@@ -230,6 +201,7 @@ try { const p = JSON.parse(localStorage.getItem("plume-prefs") || "{}"); const d
 <section class="sec life">
 	<div class="wrap duo">
 		<div class="card big reveal" id="pauseCard">
+			<div class="art-slot spot-card" data-art="pause" style="aspect-ratio:731/590" aria-hidden="true"></div>
 			<p class="eyebrow" data-t="pa.eyebrow">Pause</p>
 			<h3 data-t="pa.title">Car in the garage for the winter? Pause it.</h3>
 			<p data-t="pa.sub">Theft and fire stay covered. You pay only for what you use, and you can switch back anytime.</p>
@@ -240,6 +212,7 @@ try { const p = JSON.parse(localStorage.getItem("plume-prefs") || "{}"); const d
 			<div class="toast" id="toast" hidden><span id="toastT"></span><button type="button" id="undo"><i data-i="undo-2"></i><span data-t="undo">Undo</span></button></div>
 		</div>
 		<div class="card big reveal" id="emCard">
+			<div class="art-slot spot-card" data-art="urg" style="aspect-ratio:733/554" aria-hidden="true"></div>
 			<p class="eyebrow" data-t="em.eyebrow">Emergency mode</p>
 			<h3 data-t="em.title">Water everywhere? One screen, the right steps.</h3>
 			<p data-t="em.sub">Emergency mode keeps calm for you: what to do now, a priority line, and a claim already filled in.</p>
@@ -257,6 +230,7 @@ try { const p = JSON.parse(localStorage.getItem("plume-prefs") || "{}"); const d
 <section class="sec a11y" id="a11y">
 	<div class="wrap two">
 		<div class="sec-head reveal">
+			<div class="art-slot spot spot-l" data-art="access" style="aspect-ratio:549/417" aria-hidden="true"></div>
 			<p class="eyebrow" data-t="ac.eyebrow">Accessible to everyone</p>
 			<h2 data-t="ac.title">Insurance should work for every reader.</h2>
 			<p class="lead" data-t="ac.sub">Plume is designed for keyboards and screen readers, with readable contrast everywhere. Try the settings: they apply to the whole site.</p>
@@ -284,7 +258,7 @@ try { const p = JSON.parse(localStorage.getItem("plume-prefs") || "{}"); const d
 <section class="sec end">
 	<div class="wrap">
 		<div class="end-card reveal">
-			<svg class="ill end-ill" viewBox="0 0 220 160" aria-hidden="true"><path class="d" style="--i:0" d="M20 140h180"/><path class="d" style="--i:1" d="M60 140V86l50-42 50 42v54"/><rect class="d fill-a" style="--i:2" x="96" y="98" width="28" height="42" rx="6"/><g class="feather f2"><path class="d fill-a" style="--i:3" d="M150 54c4-20 17-34 38-42-3 21-14 36-38 42z"/><path class="d acc" style="--i:3" d="M150 54l26-29"/></g></svg>
+			<div class="art-slot spot spot-c end-art" data-art="final" style="aspect-ratio:573/445" aria-hidden="true"></div>
 			<h2 data-t="end.title">Ready when you are.</h2>
 			<p class="lead" data-t="end.sub">Two minutes for your price. No call, no paperwork, no surprise.</p>
 			<a class="btn btn-lg" href="#price" data-t="cta.price">Check my price</a>
@@ -304,5 +278,6 @@ try { const p = JSON.parse(localStorage.getItem("plume-prefs") || "{}"); const d
 
 <script src="icons.js"></script>
 <script src="home.js"></script>
+<script src="art.js"></script>
 </body>
 </html>
