@@ -44,7 +44,7 @@ const { categories } = Astro.props;
 			<button
 				type="button"
 				data-craft-filter="__all__"
-				class="craft-filter-btn cursor-pointer rounded-pill border border-ink/15 bg-accent px-4 py-2 text-sm font-semibold text-accent-ink transition-colors"
+				class="craft-filter-btn cursor-pointer rounded-pill border border-ink/15 bg-ink px-4 py-2 text-sm font-semibold text-bg transition-colors"
 				aria-pressed="true"
 			>
 				All
@@ -79,7 +79,7 @@ const { categories } = Astro.props;
 	const figures = document.querySelectorAll<HTMLElement>('.craft-figure');
 
 	if (buttons.length && figures.length) {
-		const ACTIVE_ADD = ['bg-accent', 'text-accent-ink'];
+		const ACTIVE_ADD = ['bg-ink', 'text-bg'];
 		const ACTIVE_REMOVE = ['bg-transparent', 'text-ink', 'hover:border-accent', 'hover:text-accent-text'];
 
 		function apply(filter: string) {
