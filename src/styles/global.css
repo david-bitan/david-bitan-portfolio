@@ -28,14 +28,16 @@
 }
 
 /* Dark mode: neutral graphite greys picked by David (2026-11-12): page
-   #1F1F1F, cards #303030, footer #191919. No warm or blue tint. Toggled via
+   #191919 (his reference), cards #262626, footer #1F1F1F (a lighter panel,
+   like the side panel in his reference). No warm or blue tint. Toggled via
    [data-theme] on <html>, set by the script in Layout.astro
    (localStorage-persisted, light by default, no OS detection). */
 :root[data-theme='dark'] {
-  --color-bg: #1f1f1f;
+  --color-bg: #191919;
   --color-ink: #f5f5f5;
   --color-muted: #a3a3a3;
-  --color-card: #303030;
+  --color-card: #262626;
+  --color-footer-bg: #1f1f1f;
   /* Same bright orange and white labels for buttons; small orange text is
      lightened to pass AA on the page (5.3:1) and on cards (4.6:1). */
   --color-accent-text: #f6703c;

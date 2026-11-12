@@ -2020,6 +2020,12 @@
 	}
 	/* very small phones: long uppercase words must fit the column */
 	@media (max-width: 360px) { .h2 { font-size: 28px; } .section .head { grid-template-columns: minmax(0, 1fr); } }
+	/* Portrait screens (phones, tablets, tall emulators): the hero hugs its
+	   content. A full-height hero there left a big empty band under the
+	   stats, up to ~480px on a portrait tablet (2026-11-12). */
+	@media (orientation: portrait) {
+		.hero { min-height: 0; }
+	}
 </style>
 
 <!-- Pre-hide reveal blocks BEFORE first paint to avoid a flash of visible
