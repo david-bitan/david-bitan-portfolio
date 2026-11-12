@@ -1628,7 +1628,7 @@
 				<div class="mc-stat">
 					<div class="k">Guest passes</div>
 					<div class="v">3 <span class="unit" style="font-size:14px; color:var(--white-mute)">/ 4</span></div>
-					<div class="sub">This month · resets Sep 1</div>
+					<div class="sub" id="ms-pass-reset">This month · resets on the 1st</div>
 				</div>
 			</div>
 			<div class="mc-actions">
@@ -1730,7 +1730,7 @@
 		</div>
 		<div class="pt-grid" data-reveal>
 			<div class="pt-card">
-				<div class="pt-date">Mon Aug 25 · 07:00</div>
+				<div class="pt-date" data-pt-dow="1" data-pt-time="07:00">Mon Aug 25 · 07:00</div>
 				<div class="pt-coach">Marcus Reyes</div>
 				<div class="pt-focus">Focus: deadlift form check + hip mobility. Bring your lifting shoes.</div>
 				<div class="pt-actions">
@@ -1739,7 +1739,7 @@
 				</div>
 			</div>
 			<div class="pt-card">
-				<div class="pt-date">Thu Aug 28 · 12:30</div>
+				<div class="pt-date" data-pt-dow="4" data-pt-time="12:30">Thu Aug 28 · 12:30</div>
 				<div class="pt-coach">Kai Nakamura</div>
 				<div class="pt-focus">Focus: shoulder rehab progression, week 4 of 8. Assessment + programming update.</div>
 				<div class="pt-actions">
@@ -2184,6 +2184,28 @@
 	document.getElementById("ms-price").textContent = "$" + TIER_META[account.tier].price.toLocaleString("en-US") + " / mo";
 	document.getElementById("ms-next").textContent = fmtDate(nextBilling);
 	document.getElementById("ms-since").textContent = fmtMonthYear(joinedDate);
+	// Dates that used to be hard-coded to late August now follow today:
+	// PT sessions on the next Monday / Thursday, meal tabs on this week.
+	(function () {
+		const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		document.querySelectorAll(".pt-date[data-pt-dow]").forEach((el) => {
+			const dow = +el.dataset.ptDow;
+			const d = new Date(today);
+			d.setDate(d.getDate() + (((dow - d.getDay() + 7) % 7) || 7));
+			el.textContent = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }).replace(",", "") + " · " + el.dataset.ptTime;
+		});
+		const monday = new Date(today);
+		monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+		document.querySelectorAll(".day-tab[data-day] .num").forEach((num, i) => {
+			const d = new Date(monday);
+			d.setDate(monday.getDate() + i);
+			num.textContent = d.getDate();
+		});
+	})();
+	// Guest passes reset on the 1st of next month (was hard-coded "Sep 1").
+	const passReset = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+	document.getElementById("ms-pass-reset").textContent =
+		"This month · resets " + passReset.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 	const daysMember = Math.round((now - joinedDate) / (24 * 60 * 60 * 1000));
 	document.getElementById("ms-days").textContent = daysMember < 60 ? daysMember + " days" : Math.round(daysMember / 30) + " months";
 

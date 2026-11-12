@@ -163,6 +163,8 @@
 	.scroll-top-btn{bottom:92px!important}
 	.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 	@media (max-width:560px){.cx-panel{right:0;left:0;bottom:0;width:100%;height:100dvh;border-radius:0;border:0}.cx-launch{right:16px;bottom:16px}}
+	/* Room under the footer so the fixed launcher never sits on the last line of text at the end of the page. */
+	footer.footer{padding-bottom:112px}
 	@media (prefers-reduced-motion:reduce){.cx-panel,.cx-launch{transition:none}.cx-dots i,.cx-caret::after{animation:none}}
 	`;
 	const style = document.createElement("style");
@@ -909,7 +911,7 @@
 				const prog = { 1: "Week 1 is about learning the movements and finding your weights.", 2: "Week 2 adds a rep to every exercise.", 3: "Week 2 adds a rep, week 3 adds a set.", 4: "Week 2 adds a rep, week 3 adds a set, week 4 is a lighter deload week to recover." }[P.weeks.length];
 				const again = (k, v) => "Build program: " + Object.entries({ goal: P.goal, weeks: P.weeks.length, days: P.days, meals: P.meals, diet: P.diet, ex: P.ex.join(","), avoid: P.avoid.replace(/,\s*/g, "|"), maint: P.maint, [k]: v }).map(([a, b]) => `${a}=${b}`).join("; ");
 				return {
-					text: `Your ${P.weeks.length === 4 ? "1-month" : P.weeks.length + "-week"} program is ready. ${P.goalLabel}: ${fmt(P.trainK)} kcal on training days and ${fmt(P.restK)} on rest days, averaging ${fmt(P.target)} a day, with ${P.protein} g protein every day. ${P.days} sessions a week. Meals: ${dietText(P)}. ${prog} Open any day to see the workout and the meals, or download everything as a PDF with log sheets.`,
+					text: `Your ${P.weeks.length === 4 ? "1-month" : P.weeks.length + "-week"} program is ready. ${P.goalLabel}: ${fmt(P.trainK)} kcal on training days and ${fmt(P.restK)} on rest days, averaging ${fmt(P.target)} a day, with ${P.protein} g protein every day. ${P.days} sessions a week. Meals: ${dietText(P).replace(/\.+$/, "")}. ${prog} Open any day to see the workout and the meals, or download everything as a PDF with log sheets.`,
 					html: programView(id, P),
 					note: { kind: "warn", text: "Estimates for a typical adult. Start with weights you can lift for every rep with good form. Not medical advice: see the club doctor if you have an injury or condition." },
 					chips: [

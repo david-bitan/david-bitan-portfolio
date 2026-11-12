@@ -1931,7 +1931,7 @@
 	function downloadIcs() {
 		const p = S.plan; const d = tripDates(p.nights); const c = D.cities[p.city];
 		const f = (x) => x.toISOString().slice(0, 10).replace(/-/g, "");
-		const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Otium demo//EN", "BEGIN:VEVENT", `UID:${Date.now()}@otium.demo`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}Z`, `DTSTART;VALUE=DATE:${f(d.out)}`, `DTEND;VALUE=DATE:${f(d.back)}`, `SUMMARY:${c.name} trip (Otium demo)`, "DESCRIPTION:Simulated booking — nothing was charged.", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+		const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Otium demo//EN", "BEGIN:VEVENT", `UID:${Date.now()}@otium.demo`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}Z`, `DTSTART;VALUE=DATE:${f(d.out)}`, `DTEND;VALUE=DATE:${f(d.back)}`, `SUMMARY:${c.name} trip (Otium demo)`, "DESCRIPTION:Simulated booking: nothing was charged.", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
 		const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar" })); a.download = `otium-${p.city}.ics`; a.click();
 		setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 	}

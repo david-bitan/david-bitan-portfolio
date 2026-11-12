@@ -1235,10 +1235,14 @@
 		border-top: 1px solid var(--line);
 		display: flex;
 		justify-content: space-between;
+		gap: 32px;
 		font-size: 12px;
 		color: var(--white-mute);
-		font-family: var(--font-mono);
 	}
+	/* Same type as the footer of the other pages (was mono here only); the
+	   copyright never wraps, the credits line sits right-aligned. */
+	.footer-bottom > div:first-child { white-space: nowrap; }
+	.footer-bottom > div:last-child { text-align: right; }
 
 	/* ============================================================
 	   MODAL / OVERLAY
@@ -1556,6 +1560,7 @@
 		.classes-grid { grid-template-columns: 76px repeat(5, minmax(112px, 1fr)); }
 		.about-values { grid-template-columns: 1fr; }
 		.footer-bottom { flex-direction: column; gap: 8px; }
+		.footer-bottom > div:last-child { text-align: left; }
 	}
 
 	/* ============================================================
@@ -2629,8 +2634,8 @@
 				<p><strong style="font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.06em;">APEX Athletic Club</strong></p>
 				<p>1201 Ocean Drive<br />Miami Beach, FL 33139</p>
 				<p style="margin-top: 16px;">
-					<a href="tel:+13055551200" style="color: var(--mint); font-family: var(--font-mono);">+1 (305) 555 1200</a><br />
-					<a href="mailto:hello@apexclub.com" style="color: var(--mint); font-family: var(--font-mono);">hello@apexclub.com</a>
+					<a href="tel:+13055550142" style="color: var(--mint); font-family: var(--font-mono);">+1 305 555 0142</a><br />
+					<a href="mailto:hello@apex-athletic.club" style="color: var(--mint); font-family: var(--font-mono);">hello@apex-athletic.club</a>
 				</p>
 				<div class="contact-actions">
 					<button class="btn btn-primary" data-open="contactform">Contact form</button>
