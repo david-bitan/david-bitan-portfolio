@@ -6,9 +6,9 @@
   --color-ink: #0a0a0a;
   --color-muted: #4b5563;
   --color-card: #ffffff;
-  /* Bright brand orange for buttons and big headlines, with WHITE labels
-     (David's choice). White on #F25C24 is 3.3:1, so button labels are set
-     as large text (19px bold), where WCAG AA asks 3:1. Small orange text
+  /* Bright brand orange for buttons and big headlines, with WHITE 14px
+     labels: David's explicit choice (2026-11-12), knowing white on #F25C24
+     is 3.3:1, below the AA 4.5:1 for small text. Small orange text
      uses the deeper accent-text (4.7:1 on the page). Active filter pills are
      neutral (ink / bg). 2026-11-12 quality pass. */
   --color-accent: #f25c24;
@@ -21,20 +21,21 @@
   --radius-md: 12px;
   --radius-pill: 999px;
 
-  /* Footer: warm dark charcoal (Claude-interface style), not navy/pure black */
-  --color-footer-bg: #1c1b1a;
-  --color-footer-ink: #f2f1ef;
-  --color-footer-muted: #8a8680;
+  /* Footer: neutral graphite, same family as dark mode (#191919) */
+  --color-footer-bg: #191919;
+  --color-footer-ink: #f5f5f5;
+  --color-footer-muted: #8f8f8f;
 }
 
-/* Dark mode: same warm-charcoal family as the footer, not navy/cold gray.
-   Accent: bright #F25C24 buttons with white 19px bold labels; small text #C2410C (light) / #F6703C (dark). Toggled via [data-theme] on <html>, set by the script in
-   Layout.astro (localStorage-persisted, light by default — no OS detection). */
+/* Dark mode: neutral graphite greys picked by David (2026-11-12): page
+   #1F1F1F, cards #303030, footer #191919. No warm or blue tint. Toggled via
+   [data-theme] on <html>, set by the script in Layout.astro
+   (localStorage-persisted, light by default, no OS detection). */
 :root[data-theme='dark'] {
-  --color-bg: #262624;
-  --color-ink: #f5f4f0;
-  --color-muted: #9c9a95;
-  --color-card: #30302e;
+  --color-bg: #1f1f1f;
+  --color-ink: #f5f5f5;
+  --color-muted: #a3a3a3;
+  --color-card: #303030;
   /* Same bright orange and white labels for buttons; small orange text is
      lightened to pass AA on the page (5.3:1) and on cards (4.6:1). */
   --color-accent-text: #f6703c;
