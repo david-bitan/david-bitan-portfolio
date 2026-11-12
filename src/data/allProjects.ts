@@ -229,12 +229,12 @@ Building on top of the Sonary Website design system, itself mature after six yea
 		year: '2019 – 2026',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Three major redesigns of Sonary's SaaS comparison platform since 2019: 37 verticals, ~3,000 CMS pages, WordPress to Webflow migration.`,
+		shortDesc: `Three major redesigns of Sonary's SaaS comparison platform since 2019: 1,400+ indexed pages across 37 software categories, WordPress to Webflow migration.`,
 		fullDesc: `Sole designer on Sonary's SaaS comparison and review platform since 2019. Design system that later seeded the Sonary Dashboard product. See structured case study below.`,
 		liveUrl: 'https://sonary.com',
 		scope: [
 			`3 major redesigns since 2019`,
-			`37 software categories, ~3,000 CMS pages`,
+			`1,400+ indexed pages across 37 software categories`,
 			`5 breakpoints`,
 			`WordPress to Webflow migration on the latest redesign`,
 		],
@@ -255,13 +255,13 @@ The design system was built for the site starting in 2019 (color tokens, Inter t
 			},
 			{
 				heading: 'Key challenge',
-				body: `Designing a system that could absorb the site's growth: 37 very different verticals (finance, AI, HR, e-commerce…) and close to 3,000 CMS-generated pages, without losing consistency or editorial tone. Every template needed to feel warm and inviting despite the functional density (comparison tables, review cards, scoring, lineups).
+				body: `Designing a system that could absorb the site's growth: 37 very different verticals (finance, AI, HR, e-commerce…) and 1,400+ indexed, CMS-generated pages, without losing consistency or editorial tone. Every template needed to feel warm and inviting despite the functional density (comparison tables, review cards, scoring, lineups).
 
 Addressed through a strict smart-component hierarchy and a library of editorial patterns (illustrated headers, quote blocks, category chips) that break up the dense sections.`,
 			},
 			{
 				heading: 'Deliverables',
-				body: `Templates covering homepage, article hub, article, review, comparison, alternative/lineup, about and category pages: close to 3,000 pages generated through the CMS across 37 verticals.
+				body: `Templates covering homepage, article hub, article, review, comparison, alternative/lineup, about and category pages: 1,400+ indexed pages generated through the CMS across 37 verticals.
 
 Notable components: homepage, 37-category mega menu, review card, comparison table, interactive lineup: all built as smart components reused across templates.
 
@@ -707,8 +707,8 @@ The captures below gather a selection of 13 pieces of work from that period.`,
 		client: `Gamingtech`,
 		year: '2015 – 2017',
 		category: 'iGaming',
-		shortDesc: `Sole designer on Gamingtech's three brands (10Bet, Real Deal Bet, Bet Rally), each running a casino and a sports betting vertical, for about 2.5 years.`,
-		fullDesc: `Selection of work produced at Gamingtech between 2015 and 2017 (about two and a half years). Sole designer on the three brands operated by the company: 10Bet, Real Deal Bet and Bet Rally. Each brand ran two operational verticals (a casino and a sports betting site) for a total of six sites evolving in parallel.
+		shortDesc: `Sole designer on Gamingtech's three brands (10Bet, Real Deal Bet, Bet Rally), each running a casino and a sports betting vertical, from 2015 to 2017.`,
+		fullDesc: `Selection of work produced at Gamingtech between 2015 and 2017. Sole designer on the three brands operated by the company: 10Bet, Real Deal Bet and Bet Rally. Each brand ran two operational verticals (a casino and a sports betting site) for a total of six sites evolving in parallel.
 
 Deliverables covered game lobbies, bonus systems, deposit funnels, promotional banners in large volume, mobile and desktop interfaces, as well as animations produced as videos and Flash (SWF) files for dynamic elements.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785345993/portfolio/old-wix/casino/casino-12.webp',
@@ -769,7 +769,7 @@ Deliverables covered game lobbies, bonus systems, deposit funnels, promotional b
 		client: `Tradologic`,
 		year: '2011 – 2013',
 		category: 'iGaming',
-		shortDesc: `Casino platform work at Tradologic (2011-2013, ~1.5-2 years): white-label backend for Crown Europe, City Club Casino, City Tower Casino and other operators.`,
+		shortDesc: `Casino platform work at Tradologic (2011–2013): white-label backend for Crown Europe, City Club Casino, City Tower Casino and other operators.`,
 		fullDesc: `Selection of work produced at Tradologic between 2011 and 2013 (about a year and a half to two years), within a team of several designers. Tradologic supplied white-label casino platforms to multiple operators: notably Crown Europe, City Club Casino and City Tower Casino, whose captures appear in this selection.
 
 My work quickly took on the most visible projects. Deliverables covered game lobbies, promotional banners, desktop interfaces, and animations produced as videos and Flash (SWF) files.`,
