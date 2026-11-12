@@ -24,7 +24,7 @@ const SITE_URL = 'https://david-bitan-portfolio.pages.dev';
 const SITE_NAME = 'David Bitan · Portfolio';
 const DEFAULT_TITLE = 'David Bitan · Senior AI Product Designer';
 const DEFAULT_DESCRIPTION =
-	'Senior AI Product Designer based in Israel. Case studies in SaaS, UI/UX, gaming and brand systems for Ryze Beyond, Sonary, Playright and more.';
+	'Senior AI Product Designer in Israel, available now. 20+ years designing SaaS, fintech and gaming products: case studies from Ryze Beyond, Sonary, Playright and more.';
 const DEFAULT_OG = '/og-image.png';
 
 const {
@@ -51,7 +51,7 @@ const personJsonLd = {
 	jobTitle: 'Senior AI Product Designer',
 	url: SITE_URL,
 	email: 'mailto:advance26@gmail.com',
-	sameAs: ['https://www.linkedin.com/in/david-bitan-81a12552/'],
+	sameAs: ['https://www.linkedin.com/in/david-bitan'],
 	address: {
 		'@type': 'PostalAddress',
 		addressCountry: 'IL',
@@ -123,7 +123,26 @@ const personJsonLd = {
 	<body>
 		<slot />
 		<BackToTop />
-	</body>
+			<script is:inline>
+			// nowidow: glue the last two words of short text blocks with a
+			// non-breaking space, unless the pair would be too long for a phone.
+			(() => {
+				const sel = 'h1,h2,h3,h4,p,li,figcaption,blockquote';
+				document.querySelectorAll(sel).forEach((el) => {
+					const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+					let last = null;
+					while (walker.nextNode()) if (walker.currentNode.textContent.trim()) last = walker.currentNode;
+					if (!last) return;
+					const t = last.textContent.replace(/\s+$/, '');
+					const k = t.lastIndexOf(' ');
+					if (k < 1 || t.length - k > 18) return;
+					const prev = t.lastIndexOf(' ', k - 1);
+					if (t.length - prev > 26) return;
+					last.textContent = t.slice(0, k) + '\u00A0' + t.slice(k + 1) + last.textContent.slice(t.length);
+				});
+			})();
+		</script>
+</body>
 </html>
 
 <script>

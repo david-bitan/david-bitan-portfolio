@@ -24,7 +24,7 @@ const { categories } = Astro.props;
 		<a
 			href="/#craft"
 			aria-label="Back to home"
-			class="craft-filters-back absolute left-6 lg:left-0 top-1/2 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ink/15 text-muted hover:border-accent hover:text-accent"
+			class="craft-filters-back absolute left-6 lg:left-0 top-1/2 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ink/15 text-muted hover:border-accent hover:text-accent-text"
 		>
 			<svg
 				aria-hidden="true"
@@ -54,7 +54,7 @@ const { categories } = Astro.props;
 					<button
 						type="button"
 						data-craft-filter={cat}
-						class="craft-filter-btn cursor-pointer rounded-pill border border-ink/15 bg-transparent px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent"
+						class="craft-filter-btn cursor-pointer rounded-pill border border-ink/15 bg-transparent px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent-text"
 						aria-pressed="false"
 					>
 						{cat}
@@ -80,7 +80,7 @@ const { categories } = Astro.props;
 
 	if (buttons.length && figures.length) {
 		const ACTIVE_ADD = ['bg-accent', 'text-accent-ink'];
-		const ACTIVE_REMOVE = ['bg-transparent', 'text-ink', 'hover:border-accent', 'hover:text-accent'];
+		const ACTIVE_REMOVE = ['bg-transparent', 'text-ink', 'hover:border-accent', 'hover:text-accent-text'];
 
 		function apply(filter: string) {
 			figures.forEach((f) => {

@@ -113,7 +113,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-21',
-		title: `Podracer · engine detail`,
+		title: `Twin-engine racer · engine detail`,
 		year: '2014',
 		category: '3D',
 		description: `Turbine and tether rig close up, with the cockpit sled trailing behind on its cables.`,
@@ -203,7 +203,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-17',
-		title: `Podracer · desert run`,
+		title: `Twin-engine racer · desert run`,
 		year: '2014',
 		category: '3D',
 		description: `Wide shot across the dunes. The vehicle sits small in frame on purpose: the landscape is the speed.`,
@@ -212,7 +212,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-01',
-		title: `Podracer · coupling`,
+		title: `Twin-engine racer · coupling`,
 		year: '2014',
 		category: '3D',
 		description: `The energy tether between the two engines, which is what makes the whole rig read as one machine.`,
@@ -221,7 +221,7 @@ export const craftItems: CraftItem[] = [
 	},
 	{
 		slug: '3d-14',
-		title: `Podracer · head on`,
+		title: `Twin-engine racer · head on`,
 		year: '2014',
 		category: '3D',
 		description: `Straight down the line at full tilt, motion blur pulled through the background to a low sun.`,

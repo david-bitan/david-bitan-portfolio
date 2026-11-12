@@ -75,7 +75,7 @@ The report builds itself: money in and out, spending by category and month by mo
 			title: 'The AI picks the screen, the code computes the numbers',
 			lead: 'Facet uses an open model (Llama 3.3 on Cloudflare Workers AI) for two narrow jobs: sorting merchant names it does not recognise, and turning a question into a description of the screen that answers it (which blocks, which period, which filters). The model never sees an amount and never writes one. Every number is computed in the browser from the lines of the file, so an answer can always be traced back to its source.',
 			tryUrl: '/demo/facet/',
-			tryLabel: 'Try it with a sample statement',
+			tryLabel: 'Try a sample statement',
 			states: ['Excel, CSV, PDF, Word or text, several files at once', 'Column check when a table is unclear', 'Merchants sorted by the AI, shown for review', 'Lines left to check, fixed in one tap', 'Report: overview, where the money goes, worth knowing, regular payments', 'Question answered in one sentence plus charts', 'Lines behind any figure, with search and sort', 'Filters for period, categories and amount', 'Free AI used up: simpler reader, figures still exact', 'Dark and light themes, seven languages, Hebrew in RTL'],
 			decisions: [
 				{ title: 'No figure from the model', body: 'The AI only describes the screen: blocks, periods, filters. The page drops anything it does not understand and computes every total itself, so the model cannot invent an amount, even when it misreads the question.' },
@@ -169,7 +169,7 @@ The hard part of an AI reader is trust, so the design is built around one rule: 
 			title: 'Every answer points to its source',
 			lead: 'Margin sends the relevant passages of the document to an open model (Llama 3.3 on Cloudflare Workers AI) and asks for short points, each one tied to the passages it comes from. The interface then checks every point against those passages before showing it. The reader never has to take the AI’s word for it: one tap shows the original text.',
 			tryUrl: '/demo/margin/?sample=1',
-			tryLabel: 'Try it on a sample contract',
+			tryLabel: 'Try a sample contract',
 			states: ['PDF and Word files, a link or pasted text', 'Several files, one report section each', 'Report in five groups: in short, in your favour, against you, watch out, key numbers', 'Where it says it: the passage highlighted on its page', 'Points removed when no source or a wrong number', 'Questions about the document, with sources', 'Not in the document: says so instead of guessing', 'Suggested questions', 'Listen and copy', 'Machine translation of a passage, the original stays the reference', 'Numbers written the local way (68 000 € in French)', 'Daily free AI allowance shown, with reset time', 'Allowance used up: a clear message, nothing lost', 'AI offline or slow: retry without losing the files', 'Sign in or create a demo account', 'My analyses: saved, reopened read-only, deleted with undo', 'Sign out with undo', 'Ten languages from one menu, Hebrew in RTL'],
 			decisions: [
 				{ title: 'No source, no point', body: 'Every point must cite a passage that was sent, and every number in it must appear in that passage. A point that fails either test is removed before it reaches the screen, and the report says how many were removed.' },

@@ -38,7 +38,7 @@ function isActive(href: string) {
 				links.map((link) => {
 					const active = isActive(link.href);
 					const cls = active
-						? 'nav-link nav-link-active text-sm font-semibold text-accent'
+						? 'nav-link nav-link-active text-sm font-semibold text-accent-text'
 						: 'nav-link text-sm font-medium text-muted hover:text-ink transition-colors';
 					const dataSpy = link.spy ? { 'data-spy': link.spy } : {};
 					return active ? (
@@ -106,7 +106,7 @@ function isActive(href: string) {
 		links.map((link) => {
 			const active = isActive(link.href);
 			const cls = active
-				? 'mobile-nav-link nav-link-active text-3xl font-semibold text-accent'
+				? 'mobile-nav-link nav-link-active text-3xl font-semibold text-accent-text'
 				: 'mobile-nav-link text-3xl font-semibold';
 			const dataSpy = link.spy ? { 'data-spy-mobile': link.spy } : {};
 			return active ? (
@@ -160,7 +160,7 @@ function isActive(href: string) {
 	   /contact) and <a> promoted by the scroll spy on the home page. */
 	.nav-link-active {
 		position: relative;
-		color: var(--color-accent) !important;
+		color: var(--color-accent-text) !important;
 		cursor: default;
 		pointer-events: none;
 	}
@@ -282,10 +282,10 @@ function isActive(href: string) {
 		function applyActive(el, active) {
 			if (!el) return;
 			if (active) {
-				el.classList.add('nav-link-active', 'text-accent', 'font-semibold');
+				el.classList.add('nav-link-active', 'text-accent-text', 'font-semibold');
 				el.classList.remove('text-muted', 'hover:text-ink', 'transition-colors', 'font-medium');
 			} else {
-				el.classList.remove('nav-link-active', 'text-accent');
+				el.classList.remove('nav-link-active', 'text-accent-text');
 				// Desktop-only default classes — mobile links stay font-semibold.
 				if (el.classList.contains('nav-link')) {
 					el.classList.add('text-muted', 'hover:text-ink', 'transition-colors', 'font-medium');

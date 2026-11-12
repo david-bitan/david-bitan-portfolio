@@ -4,9 +4,8 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 
 const email = 'advance26@gmail.com';
-const phone = '+972 54-924-8520';
-const linkedinUrl = 'https://www.linkedin.com/in/david-bitan-81a12552/';
-const city = 'Israel · Open to remote / hybrid';
+const linkedinUrl = 'https://www.linkedin.com/in/david-bitan';
+const city = 'Tel Aviv–Ashkelon area · Hybrid or remote';
 
 // Read at build time (env is only available in the Astro frontmatter, not in
 // client-side <script>). Injected into the client script via define:vars so
@@ -21,19 +20,26 @@ const defaultNote = hasFormspree
 
 <Layout
 	title="Contact · David Bitan"
-	description="Get in touch: reach out about product design, SaaS, UI/UX, brand systems or a freelance collaboration."
+	description="Hiring a senior product designer? David Bitan is available now for senior and lead product design roles, hybrid in the Tel Aviv–Ashkelon area or remote."
 >
 	<Nav />
 
 	<section class="mx-auto max-w-[1200px] px-6 pt-16 pb-24 sm:pt-20 lg:px-0" data-reveal>
 		<p class="text-sm font-semibold uppercase tracking-widest text-muted">Contact</p>
-		<h1 class="mt-4 max-w-2xl text-4xl font-extrabold tracking-tight sm:text-5xl">Let's build something.</h1>
+		<h1 class="mt-4 max-w-2xl text-4xl font-extrabold tracking-tight sm:text-5xl">Hiring a senior product designer?</h1>
 		<p class="mt-6 max-w-xl text-lg text-muted">
-			Tell me about your project: I'll get back to you at {email}.
+			I'm available now for senior and lead product design roles: hybrid in the Tel Aviv–Ashkelon
+			area, or remote. Send me a note and I'll reply within 24 hours.
 		</p>
 
 		<div class="mt-14 grid grid-cols-1 gap-16 lg:grid-cols-[1fr_320px]">
 			<form id="contact-form" class="flex flex-col gap-6" novalidate>
+				<!-- Honeypot: hidden from people and assistive tech, bots fill it and
+				     Formspree drops the submission (_gotcha is Formspree's own field). -->
+				<div class="hidden" aria-hidden="true">
+					<label for="_gotcha">Leave this field empty</label>
+					<input id="_gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
+				</div>
 				<div>
 					<label for="name" class="block text-sm font-semibold">Name</label>
 					<input
@@ -67,35 +73,29 @@ const defaultNote = hasFormspree
 					></textarea>
 				</div>
 
-				<div class="flex items-center gap-4">
+				<div class="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
 					<button
 						id="submit-btn"
 						type="submit"
-						class="rounded-pill bg-accent px-7 py-3.5 text-sm font-semibold text-accent-ink hover:bg-ink transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+						class="shrink-0 whitespace-nowrap rounded-pill bg-accent px-7 py-3.5 text-sm font-semibold text-accent-ink hover:bg-ink hover:text-bg transition-colors disabled:opacity-60 disabled:cursor-wait"
 					>
 						Send message
 					</button>
-					<p id="form-note" class="text-sm text-muted">{defaultNote}</p>
+					<p id="form-note" class="text-sm text-muted" role="status" aria-live="polite">{defaultNote}</p>
 				</div>
 			</form>
 
 			<div class="flex flex-col gap-8">
 				<div>
 					<p class="text-sm font-semibold uppercase tracking-widest text-muted">Email</p>
-					<a href={`mailto:${email}`} class="mt-2 block font-semibold text-accent hover:underline">
+					<a href={`mailto:${email}`} class="mt-2 block font-semibold text-accent-text hover:underline">
 						{email}
 					</a>
 				</div>
 				<div>
-					<p class="text-sm font-semibold uppercase tracking-widest text-muted">Phone</p>
-					<a href={`tel:+${phone.replace(/\D/g, '')}`} class="mt-2 block font-semibold text-accent hover:underline">
-						{phone}
-					</a>
-				</div>
-				<div>
 					<p class="text-sm font-semibold uppercase tracking-widest text-muted">LinkedIn</p>
-					<a href={linkedinUrl} target="_blank" rel="noopener" class="mt-2 block font-semibold text-accent hover:underline">
-						david-bitan-81a12552
+					<a href={linkedinUrl} target="_blank" rel="noopener" class="mt-2 block font-semibold text-accent-text hover:underline">
+						in/david-bitan
 					</a>
 				</div>
 				<div>
@@ -106,7 +106,7 @@ const defaultNote = hasFormspree
 		</div>
 	</section>
 
-	<Footer />
+	<Footer hideCta />
 </Layout>
 
 <script define:vars={{ email, formspreeId }}>
@@ -117,11 +117,11 @@ const defaultNote = hasFormspree
 	// Keep the original class strings so we can restore them after showing a
 	// transient status ("Sending…", success, error) without wiping the note's
 	// layout. `text-muted` is the resting style used at load; success uses
-	// `text-accent`; error uses a red utility already available in globals.
+	// `text-accent-text`; error uses a red utility already available in globals.
 	const NOTE_CLASSES = {
 		idle: 'text-sm text-muted',
 		sending: 'text-sm text-muted',
-		success: 'text-sm text-accent',
+		success: 'text-sm text-accent-text',
 		error: 'text-sm text-[#c1121f]',
 	};
 
@@ -147,13 +147,26 @@ const defaultNote = hasFormspree
 		event.preventDefault();
 		const data = new FormData(form);
 
+		// novalidate keeps the browser bubbles out (they don't match the site),
+		// so check the three fields here and focus the first one that's wrong.
+		const fields = ['name', 'email', 'message'].map((id) => document.getElementById(id));
+		const bad = fields.find((el) => !el.value.trim() || (el.type === 'email' && !el.checkValidity()));
+		fields.forEach((el) => el.setAttribute('aria-invalid', String(el === bad)));
+		if (bad) {
+			const label = bad.id === 'email' && bad.value.trim() ? 'a valid email address' : `your ${bad.id}`;
+			setNote('error', `Please add ${label}.`);
+			bad.focus();
+			return;
+		}
+
 		if (!formspreeId) {
 			fallbackMailto(data);
 			return;
 		}
 
 		submitBtn?.setAttribute('disabled', 'true');
-		setNote('sending', 'Sending…');
+		if (submitBtn) submitBtn.textContent = 'Sending…';
+		setNote('sending', 'Sending your message…');
 
 		try {
 			const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
@@ -164,21 +177,22 @@ const defaultNote = hasFormspree
 
 			if (res.ok) {
 				form.reset();
-				setNote('success', "Thanks, I'll get back to you shortly.");
+				setNote('success', "Thanks, your message is on its way. I'll reply within 24 hours.");
 			} else {
 				// Formspree returns JSON with a helpful `errors` array on 4xx
 				// (missing field, spam trap, etc.). We surface a generic message
 				// but keep the raw response in the console for debugging.
 				const payload = await res.json().catch(() => null);
 				console.error('Formspree responded with', res.status, payload);
-				setNote('error', 'Send failed. Please email me directly.');
+				setNote('error', `Sending failed. Please email me at ${email}.`);
 			}
 		} catch (err) {
 			// Network error, ad-blocker on the Formspree domain, etc.
 			console.error('Contact form fetch failed', err);
-			setNote('error', 'Network error. Please email me directly.');
+			setNote('error', `Network error. Please email me at ${email}.`);
 		} finally {
 			submitBtn?.removeAttribute('disabled');
+			if (submitBtn) submitBtn.textContent = 'Send message';
 		}
 	});
 </script>

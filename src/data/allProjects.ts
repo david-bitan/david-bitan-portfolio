@@ -25,6 +25,11 @@ export interface FullProject {
 	fullDesc: string;
 	/** Structured case study — preferred over `fullDesc` when present. */
 	sections?: Section[];
+	/** "Scope & outcome": short, verifiable facts on size and delivery
+	 * (surfaces, breakpoints, timelines, migrations). No business KPIs: that
+	 * data is confidential, and nothing here may be invented (2026-11-12
+	 * brief). Shown open, above the collapsed case study. */
+	scope?: string[];
 	/** Optional CTA to the live product. Rendered as a button after the
 	 * case study body. */
 	liveUrl?: string;
@@ -38,6 +43,10 @@ export interface FullProject {
 	 * `groupImagesByZone` in src/lib/zones.ts. */
 	imageDeviceOverrides?: Record<string, 'desktop' | 'mobile'>;
 	thumbnail: string;
+	/** Optional ready-made card cover (full Cloudinary URL with its own
+	 * transforms, e.g. a desktop shot with the mobile view overlaid). Used
+	 * as-is by ProjectCard instead of the cropped `thumbnail`. */
+	cardThumb?: string;
 	gallery: string[];
 	tags: string[];
 	featured: boolean;
@@ -55,10 +64,17 @@ export const allProjects: FullProject[] = [
 		year: '2025',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Sole-designed a SaaS to track software subscriptions: full dark/light design system, 96+ shipped frames, AI-powered flows.`,
-		fullDesc: `Sole-designed a SaaS to track software subscriptions: full dark/light design system, 2,000+ frames, AI chat bot for natural-language queries. See structured case study below.`,
+		shortDesc: `A SaaS to track software subscriptions: dark and light design system, AI chat for natural-language queries, 96 shipped screens from a 2,000+ frame Figma project.`,
+		fullDesc: `Sole-designed a SaaS to track software subscriptions: full dark/light design system, 96 shipped screens from a 2,000+ frame Figma project, AI chat bot for natural-language queries. See structured case study below.`,
 		liveUrl: 'https://sonary.com',
 		liveUrlNote: `Note: to reach the actual dashboard, click 'Login/Sign up' at the top right. Alternatively, 'Get started' leads to a landing page with a Sign up button.`,
+		scope: [
+			`6 core surfaces, including an AI chat for natural-language queries`,
+			`96 shipped screens, from a 2,000+ frame Figma project`,
+			`5 breakpoints`,
+			`Full visual redesign delivered in 9 working days`,
+			`Light and dark modes`,
+		],
 		sections: [
 			{
 				heading: 'Context',
@@ -213,9 +229,15 @@ Building on top of the Sonary Website design system, itself mature after six yea
 		year: '2019 – 2026',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Sole designer since 2019 on Sonary's SaaS comparison platform: 37 verticals, ~3,000 CMS pages, three major redesigns.`,
+		shortDesc: `Three major redesigns of Sonary's SaaS comparison platform since 2019: 37 verticals, ~3,000 CMS pages, WordPress to Webflow migration.`,
 		fullDesc: `Sole designer on Sonary's SaaS comparison and review platform since 2019. Design system that later seeded the Sonary Dashboard product. See structured case study below.`,
 		liveUrl: 'https://sonary.com',
+		scope: [
+			`3 major redesigns since 2019`,
+			`37 software categories, ~3,000 CMS pages`,
+			`5 breakpoints`,
+			`WordPress to Webflow migration on the latest redesign`,
+		],
 		sections: [
 			{
 				heading: 'Context',
@@ -292,9 +314,15 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 		year: '2020 – 2026',
 		category: 'SaaS',
 		categories: ['SaaS', 'B2B', 'UI/UX'],
-		shortDesc: `Sole designer on a family of ~37 vertical comparison sites (mattresses, POS, merchant services, dating…) powered by a single parametric Figma design system.`,
+		shortDesc: `One parametric Figma design system powering ~37 vertical comparison sites, from mattresses and POS providers to dating.`,
 		fullDesc: `Sole designer on Top5 since 2020: a family of ~37 vertical comparison sites all powered by one parametric Figma design system (smart components that inherit color tokens from their parent frame). See structured case study below.`,
 		liveUrl: 'https://top5-mattresses.com',
+		scope: [
+			`One parametric Figma system serving ~37 comparison sites`,
+			`Shared templates from homepage to review and lineup pages`,
+			`5 breakpoints`,
+			`WordPress to Webflow migration, with the design system rebuilt in Webflow`,
+		],
 		sections: [
 			{
 				heading: 'Context',
@@ -350,9 +378,15 @@ Addressed through a parametric design system in Figma: each smart component read
 		year: '2026',
 		category: 'Branding',
 		categories: ['Branding', 'UI/UX'],
-		shortDesc: `Sole designer on the third full redesign of Ryze Beyond's marketing website (2026). Abstract-illustration design system built from scratch.`,
+		shortDesc: `The third full redesign of Ryze Beyond's marketing website, delivered in 2026, with an abstract-illustration design system built from scratch.`,
 		fullDesc: `Sole designer on the 2026 redesign of ryzebeyond.com: the marketing website for the company behind Sonary Dashboard, Sonary Website, Top5, Playright and other products. Third full redesign of the site; ~2 months of work with an abstract-illustration design system built from scratch. See structured case study below.`,
 		liveUrl: 'https://ryzebeyond.com/',
+		scope: [
+			`Full marketing website, delivered in 2026`,
+			`About two months from research to design QA`,
+			`Design system and illustration system built for the project`,
+			`5 breakpoints, light and dark modes`,
+		],
 		sections: [
 			{
 				heading: 'Context',
@@ -432,8 +466,14 @@ The solution: a system of abstract illustrations (colored geometric shapes, text
 		year: '2025',
 		category: 'Branding',
 		categories: ['Branding', 'UI/UX'],
-		shortDesc: `Sole-designed internal portal for Ryze Beyond employees: brand assets, product info and quick access in one place. Personal initiative from concept to full design system.`,
+		shortDesc: `Ryze Beyond's internal employee portal, a personal initiative: brand assets, product info and quick access in one place, from concept to full design system.`,
 		fullDesc: `Sole designer on Ryze Hub: an internal employee portal I proposed and led end-to-end (2025). Concept, structure, dedicated design system, and templates. Delivered at full design level; production paused with an internal roadmap change. See structured case study below.`,
+		scope: [
+			`Proposed internally, then led end to end`,
+			`Brand center, product sections and quick access in one portal`,
+			`5 breakpoints, light and dark modes`,
+			`Delivered at full design level; production paused by a roadmap change`,
+		],
 		sections: [
 			{
 				heading: 'Context',
@@ -461,6 +501,7 @@ The solution: a system of abstract illustrations (colored geometric shapes, text
 			},
 		],
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342009/portfolio/ryze-hub/desktop/company-hub---home-page---step-01.webp',
+		cardThumb: 'https://res.cloudinary.com/akael/image/upload/c_fill,ar_4:3,g_north,w_1200/l_portfolio:ryze-hub:mobile:company-hub---innerpage---step-04,c_fill,ar_9:18,g_north,w_280,r_28,bo_8px_solid_rgb:3a3a3a/fl_layer_apply,g_south_east,x_56,y_48/q_auto,f_auto/v1785342014/portfolio/ryze-hub/desktop/company-hub---innerpage---step-04.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785342009/portfolio/ryze-hub/desktop/company-hub---home-page---step-01.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342011/portfolio/ryze-hub/desktop/company-hub---home-page---step-02.webp',
@@ -479,8 +520,14 @@ The solution: a system of abstract illustrations (colored geometric shapes, text
 		year: '2025',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Sole designer on a modular master email template for the Sonary ecosystem: 600/375 breakpoints, dark-mode aware, on-brand.`,
+		shortDesc: `A modular master email template for the Sonary ecosystem: 600 and 375 px breakpoints, dark-mode aware, on brand.`,
 		fullDesc: `Sole designer on the Sonary email marketing and newsletter template system (2025). Built on the existing Sonary design system tokens; a master template spinning off into multiple campaign variants. See structured case study below.`,
+		scope: [
+			`One master template for newsletters, campaigns, alerts and digests`,
+			`2 breakpoints (600 and 375 px)`,
+			`Light and dark modes`,
+			`Developer handoff`,
+		],
 		sections: [
 			{
 				heading: 'Context',
@@ -510,6 +557,7 @@ Addressed through a master template with two strict breakpoints (Desktop 600, Mo
 			},
 		],
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342153/portfolio/sonary-mailer/desktop/mailer-1-desktop.webp',
+		cardThumb: 'https://res.cloudinary.com/akael/image/upload/c_fill,ar_4:3,g_north,w_1200/l_portfolio:sonary-mailer:mobile:mailer-4-mobile,c_fill,ar_9:18,g_north,w_280,r_28,bo_8px_solid_rgb:d9d9d9/fl_layer_apply,g_south_east,x_56,y_48/q_auto,f_auto/v1785342157/portfolio/sonary-mailer/desktop/mailer-4-desktop.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785342153/portfolio/sonary-mailer/desktop/mailer-1-desktop.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342154/portfolio/sonary-mailer/desktop/mailer-2-desktop.webp',
@@ -529,12 +577,18 @@ Addressed through a master template with two strict breakpoints (Desktop 600, Mo
 		title: `Playright`,
 		client: `Ryze Beyond`,
 		year: '2019 – 2026',
-		category: 'Gaming',
-		categories: ['Gaming', 'UI/UX'],
-		shortDesc: `Sole designer on Playright since 2019: UK online casino comparison platform. Initial 4-month delivery, then years of continuous design iteration. Full redesign underway.`,
-		fullDesc: `Sole designer on Playright since 2019: Ryze Beyond's UK online casino comparison platform. Initial delivery in ~4 months (2019-2020), then continuous design iteration over the following years, with a full redesign currently underway. See structured case study below.`,
+		category: 'iGaming',
+		categories: ['iGaming', 'UI/UX'],
+		shortDesc: `A UK online casino comparison platform: first release in about four months, then years of continuous design iteration under UKGC rules.`,
+		fullDesc: `Sole designer on Playright since 2019: Ryze Beyond's UK online casino comparison platform. Initial delivery in ~4 months (2019-2020), then continuous design iteration over the following years. See structured case study below.`,
 		liveUrl: 'https://playright.co.uk/casino/reviews/',
 		liveUrlNote: `Note: the site is geo-restricted to the UK. A VPN is required to view it from outside.`,
+		scope: [
+			`First release in about four months (2019–2020)`,
+			`Iterations across dozens of pages since then`,
+			`From 3 to 5 breakpoints`,
+			`UKGC responsible-gambling requirements built in`,
+		],
 		sections: [
 			{
 				heading: 'Context',
@@ -556,7 +610,7 @@ The project also held a particular status in the Ryze roadmap: design often ran 
 			},
 			{
 				heading: 'Deliverables',
-				body: `Initial 2019-2020 delivery (~4 months): homepage, review page, comparison, lineup, category pages, casino profile, article. Since then: iterations across dozens of pages, section redesigns, retroactive design system, new verticals and payment methods. Three breakpoints originally requested (Desktop, Mobile, Tablet portrait); now expanded to five for the ongoing full redesign (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress CMS throughout; the current redesign's stack is not yet finalized. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO. A full site redesign is currently underway.`,
+				body: `Initial 2019-2020 delivery (~4 months): homepage, review page, comparison, lineup, category pages, casino profile, article. Since then: iterations across dozens of pages, section redesigns, retroactive design system, new verticals and payment methods. Three breakpoints originally requested (Desktop, Mobile, Tablet portrait); later expanded to five (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress CMS throughout. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
 			},
 			{
 				heading: 'What I took from it',
@@ -573,7 +627,7 @@ The project also held a particular status in the Ryze roadmap: design often ran 
 			'https://res.cloudinary.com/akael/image/upload/v1785342000/portfolio/playright/prodlist/mobile---375px---container-343px.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342002/portfolio/playright/prodlist/tablet---768px---container-720px.webp',
 		],
-		tags: ['Gaming', 'Casino Comparison', 'UX'],
+		tags: ['iGaming', 'Casino Comparison', 'UX'],
 		featured: false,
 		orientation: 'portrait',
 	},
@@ -649,12 +703,12 @@ The captures below gather a selection of 13 pieces of work from that period.`,
 	},
 	{
 		slug: 'gamingtech',
-		title: `Gamingtech · Casino & Sport Betting Platforms`,
+		title: `Gamingtech · Casino & Sports Betting Platforms`,
 		client: `Gamingtech`,
 		year: '2015 – 2017',
-		category: 'Gaming',
-		shortDesc: `Sole designer on Gamingtech's three brands (10Bet, Real Deal Bet, Bet Rally), each running a casino and a sport betting vertical, for about 2.5 years.`,
-		fullDesc: `Selection of work produced at Gamingtech between 2015 and 2017 (about two and a half years). Sole designer on the three brands operated by the company: 10Bet, Real Deal Bet and Bet Rally. Each brand ran two operational verticals (a casino and a sport betting site) for a total of six sites evolving in parallel.
+		category: 'iGaming',
+		shortDesc: `Sole designer on Gamingtech's three brands (10Bet, Real Deal Bet, Bet Rally), each running a casino and a sports betting vertical, for about 2.5 years.`,
+		fullDesc: `Selection of work produced at Gamingtech between 2015 and 2017 (about two and a half years). Sole designer on the three brands operated by the company: 10Bet, Real Deal Bet and Bet Rally. Each brand ran two operational verticals (a casino and a sports betting site) for a total of six sites evolving in parallel.
 
 Deliverables covered game lobbies, bonus systems, deposit funnels, promotional banners in large volume, mobile and desktop interfaces, as well as animations produced as videos and Flash (SWF) files for dynamic elements.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785345993/portfolio/old-wix/casino/casino-12.webp',
@@ -705,7 +759,7 @@ Deliverables covered game lobbies, bonus systems, deposit funnels, promotional b
 			'https://res.cloudinary.com/akael/image/upload/v1785346066/portfolio/old-wix/sport-betting/sport-betting-14.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785346068/portfolio/old-wix/sport-betting/sport-betting-15.webp',
 		],
-		tags: ['Gaming', 'Casino', 'Sport Betting', 'Banners', 'Flash'],
+		tags: ['iGaming', 'Casino', 'Sports Betting', 'Banners', 'Flash'],
 		featured: false,
 		orientation: 'landscape',
 	},
@@ -714,7 +768,7 @@ Deliverables covered game lobbies, bonus systems, deposit funnels, promotional b
 		title: `Tradologic · Casino Platforms`,
 		client: `Tradologic`,
 		year: '2011 – 2013',
-		category: 'Gaming',
+		category: 'iGaming',
 		shortDesc: `Casino platform work at Tradologic (2011-2013, ~1.5-2 years): white-label backend for Crown Europe, City Club Casino, City Tower Casino and other operators.`,
 		fullDesc: `Selection of work produced at Tradologic between 2011 and 2013 (about a year and a half to two years), within a team of several designers. Tradologic supplied white-label casino platforms to multiple operators: notably Crown Europe, City Club Casino and City Tower Casino, whose captures appear in this selection.
 
@@ -728,7 +782,7 @@ My work quickly took on the most visible projects. Deliverables covered game lob
 			'https://res.cloudinary.com/akael/image/upload/v1785346028/portfolio/old-wix/casino/casino-33.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785346031/portfolio/old-wix/casino/casino-35.webp',
 		],
-		tags: ['Gaming', 'Casino', 'White-label', 'Banners', 'Flash'],
+		tags: ['iGaming', 'Casino', 'White-label', 'Banners', 'Flash'],
 		featured: false,
 		orientation: 'landscape',
 	},

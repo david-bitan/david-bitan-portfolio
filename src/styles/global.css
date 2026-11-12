@@ -6,8 +6,13 @@
   --color-ink: #0a0a0a;
   --color-muted: #4b5563;
   --color-card: #ffffff;
+  /* Bright brand orange for surfaces (buttons, pills, big headlines) with
+     dark labels on it (5.2:1). Small orange text uses the deeper
+     accent-text so links and captions pass WCAG AA (4.7:1 on the page);
+     #F25C24 as small text only reaches 3.0:1. 2026-11-12 quality pass. */
   --color-accent: #f25c24;
-  --color-accent-ink: #ffffff;
+  --color-accent-ink: #1c1b1a;
+  --color-accent-text: #c2410c;
 
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 
@@ -22,14 +27,35 @@
 }
 
 /* Dark mode: same warm-charcoal family as the footer, not navy/cold gray.
-   Accent orange is deliberately not overridden — it stays #F25C24 in both
-   modes. Toggled via [data-theme] on <html>, set by the script in
+   Accent: bright #F25C24 surfaces with dark labels; small text #C2410C (light) / #F6703C (dark). Toggled via [data-theme] on <html>, set by the script in
    Layout.astro (localStorage-persisted, light by default — no OS detection). */
 :root[data-theme='dark'] {
   --color-bg: #262624;
   --color-ink: #f5f4f0;
   --color-muted: #9c9a95;
   --color-card: #30302e;
+  /* Slightly lighter orange in dark mode: passes AA on the page (5.3:1) and
+     on cards (4.6:1), where #F25C24 fell to 4.0:1. White text on orange
+     fails here, so buttons switch to dark text (6.0:1). */
+  --color-accent: #f6703c;
+  --color-accent-ink: #1c1b1a;
+  --color-accent-text: #f6703c;
+}
+
+/* The footer is always dark, so it keeps the bright orange in both themes. */
+footer {
+  --color-accent: #f25c24;
+  --color-accent-text: #f25c24;
+}
+
+/* No single word alone on the last line (David's rule). CSS first; the small
+   script in Layout.astro glues the last two words for browsers without
+   text-wrap: pretty. */
+p, li, figcaption, blockquote {
+  text-wrap: pretty;
+}
+h1, h2, h3, h4 {
+  text-wrap: balance;
 }
 
 html {

@@ -60,7 +60,7 @@ const projectJsonLd: Record<string, unknown> = {
 	<Nav />
 
 	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 lg:px-0" data-reveal>
-		<a href="/#work" class="text-sm font-semibold text-accent hover:underline">← Back to work</a>
+		<a href="/#work" class="text-sm font-semibold text-accent-text hover:underline">← Back to work</a>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">{project.category}</p>
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">{project.title}</h1>
@@ -71,13 +71,25 @@ const projectJsonLd: Record<string, unknown> = {
 			<span><span class="font-semibold text-ink">Year</span> · {project.year}</span>
 		</div>
 
-		<div class="mt-6 flex flex-wrap gap-2">
-			{
-				project.tags.map((tag) => (
-					<span class="rounded-pill bg-card px-3 py-1 text-xs font-medium text-muted">{tag}</span>
-				))
-			}
-		</div>
+		{/* Tags as plain text with separators: they aren't clickable, so they
+		    must not look like pills or buttons (David's rule). */}
+		<p class="mt-4 text-sm text-muted">{project.tags.join(' · ')}</p>
+
+		{project.scope && (
+			<section class="mt-8 max-w-3xl" aria-labelledby="scope-heading">
+				<h2 id="scope-heading" class="text-sm font-semibold uppercase tracking-widest text-muted">Scope &amp; outcome</h2>
+				{/* Plain text with markers, never pills: these are facts to read,
+				    not filters to click. */}
+				<ul class="mt-3 grid grid-cols-1 gap-x-8 gap-y-2 sm:grid-cols-2">
+					{project.scope.map((item) => (
+						<li class="flex items-start gap-3 text-ink">
+							<span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+							<span>{item}</span>
+						</li>
+					))}
+				</ul>
+			</section>
+		)}
 
 		{
 			/* Rich case study: kept collapsed by default so mockup images can
@@ -90,6 +102,7 @@ const projectJsonLd: Record<string, unknown> = {
 						id="case-study-body"
 						class="case-study-body"
 						aria-hidden="true"
+						inert
 					>
 						{project.sections.map((section) => (
 							<section class="mt-10 first:mt-0">
@@ -112,7 +125,7 @@ const projectJsonLd: Record<string, unknown> = {
 									href={project.liveUrl}
 									target="_blank"
 									rel="noopener"
-									class="inline-flex items-center gap-2 rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-colors hover:bg-ink"
+									class="inline-flex items-center gap-2 rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-colors hover:bg-ink hover:text-bg"
 								>
 									Visit live site
 									<svg
@@ -139,7 +152,7 @@ const projectJsonLd: Record<string, unknown> = {
 						id="case-study-toggle"
 						aria-controls="case-study-body"
 						aria-expanded="false"
-						class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
+						class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-accent-text hover:underline"
 					>
 						<span data-toggle-label>Read the full case study</span>
 						<svg
@@ -202,6 +215,7 @@ const projectJsonLd: Record<string, unknown> = {
 			function setExpanded(next) {
 				btn.setAttribute('aria-expanded', String(next));
 				body.setAttribute('aria-hidden', String(!next));
+				body.toggleAttribute('inert', !next);
 
 				if (next) {
 					// Open: measured height, then release to `none` after
@@ -261,7 +275,7 @@ const projectJsonLd: Record<string, unknown> = {
 					class="mx-auto mt-12 max-w-[1200px] scroll-mt-32"
 					data-reveal
 				>
-					<header class="grid grid-cols-12 gap-8">
+					<header class="grid grid-cols-12 gap-y-3 sm:gap-8">
 						<h2 class="col-span-12 text-3xl font-extrabold tracking-tight text-ink sm:col-span-4 sm:text-4xl">
 							{zone.label}
 						</h2>

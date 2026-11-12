@@ -22,9 +22,12 @@ const cardCategories = (project.categories ?? [project.category]).join('|');
 >
 	<div class="aspect-[4/3] overflow-hidden">
 		<img
-			src={cld(project.thumbnail, LANDSCAPE)}
+			src={project.cardThumb ?? cld(project.thumbnail, LANDSCAPE)}
 			alt={project.title}
+			width="1200"
+			height="900"
 			loading="lazy"
+			decoding="async"
 			class="thumb-hover-zoom h-full w-full object-cover object-top"
 		/>
 	</div>

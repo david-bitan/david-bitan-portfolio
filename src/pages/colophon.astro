@@ -49,7 +49,8 @@ const palette = [
 	{ swatch: '#F3F4F6', name: 'Background', role: 'Near-white canvas: launchnow.design-inspired, easy on the eyes' },
 	{ swatch: '#0A0A0A', name: 'Ink', role: 'Body copy + headlines, high contrast on the light bg' },
 	{ swatch: '#4B5563', name: 'Muted', role: 'Secondary text, metadata, captions' },
-	{ swatch: '#F25C24', name: 'Accent', role: 'CTAs, links, active states, preserved in both light + dark' },
+	{ swatch: '#C2410C', name: 'Accent', role: 'CTAs, links, active states; deepened from #F25C24 so text passes WCAG AA' },
+	{ swatch: '#F6703C', name: 'Accent (dark)', role: 'Same role in dark mode, lightened to pass AA on charcoal' },
 	{ swatch: '#1C1B1A', name: 'Footer / Dark bg', role: 'Warm charcoal (Claude-interface family), not navy or pure black' },
 ];
 
@@ -92,7 +93,7 @@ const method = [
 	<Nav />
 
 	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 lg:px-0" data-reveal>
-		<a href="/about" class="text-sm font-semibold text-accent hover:underline">← Back to About</a>
+		<a href="/about" class="text-sm font-semibold text-accent-text hover:underline">← Back to About</a>
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">Colophon</p>
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
 			How this site was built.
@@ -183,7 +184,7 @@ const method = [
 
 		<div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
 			<div class="rounded-lg border border-ink/10 bg-card p-8">
-				<p class="text-sm font-semibold uppercase tracking-widest text-accent">Claude did</p>
+				<p class="text-sm font-semibold uppercase tracking-widest text-accent-text">Claude did</p>
 				<ul class="mt-5 flex flex-col gap-3">
 					{
 						claudeDid.map((line) => (
@@ -197,7 +198,7 @@ const method = [
 			</div>
 
 			<div class="rounded-lg border border-ink/10 bg-card p-8">
-				<p class="text-sm font-semibold uppercase tracking-widest text-accent">I did</p>
+				<p class="text-sm font-semibold uppercase tracking-widest text-accent-text">I did</p>
 				<ul class="mt-5 flex flex-col gap-3">
 					{
 						davidDid.map((line) => (
@@ -241,7 +242,7 @@ const method = [
 			</p>
 			<p>
 				If you want to see the same workflow applied to your product, that's exactly what
-				the <a href="/#work" class="text-accent hover:underline">Selected work</a> section
+				the <a href="/#work" class="text-accent-text hover:underline">Selected work</a> section
 				is about.
 			</p>
 		</div>

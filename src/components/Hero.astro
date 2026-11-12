@@ -6,32 +6,38 @@
 		Senior AI Product Designer
 	</p>
 
-	<h1 class="mt-4 max-w-4xl text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
-		Product designer shipping <span class="text-accent">AI-native</span> products.
+	<h1 class="mt-4 max-w-4xl text-[1.8rem] min-[374px]:text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+		Product designer shipping <span class="whitespace-nowrap"><span class="text-accent whitespace-nowrap">AI-native</span> products.</span>
 	</h1>
 
 	<p class="mt-4 max-w-xl text-lg text-muted">
-		Product interfaces across web, mobile, 3D, video and concept art, designed with an
-		AI-native workflow.
+		20+ years designing SaaS, fintech and gaming products, from user research to shipped
+		design systems, now with an <span class="whitespace-nowrap">AI-native</span> workflow.
 	</p>
 
-	<!-- Sits under the lead rather than in the button row: beside two pills and
-	     the .docx link it pushed that row well past the text column and made a
-	     single over-long line. inline-flex so the card hugs its content instead
-	     of stretching the full width. Previous version kept in
-	     archives/v188_2026-08-31_before-stagger-nthchild-and-x-size/Hero.astro. -->
-	<div class="mt-5 inline-flex items-center gap-3 rounded-md bg-card px-4 py-3">
-		<span class="text-xl">🏆</span>
-		<p class="text-sm font-medium text-muted">
-			<span class="font-semibold text-ink">12+ Cactus awards</span> in 5 years · Publicis Group team contributor
-		</p>
-	</div>
+	<!-- Availability sits right above the buttons so a recruiter reads status,
+	     then action. The Cactus badge moved out of the hero (still in Metrics
+	     and on About) per the 2026-11-12 recruiter brief. -->
+	<!-- DOM order reads naturally for screen readers. On phones the items are
+	     re-ordered so no separator dangles at a line end: "Available now ·
+	     Hybrid or remote" then the area on its own line. -->
+	<p class="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium text-ink">
+		<span class="order-1 inline-flex items-center gap-2">
+			<span class="size-2.5 shrink-0 rounded-full bg-[#187A4F]" aria-hidden="true"></span>
+			Available now
+		</span>
+		<span class="order-2 hidden text-muted sm:inline" aria-hidden="true">·</span>
+		<span class="order-6 whitespace-nowrap pl-[18px] sm:order-3 sm:pl-0">Tel Aviv–Ashkelon area</span>
+		<span class="order-3 text-muted sm:order-4" aria-hidden="true">·</span>
+		<span class="order-4 whitespace-nowrap sm:order-5">Hybrid or remote</span>
+		<span class="order-5 basis-full sm:hidden" aria-hidden="true"></span>
+	</p>
 
 	<div class="mt-7 flex flex-col gap-4 sm:flex-row sm:items-center">
 		<div class="flex flex-col gap-4 sm:flex-row">
 			<a
 				href="#work"
-				class="rounded-pill bg-accent px-7 py-3.5 text-center text-sm font-semibold text-accent-ink hover:bg-ink transition-colors"
+				class="rounded-pill bg-accent px-7 py-3.5 text-center text-sm font-semibold text-accent-ink hover:bg-ink hover:text-bg transition-colors"
 			>
 				See work
 			</a>
@@ -55,7 +61,7 @@
 			<a
 				href="/cv/CV-David-Bitan.docx"
 				download
-				class="font-semibold text-ink underline underline-offset-4 hover:text-accent transition-colors"
+				class="font-semibold text-ink underline underline-offset-4 hover:text-accent-text transition-colors"
 			>
 				or download .docx
 			</a>

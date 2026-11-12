@@ -11,7 +11,7 @@ const timeline = [
 		company: 'Ryze Beyond (formerly TrafficPoint)',
 		highlights: [
 			'Sole product designer on every company website and product, growing with the company from 32 to 110+ employees',
-			'Sonary Software Stack Manager (SaaS dashboard): sole designer from user interviews to shipped UI: 6 core surfaces including an AI chatbot for natural-language queries, dark and light modes, 2,000+ Figma frames, full visual redesign delivered in 9 working days',
+			'Sonary Software Stack Manager (SaaS dashboard): sole designer from user interviews to shipped UI: 6 core surfaces including an AI chatbot for natural-language queries, dark and light modes, 96 shipped screens from a 2,000+ frame Figma project, full visual redesign delivered in 9 working days',
 			'Sonary comparison platform: three major redesigns; design system behind ~3,000 CMS pages across 37 verticals, WordPress → Webflow migration',
 			'Top5: parametric Figma design system (variables, inherited color tokens) serving ~37 comparison sites from one component library',
 			'Playright (UK online casino comparison): initial site in ~4 months, then continuous iteration with UKGC responsible-gambling requirements built in',
@@ -125,9 +125,6 @@ const skillGroups = [
 		title: 'AI tools',
 		items: [
 			'Claude (Code, Artifacts, Skills, Cowork)',
-			'Claude ↔ VS Code integration',
-			'v0.dev by Vercel (learning)',
-			'Framer AI (explored)',
 			'AI Agents',
 			'ChatGPT',
 			'Gemini',
@@ -160,7 +157,7 @@ const skillGroups = [
 	},
 ];
 
-const linkedinUrl = 'https://www.linkedin.com/in/david-bitan-81a12552/';
+const linkedinUrl = 'https://www.linkedin.com/in/david-bitan';
 
 const languages = [
 	{ lang: 'French', level: 'Native' },
@@ -169,30 +166,44 @@ const languages = [
 ];
 ---
 
-<Layout title="About · David Bitan">
+<Layout
+	title="About · David Bitan"
+	description="Senior AI Product Designer with 20+ years across SaaS, fintech, iGaming and digital advertising. Experience, skills and tools, plus how this AI-native portfolio was built."
+>
 	<Nav />
 
 	<section class="mx-auto max-w-[1200px] px-6 pt-16 pb-10 sm:pt-20 lg:px-0" data-reveal>
 		<p class="text-sm font-semibold uppercase tracking-widest text-muted">About</p>
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
-			20+ years of product design craft, now AI-native.
+			20+ years of product design craft, now <span class="whitespace-nowrap">AI-native.</span>
 		</h1>
 		<p class="mt-6 max-w-2xl text-lg text-muted">
 			Senior AI Product Designer with 20+ years across SaaS, fintech, iGaming and digital advertising,
 			focused on AI-augmented product design and AI UX. Sole product designer at Ryze Beyond
 			(2019–2026): the AI-augmented workflow lets a single senior handle what used to take a full team.
 		</p>
-		<p class="mt-4 text-sm font-semibold text-muted">Open to remote / hybrid roles</p>
+		<p class="mt-4 text-sm font-semibold text-ink">Available now · <span class="whitespace-nowrap">Tel Aviv–Ashkelon area</span> · <span class="whitespace-nowrap">Hybrid or remote</span></p>
 		<div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold">
-			<a href={linkedinUrl} target="_blank" rel="noopener" class="text-accent hover:underline">LinkedIn ↗</a>
-			<a href="/cv/CV-David-Bitan.pdf" class="text-accent hover:underline">Download CV (PDF)</a>
-			<a href="/cv/CV-David-Bitan.docx" class="text-accent hover:underline">Download CV (DOCX)</a>
+			<a href={linkedinUrl} target="_blank" rel="noopener" class="text-accent-text hover:underline">LinkedIn ↗</a>
+			<a href="/cv/CV-David-Bitan.pdf" class="text-accent-text hover:underline">Download CV (PDF)</a>
+			<a href="/cv/CV-David-Bitan.docx" class="text-accent-text hover:underline">Download CV (DOCX)</a>
+		</div>
+	</section>
+
+	<section class="mx-auto max-w-[1200px] px-6 pt-6 lg:px-0" data-reveal>
+		<div class="max-w-2xl border-l-2 border-accent pl-6">
+			<p class="text-lg font-semibold">Mentor at heart.</p>
+			<p class="mt-2 text-muted">
+				At every company I've worked for, I onboarded and coached the designers who joined the
+				team: honest, encouraging design reviews, shared techniques and design-system practice.
+				One of them I mentored for more than four years.
+			</p>
 		</div>
 	</section>
 
 	<section class="mx-auto max-w-[1200px] px-6 py-16 lg:px-0" data-reveal>
 		<div class="rounded-lg border border-ink/10 bg-card p-8 sm:p-10">
-			<p class="text-sm font-semibold uppercase tracking-widest text-accent">How this site was built</p>
+			<p class="text-sm font-semibold uppercase tracking-widest text-accent-text">How this site was built</p>
 			<p class="mt-4 max-w-2xl text-lg">
 				This portfolio was designed and shipped in about two weeks of evening sessions,
 				in pair with Claude, Anthropic's AI. Design decisions, copy, and code all came
@@ -201,7 +212,7 @@ const languages = [
 			</p>
 			<a
 				href="/colophon"
-				class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
+				class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent-text hover:underline"
 			>
 				Read the full colophon
 				<svg
@@ -287,7 +298,7 @@ const languages = [
 				<div class="mt-6 flex flex-col gap-6">
 					<div>
 						<p class="font-semibold">
-							<span class="text-accent">🏆</span> Cactus Gold, Silver & Bronze
+							<span class="text-accent-text">🏆</span> Cactus Gold, Silver & Bronze
 						</p>
 						<p class="mt-1 text-muted">
 							Israel's top advertising awards, for Israeli campaigns. Team contributor on 12+ Cactus

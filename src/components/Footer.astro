@@ -1,24 +1,24 @@
 ---
+// hideCta: /contact already opens with its own headline, so the closing
+// "Let's build something." would repeat it there (2026-11-12 brief).
+const { hideCta = false } = Astro.props;
 const email = 'advance26@gmail.com';
-const phone = '+972 54-924-8520';
-const linkedinUrl = 'https://www.linkedin.com/in/david-bitan-81a12552/';
+const linkedinUrl = 'https://www.linkedin.com/in/david-bitan';
 const year = new Date().getFullYear();
 ---
 
-<footer class="bg-footer-bg px-6 py-24 text-center sm:py-32">
-	<h2 class="text-4xl font-extrabold tracking-tight text-footer-ink sm:text-6xl">Let's build something.</h2>
+<footer class:list={['bg-footer-bg px-6 text-center', hideCta ? 'py-14 sm:py-16' : 'py-24 sm:py-32']}>
+	{!hideCta && <h2 class="text-4xl font-extrabold tracking-tight text-footer-ink sm:text-6xl">Let's build something.</h2>}
 
-	{/* Mobile: stacks vertically (email / phone / location on their own
-		lines) so the phone number doesn't clip off-screen on 375px width.
+	{/* Mobile: stacks vertically (email / LinkedIn / location on their own
+		lines) so nothing clips off-screen on 375px width.
 		sm+ : single-line inline with `·` separators (previous behaviour). */}
 	<p class="mt-10 flex flex-col items-center gap-y-2 text-sm font-medium text-footer-muted sm:block">
-		<a href={`mailto:${email}`} class="text-accent hover:underline">{email}</a>
+		<a href={`mailto:${email}`} class="text-accent-text hover:underline">{email}</a>
 		<span class="mx-3 hidden sm:inline">·</span>
-		<a href={`tel:+${phone.replace(/\D/g, '')}`} class="text-accent hover:underline">{phone}</a>
+		<a href={linkedinUrl} target="_blank" rel="noopener" class="text-accent-text hover:underline">LinkedIn</a>
 		<span class="mx-3 hidden sm:inline">·</span>
-		<a href={linkedinUrl} target="_blank" rel="noopener" class="text-accent hover:underline">LinkedIn</a>
-		<span class="mx-3 hidden sm:inline">·</span>
-		<span class="text-footer-ink">Israel · Open to remote / hybrid</span>
+		<span class="text-footer-ink">Tel Aviv–Ashkelon area · Hybrid or remote</span>
 	</p>
 
 	<p class="mt-10 text-xs text-footer-muted">© {year} David Bitan. All rights reserved.</p>
@@ -27,6 +27,6 @@ const year = new Date().getFullYear();
 		Links to /colophon for the full breakdown. */}
 	<p class="mt-3 text-xs text-footer-muted">
 		Designed and built with Astro, Tailwind CSS, and Claude ·
-		<a href="/colophon" class="text-accent hover:underline">Colophon</a>
+		<a href="/colophon" class="text-accent-text underline underline-offset-2 hover:no-underline">Colophon</a>
 	</p>
 </footer>
