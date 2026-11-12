@@ -1,7 +1,8 @@
 ---
 /**
  * Top nav.
- * Five items: Work, AI Lab, Craft (home anchors), About, Contact (pages).
+ * Five items: Work, AI Lab (home anchors), Craft, About, Contact (pages).
+ * Craft is its own page since the home keeps it to one line (2026-11-12).
  *
  * Active state:
  *  - /about and /contact → server-side, rendered as <span aria-current="page">
@@ -13,7 +14,7 @@
 const links = [
 	{ href: '/#work', label: 'Work', spy: 'work' },
 	{ href: '/#ai-lab', label: 'AI Lab', spy: 'ai-lab' },
-	{ href: '/#craft', label: 'Craft', spy: 'craft' },
+	{ href: '/craft', label: 'Craft', spy: null },
 	{ href: '/about', label: 'About', spy: null },
 	{ href: '/contact', label: 'Contact', spy: null },
 ];
@@ -25,6 +26,7 @@ const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
 function isActive(href: string) {
 	if (href === '/about') return pathname === '/about';
 	if (href === '/contact') return pathname === '/contact';
+	if (href === '/craft') return pathname === '/craft';
 	return false;
 }
 ---
@@ -271,7 +273,7 @@ function isActive(href: string) {
 			spyLinks.set(id + ':all', bucket);
 		});
 
-		const sectionIds = ['work', 'ai-lab', 'craft'];
+		const sectionIds = ['work', 'ai-lab'];
 		const sections = sectionIds
 			.map((id) => ({ id, el: document.getElementById(id) }))
 			.filter((s) => s.el);

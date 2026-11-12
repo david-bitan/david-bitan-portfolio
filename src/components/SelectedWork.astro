@@ -10,7 +10,11 @@ import { allProjects } from '../data/allProjects';
 // "Selected work" = recent projects (Ryze Beyond era); older work sits in its
 // own block below (2026-11-12 recruiter brief). Same filter bar drives both.
 const EARLIER = ['ui-ux-vintage', 'branding-old', 'gamingtech', 'tradologic'];
-const recent = allProjects.filter((p) => !EARLIER.includes(p.slug));
+const RECENT = ['sonary-dashboard', 'top5', 'sonary-website', 'playright', 'ryze-brand', 'ryze-hub', 'sonary-mailer'];
+const recent = [
+	...RECENT.map((slug) => allProjects.find((p) => p.slug === slug)!).filter(Boolean),
+	...allProjects.filter((p) => !EARLIER.includes(p.slug) && !RECENT.includes(p.slug)),
+];
 const earlier = EARLIER.map((slug) => allProjects.find((p) => p.slug === slug)!).filter(Boolean);
 const workCategories = Array.from(
 	new Set(allProjects.flatMap((p) => p.categories ?? [p.category])),

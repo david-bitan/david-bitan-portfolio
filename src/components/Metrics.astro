@@ -1,13 +1,12 @@
 ---
-// `sub` is optional — shown below the label when present. Used for the
-// Cactus stat to make the team-contributor context explicit (honesty pass
-// 2026-08-06 — a Cactus is a team award, not a solo one).
+// Recent, verifiable figures only (2026-11-12): no years-of-experience
+// count (age bias) and the Cactus awards live on /about.
 type Metric = { value: string; label: string; sub?: string };
 
 const metrics: Metric[] = [
-	{ value: '20+', label: 'Years designing products' },
-	{ value: '6', label: 'Industries shipped in', sub: 'SaaS · gaming · fintech · ads · mobile · 3D' },
-	{ value: '12+', label: 'Cactus awards in 5 years', sub: 'Publicis Group · team contributor' },
+	{ value: '~37', label: 'Sites on one design system', sub: 'Top5 comparison family' },
+	{ value: '96', label: 'Screens shipped', sub: 'Sonary SaaS, from a 2,000+ frame Figma project' },
+	{ value: '4', label: 'AI products with live demos', sub: 'Facet · Margin · Otium · APEX Coach' },
 	{ value: '40+', label: 'Websites & products designed at Ryze Beyond', sub: 'Often as the only product designer (design team of 1 to 4, 2019–2026)' },
 ];
 ---

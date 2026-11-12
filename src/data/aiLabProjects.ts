@@ -64,7 +64,7 @@ export const aiLabProjects: AILabProject[] = [
 		subtitle: 'Drop a bank statement, see where your money goes, then ask anything.',
 		eyebrow: 'Personal finance · 2026',
 		shortDesc:
-			'A fictional money app: drop the statement your bank gives you (Excel, CSV, PDF or Word) and Facet reads it in your browser, sorts every line and builds the full analysis. Then you ask questions in plain words. Seven languages, Hebrew in RTL.',
+			'A money app: drop the statement your bank gives you (Excel, CSV, PDF or Word) and Facet reads it in your browser, sorts every line and builds the full analysis. Then you ask questions in plain words. Seven languages, Hebrew in RTL.',
 		intro: `Facet is a fictional personal finance app I designed and built end-to-end. It starts from a file almost everyone has and almost nobody reads: the statement your bank lets you download. Facet turns it into an answer to the question behind it, where does my money go?
 
 You drop the file, or several. Facet finds the dates, labels and amounts on its own, whatever the format: a French bank's CSV with semicolons and decimal commas, an Excel budget sheet, a PDF statement with debit and credit columns. When it is not sure how to read a table, it asks: a preview of the file with a choice above each column, and the number of lines found updating as you go. Every merchant is then sorted into a category, first with the categories written in the file, then with common words, and only then with the AI.
@@ -158,7 +158,7 @@ The report builds itself: money in and out, spending by category and month by mo
 		subtitle: 'An AI reader that explains any document and shows you where it says it.',
 		eyebrow: 'Documents · 2026',
 		shortDesc:
-			'A fictional AI reader for contracts, letters and terms of use. Drop a PDF or a Word file, paste a link or some text: Margin explains what matters in plain words and points to the exact passage behind every point. Ten languages, Hebrew in RTL.',
+			'An AI reader for contracts, letters and terms of use. Drop a PDF or a Word file, paste a link or some text: Margin explains what matters in plain words and points to the exact passage behind every point. Ten languages, Hebrew in RTL.',
 		intro: `Margin is a fictional AI reader I designed and built end-to-end. It starts from a moment everyone knows: a contract, a lawyer’s letter or a page of terms lands in front of you, and you sign or scroll past it without really knowing what you agreed to.
 
 Margin reads the document and answers the questions you would ask a friend who knows the subject: what is in my favour, what could work against me, what must I not miss, which dates and amounts matter. Then you can ask your own questions. Every point comes with “Where it says it”, which opens the exact passage, highlighted, on the right page.
@@ -252,7 +252,7 @@ The hard part of an AI reader is trust, so the design is built around one rule: 
 		subtitle: 'An AI travel agent that plans in the open and asks before it acts.',
 		eyebrow: 'Travel · 2026',
 		shortDesc:
-			'A fictional AI travel agent: it reads a trip described in plain words, searches, compares and holds flights and a stay, then stops for your OK before it pays or shares your details. Five languages, Hebrew in RTL.',
+			'An AI travel agent: it reads a trip described in plain words, searches, compares and holds flights and a stay, then stops for your OK before it pays or shares your details. Five languages, Hebrew in RTL.',
 		intro: `Otium is a fictional AI travel agent I designed and built end-to-end. The question behind it is the one every agentic product now faces: once an AI can act for you (search, book, pay), how do you stay in control without doing the work yourself?
 
 The answer I designed is an agent that works in the open. You describe a trip in your own words; Otium shows each step as it happens, flags what it assumed, and lets you correct any of it. Searching is automatic. Paying, sharing your details and going over budget always wait for an explicit yes, with a before/after view of what changes. Every booking can be cancelled from the trip, every decision is written to a trip history, and a human travel team is always one tap away.
@@ -349,7 +349,7 @@ The language model only reads the request. Prices, the plan, the budget check an
 		subtitle: 'An oceanfront strength and recovery club in Miami Beach, invented and built out to five pages.',
 		eyebrow: 'Fitness · 2026',
 		shortDesc:
-			'A fictional members club: five interlinked pages, a booking gate, a live timetable, a shop with a persistent cart, a QR guest pass, and APEX Coach, an AI assistant designed state by state.',
+			'A members club: five interlinked pages, a booking gate, a live timetable, a shop with a persistent cart, a QR guest pass, and APEX Coach, an AI assistant designed state by state.',
 		intro: `APEX Athletic Club is a fictional private gym I invented and built end-to-end, and the brief I set myself was to go past the marketing page: a mini-site is easy to fake in one screen, and much harder to hold together across five.
 
 The visual language is the opposite of the wellness pastel most gyms reach for. Ink canvas, one hot pink accent, one mint signal, Space Grotesk for display and JetBrains Mono for anything numeric (times, prices, capacities), so the timetable reads like a schedule board rather than a brochure. The photography is stock, so the grid imposes its own treatment (grayscale, dimmed, colour returning on hover) instead of hoping six unrelated shoots agree with each other.
@@ -443,7 +443,7 @@ Almost all of the work was in the parts that are usually faked. Booking a class 
 		subtitle: 'A family kitchen in San Gimignano, imagined from scratch.',
 		eyebrow: 'Restaurant · 2026',
 		shortDesc:
-			'A fictional Michelin-adjacent trattoria: full brand system, menu, reservation flow with fake auth. Built as a single-page experience.',
+			'A Michelin-adjacent trattoria: full brand system, menu, reservation flow with a demo sign-in. Built as a single-page experience.',
 		intro: `Trattoria Fiori is a fictional Tuscan restaurant I designed and built end-to-end as a personal exercise.
 
 The design language borrows from fine-dining editorial: Playfair Display and Cormorant Garamond over a noir + brushed-gold + ivoire palette, dish photography treated as painterly plates rather than product shots, and micro-typography for the menu (dotted leaders, lining figures, italic wine notes) that would look at home on a printed carte.

@@ -75,4 +75,14 @@ export const testimonials: Testimonial[] = [
 			'I’ve really enjoyed working with David over the years and would highly recommend him to any team looking for a skilled and forward-thinking UX/UI designer.',
 		],
 	},
+	{
+		name: 'Hagay Dubinsky',
+		role: 'UI/UX Designer, Animator & Art',
+		relation: 'Worked with David at GamingTech (SBTech Group), on different teams',
+		text: [
+			'I’ve had the pleasure of knowing David as a close colleague in the design and product space, and I can confidently say he is a true professional with deep knowledge and extensive experience in his field.',
+			'What sets David apart is his ability to balance two crucial qualities: on one hand, he is a dedicated team player who respects company standards and pays close attention to the smallest details when needed. On the other hand, he consistently looks at the bigger picture, taking a broad, systemic view of his work rather than just focusing on isolated tasks. He is always exploring new tools and workflows to optimize processes and bring real value to the organization.',
+			'Beyond his professional capabilities, David is simply a wonderful person to be around. He brings a calm, friendly, and positive atmosphere to every interaction, making collaboration effortless and enjoyable. Any team would be lucky to have him.',
+		],
+	},
 ];

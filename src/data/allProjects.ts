@@ -703,12 +703,12 @@ The captures below gather a selection of 13 pieces of work from that period.`,
 	},
 	{
 		slug: 'gamingtech',
-		title: `Gamingtech · Casino & Sports Betting Platforms`,
-		client: `Gamingtech`,
+		title: `GamingTech · Casino & Sports Betting Platforms`,
+		client: `GamingTech (SBTech Group)`,
 		year: '2015 – 2017',
 		category: 'iGaming',
-		shortDesc: `Sole designer on Gamingtech's three brands (10Bet, Real Deal Bet, Bet Rally), each running a casino and a sports betting vertical, from 2015 to 2017.`,
-		fullDesc: `Selection of work produced at Gamingtech between 2015 and 2017. Sole designer on the three brands operated by the company: 10Bet, Real Deal Bet and Bet Rally. Each brand ran two operational verticals (a casino and a sports betting site) for a total of six sites evolving in parallel.
+		shortDesc: `Sole designer on GamingTech's three brands (10Bet, Real Deal Bet, Bet Rally), each running a casino and a sports betting vertical, from 2015 to 2017.`,
+		fullDesc: `Selection of work produced at GamingTech (SBTech Group) between 2015 and 2017. Sole designer on the three brands operated by the company: 10Bet, Real Deal Bet and Bet Rally. Each brand ran two operational verticals (a casino and a sports betting site) for a total of six sites evolving in parallel.
 
 Deliverables covered game lobbies, bonus systems, deposit funnels, promotional banners in large volume, mobile and desktop interfaces, as well as animations produced as videos and Flash (SWF) files for dynamic elements.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785345993/portfolio/old-wix/casino/casino-12.webp',
