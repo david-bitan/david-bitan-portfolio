@@ -6,11 +6,11 @@
   --color-ink: #0a0a0a;
   --color-muted: #4b5563;
   --color-card: #ffffff;
-  /* Bright brand orange for buttons. Labels on orange are night blue
-     #0D101A (5.7:1), validated by David on 13/11; white was 3.3:1. Small
-     orange text uses the deeper accent-text (4.7:1 on the page). */
+  /* Bright brand orange for buttons with WHITE labels: David's explicit
+     choice (12/11, confirmed 13/11), never change it. Small orange text
+     uses the deeper accent-text (4.7:1 on the page). */
   --color-accent: #f25c24;
-  --color-accent-ink: #0d101a;
+  --color-accent-ink: #ffffff;
   --color-accent-text: #c2410c;
   /* Text of the outlined secondary button (CL1, 13/11). */
   --color-accent-secondary: #c9461a;
