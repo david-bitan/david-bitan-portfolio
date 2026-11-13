@@ -229,19 +229,19 @@ Building on top of the Sonary Website design system, itself mature after six yea
 		year: '2019 – 2026',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Three major redesigns of Sonary's SaaS comparison platform since 2019: 1,400+ indexed pages across 37 software categories, WordPress to Webflow migration.`,
+		shortDesc: `Three major redesigns of Sonary's SaaS comparison platform since 2019, with a CMS template system and a WordPress to Webflow migration.`,
 		fullDesc: `Sole designer on Sonary's SaaS comparison and review platform since 2019. Design system that later seeded the Sonary Dashboard product. See structured case study below.`,
 		liveUrl: 'https://sonary.com',
 		scope: [
 			`3 major redesigns since 2019`,
-			`1,400+ indexed pages across 37 software categories`,
+			`One CMS template system reused across every software category`,
 			`5 breakpoints`,
 			`WordPress to Webflow migration on the latest redesign`,
 		],
 		sections: [
 			{
 				heading: 'Context',
-				body: `Sonary is a SaaS software comparison and review platform for SMBs, published by Ryze Beyond. The site covers 37 verticals (AI, E-commerce, Design, Development, Finance, HR, IT, Productivity, Sales & Marketing, and more) through buying guides, side-by-side comparisons, editorial reviews, and category lineups. It complements Sonary Dashboard: the software subscription tracker from the same publisher, shipped in 2026.`,
+				body: `Sonary is a SaaS software comparison and review platform for SMBs, published by Ryze Beyond. The site covers many software categories (AI, E-commerce, Design, Development, Finance, HR, IT, Productivity, Sales & Marketing, and more) through buying guides, side-by-side comparisons, editorial reviews, and category lineups. It complements Sonary Dashboard: the software subscription tracker from the same publisher, shipped in 2026.`,
 			},
 			{
 				heading: 'Role',
@@ -255,15 +255,15 @@ The design system was built for the site starting in 2019 (color tokens, Inter t
 			},
 			{
 				heading: 'Key challenge',
-				body: `Designing a system that could absorb the site's growth: 37 very different verticals (finance, AI, HR, e-commerce…) and 1,400+ indexed, CMS-generated pages, without losing consistency or editorial tone. Every template needed to feel warm and inviting despite the functional density (comparison tables, review cards, scoring, lineups).
+				body: `Designing a system that could absorb the site's growth: very different software categories (finance, AI, HR, e-commerce…) and a large number of CMS-generated pages, without losing consistency or editorial tone. Every template needed to feel warm and inviting despite the functional density (comparison tables, review cards, scoring, lineups).
 
 Addressed through a strict smart-component hierarchy and a library of editorial patterns (illustrated headers, quote blocks, category chips) that break up the dense sections.`,
 			},
 			{
 				heading: 'Deliverables',
-				body: `Templates covering homepage, article hub, article, review, comparison, alternative/lineup, about and category pages: 1,400+ indexed pages generated through the CMS across 37 verticals.
+				body: `Templates covering homepage, article hub, article, review, comparison, alternative/lineup, about and category pages, used by the CMS to generate the pages of every category.
 
-Notable components: homepage, 37-category mega menu, review card, comparison table, interactive lineup: all built as smart components reused across templates.
+Notable components: homepage, category mega menu, review card, comparison table, interactive lineup: all built as smart components reused across templates.
 
 Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress → Webflow migration on the latest redesign, with a full design system rebuild in Webflow and handoff to the content team. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
 			},
@@ -579,14 +579,13 @@ Addressed through a master template with two strict breakpoints (Desktop 600, Mo
 		year: '2019 – 2026',
 		category: 'iGaming',
 		categories: ['iGaming', 'UI/UX'],
-		shortDesc: `A UK online casino comparison platform: first release in about four months, then years of continuous design iteration under UKGC rules.`,
-		fullDesc: `Sole designer on Playright since 2019: Ryze Beyond's UK online casino comparison platform. Initial delivery in ~4 months (2019-2020), then continuous design iteration over the following years. See structured case study below.`,
+		shortDesc: `A UK online casino comparison platform: redesign of the homepage and ranking pages, with hover animations coded in HTML/CSS, under UKGC rules.`,
+		fullDesc: `Designer on Playright, Ryze Beyond's UK online casino comparison platform: redesign of the homepage and the ranking pages, with hover animations I coded in HTML/CSS. See structured case study below.`,
 		liveUrl: 'https://playright.co.uk/casino/reviews/',
 		liveUrlNote: `Note: the site is geo-restricted to the UK. A VPN is required to view it from outside.`,
 		scope: [
-			`First release in about four months (2019–2020)`,
-			`Iterations across dozens of pages since then`,
-			`From 3 to 5 breakpoints`,
+			`Homepage and ranking pages redesigned`,
+			`Hover animations coded in HTML/CSS`,
 			`UKGC responsible-gambling requirements built in`,
 		],
 		sections: [
@@ -596,11 +595,11 @@ Addressed through a master template with two strict breakpoints (Desktop 600, Mo
 			},
 			{
 				heading: 'Role',
-				body: `Sole designer on Playright since 2019. Initial delivery: about four months of concentrated work in late 2019, shipped to production in 2020. Since then: continuous design iteration (new pages, progressive redesigns, retroactive design system).`,
+				body: `I redesigned the Playright homepage and its ranking pages, and coded their hover animations myself in HTML/CSS. The rest of the site was not part of this redesign.`,
 			},
 			{
 				heading: 'Approach',
-				body: `Benchmarking of casino comparison sites (AskGamblers, Casino.org, Gambling.com) and visual references from Dribbble and Pinterest. On initial delivery (2019-2020), no design system yet: design produced page by page. The design system was built retroactively as the site grew, capitalizing on recurring patterns. On more recent redesigns, research accelerated with Midjourney, Firefly and Figma AI for moodboards and concepts.`,
+				body: `Benchmarking of casino comparison sites (AskGamblers, Casino.org, Gambling.com) and visual references from Dribbble and Pinterest. Research was accelerated with Midjourney, Firefly and Figma AI for moodboards and concepts.`,
 			},
 			{
 				heading: 'Key challenge',
@@ -610,11 +609,7 @@ The project also held a particular status in the Ryze roadmap: design often ran 
 			},
 			{
 				heading: 'Deliverables',
-				body: `Initial 2019-2020 delivery (~4 months): homepage, review page, comparison, lineup, category pages, casino profile, article. Since then: iterations across dozens of pages, section redesigns, retroactive design system, new verticals and payment methods. Three breakpoints originally requested (Desktop, Mobile, Tablet portrait); later expanded to five (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress CMS throughout. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
-			},
-			{
-				heading: 'What I took from it',
-				body: `A project that spans several years reveals one simple lesson: a design system's value shows up when you have to revisit your own work two years later. Playright pushed me to retroactively formalize what could have stayed ad hoc, and to accept that design has its own pace, sometimes running ahead of production.`,
+				body: `Redesigned homepage and ranking pages, with hover animations coded in HTML/CSS and handed to the developers ready to integrate. WordPress CMS. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
 			},
 		],
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785341989/portfolio/playright/home-page/desktop---1200px---container-1140px.webp',

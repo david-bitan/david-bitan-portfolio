@@ -271,6 +271,8 @@ h1 em { font-style: italic; color: var(--lagoon); }
 .scrim.on { opacity: 1; }
 .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100%); background: var(--surface); z-index: 51; transform: translateX(100%); transition: transform .35s var(--ease); display: flex; flex-direction: column; box-shadow: var(--shadow-lg); }
 .drawer.on { transform: none; }
+/* Closed drawers sit just off-screen; without this their shadow bled onto the page edge as a grey strip. The shadow comes back the moment a drawer opens. */
+.drawer:not(.on) { box-shadow: none; transition: transform .35s var(--ease), box-shadow 0s linear .35s; }
 .drawer-h { display: flex; justify-content: space-between; align-items: center; padding: 20px 22px; border-bottom: 1px solid var(--line); }
 .drawer-h h2 { margin: 0; font: 500 24px var(--serif); }
 .drawer-b { overflow-y: auto; padding: 18px 22px 30px; }
@@ -627,7 +629,8 @@ h1 { font-weight: 700; letter-spacing: -.035em; }
 	.work-bar { grid-template-columns: 1fr; }
 	.work-bar .col-r .col-t, .work-bar .col-r .col-h { display: none; }
 	.needs-you.on { display: flex; }
-	footer.foot { padding: 20px 16px 90px; }
+	footer.foot { padding: 20px 88px 90px 16px; } /* right room for the Help and T-Bot buttons, which covered the credits line */
+	[dir="rtl"] footer.foot { padding: 20px 16px 90px 88px; }
 }
 @media (prefers-reduced-motion: reduce) {
 	*, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -1331,6 +1334,8 @@ body.touring #tourCard { pointer-events: auto; }
 .seat-pick, .seat-pick > *, .voucher .seatmap { min-width: 0; max-width: 100%; }
 .legtabs button { flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; }
 @media (max-width: 400px) { .legtabs button svg.i { display: none; } .sp-legend { gap: 4px 10px; } }
+/* Phones: the two leg tabs share the row equally and shrink their text, so "Outbound · CDG–LIS" is never cut (was clipped at 390px). */
+@media (max-width: 430px) { .legtabs { gap: 0; } .legtabs button { flex: 1 1 0; justify-content: center; white-space: nowrap; padding: 8px 4px; font-size: 12.5px; letter-spacing: -0.01em; } }
 /* v4.9 — flat colours only (no gradients) */
 .card.ask { background: var(--surface); }
 .orb, .agent[data-status="waiting"] .orb { background: var(--lagoon); }

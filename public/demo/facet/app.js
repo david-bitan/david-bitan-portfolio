@@ -844,7 +844,7 @@
 	/* no single word alone on the last line: glue the last two words, unless that makes the line overflow */
 	const glue = (el) => {
 		const tn = [...el.childNodes].reverse().find((n) => n.nodeType === 3 && n.nodeValue.trim()); if (!tn) return;
-		const v = tn.nodeValue, i = v.trimEnd().lastIndexOf(" "); if (i < 1 || v.trim().split(/\s+/).length < 3) return;
+		const v = tn.nodeValue; if (/\u00A0\S+\s*$/.test(v)) return; /* already glued: running again used to glue one more word each pass */ const i = v.trimEnd().lastIndexOf(" "); if (i < 1 || v.trim().split(/\s+/).length < 3) return;
 		const w0 = el.getBoundingClientRect().width, pw = el.parentElement ? el.parentElement.clientWidth : 1e9; tn.nodeValue = v.slice(0, i) + "\u00A0" + v.slice(i + 1); if (el.scrollWidth > el.clientWidth + 1 || el.getBoundingClientRect().width > w0 + 1 || el.scrollWidth > pw + 1) tn.nodeValue = v;
 	};
 	let gl; const glueAll = () => { cancelAnimationFrame(gl); gl = requestAnimationFrame(() => $$("h1, h2, h3, h4, main p, .ov p, .site p").forEach((el) => { if (!el.closest("table, .alltx")) glue(el); })); };
