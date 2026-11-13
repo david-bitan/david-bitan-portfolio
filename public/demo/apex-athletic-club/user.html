@@ -989,6 +989,38 @@
 		font-weight: 700;
 		margin-top: 4px;
 	}
+
+	/* ---------- Coach plans: everything APEX Coach builds lands here ---------- */
+	.tp-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 18px; font-size: 13px; color: var(--white-mute); }
+	.tp-meta b { color: var(--white); font-weight: 600; }
+	.tp-meta .filters { margin: 0; }
+	.tp-updated { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--mint); }
+	.tp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+	.tp-day { background: var(--ink-2); border: 1px solid var(--line); border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 10px; transition: border-color 320ms ease, transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+	.tp-day.train { border-color: rgba(255, 46, 126, 0.35); }
+	.tp-day.changed { border-color: var(--mint); box-shadow: 0 0 0 1px var(--mint) inset; }
+	.tp-day .slot { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--white-mute); display: flex; justify-content: space-between; gap: 8px; }
+	.tp-day .tag { color: var(--mint); letter-spacing: 0.08em; }
+	.tp-day .name { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--white); }
+	.tp-day.rest .name { color: var(--white-soft); }
+	.tp-day ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--white-soft); }
+	.tp-day li { display: flex; justify-content: space-between; gap: 10px; }
+	.tp-day li span:last-child { font-family: var(--font-mono); font-size: 12px; color: var(--white-mute); white-space: nowrap; }
+	.tp-day .note { font-size: 13px; color: var(--white-mute); }
+	.tp-empty { background: var(--ink-2); border: 1px dashed var(--line-strong); border-radius: 6px; padding: 28px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+	.tp-empty p { margin: 0; color: var(--white-soft); max-width: 560px; }
+	.tp-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+	.tp-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 22px; font-size: 13px; color: var(--white-mute); }
+	.tp-foot .btn { flex: none; }
+	.calc-coach { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+	.calc-coach:empty { display: none; }
+	.calc-coach .cc-h { grid-column: 1 / -1; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--mint); }
+	.calc-coach .cc { background: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
+	.calc-coach .cc b { display: block; font-family: var(--font-mono); font-size: 17px; color: var(--white); }
+	.calc-coach .cc span { font-size: 11.5px; color: var(--white-mute); }
+	@media (max-width: 1024px) { .tp-grid { grid-template-columns: repeat(2, 1fr); } }
+	@media (max-width: 560px) { .tp-grid { grid-template-columns: 1fr; } .calc-coach { grid-template-columns: 1fr 1fr; } }
+	@media (prefers-reduced-motion: reduce) { .tp-day { transition: none; } }
 	.meal-grid {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
@@ -1756,6 +1788,24 @@
 	</div>
 </section>
 
+<!-- ============================================================ COACH PLANS ============================================================ -->
+<section class="section tight" id="coach-plans">
+	<div class="wrap">
+		<div class="head" data-reveal>
+			<div class="eyebrow pink">From APEX Coach</div>
+			<h2 class="h2">Your training plan.</h2>
+			<p class="lead">
+				Ask APEX Coach for a workout plan, a meal plan or a calculation (BMI, metabolism, macros), one at a time or together. Every result is saved here, and any change you ask for in the chat updates it.
+			</p>
+		</div>
+		<div id="tp-body" data-reveal></div>
+		<div class="tp-foot" data-reveal>
+			<span>Demo account: everything stays in this browser.</span>
+			<button type="button" class="btn btn-ghost btn-sm" id="demo-reset-btn">Reset demo account</button>
+		</div>
+	</div>
+</section>
+
 <!-- ============================================================ CALORIE CALCULATOR ============================================================ -->
 <section class="section tight" id="calc">
 	<div class="wrap">
@@ -1821,7 +1871,7 @@
 					<div class="val"><span id="r-tdee">2,720</span><span class="unit">kcal / day</span></div>
 					<div class="breakdown">BMR <span id="r-bmr">1,754</span> · TDEE <span id="r-tdee-raw">2,720</span> · <span id="r-goal-label">maintain</span></div>
 				</div>
-				<div class="calc-macros">
+				<div class="calc-macros" id="calc-macros">
 					<div class="macro protein">
 						<div class="name">Protein · <span id="r-p-pct">30</span>%</div>
 						<div class="grams"><span id="r-p-g">204</span><span style="font-size:12px; color:var(--white-mute);"> g</span></div>
@@ -1838,6 +1888,7 @@
 						<div class="cals"><span id="r-f-c">680</span> kcal</div>
 					</div>
 				</div>
+				<div class="calc-coach" id="calc-coach" aria-live="polite"></div>
 			</div>
 		</div>
 	</div>
@@ -1847,9 +1898,9 @@
 <section class="section tight" id="meal-plan">
 	<div class="wrap">
 		<div class="head" data-reveal>
-			<div class="eyebrow pink">Sample week</div>
-			<h2 class="h2">This week's meals.</h2>
-			<p class="lead">
+			<div class="eyebrow pink" id="mp-eyebrow">Sample week</div>
+			<h2 class="h2" id="mp-title">This week's meals.</h2>
+			<p class="lead" id="mp-lead">
 				A representative day from our dietitian's rotation. Not a prescription: a starting point aligned with your targets above.
 			</p>
 		</div>
@@ -1871,7 +1922,7 @@
 
 		<!-- Sub-action after the meal grid — discreet, right-aligned request. -->
 		<div style="display:flex; justify-content:flex-end; margin-top: 20px;" data-reveal>
-			<button type="button" class="btn btn-sm btn-ghost" data-soon="Full meal plan">Request full week plan →</button>
+			<button type="button" class="btn btn-sm btn-ghost" id="mp-coach-btn">Build my meal plan with Coach →</button>
 		</div>
 	</div>
 </section>
@@ -2602,6 +2653,128 @@
 	});
 	renderMeals("mon", true);
 	moveDayIndicator(true);
+	// ------------------------------------------------------------
+	// APEX Coach results — the workout plan, the meal plan and the
+	// calculations built in the chat are saved in localStorage
+	// ("apex_coach_plans") and shown here. Coach fires "apex:plans"
+	// after every change, so this page updates while the chat is open.
+	// ------------------------------------------------------------
+	const SAMPLE_MEALS = JSON.parse(JSON.stringify(meals));
+	const MEAL_TIME = { Breakfast: "08:00", Lunch: "13:00", Snack: "17:00", Dinner: "20:00" };
+	const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+	const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+	let tpWeek = 0;
+	function coachPlans() { try { return JSON.parse(localStorage.getItem("apex_coach_plans")) || {}; } catch (_) { return {}; } }
+	function ago(t) {
+		const s = Math.max(0, Math.round((Date.now() - t) / 1000));
+		if (s < 60) return "just now";
+		if (s < 3600) return Math.round(s / 60) + " min ago";
+		if (s < 86400) return Math.round(s / 3600) + " h ago";
+		return new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+	}
+	const escH = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+	function askCoach(q) { if (window.APEXCoach) window.APEXCoach.ask(q); }
+
+	function renderTraining() {
+		const body = document.getElementById("tp-body");
+		if (!body) return;
+		const w = coachPlans().workout;
+		if (!w || !w.P) {
+			body.innerHTML = `<div class="tp-empty">
+				<p>No plan saved yet. APEX Coach can build a workout plan on its own, a meal plan on its own, or both matched together, and calculate your BMI, metabolism and macros.</p>
+				<div class="tp-actions">
+					<button type="button" class="btn btn-primary btn-sm" data-ask="Build me a workout plan">Build a workout plan</button>
+					<button type="button" class="btn btn-ghost btn-sm" data-ask="Plan my meals for the week">Plan my meals</button>
+					<button type="button" class="btn btn-ghost btn-sm" data-ask="Calculate my metabolism and macros">Calculate my metabolism</button>
+				</div>
+			</div>`;
+			return;
+		}
+		const P = w.P, n = P.weeks.length;
+		if (tpWeek >= n) tpWeek = 0;
+		const swaps = (w.s && w.s.swaps) || {};
+		const weeksNav = n > 1 ? `<div class="filters" role="tablist" aria-label="Week">${P.weeks.map((_, i) => `<button type="button" role="tab" data-tp-week="${i}" class="${i === tpWeek ? "active" : ""}" aria-selected="${i === tpWeek}">Week ${i + 1}</button>`).join("")}</div>` : "";
+		const days = P.weeks[tpWeek].map((d, i) => {
+			const changed = swaps[i] !== undefined;
+			const list = d.session
+				? `<ul>${d.ex.map((e) => `<li><span>${escH(e.name)}</span><span>${e.sets} × ${escH(e.reps)}</span></li>`).join("")}</ul>`
+				: `<div class="note">Walk 30–45 min or a Recovery class.</div>`;
+			return `<article class="tp-day ${d.session ? "train" : "rest"}${changed ? " changed" : ""}">
+				<div class="slot"><span>${DAY_NAMES[i]}</span>${changed ? '<span class="tag">Updated in chat</span>' : ""}</div>
+				<div class="name">${d.session ? escH(d.session) : "Rest day"}</div>${list}</article>`;
+		}).join("");
+		body.innerHTML = `<div class="tp-meta">${weeksNav}<span><b>${P.nTrain} sessions a week</b> · ${escH(P.goalLabel)} · ${n === 4 ? "1 month" : n + (n > 1 ? " weeks" : " week")}</span><span class="tp-updated">Updated ${ago(w.at)} · APEX Coach</span></div>
+			<div class="tp-grid">${days}</div>
+			<div class="tp-actions" style="margin-top:18px"><button type="button" class="btn btn-ghost btn-sm" data-ask="Change my program settings">Change it with Coach</button></div>`;
+	}
+
+	function renderCoachMeals() {
+		const m = coachPlans().meals;
+		const eyebrow = document.getElementById("mp-eyebrow"), title = document.getElementById("mp-title"), lead = document.getElementById("mp-lead"), btn = document.getElementById("mp-coach-btn");
+		DAY_KEYS.forEach((k) => (meals[k] = SAMPLE_MEALS[k]));
+		if (m && m.P) {
+			const P = m.P;
+			P.weeks[0].forEach((d, i) => {
+				meals[DAY_KEYS[i]] = d.meals.map((x) => ({ slot: x.slot, time: MEAL_TIME[x.slot] || "", food: x.dish, kcal: x.kcal.toLocaleString("en-US") }));
+			});
+			eyebrow.textContent = "From APEX Coach · updated " + ago(m.at);
+			title.textContent = "Your meal plan.";
+			lead.textContent = `${P.trainK.toLocaleString("en-US")} kcal on training days, ${P.restK.toLocaleString("en-US")} on rest days, ${P.protein} g protein a day. Week 1 of ${P.weeks.length}: ask Coach to change anything and it updates here.`;
+			btn.textContent = "Change my meals with Coach →";
+			btn.dataset.ask = "Change my program settings";
+		} else {
+			eyebrow.textContent = "Sample week";
+			title.textContent = "This week's meals.";
+			lead.textContent = "A representative day from our dietitian's rotation. Not a prescription: a starting point aligned with your targets above.";
+			btn.textContent = "Build my meal plan with Coach →";
+			btn.dataset.ask = "Plan my meals for the week";
+		}
+		const active = document.querySelector(".day-tab.active");
+		renderMeals(active ? active.dataset.day : "mon", true);
+	}
+
+	function syncCalculator() {
+		let pr = {};
+		try { pr = JSON.parse(localStorage.getItem("apex_profile")) || {}; } catch (_) {}
+		const set = (id, v) => { const el = document.getElementById(id); if (el && v != null && v !== "" && String(el.value) !== String(v)) el.value = v; };
+		set("c-age", pr.age); set("c-weight", pr.weight); set("c-height", pr.height);
+		if (pr.sex) set("c-gender", String(pr.sex).toLowerCase().startsWith("f") ? "female" : "male");
+		if (+pr.act) set("c-activity", String(+pr.act));
+		const g = { lose: "cut", build: "bulk", cut: "cut", bulk: "bulk", maintain: "maintain" }[pr.goal];
+		if (g) { const r = document.querySelector(`#calc input[name="goal"][value="${g}"]`); if (r) r.checked = true; }
+		calc();
+		const c = coachPlans().calcs || {}, items = [];
+		if (c.bmi) items.push(`<div class="cc"><b>${c.bmi.value}</b><span>BMI · healthy ${c.bmi.lo}–${c.bmi.hi} kg</span></div>`);
+		if (c.energy) items.push(`<div class="cc"><b>${c.energy.bmr.toLocaleString("en-US")}</b><span>BMR kcal · TDEE ${c.energy.tdee.toLocaleString("en-US")}</span></div>`);
+		if (c.bodyfat) items.push(`<div class="cc"><b>${c.bodyfat.value}%</b><span>body fat · ${escH(c.bodyfat.cat)}</span></div>`);
+		if (c.water) items.push(`<div class="cc"><b>${c.water.rest} L</b><span>water · ${c.water.train} L training day</span></div>`);
+		const last = Math.max(0, ...Object.values(c).map((x) => x.at || 0));
+		document.getElementById("calc-coach").innerHTML = items.length ? `<div class="cc-h">From APEX Coach · updated ${ago(last)}</div>${items.join("")}` : "";
+	}
+
+	function renderCoach() { renderTraining(); renderCoachMeals(); syncCalculator(); }
+	window.addEventListener("apex:plans", renderCoach);
+	window.addEventListener("storage", (e) => { if (!e.key || /^apex_/.test(e.key)) renderCoach(); });
+	document.addEventListener("click", (e) => {
+		const a = e.target.closest("[data-ask]");
+		if (a) { askCoach(a.dataset.ask); return; }
+		const wk = e.target.closest("[data-tp-week]");
+		if (wk) { tpWeek = +wk.dataset.tpWeek; renderTraining(); }
+	});
+	// Back to a clean start: plans, calculations, chat history, food preferences and the demo membership.
+	document.getElementById("demo-reset-btn").addEventListener("click", () => askConfirm({
+		title: "Reset the demo account?",
+		body: "Saved plans, calculations, the Coach conversation and any membership change go back to the starting state.",
+		confirmLabel: "Yes, reset",
+		onYes: () => {
+			["apex_coach_plans", "apex_profile", "apex_food_prefs", "apex_account"].forEach((k) => { try { localStorage.removeItem(k); } catch (_) {} });
+			try { sessionStorage.removeItem("apex_coach_history"); } catch (_) {}
+			location.href = location.pathname;
+		}
+	}));
+	renderCoach();
+	setInterval(() => { renderTraining(); }, 60000);
+
 	// Tab widths are flex-derived, so they change with the viewport.
 	window.addEventListener("resize", () => moveDayIndicator(true));
 	// Webfonts landing late can shift the tab metrics after first measurement.

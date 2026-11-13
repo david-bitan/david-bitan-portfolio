@@ -28,7 +28,7 @@ export function getStaticPaths() {
 
 const { project } = Astro.props;
 
-const seoDescription = project.shortDesc;
+const seoDescription = project.metaDesc ?? project.shortDesc;
 const seoOgImage = project.thumbnail;
 
 // Split intro on blank lines. First paragraph is the visible teaser; the
@@ -41,7 +41,7 @@ const projectJsonLd = {
 	'@context': 'https://schema.org',
 	'@type': 'CreativeWork',
 	name: project.title,
-	description: project.shortDesc,
+	description: seoDescription,
 	creator: { '@type': 'Person', name: 'David Bitan' },
 	about: 'AI Lab experiment',
 	image: seoOgImage,

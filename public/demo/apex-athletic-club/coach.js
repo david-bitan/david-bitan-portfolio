@@ -76,6 +76,12 @@
 	.cx-mrow{grid-template-columns:72px 1fr auto}
 	.cx-sub2{padding:8px 12px 4px;font:600 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:#FF2E7E}
 	.cx-setup{margin-top:12px;display:flex;flex-direction:column;gap:12px}
+	.cx-setup [hidden]{display:none!important}
+	.cx-sec{margin-top:12px}
+	.cx-sec>.cx-sub2{padding:0 0 2px}
+	.cx-sum+.cx-sum{margin-top:8px}
+	.cx-sel{width:100%;background:#14141C;color:#F5F5F7;border:1px solid rgba(245,245,247,.22);border-radius:10px;padding:8px 10px;font:500 13px/1.3 Inter,sans-serif}
+	.cx-changed{margin-left:6px;font:600 9.5px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:#00E5A0;border:1px solid rgba(0,229,160,.4);border-radius:999px;padding:3px 6px;vertical-align:1px}
 	.cx-f>span{display:block;font-size:11.5px;color:rgba(245,245,247,.6);margin-bottom:6px}
 	.cx-f small{display:block;margin-top:4px;font-size:11px;color:rgba(245,245,247,.45)}
 	.cx-seg{display:flex;flex-wrap:wrap;gap:6px}
@@ -231,7 +237,8 @@
 	/* ---------- context chips ---------- */
 	function renderCtx() {
 		const c = calc();
-		const bits = [tier() ? `${tier()} member` : "Guest · not signed in", c ? `Calculator: ${c.kcal} kcal · ${c.goal}` : null, "This week's timetable"];
+		const pl = plans(), saved = [pl.workout && "workout plan", pl.meals && "meal plan"].filter(Boolean);
+		const bits = [tier() ? `${tier()} member` : "Guest · not signed in", c ? `Calculator: ${c.kcal} kcal · ${c.goal}` : null, saved.length ? `Saved: ${saved.join(" + ")}` : null, "This week's timetable"];
 		$(".cx-ctx").innerHTML = '<span style="border:0;background:none;padding-left:0">Using:</span>' +
 			bits.filter(Boolean).map((b) => `<span>${b}</span>`).join("");
 	}
@@ -303,6 +310,87 @@
 	const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 	const fmt = (n) => n.toLocaleString("en-US");
 
+
+	/* ---------- saved plans: every result is kept in the member profile (My Space) ---------- */
+	const PLANS = "apex_coach_plans";
+	function plans() { try { return JSON.parse(localStorage.getItem(PLANS)) || {}; } catch (_) { return {}; } }
+	function storePlans(pl) {
+		try { localStorage.setItem(PLANS, JSON.stringify(pl)); } catch (_) {}
+		try { window.dispatchEvent(new CustomEvent("apex:plans")); } catch (_) {}
+	}
+	function snapshot(pl) { return JSON.stringify({ workout: pl.workout || null, meals: pl.meals || null, calcs: pl.calcs || null }); }
+	function mergeProfile(vals) {
+		let saved = {}; try { saved = JSON.parse(localStorage.getItem("apex_profile")) || {}; } catch (_) {}
+		Object.keys(vals).forEach((k) => { if (vals[k] == null || vals[k] === "") delete vals[k]; });
+		try { localStorage.setItem("apex_profile", JSON.stringify(Object.assign(saved, vals))); } catch (_) {}
+	}
+	const TOOL_LABEL = { workout: "Workout plan", meals: "Meal plan", bmi: "BMI", energy: "Metabolism & macros" };
+	const ACT = [[1.2, "Sedentary: desk job, little exercise"], [1.375, "Light: 1–3 workouts / week"], [1.55, "Moderate: 3–5 workouts / week"], [1.725, "Active: 6–7 workouts / week"], [1.9, "Athlete: 2× / day or physical job"]];
+	const EGOAL = { lose: { mult: 0.8, split: [40, 40, 20] }, maintain: { mult: 1, split: [30, 45, 25] }, build: { mult: 1.15, split: [30, 50, 20] } };
+	const GOALMAP = { cut: "lose", bulk: "build", lose: "lose", build: "build", maintain: "maintain" };
+	function actOf(pr) {
+		if (+pr.act) return +pr.act;
+		const hit = ACT.find(([, l]) => pr.activity && l.split(":")[0] === String(pr.activity).split(":")[0]);
+		return hit ? hit[0] : null;
+	}
+	function energyCalc(pr, goal) {
+		const male = !String(pr.sex || "male").toLowerCase().startsWith("f");
+		const act = actOf(pr) || 1.55, g = EGOAL[goal] || EGOAL.maintain;
+		const bmr = 10 * pr.weight + 6.25 * pr.height - 5 * pr.age + (male ? 5 : -161);
+		const tdee = bmr * act, target = tdee * g.mult;
+		return { bmr: Math.round(bmr), tdee: Math.round(tdee), target: Math.round(target), goal: EGOAL[goal] ? goal : "maintain",
+			p: Math.round((target * g.split[0]) / 400), c: Math.round((target * g.split[1]) / 400), f: Math.round((target * g.split[2]) / 900),
+			age: +pr.age, sex: male ? "male" : "female", weight: +pr.weight, height: +pr.height, act, at: Date.now() };
+	}
+	function bmiCalc(pr) {
+		const m = pr.height / 100, v = pr.weight / (m * m);
+		return { value: +v.toFixed(1), lo: Math.round(18.5 * m * m), hi: Math.round(24.9 * m * m), weight: +pr.weight, height: +pr.height, at: Date.now() };
+	}
+	const goalWord = (g) => (g === "lose" ? "cut" : g === "build" ? "bulk" : "maintain");
+	function energyView(E) {
+		return `<div class="cx-sum"><div><b>${fmt(E.bmr)}</b><span>BMR · kcal</span></div><div><b>${fmt(E.tdee)}</b><span>TDEE · kcal</span></div><div><b>${fmt(E.target)}</b><span>target · ${goalWord(E.goal)}</span></div></div>` +
+			`<div class="cx-sum"><div><b>${E.p} g</b><span>protein</span></div><div><b>${E.c} g</b><span>carbs</span></div><div><b>${E.f} g</b><span>fat</span></div></div>`;
+	}
+	function bmiView(B) {
+		return `<div class="cx-sum"><div><b>${B.value}</b><span>BMI</span></div><div><b>${B.lo}–${B.hi}</b><span>healthy kg</span></div><div><b>${B.weight} kg</b><span>your weight</span></div></div>`;
+	}
+	function withCalc(kind, val) {
+		const pl = plans();
+		return { ...pl, prev: snapshot(pl), calcs: { ...(pl.calcs || {}), [kind]: val } };
+	}
+	// What the member asked for, read from their own words. Several tools can be asked at once.
+	function toolsIn(q, fallback) {
+		const t = [];
+		const w = /(workout|training|exercise|strength|routine|\bsplit\b|entra[iî]nement|musculation|s[ée]ances?)/i.test(q);
+		const m = /(meal|menu|food|nutrition|\beat\b|repas|alimentaire|manger|nourriture)/i.test(q);
+		if (w) t.push("workout");
+		if (m) t.push("meals");
+		if (fallback && !w && !m) t.push("workout", "meals");
+		if (/\b(bmi|imc)\b/i.test(q)) t.push("bmi");
+		if (/(metabolism|m[ée]tabolisme|\bbmr\b|\btdee\b|\bmacros?\b|maintenance calories|calorie needs|besoins? caloriques?)/i.test(q)) t.push("energy");
+		return t;
+	}
+	function trainMap(st) {
+		const sp = SPLITS[st.days] || SPLITS[3], map = {};
+		sp.days.forEach((d, i) => (map[d] = sp.s[i]));
+		Object.entries(st.swaps || {}).forEach(([d, v]) => (map[d] = v === "Rest" ? null : v));
+		return map;
+	}
+	function settings(kv) {
+		const avoid = String(kv.avoid || "").replace(/[|]/g, ", ");
+		return {
+			goal: GOALS[kv.goal] ? kv.goal : "maintain",
+			weeks: Math.min(4, Math.max(1, +kv.weeks || 4)),
+			days: Math.min(5, Math.max(2, +kv.days || 3)),
+			meals: +kv.meals === 3 ? 3 : 4,
+			diet: DIETS[kv.diet] ? kv.diet : "any",
+			ex: String(kv.ex || "").split(",").filter((x) => ALLERGENS.some(([k]) => k === x)),
+			avoid, maint: Math.min(4500, Math.max(1400, +kv.maint || 2400)), seed: +kv.seed || 0, adj: 0, swaps: {}
+		};
+	}
+	function build(st, map) { return buildProgram({ ...st, dis: dislikeWords(String(st.avoid || "").replace(/,\s*/g, ",")), map: map || trainMap(st) }); }
+	const lengthWord = (n) => (n === 4 ? "1-month" : n + "-week");
+
 	/* ---------- program builder: training + meals, matched ---------- */
 	const GOALS = {
 		lose: { label: "Lose fat", factor: 0.8, sets: 3, reps: 12, rest: 60, protein: 0.32 },
@@ -318,7 +406,8 @@
 		"Lower B": [["Deadlift", "main"], ["Front squat", "main"], ["Hip thrust", "acc"], ["Leg curl", "acc"], ["Calf raise", "acc"]],
 		"Upper B": [["Incline dumbbell press", "main"], ["Assisted pull-up", "main"], ["Seated cable row", "acc"], ["Lateral raise", "acc"], ["Triceps pushdown", "acc"]],
 		"Push": [["Bench press", "main"], ["Overhead press", "main"], ["Incline dumbbell press", "acc"], ["Lateral raise", "acc"], ["Triceps pushdown", "acc"]],
-		"Pull": [["Assisted pull-up", "main"], ["Barbell row", "main"], ["Face pull", "acc"], ["Hammer curl", "acc"], ["Back extension", "acc"]]
+		"Pull": [["Assisted pull-up", "main"], ["Barbell row", "main"], ["Face pull", "acc"], ["Hammer curl", "acc"], ["Back extension", "acc"]],
+		"Cardio": [["Incline treadmill walk", "cardio20"], ["Rower intervals, 1 min hard / 1 min easy", "cardio10"], ["Bike, easy spin", "cardio10"], ["Plank", "time"]]
 	};
 	const SPLITS = {
 		2: { days: [0, 3], s: ["Full body A", "Full body B"] },
@@ -357,27 +446,54 @@
 		return p;
 	}
 
-	function setupForm(p) {
+	function setupForm(p, tools) {
 		const c = calc();
 		const goal = p.goal || (c && /lose|cut|deficit/i.test(c.goal) ? "lose" : c && /gain|bulk|build/i.test(c.goal) ? "build" : "maintain");
 		const maint = maintenance() || 2400;
+		const pr = savedProfile() || {};
 		let last = {};
 		try { last = JSON.parse(localStorage.getItem("apex_food_prefs")) || {}; } catch (_) {}
+		const T = tools && tools.length ? tools : ["workout", "meals"];
+		const vis = (need, not) => ` data-for="${need.join(" ")}"${not ? ` data-not="${not}"` : ""}${need.some((t) => T.includes(t)) && !(not && T.includes(not)) ? "" : " hidden"}`;
 		const seg = (name, opts, val) => `<div class="cx-seg" role="radiogroup" aria-label="${name}">` + opts.map(([v, l]) =>
 			`<label><input type="radio" name="${name}" value="${v}"${String(v) === String(val) ? " checked" : ""}><span>${l}</span></label>`).join("") + "</div>";
+		const numf = (name, label, val, min, max, step) => `<label class="cx-mf"><span>${label}</span><input type="number" name="${name}" min="${min}" max="${max}" step="${step || 1}" value="${val || ""}"></label>`;
+		const sex = String(pr.sex || "male").toLowerCase().startsWith("f") ? "female" : "male";
+		const act = actOf(pr) || 1.55;
 		return `<form class="cx-setup">
+			<div class="cx-f"><span>What should I make? One or several</span><div class="cx-seg">${Object.entries(TOOL_LABEL).map(([k, l]) =>
+				`<label><input type="checkbox" name="tool" value="${k}"${T.includes(k) ? " checked" : ""}><span>${l}</span></label>`).join("")}</div></div>
 			<div class="cx-f"><span>Goal</span>${seg("goal", [["lose", "Lose fat"], ["maintain", "Maintain"], ["build", "Build muscle"]], goal)}</div>
-			<div class="cx-f"><span>Length</span>${seg("weeks", [[1, "1 week"], [2, "2 weeks"], [3, "3 weeks"], [4, "1 month"]], p.weeks || 4)}</div>
-			<div class="cx-f"><span>Training days / week</span>${seg("days", [[2, "2"], [3, "3"], [4, "4"], [5, "5"]], p.days || 3)}</div>
-			<div class="cx-f"><span>Meals / day</span>${seg("meals", [[3, "3"], [4, "4"]], p.meals || 4)}</div>
-			<div class="cx-f"><span>Diet</span>${seg("diet", Object.entries(DIETS).map(([k, d]) => [k, d.label]), p.diet || last.diet || "any")}</div>
-			<div class="cx-f"><span>Allergies & foods to avoid</span><div class="cx-seg">${ALLERGENS.map(([k, l]) =>
+			<div class="cx-f"${vis(["workout", "meals"])}><span>Length</span>${seg("weeks", [[1, "1 week"], [2, "2 weeks"], [3, "3 weeks"], [4, "1 month"]], p.weeks || 4)}</div>
+			<div class="cx-f"${vis(["workout", "meals"])}><span>Training days / week</span>${seg("days", [[2, "2"], [3, "3"], [4, "4"], [5, "5"]], p.days || 3)}</div>
+			<div class="cx-f"${vis(["meals"])}><span>Meals / day</span>${seg("meals", [[3, "3"], [4, "4"]], p.meals || 4)}</div>
+			<div class="cx-f"${vis(["meals"])}><span>Diet</span>${seg("diet", Object.entries(DIETS).map(([k, d]) => [k, d.label]), p.diet || last.diet || "any")}</div>
+			<div class="cx-f"${vis(["meals"])}><span>Allergies & foods to avoid</span><div class="cx-seg">${ALLERGENS.map(([k, l]) =>
 				`<label><input type="checkbox" name="ex" value="${k}"${(p.ex || last.ex || []).includes(k) ? " checked" : ""}><span>${l}</span></label>`).join("")}</div>
 			<label class="cx-num cx-txt"><input type="text" name="avoid" maxlength="120" placeholder="Other foods you don't like, e.g. mushrooms, tuna" value="${esc(last.avoid || "")}"></label></div>
-			<div class="cx-f"><span>Maintenance calories</span><label class="cx-num"><input type="number" name="maint" min="1400" max="4500" step="1" value="${maint}"> kcal/day</label>
-			<small>${maintenance() ? "From your calculator." : "An estimate. Use the calculator in My Space for yours."}</small></div>
-			<button type="submit" class="cx-chip primary cx-build">Build my program</button>
+			<div class="cx-f"${vis(["bmi", "energy"])}><span>Your body</span>${numf("weight", "Weight (kg)", pr.weight, 30, 250, 0.1)}${numf("height", "Height (cm)", pr.height, 120, 230)}</div>
+			<div class="cx-f"${vis(["energy"])}><span>For your metabolism</span>${seg("sex", [["male", "Male"], ["female", "Female"]], sex)}${numf("age", "Age", pr.age, 14, 90)}
+			<label class="cx-mf"><span>Activity</span><select name="act" class="cx-sel">${ACT.map(([v, l]) => `<option value="${v}"${v === act ? " selected" : ""}>${l}</option>`).join("")}</select></label></div>
+			<div class="cx-f"${vis(["meals"], "energy")}><span>Maintenance calories</span><label class="cx-num"><input type="number" name="maint" min="1400" max="4500" step="1" value="${maint}"> kcal/day</label>
+			<small>${maintenance() ? "From your calculator." : "An estimate. Use the calculator in My Space for yours, or tick Metabolism & macros."}</small></div>
+			<button type="submit" class="cx-chip primary cx-build">Build</button>
 		</form>`;
+	}
+	function syncSetup(f) {
+		const T = [...f.querySelectorAll('[name="tool"]:checked')].map((x) => x.value);
+		f.querySelectorAll("[data-for]").forEach((el) => {
+			el.hidden = !el.dataset.for.split(" ").some((t) => T.includes(t)) || (!!el.dataset.not && T.includes(el.dataset.not));
+			el.querySelectorAll('input[type="number"]:not([name="maint"])').forEach((i) => (i.required = !el.hidden));
+		});
+		f.querySelector(".cx-build").disabled = !T.length;
+		return T;
+	}
+	function formText(T) {
+		const w = T.includes("workout"), m = T.includes("meals"), calcs = T.filter((t) => t === "bmi" || t === "energy").map((t) => (t === "bmi" ? "BMI" : "metabolism and macros"));
+		const what = w && m ? "a complete program where training and meals are matched: more food on training days, less on rest days, protein every day"
+			: w ? "your workout plan" : m ? "your meal plan: more food on training days, less on rest days, protein every day" : "your " + calcs.join(" and ");
+		const extra = (w || m) && calcs.length ? `, plus your ${calcs.join(" and ")}` : "";
+		return `I'll make ${what}${extra}. I filled in what I could from your message. Tick or untick what you want (one tool or several), adjust anything, then tap Build. Everything is saved to your profile.`;
 	}
 
 	function dietText(P) {
@@ -394,23 +510,24 @@
 		if (phase === "reps") reps += 1;
 		if (phase === "sets") sets += 1;
 		if (phase === "deload") { sets -= 1; note = "-10% load"; }
+		if (kind.startsWith("cardio")) return { sets: 1, reps: `${kind.slice(6)} min`, rest: "-", note: "" };
 		if (kind === "time") return { sets, reps: `${30 + (phase === "reps" ? 10 : phase === "sets" ? 10 : 0)} s`, rest: "45 s", note };
 		return { sets, reps: String(reps), rest: `${G.rest} s`, note };
 	}
 
 	function buildProgram(p) {
 		const G = GOALS[p.goal];
-		const target = Math.round((p.maint * G.factor) / 10) * 10;
-		const split = SPLITS[p.days];
+		const target = Math.max(1200, Math.round((p.maint * G.factor) / 10) * 10 + (p.adj || 0));
+		const map = p.map || trainMap(p);
+		const nTrain = Object.values(map).filter(Boolean).length;
 		const trainK = target + 150;
-		const restK = Math.round(((target * 7 - trainK * p.days) / (7 - p.days)) / 10) * 10;
+		const restK = nTrain >= 7 ? trainK : Math.round(((target * 7 - trainK * nTrain) / (7 - nTrain)) / 10) * 10;
 		const protein = Math.round((target * G.protein) / 4);
 		const slots = p.meals === 4 ? ["Breakfast", "Lunch", "Snack", "Dinner"] : ["Breakfast", "Lunch", "Dinner"];
 		const weeks = [];
 		for (let w = 0; w < p.weeks; w++) {
 			const days = WEEKDAYS.map((name, d) => {
-				const si = split.days.indexOf(d);
-				const session = si >= 0 ? split.s[si] : null;
+				const session = map[d] || null;
 				const kcal = session ? trainK : restK;
 				const picks = slots.map((s, k) => {
 					let pool = MEALS[s].filter((m) => allowed(m, p.diet, p.ex, p.dis));
@@ -426,26 +543,29 @@
 			});
 			weeks.push(days);
 		}
-		return { ...p, goalLabel: G.label, target, trainK, restK, protein, weeks };
+		return { ...p, map: undefined, nTrain, goalLabel: G.label, target, trainK, restK, protein, weeks };
 	}
 
-	function programView(id, P) {
+	function programView(id, P, mode) {
+		mode = mode || "both";
 		const tabs = P.weeks.length > 1 ? `<div class="cx-tabs" role="tablist">${P.weeks.map((_, w) =>
 			`<button type="button" role="tab" data-week="${w}" aria-selected="${w === 0}">Week ${w + 1}</button>`).join("")}</div>` : "";
 		const weeks = P.weeks.map((days, w) => `<div class="cx-week" data-w="${w}"${w ? " hidden" : ""}>` + days.map((d, i) => {
-			const train = d.session ? `<div class="cx-sub2">Training · ${d.session}</div>` + d.ex.map((e) =>
+			const changed = P.swaps && P.swaps[i] !== undefined ? '<span class="cx-changed">Updated</span>' : "";
+			const train = mode === "meals" ? "" : d.session ? `<div class="cx-sub2">Training · ${d.session}</div>` + d.ex.map((e) =>
 				`<div class="cx-row cx-mrow"><span class="cx-meta">${e.sets} × ${e.reps}</span><span>${e.name}${e.note ? ` <em class="cx-meta">${e.note}</em>` : ""}${EXERCISES[e.name] ? ` <button type="button" class="cx-how" data-ex="${e.name}" aria-expanded="false">How to</button>` : ""}</span><span class="cx-meta">${e.rest}</span></div>`).join("")
 				: `<div class="cx-sub2">Rest day · walk 30–45 min or a Recovery class</div>`;
-			const meals = `<div class="cx-sub2">Meals</div>` + d.meals.map((m) =>
+			const meals = mode === "workout" ? "" : `<div class="cx-sub2">${mode === "meals" ? (d.session ? "Training day · meals" : "Rest day · meals") : "Meals"}</div>` + d.meals.map((m) =>
 				`<div class="cx-row cx-mrow"><span class="cx-day">${m.slot}</span><span>${m.dish}</span><span class="cx-meta">${fmt(m.kcal)} kcal · ${m.p} g</span></div>`).join("");
-			return `<details class="cx-dd"${i === 0 && w === 0 ? " open" : ""}><summary><span><span class="cx-day">${d.name.slice(0, 3)}</span> ${d.session || "Rest"}</span><span class="cx-meta">${fmt(d.kcal)} kcal</span></summary>${train}${meals}</details>`;
+			const right = mode === "workout" ? (d.session ? `${d.ex.length} exercises` : "") : `${fmt(d.kcal)} kcal`;
+			return `<details class="cx-dd"${i === 0 && w === 0 ? " open" : ""}><summary><span><span class="cx-day">${d.name.slice(0, 3)}</span> ${d.session || "Rest"}${changed}</span><span class="cx-meta">${right}</span></summary>${train}${meals}</details>`;
 		}).join("") + "</div>").join("");
-		return `<div class="cx-sum">
-				<div><b>${fmt(P.trainK)}</b><span>kcal training day</span></div>
-				<div><b>${fmt(P.restK)}</b><span>kcal rest day</span></div>
-				<div><b>${P.protein} g</b><span>protein / day</span></div>
-			</div>${tabs}<div class="cx-card">${weeks}</div>
-			<button type="button" class="cx-chip primary cx-pdf" data-pdf="${id}">Download PDF · program, meals & workout log</button>`;
+		const sum = mode === "workout"
+			? `<div><b>${P.nTrain}</b><span>sessions / week</span></div><div><b>${P.weeks.length === 4 ? "1 month" : P.weeks.length + (P.weeks.length > 1 ? " weeks" : " week")}</b><span>length</span></div><div><b>${P.goalLabel}</b><span>goal</span></div>`
+			: `<div><b>${fmt(P.trainK)}</b><span>kcal training day</span></div><div><b>${fmt(P.restK)}</b><span>kcal rest day</span></div><div><b>${P.protein} g</b><span>protein / day</span></div>`;
+		const pdf = mode === "workout" ? "workout plan & log" : mode === "meals" ? "meal plan" : "program, meals & workout log";
+		return `<div class="cx-sum">${sum}</div>${tabs}<div class="cx-card">${weeks}</div>
+			<button type="button" class="cx-chip primary cx-pdf" data-pdf="${id}">Download PDF · ${pdf}</button>`;
 	}
 
 	/* PDF: libraries are loaded only when someone asks for a download. */
@@ -458,7 +578,9 @@
 		return window.jspdf.jsPDF;
 	}
 
-	async function downloadPdf(P, btn) {
+	async function downloadPdf(P, btn, mode) {
+		mode = mode || "both";
+		const W0 = mode !== "meals", M0 = mode !== "workout";
 		const label = btn.textContent;
 		btn.disabled = true; btn.textContent = "Preparing PDF…";
 		try {
@@ -474,13 +596,13 @@
 			doc.setTextColor(255); doc.setFont("helvetica", "bold"); doc.setFontSize(22);
 			doc.text("APEX Coach", 14, 18);
 			doc.setFontSize(12); doc.setFont("helvetica", "normal");
-			doc.text(`${P.weeks.length}-week program · ${P.goalLabel} · ${P.days} training days · ${P.meals} meals a day`, 14, 28);
+			doc.text(`${P.weeks.length}-week ${mode === "workout" ? "workout plan" : mode === "meals" ? "meal plan" : "program"} · ${P.goalLabel} · ${P.nTrain} training days${M0 ? ` · ${P.meals} meals a day` : ""}`, 14, 28);
 			doc.setTextColor(...INK);
 			doc.autoTable({
 				startY: 48, theme: "grid", head: [["Plan", "Value"]], headStyles: { ...head, fillColor: PINK }, styles: body,
-				body: [["Member", account().name || "Guest"], ["Goal", P.goalLabel], ["Maintenance", `${n(P.maint)} kcal/day`],
+				body: [["Member", account().name || "Guest"], ["Goal", P.goalLabel]].concat(M0 ? [["Maintenance", `${n(P.maint)} kcal/day`],
 					["Training day", `${n(P.trainK)} kcal`], ["Rest day", `${n(P.restK)} kcal`], ["Protein", `${P.protein} g/day`],
-					["Diet", dietText(P)], ["Created", new Date().toLocaleDateString("en-GB")]]
+					["Diet", dietText(P)]] : [["Training days", `${P.nTrain} a week`]]).concat([["Created", new Date().toLocaleDateString("en-GB")]])
 			});
 			doc.setFontSize(9);
 			doc.text(doc.splitTextToSize("How it fits together: training days get more food (mostly carbs around the session), rest days less, so the weekly average matches your goal. Weights go up when you hit every rep with good form. Weigh in once a week and adjust by ~150 kcal if progress stalls. Estimates only, not medical advice.", W - 28), 14, doc.lastAutoTable.finalY + 8);
@@ -490,14 +612,14 @@
 				doc.setFont("helvetica", "normal");
 				const tr = [];
 				days.forEach((d) => d.ex.forEach((e, i) => tr.push([i ? "" : d.name, i ? "" : d.session, e.name, `${e.sets} × ${e.reps}`, e.rest, e.note])));
-				doc.autoTable({ startY: 22, theme: "striped", head: [["Day", "Session", "Exercise", "Sets × reps", "Rest", "Note"]], headStyles: { ...head, fillColor: PINK }, styles: body, body: tr });
+				if (W0) doc.autoTable({ startY: 22, theme: "striped", head: [["Day", "Session", "Exercise", "Sets × reps", "Rest", "Note"]], headStyles: { ...head, fillColor: PINK }, styles: body, body: tr });
 				const ml = [];
 				days.forEach((d) => d.meals.forEach((m, i) => ml.push([i ? "" : d.name, i ? "" : (d.session ? "Training" : "Rest"), m.slot, m.dish, n(m.kcal), `${m.p} g`])));
 				days.forEach(() => {});
-				doc.autoTable({ startY: doc.lastAutoTable.finalY + 8, theme: "striped", head: [["Day", "Type", "Meal", "Dish", "kcal", "Protein"]], headStyles: head, styles: body, body: ml });
+				if (M0) doc.autoTable({ startY: W0 ? doc.lastAutoTable.finalY + 8 : 22, theme: "striped", head: [["Day", "Type", "Meal", "Dish", "kcal", "Protein"]], headStyles: head, styles: body, body: ml });
 			});
 
-			P.weeks.forEach((days, w) => {
+			if (W0) P.weeks.forEach((days, w) => {
 				doc.addPage(); doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.text(`Workout log · Week ${w + 1}`, 14, 16);
 				doc.setFontSize(9); doc.setFont("helvetica", "normal");
 				doc.text("Write weight × reps for each set. Bodyweight: ________   Notes: ______________________________", 14, 23);
@@ -521,7 +643,7 @@
 			});
 			const pages = doc.getNumberOfPages();
 			for (let i = 1; i <= pages; i++) { doc.setPage(i); doc.setFontSize(8); doc.setTextColor(120); doc.text(`APEX Athletic Club · Coach (demo) · page ${i}/${pages}`, 14, 290); doc.setTextColor(...INK); }
-			doc.save(`APEX-${P.weeks.length}-week-program.pdf`);
+			doc.save(`APEX-${P.weeks.length}-week-${mode === "workout" ? "workout-plan" : mode === "meals" ? "meal-plan" : "program"}.pdf`);
 			btn.textContent = "PDF downloaded ✓";
 		} catch (e) {
 			btn.textContent = "Couldn't create the PDF. Try again";
@@ -543,6 +665,12 @@
 		let fields = f("weight", "Weight (kg)", pr.weight, 30, 250) + f("height", "Height (cm)", pr.height, 120, 230);
 		if (kind === "bodyfat") fields = sexSeg + f("height", "Height (cm)", pr.height, 120, 230) + f("waist", "Waist at navel (cm)", pr.waist, 40, 200) + f("neck", "Neck (cm)", pr.neck, 20, 70) + f("hip", "Hips, widest point (cm) · women", pr.hip, 50, 200, true);
 		if (kind === "water") fields += f("hours", "Training hours per week", pr.hours || 4, 0, 30);
+		if (kind === "energy") {
+			const act = actOf(pr) || 1.55, g = GOALMAP[pr.goal] || "maintain";
+			fields = sexSeg + f("age", "Age", pr.age, 14, 90) + fields +
+				`<label class="cx-mf"><span>Activity</span><select name="act" class="cx-sel">${ACT.map(([v, l]) => `<option value="${v}"${v === act ? " selected" : ""}>${l}</option>`).join("")}</select></label>` +
+				`<div class="cx-seg" role="radiogroup" aria-label="Goal">${[["lose", "Lose fat"], ["maintain", "Maintain"], ["build", "Build muscle"]].map(([v, l]) => `<label><input type="radio" name="egoal" value="${v}"${v === g ? " checked" : ""}><span>${l}</span></label>`).join("")}</div>`;
+		}
 		return `<form class="cx-setup cx-metric" data-kind="${kind}">${fields}<button type="submit" class="cx-chip primary cx-build">Calculate</button></form>`;
 	}
 	function bmiAnswer(pr) {
@@ -551,15 +679,28 @@
 		const lo = Math.round(18.5 * m * m), hi = Math.round(24.9 * m * m);
 		const diff = pr.weight < lo ? `about ${Math.round(lo - pr.weight)} kg below` : pr.weight > hi ? `about ${Math.round(pr.weight - hi)} kg above` : "inside";
 		return {
+			calc: ["bmi", bmiCalc(pr)],
 			text: `Your BMI is ${bmi.toFixed(1)} (${pr.weight} kg, ${pr.height} cm), which is ${cat}. For your height, a healthy weight range is ${lo}–${hi} kg; you're ${diff} it. BMI = weight ÷ height² (${pr.weight} ÷ ${m.toFixed(2)}²). It doesn't tell muscle from fat, so if you lift regularly, body fat is the better measure.`,
 			html: `<div class="cx-sum"><div><b>${bmi.toFixed(1)}</b><span>BMI</span></div><div><b>${lo}–${hi}</b><span>healthy kg</span></div><div><b>${pr.weight} kg</b><span>your weight</span></div></div>`,
 			chips: [{ label: "Estimate my body fat", ask: "How can I estimate my body fat percentage?" }, { label: "How much water should I drink?", ask: "How much water should I drink per day, including training days?" }]
+		};
+	}
+	function energyAnswer(pr) {
+		const E = energyCalc(pr, GOALMAP[pr.goal] || "maintain");
+		const aim = E.goal === "lose" ? "lose fat" : E.goal === "build" ? "build muscle" : "maintain your weight";
+		return {
+			calc: ["energy", E],
+			text: `Your BMR is ${fmt(E.bmr)} kcal a day: what your body burns at rest (Mifflin-St Jeor, from your age, sex, weight and height). With your activity level, your TDEE is ${fmt(E.tdee)} kcal. To ${aim}, aim for ${fmt(E.target)} kcal a day: ${E.p} g protein, ${E.c} g carbs and ${E.f} g fat. Saved to your profile.`,
+			html: energyView(E),
+			profile: { age: E.age, sex: E.sex, weight: E.weight, height: E.height, act: E.act, goal: { lose: "cut", build: "bulk" }[E.goal] || "maintain" },
+			chips: [{ label: "Plan my meals on these numbers", ask: "Plan my meals for the week" }, { label: "Build a workout plan", ask: "Build me a workout plan" }]
 		};
 	}
 	function waterAnswer(pr) {
 		const base = pr.weight * 0.035, h = +pr.hours || 0, perSession = 0.6;
 		const trainDay = base + perSession;
 		return {
+			calc: ["water", { rest: +base.toFixed(1), train: +trainDay.toFixed(1), weight: +pr.weight, at: Date.now() }],
 			text: `About ${base.toFixed(1)} L a day on rest days (35 ml × ${pr.weight} kg), and ${trainDay.toFixed(1)}–${(base + 0.75).toFixed(1)} L on training days: add 0.5–0.75 L per hour of training, more in Miami heat or if you sweat a lot. ${h ? `Over your ${h} training hours a week that's roughly ${(base * 7 + h * 0.6).toFixed(0)} L a week. ` : ""}Food covers about 20% of it. Simple check: pale-yellow urine means you're on track.`,
 			html: `<div class="cx-sum"><div><b>${base.toFixed(1)} L</b><span>rest day</span></div><div><b>${trainDay.toFixed(1)} L</b><span>training day</span></div><div><b>0.5 L</b><span>2 h before training</span></div></div>`,
 			chips: [{ label: "What's my BMI?", ask: "What's my BMI and what's a healthy weight range for me?" }, { label: "Build my training + meal program", ask: "Build me a program with training and meals" }]
@@ -577,6 +718,7 @@
 		const w = +pr.weight || num("c-weight");
 		const fatKg = w ? (w * bf / 100) : null;
 		return {
+			calc: ["bodyfat", { value: +bf.toFixed(1), cat, at: Date.now() }],
 			text: `Estimated body fat: ${bf.toFixed(1)}% (US Navy method, ${female ? "waist + hips − neck" : "waist − neck"} vs height), which is ${cat} for ${female ? "women" : "men"}.${fatKg ? ` That's about ${fatKg.toFixed(1)} kg of fat and ${(w - fatKg).toFixed(1)} kg of lean mass.` : ""} Expect ±3–4% versus a DEXA scan. Measure the same way every 2–4 weeks: the trend matters more than the number.`,
 			html: `<div class="cx-sum"><div><b>${bf.toFixed(1)}%</b><span>body fat</span></div><div><b>${female ? "21–31%" : "14–24%"}</b><span>fit to average</span></div><div><b>${cat}</b><span>category</span></div></div>`,
 			chips: [{ label: "Build a fat-loss program", ask: "Build me a 1 month fat loss program" }, { label: "What's my BMI?", ask: "What's my BMI and what's a healthy weight range for me?" }]
@@ -897,49 +1039,30 @@
 	const intents = [
 		{
 			id: "program",
-			test: /^Build program:|^Change my program settings|(build|make|create|give|fais|crée|donne)[^?.!]{0,40}(plan|program|programme|routine|split|menu|week|semaine)|(meal|training|workout|food|repas|nourriture|entraînement)\s*(plan|program|programme)|program(me)? (sur|for|de)|\b[1-4]\s*(weeks?|semaines?)\b|\b(month|mois)\b|[2-5]-day/i,
-			reply: (q) => {
-				if (!/^Build program:/.test(q)) return {
-					text: "I'll build a complete program where training and meals are matched: more food on training days, less on rest days, protein every day. I filled in what I could from your message. Adjust anything, then tap Build.",
-					html: setupForm(parseProgramAsk(q))
-				};
-				const kv = {};
-				q.replace(/^Build program:/, "").split(";").forEach((x) => { const [k, v] = x.split("=").map((y) => y && y.trim()); if (k) kv[k] = v; });
-				const P = buildProgram({ goal: GOALS[kv.goal] ? kv.goal : "maintain", weeks: Math.min(4, Math.max(1, +kv.weeks || 4)), days: Math.min(5, Math.max(2, +kv.days || 3)), meals: +kv.meals === 3 ? 3 : 4, diet: DIETS[kv.diet] ? kv.diet : "any", ex: (kv.ex || "").split(",").filter((x) => ALLERGENS.some(([k]) => k === x)), avoid: (kv.avoid || "").replace(/[|]/g, ", "), dis: dislikeWords((kv.avoid || "").replace(/[|]/g, ",")), maint: Math.min(4500, Math.max(1400, +kv.maint || 2400)), seed: +kv.seed || 0 });
-				const id = "p" + Math.abs([...q].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0));
-				PROGS[id] = P;
-				const prog = { 1: "Week 1 is about learning the movements and finding your weights.", 2: "Week 2 adds a rep to every exercise.", 3: "Week 2 adds a rep, week 3 adds a set.", 4: "Week 2 adds a rep, week 3 adds a set, week 4 is a lighter deload week to recover." }[P.weeks.length];
-				const again = (k, v) => "Build program: " + Object.entries({ goal: P.goal, weeks: P.weeks.length, days: P.days, meals: P.meals, diet: P.diet, ex: P.ex.join(","), avoid: P.avoid.replace(/,\s*/g, "|"), maint: P.maint, [k]: v }).map(([a, b]) => `${a}=${b}`).join("; ");
-				return {
-					text: `Your ${P.weeks.length === 4 ? "1-month" : P.weeks.length + "-week"} program is ready. ${P.goalLabel}: ${fmt(P.trainK)} kcal on training days and ${fmt(P.restK)} on rest days, averaging ${fmt(P.target)} a day, with ${P.protein} g protein every day. ${P.days} sessions a week. Meals: ${dietText(P).replace(/\.+$/, "")}. ${prog} Open any day to see the workout and the meals, or download everything as a PDF with log sheets.`,
-					html: programView(id, P),
-					note: { kind: "warn", text: "Estimates for a typical adult. Start with weights you can lift for every rep with good form. Not medical advice: see the club doctor if you have an injury or condition." },
-					chips: [
-						{ label: P.days < 5 ? `${P.days + 1} training days` : "4 training days", ask: again("days", P.days < 5 ? P.days + 1 : 4), display: "Rebuild with " + (P.days < 5 ? P.days + 1 : 4) + " training days" },
-						{ label: "Swap all the meals", ask: again("seed", (+(P.seed || 0) + 1) % 7), display: "Swap all the meals" },
-						{ label: "Change settings", ask: "Change my program settings" }
-					]
-				};
-			}
+			test: /^Build program:|^Change my program settings|(build|make|create|give|fais|crée|donne)[^?.!]{0,40}(plan|program|programme|routine|split|menu|week|semaine)|(meal|training|workout|food|repas|nourriture|entraînement)\s*(plan|program|programme)|program(me)? (sur|for|de)|\b[1-4]\s*(weeks?|semaines?)\b|\b(month|mois)\b|[2-5]-day|\bplan\s+(my|a|me|the)\b[^?.!]{0,30}(meal|menu|workout|training|week|program)/i,
+			reply: (q) => programReply(q)
 		},
 		{
 			id: "metrics",
-			test: /^Metric:|\b(bmi|imc|body ?fat|masse grasse|graisse corporelle|ideal weight|poids idéal|poids ideal|healthy weight|how much water|combien d'eau|quantité d'eau|hydrat)/i,
+			test: /^Metric:|\b(bmi|imc|body ?fat|masse grasse|graisse corporelle|ideal weight|poids idéal|poids ideal|healthy weight|how much water|combien d'eau|quantité d'eau|hydrat|metabolism|métabolisme|metabolisme|bmr|tdee|macros?|maintenance calories|calorie needs|besoins? caloriques?)/i,
 			reply: (q) => {
-				let kind = /^Metric:/.test(q) ? q.match(/kind=(\w+)/)[1] : /fat|grasse|graisse/i.test(q) ? "bodyfat" : /water|eau|hydrat/i.test(q) ? "water" : "bmi";
+				let kind = /^Metric:/.test(q) ? q.match(/kind=(\w+)/)[1] : /metabol|bmr|tdee|macro|maintenance calories|calorie needs|caloriques?/i.test(q) ? "energy" : /fat|grasse|graisse/i.test(q) ? "bodyfat" : /water|eau|hydrat/i.test(q) ? "water" : "bmi";
 				const pr = Object.assign({}, savedProfile());
 				if (/^Metric:/.test(q)) q.replace(/^Metric:/, "").split(";").forEach((x) => { const [k, v] = x.split("=").map((y) => y && y.trim()); if (k && v && k !== "kind") pr[k] = isNaN(+v) ? v : +v; });
-				const need = kind === "bodyfat" ? ["height", "waist", "neck"] : ["weight", "height"];
+				const need = kind === "bodyfat" ? ["height", "waist", "neck"] : kind === "energy" ? ["age", "sex", "weight", "height"] : ["weight", "height"];
+				const done = (r) => (r.calc ? { ...r, save: withCalc(r.calc[0], r.calc[1]) } : r);
 				if (!/^Metric:/.test(q) || need.some((k) => !pr[k])) {
-					if (kind !== "bodyfat" && need.every((k) => pr[k]) && !/^Metric:/.test(q)) return kind === "bmi" ? bmiAnswer(pr) : waterAnswer(pr);
+					if (kind !== "bodyfat" && need.every((k) => pr[k]) && !/^Metric:/.test(q)) return done(kind === "bmi" ? bmiAnswer(pr) : kind === "energy" ? energyAnswer(pr) : waterAnswer(pr));
 					return {
-						text: kind === "bodyfat"
+						text: kind === "energy"
+							? "I'll calculate your metabolism (BMR and TDEE, Mifflin-St Jeor) and your daily macros. I need a few details:"
+							: kind === "bodyfat"
 							? "I'll estimate it with the US Navy method: a tape measure is all you need. Measure your waist at the navel and your neck just below the Adam's apple (women: also hips at the widest point)."
 							: "I just need your weight and height." + (kind === "water" ? " Add your weekly training hours too." : ""),
 						html: metricForm(kind, pr)
 					};
 				}
-				return kind === "bodyfat" ? bodyfatAnswer(pr) : kind === "water" ? waterAnswer(pr) : bmiAnswer(pr);
+				return done(kind === "bodyfat" ? bodyfatAnswer(pr) : kind === "water" ? waterAnswer(pr) : kind === "energy" ? energyAnswer(pr) : bmiAnswer(pr));
 			}
 		},
 		{
@@ -1003,10 +1126,161 @@
 		}
 	];
 
+
+	/* ---------- workout plan, meal plan, calculations: separately or together ---------- */
+	function programReply(q) {
+		if (!/^Build program:/.test(q)) {
+			const pl = plans();
+			let T = /^Change my program settings/.test(q) ? ["workout", "meals", "bmi", "energy"].filter((t) => (t === "workout" || t === "meals" ? pl[t] : pl.calcs && pl.calcs[t])) : toolsIn(q, true);
+			if (!T.length) T = ["workout", "meals"];
+			const base = /^Change my program settings/.test(q) ? ((pl.meals || pl.workout || {}).s || {}) : parseProgramAsk(q);
+			return { text: formText(T), html: setupForm(base, T) };
+		}
+		const kv = {};
+		q.replace(/^Build program:/, "").split(";").forEach((x) => { const [k, v] = x.split("=").map((y) => y && y.trim()); if (k) kv[k] = v; });
+		const T = String(kv.tools || "workout,meals").split(",").filter((t) => TOOL_LABEL[t]);
+		const pl = plans(), now = Date.now();
+		const next = { ...pl, prev: snapshot(pl), calcs: { ...(pl.calcs || {}) } };
+		const pr = Object.assign({}, savedProfile());
+		["age", "weight", "height", "act"].forEach((k) => { if (kv[k]) pr[k] = +kv[k]; });
+		if (kv.sex) pr.sex = kv.sex;
+		let B = null, E = null;
+		if (T.includes("bmi") && pr.weight && pr.height) next.calcs.bmi = B = bmiCalc(pr);
+		if (T.includes("energy") && pr.weight && pr.height && pr.age) next.calcs.energy = E = energyCalc(pr, GOALS[kv.goal] ? kv.goal : "maintain");
+		let W = null, M = null;
+		if (T.includes("workout")) { const st = settings(kv); next.workout = W = { s: st, P: build(st), at: now }; }
+		if (T.includes("meals")) {
+			const st = settings(kv);
+			if (E) st.maint = Math.min(4500, Math.max(1400, E.tdee));
+			next.meals = M = { s: st, P: build(st, next.workout ? trainMap(next.workout.s) : null), at: now };
+		} else if (W && next.meals) next.meals = { ...next.meals, P: build(next.meals.s, trainMap(W.s)), at: now };
+
+		const parts = [], html = [];
+		const id = "p" + Math.abs([...q].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0));
+		const sec = (title, inner) => `<div class="cx-sec"><div class="cx-sub2">${title}</div>${inner}</div>`;
+		const prog = (n) => ({ 1: "Week 1 is about learning the movements and finding your weights.", 2: "Week 2 adds a rep to every exercise.", 3: "Week 2 adds a rep, week 3 adds a set.", 4: "Week 2 adds a rep, week 3 adds a set, week 4 is a lighter deload week to recover." })[n];
+		if (W && M) {
+			const P = M.P; PROGS[id] = { P, mode: "both" };
+			parts.push(`Your ${lengthWord(P.weeks.length)} program is ready. ${P.goalLabel}: ${fmt(P.trainK)} kcal on training days and ${fmt(P.restK)} on rest days, averaging ${fmt(P.target)} a day, with ${P.protein} g protein every day. ${P.nTrain} sessions a week. Meals: ${dietText(P).replace(/\.+$/, "")}. ${prog(P.weeks.length)}`);
+			html.push(programView(id, P, "both"));
+		} else if (W) {
+			const P = W.P; PROGS[id] = { P, mode: "workout" };
+			const names = [...new Set(P.weeks[0].map((d) => d.session).filter(Boolean))];
+			parts.push(`Your ${lengthWord(P.weeks.length)} workout plan is ready: ${P.nTrain} sessions a week (${names.join(", ")}), aimed at ${{ lose: "fat loss", maintain: "staying fit", build: "muscle gain" }[P.goal]}. ${prog(P.weeks.length)}`);
+			html.push(programView(id, P, "workout"));
+		} else if (M) {
+			const P = M.P; PROGS[id] = { P, mode: "meals" };
+			parts.push(`Your ${lengthWord(P.weeks.length)} meal plan is ready: ${fmt(P.trainK)} kcal on training days and ${fmt(P.restK)} on rest days, averaging ${fmt(P.target)} a day, with ${P.protein} g protein every day. ${P.meals} meals a day${P.diet === "any" && !P.ex.length && !P.avoid ? "" : ": " + dietText(P).replace(/\.+$/, "")}.${next.workout ? " Training days follow your saved workout plan." : ""}`);
+			html.push(programView(id, P, "meals"));
+		}
+		if (B) { parts.push(`BMI ${B.value}: a healthy weight for your height is ${B.lo}–${B.hi} kg.`); html.push(sec("BMI", bmiView(B))); }
+		if (E) { parts.push(`Metabolism: BMR ${fmt(E.bmr)} kcal and TDEE ${fmt(E.tdee)} kcal, so ${fmt(E.target)} kcal a day to ${goalWord(E.goal)}, with ${E.p} g protein, ${E.c} g carbs and ${E.f} g fat.${M ? " Your meal plan uses these numbers." : ""}`); html.push(sec("Metabolism & macros", energyView(E))); }
+		if (!parts.length) return { text: "I need your weight and height (and your age for the metabolism) to calculate that.", html: setupForm(kv, T) };
+		parts.push("Everything is saved to your profile in My Space. Ask me to change anything and it updates there too.");
+		const P0 = (M || W || {}).P;
+		const again = (k, v) => "Build program: " + Object.entries({ ...kv, tools: T.join(","), [k]: v }).map(([a, b]) => `${a}=${b}`).join("; ");
+		const chips = [];
+		if (P0) {
+			if (W) chips.push({ label: P0.nTrain < 5 ? `${P0.nTrain + 1} training days` : "4 training days", ask: again("days", P0.nTrain < 5 ? P0.nTrain + 1 : 4), display: "Rebuild with " + (P0.nTrain < 5 ? P0.nTrain + 1 : 4) + " training days" });
+			if (M) chips.push({ label: "Swap all the meals", ask: again("seed", (+(kv.seed || 0) + 1) % 7), display: "Swap all the meals" });
+			chips.push({ label: "Change settings", ask: "Change my program settings" });
+		}
+		return {
+			text: parts.join(" "),
+			html: html.join(""),
+			note: P0 ? { kind: "warn", text: "Estimates for a typical adult. Start with weights you can lift for every rep with good form. Not medical advice: see the club doctor if you have an injury or condition." } : undefined,
+			save: next, profile: Object.assign({}, B || E ? { weight: pr.weight, height: pr.height } : {}, E ? { age: pr.age, sex: pr.sex, act: pr.act, goal: { lose: "cut", build: "bulk" }[E.goal] || "maintain" } : {}),
+			chips
+		};
+	}
+
+	/* ---------- changes asked in the chat update the saved plans ---------- */
+	const DAYRX = [/\b(mondays?|lundi)\b/i, /\b(tuesdays?|tue|mardi)\b/i, /\b(wednesdays?|wed|mercredi)\b/i, /\b(thursdays?|thu|jeudi)\b/i, /\b(fridays?|fri|vendredi)\b/i, /\b(saturdays?|sat|samedi)\b/i, /\b(sundays?|sun|dimanche)\b/i];
+	const SWAPS = [[/cardio|running|\brun\b|jogging|course à pied|\bbike\b|cycling|vélo|velo|hiit|swim|natation|rameur|rower/i, "Cardio"], [/\b(rest|repos|day off|off day|jour off|break|recovery|récup)\b/i, "Rest"], [/upper|haut du corps/i, "Upper A"], [/lower|\blegs?\b|jambes|bas du corps/i, "Lower A"], [/full[ -]?body|corps entier/i, "Full body A"], [/\bpush\b/i, "Push"], [/\bpull\b/i, "Pull"]];
+	const EDITVERB = /\b(replace|swap|change|switch|make|move|instead|put|set|turn|update|adjust|less|fewer|more|lower|higher|reduce|increase|remplace|mets|passe|transforme|plutôt|plutot|lieu|moins|plus|baisse|augmente|réduis|reduis|diminue)\b/i;
+	function lastSwap(q) {
+		let best = null;
+		SWAPS.forEach(([re, v]) => { const g = new RegExp(re.source, "gi"); let m; while ((m = g.exec(q))) if (!best || m.index > best.i) best = { i: m.index, v }; });
+		return best && best.v;
+	}
+	function editReply(q) {
+		const pl = plans();
+		if (!pl.workout && !pl.meals) return null;
+		const mine = [{ label: "See my profile", href: here("#coach-plans"), primary: true }];
+		if (/^(undo|annule|annuler)\b/i.test(q.trim())) {
+			if (!pl.prev) return { text: "There's no change to undo.", chips: mine };
+			const old = JSON.parse(pl.prev), next = { ...pl, workout: old.workout, meals: old.meals, calcs: old.calcs };
+			delete next.prev;
+			return { text: "Undone: your profile is back to how it was before the last change.", save: next, chips: mine };
+		}
+		const days = DAYRX.map((r, i) => (r.test(q) ? i : -1)).filter((i) => i >= 0);
+		const act = days.length ? lastSwap(q) : null;
+		if (!EDITVERB.test(q) && !(days.length && act)) return null;
+		const now = Date.now(), notes = [];
+		const w = pl.workout ? { ...pl.workout, s: { ...pl.workout.s, swaps: { ...(pl.workout.s.swaps || {}) } } } : null;
+		const m = pl.meals ? { ...pl.meals, s: { ...pl.meals.s, ex: [...(pl.meals.s.ex || [])] } } : null;
+		let wCh = false, mCh = false;
+		if (w && days.length && act) {
+			days.forEach((d) => (w.s.swaps[d] = act));
+			wCh = true;
+			notes.push(`${days.map((d) => WEEKDAYS[d]).join(" and ")} ${days.length > 1 ? "are" : "is"} now ${act === "Rest" ? "a rest day" : act === "Cardio" ? "cardio (incline walk, rower intervals, easy bike)" : act}`);
+		}
+		const less = /(less|fewer|lower|reduce|cut|drop|moins|baisse|réduis|reduis|diminue)[^.?!]{0,25}(calorie|kcal|food|nourriture|manger)|(calorie|kcal)s?[^.?!]{0,12}(lower|less|down|en moins)/i.test(q);
+		const more = /(more|increase|higher|raise|add|plus|augmente|ajoute)[^.?!]{0,25}(calorie|kcal|food|nourriture|manger)|(calorie|kcal)s?[^.?!]{0,12}(higher|more|up|en plus)/i.test(q);
+		const amt = q.match(/(\d[\d,.\s]{1,5})\s*(kcal|calories|cal)\b/i);
+		if (m && (less || more || amt)) {
+			const n = amt ? +amt[1].replace(/[^\d]/g, "") : 0;
+			const base = Math.round((m.s.maint * GOALS[m.s.goal].factor) / 10) * 10;
+			if (n >= 1000 && !less && !more) m.s.adj = n - base;
+			else m.s.adj = (m.s.adj || 0) + (less ? -1 : 1) * (n && n < 1000 ? n : 200);
+			mCh = true;
+		}
+		const pa = parseProgramAsk(q);
+		if (less || more || amt) delete pa.goal;
+		if (Object.keys(pa).length && EDITVERB.test(q)) {
+			if (pa.goal) notes.push(`goal: ${GOALS[pa.goal].label.toLowerCase()}`);
+			if (pa.weeks) notes.push(`length: ${lengthWord(pa.weeks)}`);
+			if (w) {
+				["goal", "weeks"].forEach((k) => { if (pa[k] != null && pa[k] !== w.s[k]) { w.s[k] = pa[k]; wCh = true; } });
+				if (pa.days && pa.days !== w.s.days) { w.s.days = pa.days; w.s.swaps = {}; wCh = true; notes.push(`${pa.days} training days a week`); }
+			}
+			if (m) {
+				["goal", "weeks", "meals", "diet"].forEach((k) => { if (pa[k] != null && pa[k] !== m.s[k]) { m.s[k] = pa[k]; mCh = true; } });
+				if (pa.meals) notes.push(`${pa.meals} meals a day`);
+				if (pa.diet) notes.push(`diet: ${DIETS[pa.diet].label.toLowerCase()}`);
+				if (pa.ex) { const ex = [...new Set([...m.s.ex, ...pa.ex])]; if (ex.length !== m.s.ex.length) { m.s.ex = ex; mCh = true; notes.push("no " + pa.ex.map((k) => ALLERGENS.find(([a]) => a === k)[1].toLowerCase()).join(", no ")); } }
+				if (!w && pa.days && pa.days !== m.s.days) { m.s.days = pa.days; mCh = true; notes.push(`${pa.days} training days a week`); }
+			}
+		}
+		if (!wCh && !mCh) return null;
+		if (wCh) { w.P = build(w.s); w.at = now; }
+		if (m && (mCh || wCh)) { m.P = build(m.s, w ? trainMap(w.s) : null); m.at = now; }
+		if (m && mCh && (less || more || amt)) notes.push(`meals now ${fmt(m.P.trainK)} kcal on training days and ${fmt(m.P.restK)} on rest days (average ${fmt(m.P.target)})`);
+		else if (m && wCh) notes.push("your meals follow the new training days");
+		const next = { ...pl, workout: w, meals: m, prev: snapshot(pl), last: { text: q, at: now } };
+		const mode = wCh ? "workout" : "meals", P = wCh ? w.P : m.P, id = "e" + Math.abs([...q].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0));
+		PROGS[id] = { P, mode };
+		const t = notes.join("; ");
+		return {
+			text: `Done: ${t}. Your profile in My Space is updated.`,
+			html: programView(id, P, mode),
+			save: next,
+			chips: mine.concat([{ label: "Undo", ask: "Undo the last change" }])
+		};
+	}
+
 	function answer(q) {
 		// Deterministic flows where exactness matters; the live model for everything else.
-		const order = ["medical", "metrics", "membership", "program", "classes"];
-		for (const id of order) { const it = intents.find((x) => x.id === id); if (it.test.test(q)) return { id, ...it.reply(q) }; }
+		const it = (id) => intents.find((x) => x.id === id);
+		const run = (id) => ({ id, ...it(id).reply(q) });
+		if (it("medical").test.test(q)) return run("medical");
+		if (/^(Build program:|Change my program settings)/.test(q)) return run("program");
+		if (/^Metric:/.test(q)) return run("metrics");
+		const ed = editReply(q);
+		if (ed) return { id: "edit", ...ed };
+		const T = toolsIn(q, false);
+		if (it("program").test.test(q) || (T.length >= 2 && /(build|make|create|give|plan|calculate|compute|work out|fais|crée|cree|donne|calcule|prépare|prepare)/i.test(q))) return run("program");
+		for (const id of ["metrics", "membership", "classes"]) if (it(id).test.test(q)) return run(id);
 		return { id: "ai", ai: true };
 	}
 
@@ -1014,9 +1288,9 @@
 		return [
 			{ label: "What's my BMI and ideal weight range?", ask: "What's my BMI and what's a healthy weight range for me?" },
 			{ label: "How much water should I drink?", ask: "How much water should I drink per day, including training days?" },
-			{ label: "Build my training + meal program", ask: "Build me a program with training and meals" },
-			{ label: "Which class fits a beginner?", ask: "Which class fits a beginner?" },
-			{ label: "How do I estimate my body fat?", ask: "How can I estimate my body fat percentage?" },
+			{ label: "Build a workout plan", ask: "Build me a workout plan" },
+			{ label: "Plan my meals for the week", ask: "Plan my meals for the week" },
+			{ label: "Calculate my metabolism and macros", ask: "Calculate my metabolism and macros" },
 			{ label: "Show me exercises for my back", ask: "Show me exercises for my back" }
 		];
 	}
@@ -1096,9 +1370,11 @@
 			const sexEl = document.getElementById("c-gender"), actEl = document.getElementById("c-activity");
 			const goalEl = document.querySelector('input[name="goal"]:checked');
 			const p = { age: num("c-age"), sex: sexEl ? (sexEl.value || sexEl.options[sexEl.selectedIndex].text) : null, weight: w, height: h,
-				activity: actEl ? actEl.options[actEl.selectedIndex].text : null, goal: goalEl ? goalEl.value : null };
-			try { localStorage.setItem("apex_profile", JSON.stringify(p)); } catch (_) {}
-			return p;
+				activity: actEl ? actEl.options[actEl.selectedIndex].text : null, act: actEl ? +actEl.value : null, goal: goalEl ? goalEl.value : null };
+			let saved = {}; try { saved = JSON.parse(localStorage.getItem("apex_profile")) || {}; } catch (_) {}
+			const all = Object.assign(saved, p);
+			try { localStorage.setItem("apex_profile", JSON.stringify(all)); } catch (_) {}
+			return all;
 		}
 		try { return JSON.parse(localStorage.getItem("apex_profile")); } catch (_) { return null; }
 	}
@@ -1274,7 +1550,11 @@
 		p.classList.remove("cx-caret");
 		if (a.html) bubble.insertAdjacentHTML("beforeend", a.html);
 		if (a.note && !seen.has(a.id)) { seen.add(a.id); bubble.appendChild(noteEl(a.note)); }
-		if (a.chips && a.chips.length) wrap.appendChild(chipRow(a.chips));
+		if (a.save) { storePlans(a.save); renderCtx(); }
+		if (a.profile) mergeProfile(a.profile);
+		const chips = (a.chips || []).slice();
+		if (a.save && !chips.some((c) => c.href && c.href.indexOf("#coach-plans") >= 0)) chips.unshift({ label: "See it in my profile", href: here("#coach-plans") });
+		if (chips.length) wrap.appendChild(chipRow(chips));
 		wrap.appendChild(actions(q, wrap, bubble));
 		convo.push({ role: "assistant", content: a.text });
 		history.push({ q, d: display || null, id: a.id });
@@ -1419,22 +1699,38 @@
 			const kind = mf.dataset.kind, vals = {};
 			mf.querySelectorAll("input[type=number]").forEach((i) => { if (i.value) vals[i.name] = +i.value; });
 			const sx = mf.querySelector("[name=sex]:checked"); if (sx) vals.sex = sx.value;
+			const ac = mf.querySelector("[name=act]"); if (ac) vals.act = +ac.value;
+			const eg = mf.querySelector("[name=egoal]:checked"); if (eg) vals.goal = eg.value;
 			let saved = {}; try { saved = JSON.parse(localStorage.getItem("apex_profile")) || {}; } catch (_) {}
 			try { localStorage.setItem("apex_profile", JSON.stringify(Object.assign(saved, vals))); } catch (_) {}
-			const label = kind === "bodyfat" ? `Waist ${vals.waist} cm · neck ${vals.neck} cm${vals.hip ? ` · hips ${vals.hip} cm` : ""} · ${vals.height} cm` : `${vals.weight} kg · ${vals.height} cm${vals.hours != null ? ` · ${vals.hours} h training/week` : ""}`;
+			const label = kind === "energy" ? `${vals.age} y · ${vals.sex} · ${vals.weight} kg · ${vals.height} cm · ${(ACT.find(([v]) => v === vals.act) || [0, ""])[1].split(":")[0]} · ${GOALS[vals.goal] ? GOALS[vals.goal].label : "Maintain"}` : kind === "bodyfat" ? `Waist ${vals.waist} cm · neck ${vals.neck} cm${vals.hip ? ` · hips ${vals.hip} cm` : ""} · ${vals.height} cm` : `${vals.weight} kg · ${vals.height} cm${vals.hours != null ? ` · ${vals.hours} h training/week` : ""}`;
 			send("Metric: kind=" + kind + "; " + Object.entries(vals).map(([a, b]) => `${a}=${b}`).join("; "), label);
 			return;
 		}
 		const f = e.target.closest(".cx-setup"); if (!f || f.classList.contains("cx-metric")) return;
 		e.preventDefault();
+		const T = syncSetup(f);
+		if (!T.length || !f.reportValidity()) return;
 		const v = (n) => (f.querySelector(`[name="${n}"]:checked`) || f.querySelector(`[name="${n}"]`)).value;
 		const ex = [...f.querySelectorAll('[name="ex"]:checked')].map((x) => x.value);
 		const avoid = f.querySelector('[name="avoid"]').value.replace(/[;=|]/g, " ").split(",").map((x) => x.trim()).filter(Boolean).join("|");
-		const P = { goal: v("goal"), weeks: v("weeks"), days: v("days"), meals: v("meals"), diet: v("diet"), ex: ex.join(","), avoid, maint: v("maint") };
-		try { localStorage.setItem("apex_food_prefs", JSON.stringify({ diet: P.diet, ex, avoid: avoid.replace(/\|/g, ", ") })); } catch (_) {}
+		const P = { tools: T.join(","), goal: v("goal"), weeks: v("weeks"), days: v("days"), meals: v("meals"), diet: v("diet"), ex: ex.join(","), avoid, maint: v("maint") };
+		const body = {};
+		["weight", "height", "age"].forEach((k) => { const i = f.querySelector(`[name="${k}"]`); if (i && i.value && !i.closest("[hidden]")) body[k] = +i.value; });
+		if (T.includes("energy")) { body.sex = v("sex"); body.act = +v("act"); }
+		Object.assign(P, body);
+		if (T.includes("meals")) try { localStorage.setItem("apex_food_prefs", JSON.stringify({ diet: P.diet, ex, avoid: avoid.replace(/\|/g, ", ") })); } catch (_) {}
+		if (Object.keys(body).length) mergeProfile({ ...body, goal: { lose: "cut", build: "bulk" }[P.goal] || "maintain" });
 		const q = "Build program: " + Object.entries(P).map(([a, b]) => `${a}=${b}`).join("; ");
-		const label = `${+P.weeks === 4 ? "1 month" : P.weeks + (+P.weeks > 1 ? " weeks" : " week")} · ${GOALS[P.goal].label} · ${P.days} training days · ${P.meals} meals a day${P.diet !== "any" ? " · " + DIETS[P.diet].label : ""}${ex.length ? " · no " + ex.join(", ") : ""}${avoid ? " · avoid " + avoid.replace(/\|/g, ", ") : ""}`;
-		send(q, label);
+		const len = +P.weeks === 4 ? "1 month" : P.weeks + (+P.weeks > 1 ? " weeks" : " week");
+		const bits = [T.map((t) => TOOL_LABEL[t]).join(" + "), GOALS[P.goal].label];
+		if (T.includes("workout") || T.includes("meals")) bits.push(len, `${P.days} training days`);
+		if (T.includes("meals")) { bits.push(`${P.meals} meals a day`); if (P.diet !== "any") bits.push(DIETS[P.diet].label); if (ex.length) bits.push("no " + ex.join(", no ")); }
+		send(q, bits.join(" · "));
+	});
+	log.addEventListener("change", (e) => {
+		const f = e.target.closest(".cx-setup");
+		if (f && !f.classList.contains("cx-metric") && e.target.name === "tool") syncSetup(f);
 	});
 	log.addEventListener("click", (e) => {
 		const tab = e.target.closest("[data-week]");
@@ -1462,11 +1758,14 @@
 			return;
 		}
 		const pdf = e.target.closest("[data-pdf]");
-		if (pdf && PROGS[pdf.dataset.pdf]) downloadPdf(PROGS[pdf.dataset.pdf], pdf);
+		if (pdf && PROGS[pdf.dataset.pdf]) downloadPdf(PROGS[pdf.dataset.pdf].P, pdf, PROGS[pdf.dataset.pdf].mode);
 	});
 
 	restore();
 	if (/[?&]coach=open/.test(location.search)) open();
+	// The member page opens Coach with a ready question (empty states, "change it" links).
+	window.APEXCoach = { open, ask: (t) => { open(); setTimeout(() => send(t), 120); } };
+	window.dispatchEvent(new CustomEvent("apex:coach-ready"));
 })();
 
 /* No word alone on the last line, in every language: the last two words of each sentence are kept together,

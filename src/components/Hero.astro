@@ -18,19 +18,19 @@
 	<!-- Availability sits right above the buttons so a recruiter reads status,
 	     then action. The Cactus badge moved out of the hero (still in Metrics
 	     and on About) per the 2026-11-12 recruiter brief. -->
-	<!-- DOM order reads naturally for screen readers. On phones the items are
-	     re-ordered so no separator dangles at a line end: "Available now ·
-	     Hybrid or remote" then the area on its own line. -->
+	<!-- DOM order reads naturally for screen readers. On phones the line breaks
+	     after "Available now · Ashkelon, Israel", so no separator dangles at a
+	     line end, and "Hybrid or remote, Tel Aviv area" sits on its own line. -->
 	<p class="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium text-ink">
 		<span class="order-1 inline-flex items-center gap-2">
-			<span class="size-2.5 shrink-0 rounded-full bg-[#187A4F]" aria-hidden="true"></span>
+			<span class="size-2.5 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
 			Available now
 		</span>
-		<span class="order-2 hidden text-muted sm:inline" aria-hidden="true">·</span>
-		<span class="order-6 whitespace-nowrap pl-[18px] sm:order-3 sm:pl-0">Tel Aviv–Ashkelon area</span>
-		<span class="order-3 text-muted sm:order-4" aria-hidden="true">·</span>
-		<span class="order-4 whitespace-nowrap sm:order-5">Hybrid or remote</span>
-		<span class="order-5 basis-full sm:hidden" aria-hidden="true"></span>
+		<span class="order-2 text-muted" aria-hidden="true">·</span>
+		<span class="order-3 whitespace-nowrap">Ashkelon, Israel</span>
+		<span class="order-4 basis-full sm:hidden" aria-hidden="true"></span>
+		<span class="order-5 hidden text-muted sm:inline" aria-hidden="true">·</span>
+		<span class="order-6 whitespace-nowrap pl-[18px] sm:pl-0">Hybrid or remote, Tel Aviv area</span>
 	</p>
 
 	<div class="mt-7 flex flex-col gap-4 sm:flex-row sm:items-center">

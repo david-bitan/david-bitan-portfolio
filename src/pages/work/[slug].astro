@@ -468,9 +468,9 @@ const projectJsonLd: Record<string, unknown> = {
 		.img-skeleton {
 			position: relative;
 			background: linear-gradient(90deg,
-				rgb(0 0 0 / 0.04) 0%,
-				rgb(0 0 0 / 0.09) 50%,
-				rgb(0 0 0 / 0.04) 100%);
+				color-mix(in srgb, var(--color-ink) 4%, transparent) 0%,
+				color-mix(in srgb, var(--color-ink) 9%, transparent) 50%,
+				color-mix(in srgb, var(--color-ink) 4%, transparent) 100%);
 			background-size: 200% 100%;
 			animation: img-skeleton-shimmer 1.6s ease-in-out infinite;
 			min-height: 200px;

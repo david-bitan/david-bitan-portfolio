@@ -11,6 +11,8 @@ export interface AILabProject {
 	eyebrow: string;
 	/** Short blurb shown on the AI Lab home section card. */
 	shortDesc: string;
+	/** Optional shorter meta description (≤158 characters); falls back to shortDesc. */
+	metaDesc?: string;
 	/** Case study body — 2–3 paragraphs, blank-line separated. First para
 	 * shown by default; remaining paras hidden behind a Show more toggle. */
 	intro: string;
@@ -349,7 +351,7 @@ The language model only reads the request. Prices, the plan, the budget check an
 		subtitle: 'An oceanfront strength and recovery club in Miami Beach, invented and built out to five pages.',
 		eyebrow: 'Fitness · 2026',
 		shortDesc:
-			'A members club: five interlinked pages, a booking gate, a live timetable, a shop with a persistent cart, a QR guest pass, and APEX Coach, an AI assistant designed state by state.',
+			'A members club: five interlinked pages, a booking gate, a live timetable, a shop with a persistent cart, a QR guest pass, and APEX Coach, its AI chatbot, designed state by state.',
 		intro: `APEX Athletic Club is a fictional private gym I invented and built end-to-end, and the brief I set myself was to go past the marketing page: a mini-site is easy to fake in one screen, and much harder to hold together across five.
 
 The visual language is the opposite of the wellness pastel most gyms reach for. Ink canvas, one hot pink accent, one mint signal, Space Grotesk for display and JetBrains Mono for anything numeric (times, prices, capacities), so the timetable reads like a schedule board rather than a brochure. The photography is stock, so the grid imposes its own treatment (grayscale, dimmed, colour returning on hover) instead of hoping six unrelated shoots agree with each other.
@@ -358,10 +360,10 @@ Almost all of the work was in the parts that are usually faked. Booking a class 
 		aiFeature: {
 			eyebrow: 'AI UX · Assistant',
 			title: 'APEX Coach',
-			lead: 'An AI assistant on every page of APEX. Open questions about training, nutrition, BMI, body fat, hydration or recovery are answered live by an LLM (Llama 3.3 on Cloudflare Workers AI) with a coaching system prompt and the member’s own numbers. Tasks where numbers must be exact (programs, prices, warning signs) run through designed, deterministic flows.',
+			lead: 'APEX Athletic Club: a fitness club website where the AI coach offers several tools, used separately or together: workout plan, meal plan, BMI, metabolism and macro calculations. Every result updates the member’s profile. Open questions about training, nutrition, BMI, body fat, hydration or recovery are answered live by an LLM (Llama 3.3 on Cloudflare Workers AI) with a coaching system prompt and the member’s own numbers. Tasks where numbers must be exact (programs, prices, warning signs) run through designed, deterministic flows.',
 			tryUrl: '/demo/apex-athletic-club/user.html?coach=open',
 			tryLabel: 'Try APEX Coach',
-			states: ['Empty state with starters', 'Thinking with visible steps', 'Streaming answer', 'Clarifying question', 'Structured plan with actions', 'Setup form for missing details', 'Body metrics: BMI, water, body fat', 'Diets, allergies & dislikes', 'Exercise demos for every muscle group, side + front, with tempo', 'Training + meal program, 1 to 4 weeks', 'PDF export with workout log', 'Low-confidence note', 'AI service offline fallback', 'Safety refusal', 'Out of scope', 'Error + retry', 'Stop · Regenerate · Copy', 'Feedback with reasons'],
+			states: ['Empty state with starters', 'Thinking with visible steps', 'Streaming answer', 'Clarifying question', 'Structured plan with actions', 'Setup form for missing details', 'Body metrics: BMI, water, body fat', 'Diets, allergies & dislikes', 'Exercise demos for every muscle group, side + front, with tempo', 'Workout plan, meal plan or both, 1 to 4 weeks', 'Plans saved to the member profile, changed from the chat', 'PDF export with workout log', 'Low-confidence note', 'AI service offline fallback', 'Safety refusal', 'Out of scope', 'Error + retry', 'Stop · Regenerate · Copy', 'Feedback with reasons'],
 			decisions: [
 				{ title: 'Show what it uses', body: 'A context bar lists exactly what Coach can see: membership tier, calculator numbers, this week’s timetable. Users trust an answer more when they know where it comes from.' },
 				{ title: 'Ask before guessing', body: 'A vague goal like “lose weight” gets one clarifying question with tappable options instead of a generic plan. One question, not an interview.' },
@@ -443,8 +445,10 @@ Almost all of the work was in the parts that are usually faked. Booking a class 
 		subtitle: 'A family kitchen in San Gimignano, imagined from scratch.',
 		eyebrow: 'Restaurant · 2026',
 		shortDesc:
-			'A Michelin-adjacent trattoria: full brand system, menu, reservation flow with a demo sign-in. Built as a single-page experience.',
-		intro: `Trattoria Fiori is a fictional Tuscan restaurant I designed and built end-to-end as a personal exercise.
+			'A refined trattoria: full brand identity, menu and table booking with a demo sign-in. Designed and built with AI, from research to finished product, every choice directed by me.',
+		metaDesc:
+			'A refined trattoria: brand identity, menu and table booking with a demo sign-in. Designed and built with AI, every choice directed by me.',
+		intro: `A refined trattoria: full brand identity, menu and table booking with a demo sign-in. Designed and built with AI, from research to finished product, every choice directed by me.
 
 The design language borrows from fine-dining editorial: Playfair Display and Cormorant Garamond over a noir + brushed-gold + ivoire palette, dish photography treated as painterly plates rather than product shots, and micro-typography for the menu (dotted leaders, lining figures, italic wine notes) that would look at home on a printed carte.
 

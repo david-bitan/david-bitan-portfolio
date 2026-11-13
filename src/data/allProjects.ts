@@ -61,11 +61,11 @@ export const allProjects: FullProject[] = [
 		slug: 'sonary-dashboard',
 		title: `Sonary · Software Stack Manager`,
 		client: `Ryze Beyond`,
-		year: '2025',
+		year: '2026',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
 		shortDesc: `A SaaS to track software subscriptions: dark and light design system, AI chat for natural-language queries, 96 shipped screens from a 2,000+ frame Figma project.`,
-		fullDesc: `Sole-designed a SaaS to track software subscriptions: full dark/light design system, 96 shipped screens from a 2,000+ frame Figma project, AI chat bot for natural-language queries. See structured case study below.`,
+		fullDesc: `Designed a SaaS to track software subscriptions: full dark/light design system, 96 shipped screens from a 2,000+ frame Figma project, AI chat bot for natural-language queries. See structured case study below.`,
 		liveUrl: 'https://sonary.com',
 		liveUrlNote: `Note: to reach the actual dashboard, click 'Login/Sign up' at the top right. Alternatively, 'Get started' leads to a landing page with a Sign up button.`,
 		scope: [
@@ -84,7 +84,7 @@ Sonary was Ryze Beyond's answer: a single dashboard that gives users a full view
 			},
 			{
 				heading: 'Role',
-				body: `Sole designer on the product, within a cross-functional team of product managers, content managers and engineers. From research to shipped design system, and through design QA post-implementation.`,
+				body: `Product designer on Sonary Dashboard, within a cross-functional team of product managers, content managers and engineers. From research to shipped design system, and through design QA post-implementation.`,
 			},
 			{
 				heading: 'Approach',
@@ -94,7 +94,7 @@ Research phase: user interviews, competitive benchmarking, curated inspiration f
 
 Then: information architecture, wireframes, high-fidelity design, iteration on stakeholder feedback, developer hand-off, and design QA after implementation to verify conformance screen by screen.
 
-Design system extended from the Sonary Website foundation (already ~6 years mature at that point), then expanded with dashboard-heavy components (data grids, filters, complex flows, multi-state modals), all responsive across 5 breakpoints (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375), with all component states (empty, loading, filter, multi-select, modals) documented. Separate motion design system documented in Figma for developers, complemented by SVGator animations delivered when needed. An AI chat bot was designed as a dedicated flow so users could query their stack in natural language.`,
+Design system extended from the Sonary Website foundation (already almost 7 years mature at that point), then expanded with dashboard-heavy components (data grids, filters, complex flows, multi-state modals), all responsive across 5 breakpoints (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375), with all component states (empty, loading, filter, multi-select, modals) documented. Separate motion design system documented in Figma for developers, complemented by SVGator animations delivered when needed. An AI chat bot was designed as a dedicated flow so users could query their stack in natural language.`,
 			},
 			{
 				heading: 'Key challenge',
@@ -110,7 +110,7 @@ I then brought forward the alternative I had been proposing from the start; once
 				heading: 'What I took from it',
 				body: `Consolidating both sides of the value equation into one product (help users spend less, help the business recommend more) is a UX balancing act that only works in a team.
 
-Building on top of the Sonary Website design system, itself mature after six years, meant the Dashboard could ship complex flows quickly while contributing new patterns (data grids, dashboard widgets, chat bot flows) back to the shared library.`,
+Building on top of the Sonary Website design system, itself mature after almost 7 years, meant the Dashboard could ship complex flows quickly while contributing new patterns (data grids, dashboard widgets, chat bot flows) back to the shared library.`,
 			},
 		],
 		// Homepage thumb switched to the real Dashboard screen (the 4 gradient
@@ -230,7 +230,7 @@ Building on top of the Sonary Website design system, itself mature after six yea
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
 		shortDesc: `Three major redesigns of Sonary's SaaS comparison platform since 2019: 1,400+ indexed pages across 37 software categories, WordPress to Webflow migration.`,
-		fullDesc: `Sole designer on Sonary's SaaS comparison and review platform since 2019. Design system that later seeded the Sonary Dashboard product. See structured case study below.`,
+		fullDesc: `Product designer on Sonary's SaaS comparison and review platform since 2019. Design system that later seeded the Sonary Dashboard product. See structured case study below.`,
 		liveUrl: 'https://sonary.com',
 		scope: [
 			`3 major redesigns since 2019`,
@@ -245,7 +245,7 @@ Building on top of the Sonary Website design system, itself mature after six yea
 			},
 			{
 				heading: 'Role',
-				body: `Sole designer on the site since 2019. Three major redesigns spaced roughly two years apart, each running from research through post-implementation design QA. Between redesigns, continuous iteration: new pages, new features, incremental improvements.`,
+				body: `Product designer on the site since 2019. Three major redesigns spaced roughly two years apart, each running from research through post-implementation design QA. Between redesigns, continuous iteration: new pages, new features, incremental improvements.`,
 			},
 			{
 				heading: 'Approach',
@@ -269,7 +269,7 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 			},
 			{
 				heading: 'What I took from it',
-				body: `Seven years on the same site taught me that a design system lasts when it makes the team autonomous (content, marketing, developers), not when it piles on rules.`,
+				body: `Almost 7 years on the same site taught me that a design system lasts when it makes the team autonomous (content, marketing, developers), not when it piles on rules.`,
 			},
 		],
 		// article-hub/ files were uploaded before the -desktop / -mobile naming
@@ -314,8 +314,8 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 		year: '2020 – 2026',
 		category: 'SaaS',
 		categories: ['SaaS', 'B2B', 'UI/UX'],
-		shortDesc: `One parametric Figma design system with ~40 verticals on one design system, from mattresses and POS providers to dating.`,
-		fullDesc: `Sole designer on Top5 since 2020: a family of comparison sites, ~40 verticals all powered by one parametric Figma design system (smart components that inherit color tokens from their parent frame). See structured case study below.`,
+		shortDesc: `One parametric Figma design system behind ~40 verticals, from mattresses and POS providers to dating.`,
+		fullDesc: `Product designer on Top5 since 2020: a family of comparison sites, ~40 verticals all powered by one parametric Figma design system (smart components that inherit color tokens from their parent frame). See structured case study below.`,
 		liveUrl: 'https://top5-mattresses.com',
 		scope: [
 			`~40 verticals on one parametric Figma design system`,
@@ -330,7 +330,7 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 			},
 			{
 				heading: 'Role',
-				body: `Sole designer on Top5 since 2020. Three major redesigns and continuous iteration between them: new smart components, incremental improvements. From research through post-implementation design QA.`,
+				body: `Product designer on Top5 since 2020. Three major redesigns and continuous iteration between them: new smart components, incremental improvements. From research through post-implementation design QA.`,
 			},
 			{
 				heading: 'Approach',
@@ -348,7 +348,7 @@ Addressed through a parametric design system in Figma: each smart component read
 			},
 			{
 				heading: 'What I took from it',
-				body: `A well-architected smart component system (one that inherits tokens from its container rather than binding manually) multiplies production velocity. What could have cost ~40 verticals × N components becomes one design system × 37 parametric variants. The discipline required upfront (structured Figma variables, container-first thinking) pays off across the entire lifespan of the project.`,
+				body: `A well-architected smart component system (one that inherits tokens from its container rather than binding manually) multiplies production velocity. What could have cost ~40 verticals × N components becomes one design system × ~40 parametric variants. The discipline required upfront (structured Figma variables, container-first thinking) pays off across the entire lifespan of the project.`,
 			},
 		],
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/portfolio/top5/homepage/mattresses-desktop-1920.webp',
@@ -379,7 +379,7 @@ Addressed through a parametric design system in Figma: each smart component read
 		category: 'Branding',
 		categories: ['Branding', 'UI/UX'],
 		shortDesc: `The third full redesign of Ryze Beyond's marketing website, delivered in 2026, with an abstract-illustration design system built from scratch.`,
-		fullDesc: `Sole designer on the 2026 redesign of ryzebeyond.com: the marketing website for the company behind Sonary Dashboard, Sonary Website, Top5, Playright and other products. Third full redesign of the site; ~2 months of work with an abstract-illustration design system built from scratch. See structured case study below.`,
+		fullDesc: `Product designer on the 2026 redesign of ryzebeyond.com: the marketing website for the company behind Sonary Dashboard, Sonary Website, Top5, Playright and other products. Third full redesign of the site; ~2 months of work with an abstract-illustration design system built from scratch. See structured case study below.`,
 		liveUrl: 'https://ryzebeyond.com/',
 		scope: [
 			`Full marketing website, delivered in 2026`,
@@ -394,7 +394,7 @@ Addressed through a parametric design system in Figma: each smart component read
 			},
 			{
 				heading: 'Role',
-				body: `Sole designer on the 2026 redesign, about two months of work. From research through post-implementation design QA.`,
+				body: `Product designer on the 2026 redesign, about two months of work. From research through post-implementation design QA.`,
 			},
 			{
 				heading: 'Approach',
@@ -467,7 +467,7 @@ The solution: a system of abstract illustrations (colored geometric shapes, text
 		category: 'Branding',
 		categories: ['Branding', 'UI/UX'],
 		shortDesc: `Ryze Beyond's internal employee portal, a personal initiative: brand assets, product info and quick access in one place, from concept to full design system.`,
-		fullDesc: `Sole designer on Ryze Hub: an internal employee portal I proposed and led end-to-end (2025). Concept, structure, dedicated design system, and templates. Delivered at full design level; production paused with an internal roadmap change. See structured case study below.`,
+		fullDesc: `Product designer on Ryze Hub: an internal employee portal I proposed and led end-to-end (2025). Concept, structure, dedicated design system, and templates. Delivered at full design level; production paused with an internal roadmap change. See structured case study below.`,
 		scope: [
 			`Proposed internally, then led end to end`,
 			`Brand center, product sections and quick access in one portal`,
@@ -481,7 +481,7 @@ The solution: a system of abstract illustrations (colored geometric shapes, text
 			},
 			{
 				heading: 'Role',
-				body: `Sole designer on the project, from the initial idea (proposed internally) through the full design system, site structure, and templates. Solo delivery with direct validation from the manager.`,
+				body: `Product designer on the project, from the initial idea (proposed internally) through the full design system, site structure, and templates. Solo delivery with direct validation from the manager.`,
 			},
 			{
 				heading: 'Approach',
@@ -521,7 +521,7 @@ The solution: a system of abstract illustrations (colored geometric shapes, text
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
 		shortDesc: `A modular master email template for the Sonary ecosystem: 600 and 375 px breakpoints, dark-mode aware, on brand.`,
-		fullDesc: `Sole designer on the Sonary email marketing and newsletter template system (2025). Built on the existing Sonary design system tokens; a master template spinning off into multiple campaign variants. See structured case study below.`,
+		fullDesc: `Product designer on the Sonary email marketing and newsletter template system (2025). Built on the existing Sonary design system tokens; a master template spinning off into multiple campaign variants. See structured case study below.`,
 		scope: [
 			`One master template for newsletters, campaigns, alerts and digests`,
 			`2 breakpoints (600 and 375 px)`,
@@ -535,7 +535,7 @@ The solution: a system of abstract illustrations (colored geometric shapes, text
 			},
 			{
 				heading: 'Role',
-				body: `Sole designer on the mailer, owning art direction end-to-end. Collaborated with the content writer on editorial structure. Delivered from research through design, template specs, dev handoff, and QA.`,
+				body: `Product designer on the mailer, owning art direction end-to-end. Collaborated with the content writer on editorial structure. Delivered from research through design, template specs, dev handoff, and QA.`,
 			},
 			{
 				heading: 'Approach',
