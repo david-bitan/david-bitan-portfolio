@@ -229,19 +229,19 @@ Building on top of the Sonary Website design system, itself mature after six yea
 		year: '2019 – 2026',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Three major redesigns of Sonary's SaaS comparison platform since 2019, with a CMS template system and a WordPress to Webflow migration.`,
+		shortDesc: `Three major redesigns of Sonary's SaaS comparison platform since 2019: 1,400+ indexed pages across 37 software categories, WordPress to Webflow migration.`,
 		fullDesc: `Sole designer on Sonary's SaaS comparison and review platform since 2019. Design system that later seeded the Sonary Dashboard product. See structured case study below.`,
 		liveUrl: 'https://sonary.com',
 		scope: [
 			`3 major redesigns since 2019`,
-			`One CMS template system reused across every software category`,
+			`1,400+ indexed pages across 37 software categories`,
 			`5 breakpoints`,
 			`WordPress to Webflow migration on the latest redesign`,
 		],
 		sections: [
 			{
 				heading: 'Context',
-				body: `Sonary is a SaaS software comparison and review platform for SMBs, published by Ryze Beyond. The site covers many software categories (AI, E-commerce, Design, Development, Finance, HR, IT, Productivity, Sales & Marketing, and more) through buying guides, side-by-side comparisons, editorial reviews, and category lineups. It complements Sonary Dashboard: the software subscription tracker from the same publisher, shipped in 2026.`,
+				body: `Sonary is a SaaS software comparison and review platform for SMBs, published by Ryze Beyond. The site covers 37 software categories (AI, E-commerce, Design, Development, Finance, HR, IT, Productivity, Sales & Marketing, and more) through buying guides, side-by-side comparisons, editorial reviews, and category lineups. It complements Sonary Dashboard: the software subscription tracker from the same publisher, shipped in 2026.`,
 			},
 			{
 				heading: 'Role',
@@ -255,15 +255,15 @@ The design system was built for the site starting in 2019 (color tokens, Inter t
 			},
 			{
 				heading: 'Key challenge',
-				body: `Designing a system that could absorb the site's growth: very different software categories (finance, AI, HR, e-commerce…) and a large number of CMS-generated pages, without losing consistency or editorial tone. Every template needed to feel warm and inviting despite the functional density (comparison tables, review cards, scoring, lineups).
+				body: `Designing a system that could absorb the site's growth: 37 very different software categories (finance, AI, HR, e-commerce…) and 1,400+ indexed, CMS-generated pages, without losing consistency or editorial tone. Every template needed to feel warm and inviting despite the functional density (comparison tables, review cards, scoring, lineups).
 
 Addressed through a strict smart-component hierarchy and a library of editorial patterns (illustrated headers, quote blocks, category chips) that break up the dense sections.`,
 			},
 			{
 				heading: 'Deliverables',
-				body: `Templates covering homepage, article hub, article, review, comparison, alternative/lineup, about and category pages, used by the CMS to generate the pages of every category.
+				body: `Templates covering homepage, article hub, article, review, comparison, alternative/lineup, about and category pages: 1,400+ indexed pages generated through the CMS across 37 software categories.
 
-Notable components: homepage, category mega menu, review card, comparison table, interactive lineup: all built as smart components reused across templates.
+Notable components: homepage, 37-category mega menu, review card, comparison table, interactive lineup: all built as smart components reused across templates.
 
 Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress → Webflow migration on the latest redesign, with a full design system rebuild in Webflow and handoff to the content team. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
 			},
@@ -314,11 +314,11 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 		year: '2020 – 2026',
 		category: 'SaaS',
 		categories: ['SaaS', 'B2B', 'UI/UX'],
-		shortDesc: `One parametric Figma design system powering ~37 vertical comparison sites, from mattresses and POS providers to dating.`,
-		fullDesc: `Sole designer on Top5 since 2020: a family of ~37 vertical comparison sites all powered by one parametric Figma design system (smart components that inherit color tokens from their parent frame). See structured case study below.`,
+		shortDesc: `One parametric Figma design system with ~40 verticals on one design system, from mattresses and POS providers to dating.`,
+		fullDesc: `Sole designer on Top5 since 2020: a family of comparison sites, ~40 verticals all powered by one parametric Figma design system (smart components that inherit color tokens from their parent frame). See structured case study below.`,
 		liveUrl: 'https://top5-mattresses.com',
 		scope: [
-			`One parametric Figma system serving ~37 comparison sites`,
+			`~40 verticals on one parametric Figma design system`,
 			`Shared templates from homepage to review and lineup pages`,
 			`5 breakpoints`,
 			`WordPress to Webflow migration, with the design system rebuilt in Webflow`,
@@ -326,7 +326,7 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 		sections: [
 			{
 				heading: 'Context',
-				body: `Top5 is a family of comparison sites for products and services aimed at SMBs, published by Ryze Beyond. The family currently spans about 37 vertical spinoffs (mattresses, POS providers, merchant services, dating sites, website builders, and more), each on its own domain (top5-mattresses.com, top-posproviders.com, top-merchantservices.com, top5-datingsites.com…) but all powered by a shared parametric design system.`,
+				body: `Top5 is a family of comparison sites for products and services aimed at SMBs, published by Ryze Beyond. The family currently spans about 40 verticals (mattresses, POS providers, merchant services, dating sites, website builders, and more), each on its own domain (top5-mattresses.com, top-posproviders.com, top-merchantservices.com, top5-datingsites.com…) but all powered by a shared parametric design system.`,
 			},
 			{
 				heading: 'Role',
@@ -338,17 +338,17 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 			},
 			{
 				heading: 'Key challenge',
-				body: `Designing a system that could serve 37 distinct vertical sites (entirely different content, its own color identity per site), without duplicating components manually. Every site needed its own accent (from four base themes, extensible to more) while sharing the same UI architecture and behavior.
+				body: `Designing a system that could serve ~40 distinct verticals (entirely different content, its own color identity per site), without duplicating components manually. Every site needed its own accent (from four base themes, extensible to more) while sharing the same UI architecture and behavior.
 
-Addressed through a parametric design system in Figma: each smart component reads its color tokens from its parent frame via Figma variables. Result: a drag-and-drop into a pre-themed section re-skins all colored elements automatically (buttons, chips, cards, accents): a single asset serving all 37 sites, just by changing the parent container.`,
+Addressed through a parametric design system in Figma: each smart component reads its color tokens from its parent frame via Figma variables. Result: a drag-and-drop into a pre-themed section re-skins all colored elements automatically (buttons, chips, cards, accents): a single asset serving all ~40 verticals, just by changing the parent container.`,
 			},
 			{
 				heading: 'Deliverables',
-				body: `Parametric design system covering homepage, article, comparison, lineup, review, about and category pages, deployed across ~37 vertical sites. Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress → Webflow migration on the latest redesign, with a full design system rebuild in Webflow and handoff to the content team. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
+				body: `Parametric design system covering homepage, article, comparison, lineup, review, about and category pages, deployed across ~40 verticals. Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress → Webflow migration on the latest redesign, with a full design system rebuild in Webflow and handoff to the content team. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
 			},
 			{
 				heading: 'What I took from it',
-				body: `A well-architected smart component system (one that inherits tokens from its container rather than binding manually) multiplies production velocity. What could have cost 37 sites × N components becomes one design system × 37 parametric variants. The discipline required upfront (structured Figma variables, container-first thinking) pays off across the entire lifespan of the project.`,
+				body: `A well-architected smart component system (one that inherits tokens from its container rather than binding manually) multiplies production velocity. What could have cost ~40 verticals × N components becomes one design system × 37 parametric variants. The discipline required upfront (structured Figma variables, container-first thinking) pays off across the entire lifespan of the project.`,
 			},
 		],
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/portfolio/top5/homepage/mattresses-desktop-1920.webp',
