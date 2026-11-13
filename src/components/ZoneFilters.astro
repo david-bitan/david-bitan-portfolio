@@ -36,11 +36,13 @@ if (hasLight || hasDark) {
 const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 ---
 
+{/* The bar is always rendered so every project page keeps the sticky back
+    arrow (CL1, 13/11). Without filters it stays invisible until it sticks. */}
 {
-	showBar && (
+	(
 		<div
 			id="zone-filters-bar"
-			class="sticky top-[76px] z-30 w-full border-y border-ink/10 bg-bg"
+			class:list={['sticky top-[76px] z-30 w-full border-y border-ink/10 bg-bg', { 'zf-bare': !showBar }]}
 		>
 			{/* Bar bg spans FULL viewport (w-full outer). Inner container
 				max-w-[1200px] mx-auto centres the content (pills + arrows)
@@ -230,6 +232,15 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 		#zone-filters-bar.is-stuck .zone-filters-scroll {
 			padding-left: 52px;
 		}
+	}
+
+	/* No filters: no visible bar until it sticks, then just the back arrow. */
+	#zone-filters-bar.zf-bare:not(.is-stuck) {
+		border-color: transparent;
+		background: transparent;
+	}
+	#zone-filters-bar.zf-bare .zone-filters-scroll {
+		min-height: 3rem;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

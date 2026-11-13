@@ -1793,7 +1793,7 @@
 	<div class="wrap">
 		<div class="head" data-reveal>
 			<div class="eyebrow pink">From APEX Coach</div>
-			<h2 class="h2">Your training plan.</h2>
+			<h2 class="h2">Your workout plan.</h2>
 			<p class="lead">
 				Ask APEX Coach for a workout plan, a meal plan or a calculation (BMI, metabolism, macros), one at a time or together. Every result is saved here, and any change you ask for in the chat updates it.
 			</p>
@@ -1811,7 +1811,7 @@
 	<div class="wrap">
 		<div class="head" data-reveal>
 			<div class="eyebrow">Nutrition</div>
-			<h2 class="h2">Calorie &amp; macro calculator.</h2>
+			<h2 class="h2">Your metabolism &amp; macros.</h2>
 			<p class="lead">
 				Live TDEE using the Mifflin-St Jeor formula, plus a macro split tuned to your goal. Values update as you type.
 			</p>
@@ -1922,7 +1922,7 @@
 
 		<!-- Sub-action after the meal grid — discreet, right-aligned request. -->
 		<div style="display:flex; justify-content:flex-end; margin-top: 20px;" data-reveal>
-			<button type="button" class="btn btn-sm btn-ghost" id="mp-coach-btn">Build my meal plan with Coach →</button>
+			<button type="button" class="btn btn-sm btn-ghost" id="mp-coach-btn">Build a meal plan with Coach →</button>
 		</div>
 	</div>
 </section>
@@ -2684,8 +2684,8 @@
 				<p>No plan saved yet. APEX Coach can build a workout plan on its own, a meal plan on its own, or both matched together, and calculate your BMI, metabolism and macros.</p>
 				<div class="tp-actions">
 					<button type="button" class="btn btn-primary btn-sm" data-ask="Build me a workout plan">Build a workout plan</button>
-					<button type="button" class="btn btn-ghost btn-sm" data-ask="Plan my meals for the week">Plan my meals</button>
-					<button type="button" class="btn btn-ghost btn-sm" data-ask="Calculate my metabolism and macros">Calculate my metabolism</button>
+					<button type="button" class="btn btn-ghost btn-sm" data-ask="Plan my meals for the week">Build a meal plan</button>
+					<button type="button" class="btn btn-ghost btn-sm" data-ask="Calculate my metabolism and macros">Calculate my metabolism &amp; macros</button>
 				</div>
 			</div>`;
 			return;
@@ -2726,7 +2726,7 @@
 			eyebrow.textContent = "Sample week";
 			title.textContent = "This week's meals.";
 			lead.textContent = "A representative day from our dietitian's rotation. Not a prescription: a starting point aligned with your targets above.";
-			btn.textContent = "Build my meal plan with Coach →";
+			btn.textContent = "Build a meal plan with Coach →";
 			btn.dataset.ask = "Plan my meals for the week";
 		}
 		const active = document.querySelector(".day-tab.active");

@@ -58,12 +58,13 @@ const projectJsonLd: Record<string, unknown> = {
 	structuredData={projectJsonLd}
 >
 	<Nav />
+	<main id="main" tabindex="-1">
 
 	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 lg:px-0" data-reveal>
 		<a href="/#work" class="text-sm font-semibold text-accent-text hover:underline">← Back to work</a>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">{project.category}</p>
-		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">{project.title}</h1>
+		<h1 class="mt-4 max-w-3xl text-[1.85rem] font-extrabold tracking-tight min-[374px]:text-4xl sm:text-5xl">{project.title}</h1>
 		<p class="mt-4 max-w-2xl text-lg text-muted">{project.shortDesc}</p>
 
 		<div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
@@ -315,8 +316,11 @@ const projectJsonLd: Record<string, unknown> = {
 								    Rows center-align, so no wasted "gray strip"
 								    between image and cell edge — the cell IS
 								    the image slot. Gap tightened 24→12. */}
+								{/* 4 per row on desktop, 2 on tablets, 1 on phones (CL1, 13/11).
+								    Rows are centred, so a short last row sits in the middle
+								    instead of leaving empty slots on the right. */}
 								<div
-									class="flex flex-wrap items-start justify-start gap-[37.5px]"
+									class="flex flex-wrap items-start justify-center gap-6"
 									data-mobile-grid
 								>
 									{zone.images.map(({ url }, imgIdx) =>
@@ -325,14 +329,14 @@ const projectJsonLd: Record<string, unknown> = {
 											// (cell = image slot). No border — dark mockup provides
 											// its own contrast against the near-white body.
 											<span
-												class="img-skeleton block w-[375px] max-w-full rounded-xl overflow-hidden"
+												class="mobile-cell img-skeleton block rounded-xl overflow-hidden"
 												data-mobile-item
 												data-is-dark="1"
 											>
 												<img
 													src={cld(url, MOBILE)}
 													srcset={mobileSrcset(url)}
-													sizes="375px"
+													sizes="(min-width: 1024px) 282px, (min-width: 640px) 50vw, 100vw"
 													alt={project.title}
 													loading="lazy"
 													fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
@@ -349,13 +353,13 @@ const projectJsonLd: Record<string, unknown> = {
 											// Border + shadow directly on <img> — the visible frame
 											// is the image's edge, no padded gray strip anywhere.
 											<span
-												class="img-skeleton block w-[375px] max-w-full rounded-xl border border-ink/15 shadow-md overflow-hidden"
+												class="mobile-cell img-skeleton block rounded-xl border border-ink/15 shadow-md overflow-hidden"
 												data-mobile-item
 											>
 												<img
 													src={cld(url, MOBILE)}
 													srcset={mobileSrcset(url)}
-													sizes="375px"
+													sizes="(min-width: 1024px) 282px, (min-width: 640px) 50vw, 100vw"
 													alt={project.title}
 													loading="lazy"
 													fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
@@ -442,11 +446,12 @@ const projectJsonLd: Record<string, unknown> = {
 								    template to half its size for no reason. At 560 the tablet
 								    gets one full-width row (the item centres at its native 600)
 								    and the 1200px desktop still fits two. */}
-								<div
-									class="mt-10 grid items-start justify-center gap-8"
-									style="grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr));"
-									data-desktop-narrow-grid
-								></div>
+								{/* 13/11 (CL1): narrow items (email templates, banners) now
+								    stack in columns, masonry style: 3 columns on desktop, 2 on
+								    tablets, 1 on phones. Each item sits right under the previous
+								    one in its column, so templates of different heights leave
+								    no holes. */}
+								<div class="narrow-masonry mt-10" data-desktop-narrow-grid></div>
 							</div>
 						)
 					}
@@ -498,6 +503,15 @@ const projectJsonLd: Record<string, unknown> = {
 			.img-skeleton > img { transition: none; }
 		}
 
+		.narrow-masonry { columns: 1; column-gap: 32px; }
+		@media (min-width: 640px) { .narrow-masonry { columns: 2; } }
+		@media (min-width: 1024px) { .narrow-masonry { columns: 3; } }
+		.narrow-masonry > * { display: block; break-inside: avoid; margin-bottom: 32px; }
+		/* Mobile captures: 4 per row ≥1024px, 2 ≥640px, 1 below (gap 24px). */
+		.mobile-cell { width: 100%; }
+		@media (min-width: 640px) { .mobile-cell { width: calc((100% - 24px) / 2); } }
+		@media (min-width: 1024px) { .mobile-cell { width: calc((100% - 72px) / 4); } }
+		[data-mobile-wide-stack] > .mobile-cell { width: 100%; }
 		/* Wide (multi-screen composition) items moved out of the mobile grid
 		   into the full-width stack. v092: no more forced width:100% — the
 		   mobile script probes each composition's TRUE source width and sets
@@ -628,15 +642,10 @@ const projectJsonLd: Record<string, unknown> = {
 							// Negative value → CSS treats as smaller → renders first.
 							item.style.order = String(-Math.round(h));
 
-							// If the true source is narrower than 375, cap CSS
-							// max-width to source width so the 375-column slot
-							// doesn't stretch the image past its native pixels.
-							// (Sources ≥ 375 need no cap — grid already tops at 375.)
-							const trueW = await probeSourceWidth(img.src);
-							if (trueW > 0 && trueW < 375) {
-								const target = item.tagName === 'IMG' ? item : img;
-								target.style.maxWidth = trueW + 'px';
-							}
+							// No width cap any more: every capture fills its cell like
+							// its neighbours (CL1, 13/11). A narrower source used to be
+							// capped to its own width, which left a blank band inside
+							// the card.
 						}
 					};
 
@@ -737,8 +746,11 @@ const projectJsonLd: Record<string, unknown> = {
 						item.style.width = '100%';
 						item.style.maxWidth = 'min(100%, ' + trueW + 'px)';
 						item.style.marginInline = 'auto';
-						item.style.order = String(idx);
-						narrowGrid.appendChild(item);
+						// Keep gallery order: probes resolve in any order, so insert
+						// before the first item that comes later in the gallery.
+						item.dataset.idx = String(idx);
+						const after = Array.from(narrowGrid.children).find((c) => Number(c.dataset.idx) > idx);
+						narrowGrid.insertBefore(item, after || null);
 					};
 
 					if (img.complete && img.naturalWidth) {
@@ -752,5 +764,6 @@ const projectJsonLd: Record<string, unknown> = {
 		})();
 	</script>
 
+	</main>
 	<Footer />
 </Layout>

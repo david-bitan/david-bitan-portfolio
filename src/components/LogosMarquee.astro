@@ -18,11 +18,13 @@ const track = [...employers, ...employers, ...employers];
 	<p class="mb-5 text-center text-xs font-semibold uppercase tracking-widest text-muted">
 		Companies I have designed for
 	</p>
-	<div class="marquee-mask">
+	{/* Focusable region so keyboard users can pause the strip too. Only the
+	    first copy is read out; the two loop copies are aria-hidden. */}
+	<div class="marquee-mask" tabindex="0" role="region" aria-label="Companies I have designed for">
 		<div class="marquee-track">
 			{
-				track.map((name) => (
-					<span class="shrink-0 px-8 text-xl font-bold text-ink/25 whitespace-nowrap">{name}</span>
+				track.map((name, i) => (
+					<span class="marquee-name shrink-0 px-8 text-xl font-bold whitespace-nowrap" aria-hidden={i >= employers.length ? 'true' : undefined}>{name}</span>
 				))
 			}
 		</div>

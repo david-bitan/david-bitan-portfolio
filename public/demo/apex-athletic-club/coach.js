@@ -77,6 +77,8 @@
 	.cx-sub2{padding:8px 12px 4px;font:600 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:#FF2E7E}
 	.cx-setup{margin-top:12px;display:flex;flex-direction:column;gap:12px}
 	.cx-setup [hidden]{display:none!important}
+	.cx-glow{border-radius:10px;animation:cx-glow 1.6s cubic-bezier(.22,.61,.36,1) both}
+	@keyframes cx-glow{0%{box-shadow:0 0 0 2px #FF2E7E,0 0 28px rgba(255,46,126,.35)}100%{box-shadow:0 0 0 2px rgba(255,46,126,0),0 0 28px rgba(255,46,126,0)}}
 	.cx-sec{margin-top:12px}
 	.cx-sec>.cx-sub2{padding:0 0 2px}
 	.cx-sum+.cx-sum{margin-top:8px}
@@ -1050,7 +1052,7 @@
 				const pr = Object.assign({}, savedProfile());
 				if (/^Metric:/.test(q)) q.replace(/^Metric:/, "").split(";").forEach((x) => { const [k, v] = x.split("=").map((y) => y && y.trim()); if (k && v && k !== "kind") pr[k] = isNaN(+v) ? v : +v; });
 				const need = kind === "bodyfat" ? ["height", "waist", "neck"] : kind === "energy" ? ["age", "sex", "weight", "height"] : ["weight", "height"];
-				const done = (r) => (r.calc ? { ...r, save: withCalc(r.calc[0], r.calc[1]) } : r);
+				const done = (r) => (r.calc ? { ...r, save: withCalc(r.calc[0], r.calc[1]), target: "calc" } : r);
 				if (!/^Metric:/.test(q) || need.some((k) => !pr[k])) {
 					if (kind !== "bodyfat" && need.every((k) => pr[k]) && !/^Metric:/.test(q)) return done(kind === "bmi" ? bmiAnswer(pr) : kind === "energy" ? energyAnswer(pr) : waterAnswer(pr));
 					return {
@@ -1127,6 +1129,24 @@
 	];
 
 
+	/* ---------- after a change: bring the updated section into view, then light it up ---------- */
+	const TARGET = { "coach-plans": "#tp-body", "meal-plan": "#meal-grid", calc: ".calc-grid" };
+	function showResult(id, scroll) {
+		const sec = document.getElementById(id);
+		if (!sec) return false;
+		const box = sec.querySelector(TARGET[id]) || sec;
+		if (scroll) {
+			const top = sec.getBoundingClientRect().top + window.scrollY - 88;
+			window.scrollTo({ top, behavior: REDUCED ? "auto" : "smooth" });
+		}
+		box.classList.remove("cx-glow");
+		void box.offsetWidth;
+		box.classList.add("cx-glow");
+		box.addEventListener("animationend", () => box.classList.remove("cx-glow"), { once: true });
+		return true;
+	}
+	const WIDE = () => window.matchMedia("(min-width: 900px)").matches;
+
 	/* ---------- workout plan, meal plan, calculations: separately or together ---------- */
 	function programReply(q) {
 		if (!/^Build program:/.test(q)) {
@@ -1189,6 +1209,7 @@
 			text: parts.join(" "),
 			html: html.join(""),
 			note: P0 ? { kind: "warn", text: "Estimates for a typical adult. Start with weights you can lift for every rep with good form. Not medical advice: see the club doctor if you have an injury or condition." } : undefined,
+			target: W ? "coach-plans" : M ? "meal-plan" : "calc",
 			save: next, profile: Object.assign({}, B || E ? { weight: pr.weight, height: pr.height } : {}, E ? { age: pr.age, sex: pr.sex, act: pr.act, goal: { lose: "cut", build: "bulk" }[E.goal] || "maintain" } : {}),
 			chips
 		};
@@ -1206,12 +1227,12 @@
 	function editReply(q) {
 		const pl = plans();
 		if (!pl.workout && !pl.meals) return null;
-		const mine = [{ label: "See my profile", href: here("#coach-plans"), primary: true }];
+		const mine = [{ label: "See my profile", href: here("#coach-plans"), primary: true, profile: true }];
 		if (/^(undo|annule|annuler)\b/i.test(q.trim())) {
 			if (!pl.prev) return { text: "There's no change to undo.", chips: mine };
 			const old = JSON.parse(pl.prev), next = { ...pl, workout: old.workout, meals: old.meals, calcs: old.calcs };
 			delete next.prev;
-			return { text: "Undone: your profile is back to how it was before the last change.", save: next, chips: mine };
+			return { text: "Undone: your profile is back to how it was before the last change.", save: next, target: "coach-plans", chips: mine };
 		}
 		const days = DAYRX.map((r, i) => (r.test(q) ? i : -1)).filter((i) => i >= 0);
 		const act = days.length ? lastSwap(q) : null;
@@ -1264,7 +1285,7 @@
 		return {
 			text: `Done: ${t}. Your profile in My Space is updated.`,
 			html: programView(id, P, mode),
-			save: next,
+			save: next, target: wCh ? "coach-plans" : "meal-plan",
 			chips: mine.concat([{ label: "Undo", ask: "Undo the last change" }])
 		};
 	}
@@ -1289,8 +1310,8 @@
 			{ label: "What's my BMI and ideal weight range?", ask: "What's my BMI and what's a healthy weight range for me?" },
 			{ label: "How much water should I drink?", ask: "How much water should I drink per day, including training days?" },
 			{ label: "Build a workout plan", ask: "Build me a workout plan" },
-			{ label: "Plan my meals for the week", ask: "Plan my meals for the week" },
-			{ label: "Calculate my metabolism and macros", ask: "Calculate my metabolism and macros" },
+			{ label: "Build a meal plan", ask: "Plan my meals for the week" },
+			{ label: "Calculate my metabolism & macros", ask: "Calculate my metabolism and macros" },
 			{ label: "Show me exercises for my back", ask: "Show me exercises for my back" }
 		];
 	}
@@ -1325,7 +1346,7 @@
 				else if (c.href.indexOf(location.pathname + "#") === 0) el.addEventListener("click", () => close());
 			} else {
 				el.type = "button";
-				el.addEventListener("click", () => send(c.ask, c.display));
+				el.addEventListener("click", c.fn ? c.fn : () => send(c.ask, c.display));
 			}
 			row.appendChild(el);
 		});
@@ -1552,8 +1573,16 @@
 		if (a.note && !seen.has(a.id)) { seen.add(a.id); bubble.appendChild(noteEl(a.note)); }
 		if (a.save) { storePlans(a.save); renderCtx(); }
 		if (a.profile) mergeProfile(a.profile);
-		const chips = (a.chips || []).slice();
-		if (a.save && !chips.some((c) => c.href && c.href.indexOf("#coach-plans") >= 0)) chips.unshift({ label: "See it in my profile", href: here("#coach-plans") });
+		let chips = (a.chips || []).slice();
+		if (a.save) {
+			const id = a.target || "coach-plans", onPage = !!document.getElementById(id);
+			chips = chips.filter((c) => !c.profile);
+			// Member page: on a wide screen the page glides to the updated section and
+			// lights it up; on a phone the chat covers the page, so a button does it.
+			if (onPage && WIDE()) setTimeout(() => showResult(id, true), 250);
+			else if (onPage) chips.unshift({ label: "View in my profile ↓", primary: true, fn: () => { close(); setTimeout(() => showResult(id, true), 200); } });
+			else chips.unshift({ label: "See it in my profile", href: BASE + "user.html#" + id, primary: true });
+		}
 		if (chips.length) wrap.appendChild(chipRow(chips));
 		wrap.appendChild(actions(q, wrap, bubble));
 		convo.push({ role: "assistant", content: a.text });
@@ -1765,6 +1794,8 @@
 	if (/[?&]coach=open/.test(location.search)) open();
 	// The member page opens Coach with a ready question (empty states, "change it" links).
 	window.APEXCoach = { open, ask: (t) => { open(); setTimeout(() => send(t), 120); } };
+	const hashId = location.hash.slice(1);
+	if (TARGET[hashId]) setTimeout(() => showResult(hashId, false), 600);
 	window.dispatchEvent(new CustomEvent("apex:coach-ready"));
 })();
 

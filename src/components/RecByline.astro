@@ -1,0 +1,42 @@
+---
+// Author line of a LinkedIn recommendation: round photo (or initials until
+// David supplies one), name, role, relation, and a link to the
+// recommendations on LinkedIn (LinkedIn has no per-recommendation URL).
+import { LINKEDIN_RECOMMENDATIONS_URL, type Testimonial } from '../data/testimonials';
+
+interface Props {
+	t: Testimonial;
+}
+const { t } = Astro.props;
+const initials = t.name
+	.split(/\s+/)
+	.map((w) => w[0])
+	.slice(0, 2)
+	.join('')
+	.toUpperCase();
+---
+
+<figcaption class="mt-6 flex items-center gap-4 border-t border-ink/10 pt-5">
+	{
+		t.photo ? (
+			<img src={t.photo} alt="" width="60" height="60" loading="lazy" class="h-[60px] w-[60px] shrink-0 rounded-full object-cover" />
+		) : (
+			<span
+				class="flex h-[60px] w-[60px] shrink-0 items-center justify-center rounded-full bg-ink/10 text-base font-bold text-muted"
+				aria-hidden="true">{initials}</span
+			>
+		)
+	}
+	<div class="min-w-0">
+		<p class="font-semibold">{t.name}</p>
+		<p class="mt-0.5 text-sm text-muted">{t.role}</p>
+		<p class="text-sm text-muted">{t.relation}</p>
+		<a
+			href={LINKEDIN_RECOMMENDATIONS_URL}
+			target="_blank"
+			rel="noopener"
+			class="mt-1 inline-block text-sm font-semibold text-accent-text hover:underline"
+			>View on LinkedIn<span class="sr-only"> (recommendation by {t.name}, opens in a new tab)</span> ↗</a
+		>
+	</div>
+</figcaption>

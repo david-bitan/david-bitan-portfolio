@@ -284,7 +284,7 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342185/portfolio/sonary-website/homepage/home-page-desktop.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785342185/portfolio/sonary-website/homepage/home-page-desktop.webp',
-			'https://res.cloudinary.com/akael/image/upload/v1785342187/portfolio/sonary-website/homepage/home-page-mobile.webp',
+			'https://res.cloudinary.com/akael/image/upload/c_crop,w_375,g_center/v1785342187/portfolio/sonary-website/homepage/home-page-mobile.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342169/portfolio/sonary-website/alternative-prod-info/alternative---desktop.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342172/portfolio/sonary-website/alternative-prod-info/mobile.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342174/portfolio/sonary-website/article-hub/article-hub-1.webp',
@@ -296,7 +296,7 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 			'https://res.cloudinary.com/akael/image/upload/v1785342195/portfolio/sonary-website/lineup/lineup---mobile-1.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342197/portfolio/sonary-website/lineup/lineup---mobile.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342199/portfolio/sonary-website/review-hub/desktop.webp',
-			'https://res.cloudinary.com/akael/image/upload/v1785342201/portfolio/sonary-website/review-hub/mobile.webp',
+			'https://res.cloudinary.com/akael/image/upload/c_crop,w_375,g_center/v1785342201/portfolio/sonary-website/review-hub/mobile.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342204/portfolio/sonary-website/review-page/review-page---desktop-side-table-of-content.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342207/portfolio/sonary-website/review-page/review-page---with-table-of-content-open---mobile.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342208/portfolio/sonary-website/write-a-review/write-review-step-2---desktop.webp',
@@ -423,12 +423,10 @@ The solution: a system of abstract illustrations (colored geometric shapes, text
 		imageDeviceOverrides: {
 			'other/all-field': 'desktop',
 		},
-		thumbnail: 'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---example-of-lines-per-section---desktop.png',
+		thumbnail: 'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---example-of-lines-per-section---desktop-2.png',
 		gallery: [
 			// 01 — Homepage (2 desktop variants + 2 mobile variants)
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---example-of-lines-per-section---desktop.png',
 			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---example-of-lines-per-section---desktop-2.png',
-			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---mobile.png',
 			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/01---homepage/ryze-website---homepage---mobile-2-v2.webp',
 			// 02 — About us
 			'https://res.cloudinary.com/akael/image/upload/portfolio/ryze/02---about-us/ryze-website---about-us---desktop.png',
@@ -619,7 +617,7 @@ The project also held a particular status in the Ryze roadmap: design often ran 
 			'https://res.cloudinary.com/akael/image/upload/v1785341993/portfolio/playright/home-page/laptop---992px---container-944px.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785341995/portfolio/playright/home-page/mobile---375px---container-343px.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785341997/portfolio/playright/home-page/tablet---768px---container-720px.webp',
-			'https://res.cloudinary.com/akael/image/upload/v1785342000/portfolio/playright/prodlist/mobile---375px---container-343px.webp',
+			'https://res.cloudinary.com/akael/image/upload/c_crop,w_375,g_west/v1785342000/portfolio/playright/prodlist/mobile---375px---container-343px.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342002/portfolio/playright/prodlist/tablet---768px---container-720px.webp',
 		],
 		tags: ['iGaming', 'Casino Comparison', 'UX'],

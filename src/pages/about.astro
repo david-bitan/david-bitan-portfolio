@@ -3,6 +3,7 @@ import { testimonials, LINKEDIN_RECOMMENDATIONS_URL } from '../data/testimonials
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import RecByline from '../components/RecByline.astro';
 
 // Sourced from ../../CV_David_Bitan_2026_v3.docx and ../../portfolio-cms-v2.xlsx (Timeline sheet).
 const timeline = [
@@ -170,6 +171,7 @@ const languages = [
 	description="Senior AI Product Designer across SaaS, fintech, iGaming and digital advertising. Experience, skills and tools, plus how this AI-native portfolio was built."
 >
 	<Nav />
+	<main id="main" tabindex="-1">
 
 	<section class="mx-auto max-w-[1200px] px-6 pt-16 pb-10 sm:pt-20 lg:px-0" data-reveal>
 		<p class="text-sm font-semibold uppercase tracking-widest text-muted">About</p>
@@ -270,10 +272,7 @@ const languages = [
 						<blockquote class="flex-1 space-y-4 leading-relaxed text-ink">
 							{t.text.map((para) => <p>{para}</p>)}
 						</blockquote>
-						<figcaption class="mt-6 border-t border-ink/10 pt-4">
-							<p class="font-semibold">{t.name}</p>
-							<p class="mt-0.5 text-sm text-muted">{t.role} · {t.relation}</p>
-						</figcaption>
+						<RecByline t={t} />
 					</figure>
 				))
 			}
@@ -352,5 +351,6 @@ const languages = [
 		</div>
 	</section>
 
+	</main>
 	<Footer />
 </Layout>

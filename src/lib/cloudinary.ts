@@ -1,5 +1,8 @@
+// A gallery URL may carry its own fix-up first (e.g. `c_crop,w_375,g_west/`
+// to cut a scrollbar baked into a capture). The preset goes after it, so the
+// crop runs first and the original file on Cloudinary is never touched.
 export function cld(url: string, transform: string): string {
-	return url.replace('/upload/', `/upload/${transform}/`);
+	return url.replace(/\/upload\/((?:[a-z]{1,3}_[^/]+\/)*)/, (_m, pre) => `/upload/${pre}${transform}/`);
 }
 
 // Detects tall mobile-viewport screenshots (folder/filename contains "mobile")

@@ -23,10 +23,11 @@ const defaultNote = hasFormspree
 	description="Hiring a senior product designer? David Bitan is available now for senior and lead product design roles. Ashkelon, Israel · Hybrid or remote, Tel Aviv area."
 >
 	<Nav />
+	<main id="main" tabindex="-1">
 
 	<section class="mx-auto max-w-[1200px] px-6 pt-16 pb-24 sm:pt-20 lg:px-0" data-reveal>
 		<p class="text-sm font-semibold uppercase tracking-widest text-muted">Contact</p>
-		<h1 class="mt-4 max-w-2xl text-4xl font-extrabold tracking-tight sm:text-5xl">Hiring a senior product designer?</h1>
+		<h1 class="mt-4 max-w-2xl text-[1.85rem] font-extrabold tracking-tight min-[374px]:text-4xl sm:text-5xl">Hiring a senior product designer?</h1>
 		<p class="mt-6 max-w-xl text-lg text-muted">
 			I'm available now for senior and lead product design roles: based in Ashkelon, Israel,
 			hybrid or remote in the Tel Aviv area. Send me a note and I'll reply within 24 hours.
@@ -44,6 +45,7 @@ const defaultNote = hasFormspree
 					<label for="name" class="block text-sm font-semibold">Name</label>
 					<input
 						id="name"
+						autocomplete="name"
 						name="name"
 						type="text"
 						required
@@ -55,6 +57,7 @@ const defaultNote = hasFormspree
 					<label for="email" class="block text-sm font-semibold">Email</label>
 					<input
 						id="email"
+						autocomplete="email"
 						name="email"
 						type="email"
 						required
@@ -106,6 +109,7 @@ const defaultNote = hasFormspree
 		</div>
 	</section>
 
+	</main>
 	<Footer hideCta />
 </Layout>
 

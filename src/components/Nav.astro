@@ -90,6 +90,7 @@ function isActive(href: string) {
 
 <div
 	id="mobile-nav"
+	inert
 	class="mobile-nav-panel fixed inset-0 z-[60] flex translate-x-full flex-col items-center justify-center gap-8 bg-bg transition-transform duration-[620ms] lg:hidden"
 >
 	<button id="nav-close" type="button" aria-label="Close menu" class="absolute right-6 top-5 flex items-center justify-center">
@@ -212,13 +213,23 @@ function isActive(href: string) {
 		overlay?.classList.add('is-open');
 		toggle?.setAttribute('aria-expanded', 'true');
 		document.body.style.overflow = 'hidden';
+		// Reachable only while open (inert when closed), focus moves inside.
+		if (overlay) overlay.inert = false;
+		(overlay?.querySelector('.mobile-nav-link') as HTMLElement | null)?.focus();
 	}
 	function closeMenu() {
 		overlay?.classList.add('translate-x-full');
 		overlay?.classList.remove('is-open');
 		toggle?.setAttribute('aria-expanded', 'false');
 		document.body.style.overflow = '';
+		if (overlay && !overlay.inert) {
+			overlay.inert = true;
+			toggle?.focus();
+		}
 	}
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape' && overlay?.classList.contains('is-open')) closeMenu();
+	});
 	window.addEventListener('resize', () => {
 		if (overlay?.classList.contains('is-open')) syncClosePosition();
 	});

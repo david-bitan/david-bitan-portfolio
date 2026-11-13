@@ -58,6 +58,7 @@ const ds = project.designSystem;
 	structuredData={projectJsonLd}
 >
 	<Nav />
+	<main id="main" tabindex="-1">
 
 	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-2 sm:pt-20 lg:px-0" data-reveal>
 		<a href="/#ai-lab" class="text-sm font-semibold text-accent-text hover:underline"
@@ -95,7 +96,7 @@ const ds = project.designSystem;
 				</svg>
 			</a>
 			<span class="text-xs uppercase tracking-widest text-muted"
-				>Fictional experiment · self-brief</span
+				>Self-initiated concept</span
 			>
 		</div>
 	</article>
@@ -153,7 +154,7 @@ const ds = project.designSystem;
 						href={project.aiFeature.tryUrl}
 						target="_blank"
 						rel="noopener noreferrer"
-						class="mt-6 inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-pill bg-accent px-4 sm:w-auto sm:px-7 py-3.5 text-sm font-semibold text-accent-ink transition-colors hover:bg-ink hover:text-bg"
+						class="btn-secondary mt-6 inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-pill px-4 sm:w-auto sm:px-7 py-3.5 text-sm font-semibold"
 					>
 						{project.aiFeature.tryLabel}
 						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"></path></svg>
@@ -368,6 +369,7 @@ const ds = project.designSystem;
 		</a>
 	</section>
 
+	</main>
 	<Footer />
 </Layout>
 

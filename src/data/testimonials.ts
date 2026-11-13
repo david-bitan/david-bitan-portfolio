@@ -2,7 +2,7 @@
 // two long dashes turned into ": " / ", " (site rule, OK'd by David) and one
 // typo fixed ("producr" -> "product"). `excerpt` is a verbatim cut of `text`,
 // cuts marked […]. Never rephrase inside quotes. No photos: the words are
-// the proof. Source for everything: LINKEDIN_RECOMMENDATIONS_URL.
+// the proof (13/11: photos added with each author's consent, supplied by David). Source for everything: LINKEDIN_RECOMMENDATIONS_URL.
 export const LINKEDIN_RECOMMENDATIONS_URL =
 	'https://www.linkedin.com/in/david-bitan/details/recommendations/';
 
@@ -11,6 +11,8 @@ export interface Testimonial {
 	role: string;
 	relation: string;
 	text: string[];
+	/** Round photo supplied by David (WebP, 120×120 for a 60px display). Initials until then. */
+	photo?: string;
 	/** Verbatim excerpt shown on the home page (featured only). */
 	excerpt?: string;
 	featured?: boolean;
