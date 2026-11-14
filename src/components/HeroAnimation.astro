@@ -2,26 +2,31 @@
 // Home hero animation (CL2 étape 6, lot 4, phase D). Decorative (aria-hidden):
 // five scenes from David's work: scene 1 lasts 9 s, the others 6 s (loop of 33 s).
 // Coded SVG + a small requestAnimationFrame engine (no GSAP: its licence is
-// not on the project's free-licence list). Two scene transitions, chosen with
-// ?transition=a (default: the background card stays and reshapes, content
-// changes) or ?transition=b (morphing: each shape becomes a shape of the next
-// scene). The "AI" scan line lives only in scene 1. Colours come from CSS variables, so
+// not on the project's free-licence list). Scenes change by morphing: each
+// squircle becomes a squircle of the next scene. The "AI" scan line lives
+// only in scene 1. Colours come from CSS variables, so
 // the same drawing follows the light and dark themes. Pencil-style doodles
 // reuse the filters of David's animated LinkedIn banner and float all the
 // time, each at its own slow rhythm, never stopping.
 // Scenes: 1 prompt to product, 2 one system many brands (Top5),
 // 3 comparison (Top5, Sonary), 4 chatbot (APEX, Facet), 5 SaaS dashboard
 // (Sonary Software Stack Manager).
+// Squircle (super-ellipse corners, about 60 % smoothing like Figma's corner smoothing): the
+// corner starts 1.6 x r from the edge and its control points hug the corner. As r reaches half
+// the short side the smoothing fades out, so pills and circles stay truly round. One fixed path
+// structure, so a shape can be recomputed every frame while it morphs.
 const sq = (x: number, y: number, w: number, h: number, r: number) => {
-	const p = Math.min(r * 1.6, w / 2, h / 2), k = p * 0.38;
+	w = Math.max(w, 0); h = Math.max(h, 0);
+	const m = Math.min(w, h) / 2, rr = Math.min(Math.max(r, 0), m), sm = m > 0 ? Math.min(1, Math.max(0, (1 - rr / m) / 0.25)) : 0;
+	const p = Math.min(rr * (1 + 0.6 * sm), m), k = p * (0.4477 - 0.0677 * sm);
 	return `M${x + p} ${y} H${x + w - p} C${x + w - k} ${y} ${x + w} ${y + k} ${x + w} ${y + p} V${y + h - p} C${x + w} ${y + h - k} ${x + w - k} ${y + h} ${x + w - p} ${y + h} H${x + p} C${x + k} ${y + h} ${x} ${y + h - k} ${x} ${y + h - p} V${y + p} C${x} ${y + k} ${x + k} ${y} ${x + p} ${y} Z`;
 };
 // Scene 1 card: 420 x 216 at (70, 112). Blocks: [x, y, w, h, r, tone]
 const C1 = { x: 70, y: 112 };
 const blocks = [
-	[16, 14, 80, 22, 7, 'chip'], [112, 14, 196, 22, 7, 'soft'], [324, 14, 80, 22, 7, 'chip'],
-	[16, 48, 240, 90, 9, 'acc'], [272, 48, 132, 40, 9, 'soft'], [272, 98, 132, 40, 9, 'soft'],
-	[16, 152, 120, 50, 9, 'soft'], [150, 152, 120, 50, 9, 'soft'], [284, 152, 120, 50, 9, 'soft'],
+	[16, 14, 80, 22, 4, 'chip'], [112, 14, 196, 22, 4, 'soft'], [324, 14, 80, 22, 4, 'chip'],
+	[16, 48, 240, 90, 4, 'acc'], [272, 48, 132, 40, 4, 'soft'], [272, 98, 132, 40, 4, 'soft'],
+	[16, 152, 120, 50, 4, 'soft'], [150, 152, 120, 50, 4, 'soft'], [284, 152, 120, 50, 4, 'soft'],
 ] as const;
 const D: Record<string, string> = {
 	robot: '<path d="M4 14 q0-12 12-12 h24 q12 0 12 12 v18 q0 12-12 12 h-24 q-12 0-12-12z"/><path d="M28 2 v-9"/><circle cx="28" cy="-11" r="3.5"/><path d="M4 18 q-7 0 -7 6 q0 6 7 6 M52 18 q7 0 7 6 q0 6 -7 6"/><path d="M14 23 q5 -5 10 0 M32 23 q5 -5 10 0"/><path d="M20 32 q8 6 16 0"/>',
@@ -45,9 +50,9 @@ const doodles: Dd[][] = [
 	[['bubble', 510, 112, 6, 0.9, false], ['spark', 52, 330, 0, 1, true]],
 	[['sun', 520, 92, 0, 1, false, 'sun'], ['moon', 520, 92, 0, 1, false, 'moon'], ['spark', 40, 120, 0, 0.8, true]],
 ];
-const texts: [number, string, number, number, number, number, boolean][] = [
+const texts: [number, string, number, number, number, number, boolean, string?][] = [
 	[0, 'wireframe', 90, 362, -5, 26, true],
-	[0, 'live UI', 434, 360, 3, 26, false],
+	[0, 'live UI', 434, 360, 3, 26, false, 'pin'],
 	[1, '1 system', 404, 384, -5, 28, true],
 ];
 const PROMPT = 'Design an AI-powered SaaS dashboard';
@@ -71,8 +76,6 @@ let di = 0;
 		</defs>
 
 		<rect width="560" height="440" fill="url(#ha-grid)" mask="url(#ha-mask)"></rect>
-		<!-- Transition A: the shared background card that reshapes between scenes -->
-		<path id="ha-frame" class="ha-card" style="display:none"></path>
 
 		<!-- 1 · From prompt to product -->
 		<g class="ha-scene" data-scene="0">
@@ -110,27 +113,27 @@ let di = 0;
 		<g class="ha-scene" data-scene="1" style="--ha-b:#f25c24">
 			<g class="ha-it">
 				<path data-m="card" data-r="16" data-bg d={sq(80, 62, 400, 276, 16)} class="ha-surface ha-card"></path>
-				<rect data-m="band" x="80" y="62" width="400" height="44" rx="16" class="ha-b-soft"></rect>
+				<path data-m="band" data-r="16" d={sq(80, 62, 400, 44, 16)} class="ha-b-soft"></path>
 				<rect data-m="btn" id="ha-logo" x="100" y="76" width="70" height="16" rx="8" style="fill:var(--ha-b)"></rect>
 				{[[300, 40], [352, 40], [404, 56]].map(([x, w]) => <rect data-m="pill" class="ha-nav ha-b-chip" x={x} y="80" width={w} height="8" rx="4"></rect>)}
 			</g>
 			{rowsA.map((y) => (
 				<g class="ha-it">
 					<g class="ha-row">
-						<rect data-m="row" class="ha-rbg ha-b-soft" x="100" y={y} width="360" height="56" rx="12"></rect>
-						<rect data-m="icon" class="ha-ric" x="114" y={y + 12} width="32" height="32" rx="8" style="fill:var(--ha-b)"></rect>
+						<path data-m="row" data-r="4" class="ha-rbg ha-b-soft" d={sq(100, y, 360, 56, 4)}></path>
+						<path data-m="icon" data-r="3" class="ha-ric" d={sq(114, y + 12, 32, 32, 3)} style="fill:var(--ha-b)"></path>
 						<rect data-m="pill" class="ha-rt1 ha-b-chip" x="160" y={y + 17} width="140" height="9" rx="4.5"></rect>
 						<rect data-m="pill" class="ha-rt2 ha-b-chip" x="160" y={y + 32} width="90" height="9" rx="4.5"></rect>
-						<rect data-m="btn" class="ha-btn" x="376" y={y + 16} width="68" height="24" rx="12" style="fill:var(--ha-b)"></rect>
+						<path data-m="btn" data-r="12" class="ha-btn" d={sq(376, y + 16, 68, 24, 12)} style="fill:var(--ha-b)"></path>
 					</g>
 				</g>
 			))}
 			<g class="ha-it">
 				<g id="ha-side" opacity="0">
-					<rect data-m="row" x="362" y="120" width="98" height="160" rx="12" class="ha-b-soft"></rect>
+					<path data-m="row" data-r="4" d={sq(362, 120, 98, 160, 4)} class="ha-b-soft"></path>
 					<rect data-m="pill" x="376" y="136" width="56" height="8" rx="4" class="ha-b-chip"></rect>
 					{[0, 1, 2].map((j) => <rect data-m="pill" x="376" y={158 + j * 20} width={[70, 52, 62][j]} height="7" rx="3.5" class="ha-b-soft2"></rect>)}
-					<rect data-m="btn" x="376" y="236" width="70" height="28" rx="9" style="fill:var(--ha-b)"></rect>
+					<path data-m="btn" data-r="3" d={sq(376, 236, 70, 28, 3)} style="fill:var(--ha-b)"></path>
 				</g>
 			</g>
 		</g>
@@ -143,7 +146,7 @@ let di = 0;
 						<path data-m="row" data-r="14" d={sq(110, 0, 340, 74, 14)} class="ha-surface ha-card"></path>
 						<circle data-m="dot" cx="140" cy="37" r="15" class="ha-b-soft"></circle>
 						<text x="140" y="42" class="ha-num">{rank}</text>
-						<rect data-m="icon" x="166" y="20" width="34" height="34" rx="9" class="ha-b-chip"></rect>
+						<path data-m="icon" data-r="4" d={sq(166, 20, 34, 34, 4)} class="ha-b-chip"></path>
 						<rect data-m="pill" x="212" y="24" width="96" height="9" rx="4.5" class="ha-b-chip"></rect>
 						<rect data-m="pill" x="212" y="41" width="60" height="9" rx="4.5" class="ha-b-soft2"></rect>
 						{[0, 1, 2, 3, 4].map((s) => (
@@ -172,22 +175,22 @@ let di = 0;
 			</g>
 			<g class="ha-it">
 				<g id="ha-user" opacity="0">
-					<rect data-m="bubble" x="234" y="120" width="214" height="40" rx="14" style="fill:var(--ha-acc)"></rect>
+					<path data-m="bubble" data-r="4" d={sq(234, 120, 214, 40, 4)} style="fill:var(--ha-acc)"></path>
 					<text id="ha-utext" x="250" y="145" class="ha-utext"></text>
 					<rect id="ha-ucaret" x="250" y="132" width="2" height="16" fill="#fff"></rect>
 				</g>
 			</g>
 			<g class="ha-it">
 				<g id="ha-typing" opacity="0">
-					<rect data-m="bubble" x="112" y="186" width="74" height="36" rx="14" class="ha-b-soft"></rect>
+					<path data-m="bubble" data-r="4" d={sq(112, 186, 74, 36, 4)} class="ha-b-soft"></path>
 					{[0, 1, 2].map((j) => <circle class="ha-tdot" cx={134 + j * 15} cy="204" r="4"></circle>)}
 				</g>
 				<g id="ha-bot" opacity="0">
-					<rect data-m="bubble" x="112" y="186" width="262" height="150" rx="14" class="ha-b-soft"></rect>
+					<path data-m="bubble" data-r="4" d={sq(112, 186, 262, 150, 4)} class="ha-b-soft"></path>
 					<rect data-m="pill" x="128" y="202" width="200" height="8" rx="4" class="ha-b-chip"></rect>
 					<rect data-m="pill" x="128" y="217" width="140" height="8" rx="4" class="ha-b-chip"></rect>
 					<line x1="130" y1="320" x2="356" y2="320" class="ha-hair"></line>
-					{[0, 1, 2, 3, 4, 5].map((j) => <rect data-m="col" class="ha-cbar" x={136 + j * 36} y="320" width="22" height="0" rx="4" data-h={[38, 56, 44, 72, 60, 84][j]} style={j === 5 ? 'fill:var(--ha-acc)' : ''}></rect>)}
+					{[0, 1, 2, 3, 4, 5].map((j) => <path data-m="col" data-r="3" class="ha-cbar" data-x={136 + j * 36} d="" data-h={[38, 56, 44, 72, 60, 84][j]} style={j === 5 ? 'fill:var(--ha-acc)' : ''}></path>)}
 				</g>
 			</g>
 		</g>
@@ -203,7 +206,7 @@ let di = 0;
 			<g class="ha-it">
 				{[0, 1, 2].map((j) => (
 					<g>
-						<rect data-m="row" x={186 + j * 92} y="104" width="80" height="54" rx="10" class="ha-dtile"></rect>
+						<path data-m="row" data-r="4" d={sq(186 + j * 92, 104, 80, 54, 4)} class="ha-dtile"></path>
 						<rect data-m="pill" x={198 + j * 92} y="118" width="36" height="7" rx="3.5" class="ha-dbar"></rect>
 						<rect data-m="pill" x={198 + j * 92} y="134" width="52" height="11" rx="5.5" class={j === 0 ? 'ha-dacc' : 'ha-dink'}></rect>
 					</g>
@@ -211,7 +214,7 @@ let di = 0;
 			</g>
 			<g class="ha-it">
 				<line x1="190" y1="330" x2="466" y2="330" class="ha-dline"></line>
-				{[0, 1, 2, 3, 4, 5, 6].map((j) => <rect data-m="col" class="ha-dcol" x={196 + j * 38} y="330" width="24" height="0" rx="5" data-h={[60, 92, 74, 118, 96, 140, 120][j]} style={j % 3 === 2 ? '' : ''}></rect>)}
+				{[0, 1, 2, 3, 4, 5, 6].map((j) => <path data-m="col" data-r="4" class="ha-dcol" data-x={196 + j * 38} d="" data-h={[60, 92, 74, 118, 96, 140, 120][j]}></path>)}
 			</g>
 			<g class="ha-it">
 				<rect data-m="btn" x="418" y="70" width="48" height="24" rx="12" id="ha-track"></rect>
@@ -231,8 +234,8 @@ let di = 0;
 						<g transform="translate(.9 .7)" filter="url(#ha-pencil2)" class="ha-ds" style="stroke-width:1.4;opacity:.5" set:html={D[key]}></g>
 					</g>
 				))}
-				{texts.filter((t) => t[0] === k).map(([, txt, x, y, r, size, o]) => (
-					<g class="ha-d" data-x={x} data-y={y} data-r={r} data-s="1" data-i={di++}>
+				{texts.filter((t) => t[0] === k).map(([, txt, x, y, r, size, o, tag]) => (
+					<g class="ha-d" data-x={x} data-y={y} data-r={r} data-s="1" data-i={di++} data-tag={tag}>
 						<text class:list={['ha-dt', { 'ha-o': o }]} font-size={size} filter="url(#ha-chalk)">{txt}</text>
 					</g>
 				))}
@@ -255,8 +258,7 @@ let di = 0;
 		const $ = (s) => svg.querySelector(s);
 		const $$ = (s) => Array.from(svg.querySelectorAll(s));
 		const DURS = [9, 6, 6, 6, 6], N = 5;
-		const VER = new URLSearchParams(location.search).get('transition') === 'b' ? 'b' : 'a';
-		const H = VER === 'a' ? 0.45 : 0.65; // half of the transition window, centred on each scene change
+		const H = 0.65; // half of the 1.3 s transition window, centred on each scene change
 		const START = DURS.map((d, k) => DURS.slice(0, k).reduce((a, b) => a + b, 0)), LOOP = DURS.reduce((a, b) => a + b, 0);
 		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 		const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
@@ -277,7 +279,14 @@ let di = 0;
 			return 3 * y1 * t * (1 - t) ** 2 + 3 * y2 * t * t * (1 - t) + t ** 3;
 		};
 		const EM = bez(0.77, 0, 0.175, 1), EO = bez(0.23, 1, 0.32, 1);
-		const sq = (x, y, w, h, r) => { const p = Math.min(r * 1.6, w / 2, h / 2), k = p * 0.38; return `M${x + p} ${y} H${x + w - p} C${x + w - k} ${y} ${x + w} ${y + k} ${x + w} ${y + p} V${y + h - p} C${x + w} ${y + h - k} ${x + w - k} ${y + h} ${x + w - p} ${y + h} H${x + p} C${x + k} ${y + h} ${x} ${y + h - k} ${x} ${y + h - p} V${y + p} C${x} ${y + k} ${x + k} ${y} ${x + p} ${y} Z`; };
+		// Same squircle as in the markup (see the top of this file).
+		const sq = (x, y, w, h, r) => {
+			w = Math.max(w, 0); h = Math.max(h, 0);
+			const m = Math.min(w, h) / 2, rr = Math.min(Math.max(r, 0), m), sm2 = m > 0 ? clamp((1 - rr / m) / 0.25) : 0;
+			const p = Math.min(rr * (1 + 0.6 * sm2), m), k = p * (0.4477 - 0.0677 * sm2);
+			return `M${x + p} ${y} H${x + w - p} C${x + w - k} ${y} ${x + w} ${y + k} ${x + w} ${y + p} V${y + h - p} C${x + w} ${y + h - k} ${x + w - k} ${y + h} ${x + w - p} ${y + h} H${x + p} C${x + k} ${y + h} ${x} ${y + h - k} ${x} ${y + h - p} V${y + p} C${x} ${y + k} ${x + k} ${y} ${x + p} ${y} Z`;
+		};
+		const setSq = (el, x, y, w, h, r) => { el.setAttribute('d', sq(x, y, w, h, r)); el.dataset.r = r; };
 		// Colours mixed in OKLab (no muddy grey, no green in between).
 		const parseC = (c) => { const m = String(c).match(/[\d.]+/g) || [0, 0, 0]; return [+m[0], +m[1], +m[2], m[3] != null ? +m[3] : 1]; };
 		const lin = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
@@ -330,7 +339,7 @@ let di = 0;
 		const bzp = (p0, p1, u) => { const c = [(p0[0] + p1[0]) / 2, CY]; const v = 1 - u; return [v * v * p0[0] + 2 * v * u * c[0] + u * u * p1[0], v * v * p0[1] + 2 * v * u * c[1] + u * u * p1[1], 2 * v * (c[0] - p0[0]) + 2 * u * (p1[0] - c[0]), 2 * v * (c[1] - p0[1]) + 2 * u * (p1[1] - c[1])]; };
 		const trip = (q, p0, p1, r0, r1) => {
 			const u = EM(clamp(q / 0.85));
-			const ov = 0.014 * Math.sin(Math.PI * clamp((q - 0.78) / 0.22));
+			const ov = 0.014 * Math.sin(Math.PI * clamp((q - 0.78) / 0.22)) ** 2; // overshoot and return, ends with zero speed while the float has already taken over
 			const [x, y, tx, ty] = bzp(p0, p1, u + ov);
 			let d = Math.atan2(ty, tx) - Math.atan2(p1[1] - p0[1], p1[0] - p0[0]);
 			d = Math.atan2(Math.sin(d), Math.cos(d));
@@ -351,8 +360,11 @@ let di = 0;
 			clipUI.setAttribute('width', Math.max(0, 494 - x));
 			scan.setAttribute('transform', `translate(${x} 0)`);
 			const [cx, cy, cr, cq] = curPos(s), [ax, ay] = curPos(s - 0.03), [bx, by] = curPos(s + 0.03);
-			const f = float(40, T), fa = 1 - 0.6 * Math.sin(Math.PI * cq); // float keeps going, smaller during a trip
-			cur.setAttribute('transform', `translate(${cx + fa * f.dx} ${cy + fa * f.dy}) rotate(${cr + fa * f.dr})`);
+			// Cursor float: its own lively sine (about 3.5 s), smaller mid-trip and back to full before
+			// the overshoot ends, so there is never a still frame on arrival.
+			const P2 = 2 * Math.PI, fa = 1 - 0.6 * Math.sin(Math.PI * clamp(cq / 0.8));
+			const fdx = 2.6 * Math.sin((P2 * T) / 3.6), fdy = 2 * Math.sin((P2 * T) / 2.9 + 1), fdr = 1.5 * Math.sin((P2 * T) / 4.3 + 2);
+			cur.setAttribute('transform', `translate(${cx + fa * fdx} ${cy + fa * fdy}) rotate(${cr + fa * fdr})`);
 			let vx = bx - ax, vy = by - ay; const sp = Math.hypot(vx, vy);
 			if (sp > 1.2) {
 				vx /= sp; vy /= sp; const k = Math.min(1, sp / 12), px = -vy, py = vx;
@@ -364,9 +376,10 @@ let di = 0;
 		const s2 = scenes[1].g, logo = $('#ha-logo'), btns = $$('.ha-btn'), navs = $$('.ha-nav'), side = $('#ha-side');
 		const rows = $$('.ha-row').map((g) => ['.ha-rbg', '.ha-ric', '.ha-rt1', '.ha-rt2', '.ha-btn'].map((c) => g.querySelector(c)));
 		const brands = [
+			// button: a pill (exempt from the nested-radius law) or a squircle at the law's floor (3)
 			{ c: hex('#f25c24'), w: 70, r: 12, rowH: 56, gap: 12, rowW: 360, side: 0, nav: [40, 40, 56], navH: 8 },
-			{ c: hex('#2f6feb'), w: 54, r: 5, rowH: 44, gap: 14, rowW: 248, side: 1, nav: [32, 32, 44], navH: 7 },
-			{ c: hex('#c2367a'), w: 86, r: 8, rowH: 62, gap: 10, rowW: 360, side: 0, nav: [46, 46, 64], navH: 9 },
+			{ c: hex('#2f6feb'), w: 54, r: 3, rowH: 44, gap: 14, rowW: 248, side: 1, nav: [32, 32, 44], navH: 7 },
+			{ c: hex('#c2367a'), w: 86, r: 12, rowH: 62, gap: 10, rowW: 360, side: 0, nav: [46, 46, 64], navH: 9 },
 		];
 		const set = (el, o) => { for (const k in o) el.setAttribute(k, typeof o[k] === 'number' ? o[k].toFixed(1) : o[k]); };
 		function scene2(s) {
@@ -375,18 +388,17 @@ let di = 0;
 			const L = (k) => lerp(a[k], b[k], m);
 			s2.style.setProperty('--ha-b', rgb(mix(a.c, b.c, m)));
 			logo.setAttribute('width', L('w').toFixed(1));
-			btns.forEach((el) => el.setAttribute('rx', L('r').toFixed(1)));
 			const navH = L('navH'), nw = a.nav.map((v, i) => lerp(v, b.nav[i], m));
 			let nx = 460;
 			for (let i = 2; i >= 0; i--) { nx -= nw[i]; set(navs[i], { x: nx, y: 84 - navH / 2, width: nw[i], height: navH, rx: navH / 2 }); nx -= 12; }
 			const rowH = L('rowH'), gap = L('gap'), rowW = L('rowW'), k = rowW / 360, ic = 32 * (rowH / 56);
 			rows.forEach(([bg, icon, t1, t2, btn], j) => {
 				const y = 120 + j * (rowH + gap);
-				set(bg, { y, width: rowW, height: rowH });
-				set(icon, { y: y + (rowH - ic) / 2, width: ic, height: ic });
+				setSq(bg, 100, y, rowW, rowH, 4);
+				setSq(icon, 114, y + (rowH - ic) / 2, ic, ic, 3);
 				set(t1, { y: y + rowH / 2 - 11, width: 140 * k });
 				set(t2, { y: y + rowH / 2 + 4, width: 90 * k });
-				set(btn, { x: 100 + rowW - 84, y: y + (rowH - 24) / 2 });
+				setSq(btn, 100 + rowW - 84, y + (rowH - 24) / 2, 68, 24, L('r'));
 			});
 			const sd = L('side');
 			side.setAttribute('opacity', sd.toFixed(3));
@@ -431,7 +443,7 @@ let di = 0;
 			tdots.forEach((d, j) => d.setAttribute('transform', `translate(0 ${-3.5 * Math.max(0, Math.sin(2 * Math.PI * (s * 1.5 - j * 0.16)))})`));
 			const b = out(clamp((s - keyEnd - 1.15) / 0.45));
 			bot.setAttribute('opacity', b); bot.setAttribute('transform', `translate(0 ${8 * (1 - b)})`);
-			cbars.forEach((r, j) => { const h = +r.dataset.h * out(clamp((s - keyEnd - 1.45 - j * 0.12) / 0.5)); r.setAttribute('y', 320 - h); r.setAttribute('height', h); });
+			cbars.forEach((r, j) => { const h = +r.dataset.h * out(clamp((s - keyEnd - 1.45 - j * 0.12) / 0.5)); setSq(r, +r.dataset.x, 320 - h, 22, h, 3); });
 		}
 
 		// ---- Scene 5
@@ -444,7 +456,7 @@ let di = 0;
 			for (const k of Object.keys(L5)) dash.style.setProperty(`--d-${k}`, rgb(mix(L5[k], D5[k], m)));
 			track.style.fill = rgb(mix(hex('#c9cfdb'), hex('#f25c24'), m));
 			knob.setAttribute('cx', 430 + 24 * io(clamp((s - 2.6) / 0.45)));
-			dcols.forEach((r, j) => { const h = +r.dataset.h * out(clamp((s - 0.3 - j * 0.08) / 0.6)) * (1 - 0.12 * Math.sin(Math.PI * clamp((s - 2.6 - j * 0.04) / 0.6))); r.setAttribute('y', 330 - h); r.setAttribute('height', h); r.style.fill = j === 5 || j === 3 ? 'var(--ha-acc)' : `var(--d-bar)`; });
+			dcols.forEach((r, j) => { const h = +r.dataset.h * out(clamp((s - 0.3 - j * 0.08) / 0.6)) * (1 - 0.12 * Math.sin(Math.PI * clamp((s - 2.6 - j * 0.04) / 0.6))); setSq(r, +r.dataset.x, 330 - h, 24, h, 4); r.style.fill = j === 5 || j === 3 ? 'var(--ha-acc)' : `var(--d-bar)`; });
 			sun.forEach((d) => (d.el.style.opacity = 1 - m));
 			moon.forEach((d) => (d.el.style.opacity = m));
 		}
@@ -463,52 +475,20 @@ let di = 0;
 			dTexts[k].forEach((el) => (el.style.clipPath = tr >= 1 ? '' : `inset(-30% ${(100 * (1 - tr)).toFixed(1)}% -30% -10%)`));
 			doodleSets[k].style.opacity = Math.min(1, tr * 4).toFixed(3);
 		}
-		const TRACE_AT = VER === 'a' ? 0.9 : 1.25; // in the transition window, then about 0.4 s of drawing
+		const TRACE_AT = 1.25; // in the transition window, then about 0.4 s of drawing (sine in-out)
 
-		// ---- Version A: the background card stays and reshapes, the content changes.
-		const frameEl = $('#ha-frame');
-		const cssv = (n) => getComputedStyle(root).getPropertyValue(n).trim();
-		const G = [
-			{ x: 70, y: 112, w: 420, h: 216, r: 17, c: () => cssv('--ha-surface') },
-			{ x: 80, y: 62, w: 400, h: 276, r: 16, c: () => cssv('--ha-surface') },
-			{ x: 96, y: 50, w: 368, h: 290, r: 16, c: () => cssv('--ha-soft') }, // scene 3 has no card: a discreet background
-			{ x: 90, y: 52, w: 380, h: 304, r: 16, c: () => cssv('--ha-surface') },
-			{ x: 70, y: 56, w: 420, h: 296, r: 16, cIn: () => '#ffffff', c: () => '#151a28' }, // dashboard starts light, ends dark
-		];
-		const bgs = scenes.map((sc) => sc.g.querySelector('[data-bg]'));
-		function drawFrame(g, col, op) {
-			frameEl.style.display = op > 0.002 ? '' : 'none';
-			if (op <= 0.002) return;
-			frameEl.setAttribute('d', sq(g.x, g.y, g.w, g.h, g.r));
-			frameEl.style.fill = col; frameEl.style.opacity = op.toFixed(3);
-		}
-		let colKey = '', colA, colB, restTheme = null, restCol = '';
-		function transA(p, n, tau) {
-			const sp = scenes[p], sn = scenes[n];
-			const fo = 1 - sm(clamp(tau / 0.2));
-			sp.items.forEach((it) => { it.style.opacity = fo.toFixed(3); it.removeAttribute('transform'); });
-			const cnt = sn.items.length, gap = cnt > 4 ? 0.15 / (cnt - 1) : 0.05;
-			sn.items.forEach((it, j) => { const q = EO(clamp((tau - 0.45 - j * gap) / 0.3)); it.style.opacity = q.toFixed(3); it.setAttribute('transform', `translate(0 ${(8 * (1 - q)).toFixed(2)})`); });
-			if (bgs[p] && p !== 0) bgs[p].style.visibility = 'hidden';
-			if (bgs[n] && n !== 0) bgs[n].style.visibility = 'hidden';
-			const m = EM(clamp((tau - 0.1) / 0.6)), a = G[p], b = G[n];
-			const g = { x: lerp(a.x, b.x, m), y: lerp(a.y, b.y, m), w: lerp(a.w, b.w, m), h: lerp(a.h, b.h, m), r: lerp(a.r, b.r, m) };
-			const key = `${p}-${n}-${document.documentElement.dataset.theme}`; // read the theme colours once per transition
-			if (key !== colKey) { colKey = key; colA = toLab(parseC(rgbOf(a.c()))); colB = toLab(parseC(rgbOf((b.cIn || b.c)()))); }
-			const col = mixLab(colA, colB, m);
-			const op = (p === 0 ? sm(clamp(tau / 0.2)) : 1) * (n === 0 ? 1 - sm(clamp((tau - 0.6) / 0.3)) : 1);
-			drawFrame(g, col, op);
-			doodleSets[p].style.opacity = fo.toFixed(3); lastTrace[p] = -1;
-		}
-		const rgbOf = (c) => { if (c[0] !== '#') return c; const v = hex(c.length === 4 ? '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3] : c); return `rgb(${v[0]},${v[1]},${v[2]})`; };
-
-		// ---- Version B: morphing. Each rounded rectangle of the outgoing scene becomes one of the
-		// next scene (same role: card, bar, button, row...). Real width, height and corner radius are
-		// interpolated (never a scale), colours in OKLab. A shape without a partner shrinks into
-		// (or grows from) the nearest shape while fading. Texts, lines, stars and doodles are not
-		// morphed: they fade out before and appear / draw after.
+		// ---- Morphing between scenes. Each squircle of the outgoing scene becomes the nearest one
+		// with the same role in the next scene (card, band, row, bubble, button, icon, dot, pill,
+		// column). Real x, y, width, height and radius are interpolated and the squircle path is
+		// rebuilt every frame (never a scale), colours in OKLab. Stacking: shapes leaving without a
+		// partner sit at the bottom and are gone by 0.45 s (35 % of the window); every other shape is
+		// stacked in the order of the incoming scene, so what arrives is always on top. Shapes that
+		// arrive without a partner appear only after 0.55 s. A pair whose lightness changes a lot
+		// (dark card to light card) keeps its colour and the new surface grows on top from its centre
+		// in 0.3 s, crisp, so it never shows a dull grey. Texts, lines, stars and doodles are not morphed.
 		const morphG = $('#ha-morph'), pool = [];
 		const svgInv = () => svg.getScreenCTM().inverse();
+		const ROLE_DELAY = { card: 0, side: 0, band: 0.03, row: 0.05, bubble: 0.05, icon: 0.09, dot: 0.09, btn: 0.09, pill: 0.12, col: 0.12 }; // big to small, rows together
 		function measure(k, s, T) {
 			const sc = scenes[k];
 			sc.g.style.display = ''; sc.g.style.opacity = 1; sc.g.classList.remove('ha-hide-m');
@@ -516,7 +496,7 @@ let di = 0;
 			update[k](s, T);
 			const inv = svgInv(), list = [];
 			const clipX = +clipUI.getAttribute('x');
-			sc.g.querySelectorAll('[data-m]').forEach((el) => {
+			sc.g.querySelectorAll('[data-m]').forEach((el, idx) => {
 				let op = 1;
 				for (let e = el; e && e !== sc.g; e = e.parentElement) { const o = parseFloat(getComputedStyle(e).opacity); if (!isNaN(o)) op *= o; }
 				if (op < 0.03) return;
@@ -524,53 +504,73 @@ let di = 0;
 				let x = mt.a * bb.x + mt.e, y = mt.d * bb.y + mt.f, w = bb.width * mt.a, h = bb.height * mt.d;
 				if (k === 0 && el.closest('[data-clip]')) { const x2 = x + w; x = Math.max(x, clipX); w = x2 - x; }
 				if (w < 0.5 || h < 0.5) return;
-				let r;
-				if (el.tagName === 'circle') r = w / 2;
-				else if (el.dataset.r) r = Math.min(+el.dataset.r * 1.6, w / 2, h / 2) * 0.75;
-				else r = (+el.getAttribute('rx') || 0) * mt.a;
+				const r = el.tagName === 'circle' ? w / 2 : el.dataset.r ? +el.dataset.r : +(el.getAttribute('rx') || 0) * mt.a;
 				const cs = getComputedStyle(el);
 				const st = cs.stroke && cs.stroke !== 'none' ? cs.stroke : null;
-				list.push({ role: el.dataset.m, x, y, w, h, r, f: toLab(parseC(cs.fill)), op, s: st ? toLab(parseC(st)) : null, sw: st ? parseFloat(cs.strokeWidth) || 0 : 0 });
+				list.push({ role: el.dataset.m, idx, x, y, w, h, r, f: toLab(parseC(cs.fill)), op, s: st ? toLab(parseC(st)) : null, sw: st ? parseFloat(cs.strokeWidth) || 0 : 0 });
 			});
 			return list;
 		}
+		const ctr = (o) => [o.x + o.w / 2, o.y + o.h / 2];
+		const dist = (a, b) => { const [ax, ay] = ctr(a), [bx, by] = ctr(b); return (ax - bx) ** 2 + (ay - by) ** 2; };
 		function pairUp(A, B) {
-			const res = [], roles = new Set([...A, ...B].map((o) => o.role));
-			const ctr = (o) => [o.x + o.w / 2, o.y + o.h / 2];
-			const near = (o, L) => L.reduce((best, c) => { const [ax, ay] = ctr(o), [bx, by] = ctr(c), d = (ax - bx) ** 2 + (ay - by) ** 2; return !best || d < best.d ? { c, d } : best; }, null)?.c;
+			const pairs = [], usedA = new Set(), usedB = new Set();
+			// nearest pairs first, same role only: fewer crossing paths
+			const cand = [];
+			A.forEach((a, i) => B.forEach((b, j) => { if (a.role === b.role) cand.push([dist(a, b), i, j]); }));
+			cand.sort((p, q) => p[0] - q[0]);
+			for (const [, i, j] of cand) if (!usedA.has(i) && !usedB.has(j)) { usedA.add(i); usedB.add(j); pairs.push({ a: A[i], b: B[j], kind: 'pair' }); }
+			// rows keep their order: pair rows by vertical order so they stay aligned while moving
+			const rowsA = pairs.filter((p) => p.a.role === 'row' && p.b.role === 'row');
+			const ya = rowsA.map((p) => p.a).sort((m, n) => m.y - n.y), yb = rowsA.map((p) => p.b).sort((m, n) => m.y - n.y);
+			rowsA.forEach((p, i) => { p.a = ya[i]; p.b = yb[i]; });
+			const near = (o, L) => L.reduce((best, c) => (!best || dist(o, c) < dist(o, best) ? c : best), null);
 			const dot = (o, src) => { const [cx, cy] = ctr(o); return { ...src, x: cx - 2, y: cy - 2, w: 4, h: 4, r: 2, op: 0 }; };
-			for (const role of roles) {
-				const sort = (L) => L.filter((o) => o.role === role).sort((a, b) => a.y - b.y || a.x - b.x);
-				const As = sort(A), Bs = sort(B), n = Math.min(As.length, Bs.length);
-				for (let i = 0; i < n; i++) res.push({ a: As[i], b: Bs[i] });
-				As.slice(n).forEach((a) => { const t = near(a, B) || a; res.push({ a, b: dot(t, a) }); });
-				Bs.slice(n).forEach((b) => { const t = near(b, A) || b; res.push({ a: dot(t, b), b }); });
-			}
-			// big shapes first in the drawing order, small ones on top
-			res.sort((p, q) => q.b.w * q.b.h + q.a.w * q.a.h - (p.b.w * p.b.h + p.a.w * p.a.h));
-			res.forEach((pr) => (pr.delay = 0.15 * clamp((Math.min(pr.a.y, pr.b.y) - 40) / 300))); // top rows first, about 40 ms apart
+			const gone = A.filter((_, i) => !usedA.has(i)).map((a) => ({ a, b: dot(near(a, B) || a, a), kind: 'out' }));
+			const born = B.filter((_, j) => !usedB.has(j)).map((b) => ({ a: dot(near(b, A) || b, b), b, kind: 'in' }));
+			const res = [...gone, ...pairs, ...born];
+			res.forEach((pr) => {
+				pr.delay = ROLE_DELAY[pr.b.role ?? pr.a.role] ?? 0.1;
+				pr.swap = pr.kind === 'pair' && Math.abs(pr.a.f[0] - pr.b.f[0]) > 0.3; // big lightness jump
+				pr.z = pr.kind === 'out' ? -1 : pr.b.idx; // incoming order on top
+			});
+			res.sort((p, q) => p.z - q.z);
 			return res;
 		}
 		let morphKey = '', pairs = [];
+		const mk = () => { const el = document.createElementNS('http://www.w3.org/2000/svg', 'path'); morphG.appendChild(el); return el; };
+		function paint(el, g, fill, op, stroke, sw) {
+			el.style.display = op > 0.002 ? '' : 'none';
+			if (op <= 0.002) return;
+			el.setAttribute('d', sq(g.x, g.y, g.w, g.h, g.r));
+			el.style.fill = fill; el.style.opacity = op.toFixed(3);
+			if (stroke) { el.style.stroke = stroke; el.style.strokeWidth = sw.toFixed(2); } else el.style.stroke = 'none';
+		}
 		function drawMorph(tau) {
 			morphG.style.display = '';
-			while (pool.length < pairs.length) { const el = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); morphG.appendChild(el); pool.push(el); }
-			pool.forEach((el, i) => {
-				const pr = pairs[i];
-				if (!pr) { el.style.display = 'none'; return; }
-				const q = EM(clamp((tau - 0.15 - pr.delay) / 0.9)), a = pr.a, b = pr.b;
-				const w = lerp(a.w, b.w, q), h = lerp(a.h, b.h, q), r = Math.min(lerp(a.r, b.r, q), w / 2, h / 2);
-				el.style.display = '';
-				el.setAttribute('x', lerp(a.x, b.x, q).toFixed(2)); el.setAttribute('y', lerp(a.y, b.y, q).toFixed(2));
-				el.setAttribute('width', w.toFixed(2)); el.setAttribute('height', h.toFixed(2));
-				el.setAttribute('rx', r.toFixed(2)); el.setAttribute('ry', r.toFixed(2));
-				el.style.fill = mixLab(a.f, b.f, q);
-				// a shape without partner fades early (shrinking) or late (growing): less clutter mid-way
-				const oq = b.op === 0 ? clamp(q * 1.8) : a.op === 0 ? clamp((q - 0.4) / 0.6) : q;
-				el.style.opacity = lerp(a.op, b.op, oq).toFixed(3);
+			let n = 0;
+			for (const pr of pairs) {
+				const a = pr.a, b = pr.b;
+				let q, oq;
+				if (pr.kind === 'out') { q = EO(clamp((tau - 0.1) / 0.35)); oq = q; } // shrinks and fades out first
+				else if (pr.kind === 'in') { q = EO(clamp((tau - 0.55) / 0.5)); oq = q; } // grows in once the old shapes are gone
+				else { q = EM(clamp((tau - 0.15 - pr.delay) / 0.9)); oq = q; }
+				const w = lerp(a.w, b.w, q), h = lerp(a.h, b.h, q);
+				const g = { x: lerp(a.x, b.x, q), y: lerp(a.y, b.y, q), w, h, r: Math.min(lerp(a.r, b.r, q), w / 2, h / 2) };
 				const sa = a.s || (b.s && [...b.s.slice(0, 3), 0]), sb = b.s || (a.s && [...a.s.slice(0, 3), 0]);
-				if (sa) { el.style.stroke = mixLab(sa, sb, q); el.style.strokeWidth = lerp(a.sw || b.sw, b.sw || a.sw, q).toFixed(2); } else el.style.stroke = 'none';
-			});
+				const stroke = sa ? mixLab(sa, sb, q) : null, sw = lerp(a.sw || b.sw, b.sw || a.sw, q);
+				const op = lerp(a.op, b.op, oq);
+				const e1 = pool[n] || (pool[n] = mk()); n++;
+				if (pr.swap) {
+					// the new surface grows from the centre of the shape, crisp, over the old colour (no grey cross-fade)
+					const over = EM(clamp((tau - 0.42) / 0.3)), ins = (1 - over) * Math.min(g.w, g.h) / 2;
+					paint(e1, g, fromLab(a.f), op * (over < 1 ? 1 : 0), stroke, sw);
+					const e2 = pool[n] || (pool[n] = mk()); n++;
+					const gi = { x: g.x + ins, y: g.y + ins, w: g.w - 2 * ins, h: g.h - 2 * ins }; gi.r = Math.min(g.r, gi.w / 2, gi.h / 2);
+					paint(e2, gi, fromLab(b.f), over > 0 ? op : 0, over < 1 ? null : stroke, sw);
+				} else paint(e1, g, mixLab(a.f, b.f, q), op, stroke, sw);
+			}
+			for (; n < pool.length; n++) pool[n].style.display = 'none';
 		}
 		function transB(p, n, tau, T, key) {
 			if (key !== morphKey) {
@@ -579,10 +579,11 @@ let di = 0;
 				scenes[n].g.style.display = 'none';
 			}
 			const sp = scenes[p], sn = scenes[n];
-			if (tau < 0.15) { sp.g.style.display = ''; sp.g.classList.add('ha-hide-m'); sp.g.style.opacity = (1 - sm(tau / 0.15)).toFixed(3); }
+			// texts and lines leave fast with an ease-out (they react at once), new ones fade in with an ease-out
+			if (tau < 0.15) { sp.g.style.display = ''; sp.g.classList.add('ha-hide-m'); sp.g.style.opacity = (1 - EO(tau / 0.15)).toFixed(3); }
 			else sp.g.style.display = 'none';
-			doodleSets[p].style.opacity = (1 - sm(clamp(tau / 0.15))).toFixed(3); lastTrace[p] = -1;
-			if (tau >= 1.05) { sn.g.style.display = ''; sn.g.classList.toggle('ha-hide-m', tau < 1.25); sn.g.style.opacity = tau < 1.25 ? sm((tau - 1.05) / 0.2).toFixed(3) : 1; }
+			doodleSets[p].style.opacity = (1 - EO(clamp(tau / 0.15))).toFixed(3); lastTrace[p] = -1;
+			if (tau >= 1.05) { sn.g.style.display = ''; sn.g.classList.toggle('ha-hide-m', tau < 1.25); sn.g.style.opacity = tau < 1.25 ? EO((tau - 1.05) / 0.2).toFixed(3) : 1; }
 			else sn.g.style.display = 'none';
 			if (tau < 1.25) drawMorph(tau); else morphG.style.display = 'none';
 		}
@@ -601,21 +602,22 @@ let di = 0;
 				sc.g.style.display = vis ? '' : 'none';
 				doodleSets[k].style.display = vis ? '' : 'none';
 				if (!vis) return;
-				if (!inTrans || VER === 'a') { sc.g.style.opacity = 1; sc.g.classList.remove('ha-hide-m'); }
-				if (!inTrans) { sc.items.forEach((it) => { it.style.opacity = 1; it.removeAttribute('transform'); }); if (bgs[k]) bgs[k].style.visibility = ''; }
+				if (!inTrans) { sc.g.style.opacity = 1; sc.g.classList.remove('ha-hide-m'); sc.items.forEach((it) => { it.style.opacity = 1; it.removeAttribute('transform'); }); }
 				update[k](s, T);
-				if (!inTrans || k === n) trace(k, clamp((s + H - TRACE_AT) / 0.4));
+				if (!inTrans || k === n) trace(k, sm(clamp((s + H - TRACE_AT) / 0.4)));
 			});
-			if (inTrans && VER === 'a') transA(p, n, tau);
-			else if (inTrans) transB(p, n, tau, T, `${p}-${n}-${Math.floor(T / LOOP)}`);
-			if (!inTrans) {
-				morphG.style.display = 'none';
-				if (VER === 'a' && current === 2) { const th = document.documentElement.dataset.theme; if (th !== restTheme) { restTheme = th; restCol = G[2].c(); } drawFrame(G[2], restCol, 1); } else frameEl.style.display = 'none';
-			} else if (VER === 'b') frameEl.style.display = 'none';
+			if (inTrans) transB(p, n, tau, T, `${p}-${n}-${Math.floor(T / LOOP)}`);
+			else morphG.style.display = 'none';
+			const P2 = 2 * Math.PI;
 			doodles.forEach((d) => {
 				if (doodleSets[+d.el.closest('.ha-doodles').dataset.scene].style.display === 'none') return;
-				const f = float(d.i, T), a = d.tag === 'pin' ? 0.3 : 1; // the "live UI" arrow keeps its tail on the design
-				d.el.setAttribute('transform', `translate(${d.x + a * f.dx} ${d.y + a * f.dy}) rotate(${d.r + a * f.dr}) scale(${d.s})`);
+				let dx, dy, dr;
+				if (d.tag === 'pin') {
+					// "live UI" and its arrow: their own slow sine float, 1 to 2 px, the arrow keeps aiming at its target
+					const ph = d.i * 1.3;
+					dx = 1.6 * Math.sin((P2 * T) / 4.6 + ph); dy = 1.2 * Math.sin((P2 * T) / 3.8 + ph + 1); dr = 0.6 * Math.sin((P2 * T) / 5.2 + ph);
+				} else { const f = float(d.i, T); dx = f.dx; dy = f.dy; dr = f.dr; }
+				d.el.setAttribute('transform', `translate(${d.x + dx} ${d.y + dy}) rotate(${d.r + dr}) scale(${d.s})`);
 			});
 			dots.forEach((d, k) => d.setAttribute('aria-current', k === current ? 'true' : 'false'));
 		}
