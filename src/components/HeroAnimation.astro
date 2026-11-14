@@ -1,6 +1,6 @@
 ---
 // Home hero animation (CL2 étape 6, lot 4, phase D). Decorative (aria-hidden):
-// five scenes from David's work, about 6 s each, looping in about 30 s.
+// five scenes from David's work: scene 1 lasts 9 s, the others 6 s (loop of 33 s).
 // Coded SVG + a small requestAnimationFrame engine (no GSAP: its licence is
 // not on the project's free-licence list). Scenes cross-fade (overlap, light
 // blur, scale 0.98 to 1, items in cascade); the "AI" scan line lives only in
@@ -38,15 +38,15 @@ const D: Record<string, string> = {
 // [key, x, y, rotation, scale, orange]
 type Dd = [string, number, number, number, number, boolean, string?];
 const doodles: Dd[][] = [
-	[['robot', 14, 96, -8, 0.7, false], ['dollar', 516, 196, 8, 0.9, true], ['arrow3', 434, 349, -90, 0.75, false, 'pin']],
+	[['robot', 14, 96, -8, 0.7, false], ['dollar', 516, 196, 8, 0.9, true], ['arrow3', 406, 330, 0, 0.8, false, 'pin']],
 	[['swatch', 506, 92, 0, 1, false, 'a'], ['swatch', 526, 114, 0, 1, false, 'b'], ['swatch', 504, 134, 0, 1, false, 'c'], ['arrow3', 470, 352, 180, 0.7, false]],
 	[['cup', 506, 96, -6, 1, true], ['check', 476, 196, -8, 1, false], ['check', 476, 286, 6, 1, false]],
 	[['bubble', 510, 112, 6, 0.9, false], ['spark', 52, 330, 0, 1, true]],
 	[['sun', 520, 92, 0, 1, false, 'sun'], ['moon', 520, 92, 0, 1, false, 'moon'], ['spark', 40, 120, 0, 0.8, true]],
 ];
 const texts: [number, string, number, number, number, number, boolean][] = [
-	[0, 'wireframe', 70, 372, -4, 26, true],
-	[0, 'live UI', 380, 382, 3, 26, false],
+	[0, 'wireframe', 90, 362, -5, 26, true],
+	[0, 'live UI', 434, 360, 3, 26, false],
 	[1, '1 system', 404, 384, -5, 28, true],
 ];
 const PROMPT = 'Design an AI-powered SaaS dashboard';
@@ -249,7 +249,8 @@ let di = 0;
 		const svg = root.querySelector('svg');
 		const $ = (s) => svg.querySelector(s);
 		const $$ = (s) => Array.from(svg.querySelectorAll(s));
-		const N = 5, DUR = 6, TR = 1.1, ST = 0.06, LOOP = N * DUR;
+		const DURS = [9, 6, 6, 6, 6], TR = 1.1, ST = 0.06;
+		const START = DURS.map((d, k) => DURS.slice(0, k).reduce((a, b) => a + b, 0)), LOOP = DURS.reduce((a, b) => a + b, 0);
 		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 		const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 		const io = (q) => (q < 0.5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2); // ease in-out
@@ -281,20 +282,18 @@ let di = 0;
 		for (let k = 0; k < PROMPT.length; k++) { acc += 0.038 + 0.03 * Math.abs(Math.sin(k * 12.9898) * 43758.5453 % 1); if (PROMPT[k] === ' ') acc += 0.03; typeAt.push(acc); }
 		const typeEnd = acc;
 		let lastN = -1, caretX = 84;
-		// Scan line: endless back and forth, one round trip per 6 s (sine ease: slow at each end).
-		// Left of the line = wireframe, right = finished UI (as in the LinkedIn banner).
-		const sx = (s) => 279 + 169 * Math.cos((Math.PI * s) / 3);
-		// Cursor flees the line: it waits ahead of it, then jumps over it in an arc and turns
-		// to point back at it. Jump 1 (line going left): left to right, arc up, 90 to 0 deg.
-		// Jump 2 (line going right): right to left, arc down, 0 to 90 deg.
+		// Scan line, as on the LinkedIn banner: it waits in the middle while the prompt types, then
+		// swings around the middle (26 % of the card each way, one round trip in 6 s, sine ease).
+		// Left of the line = wireframe, right = finished UI.
+		const S0 = typeEnd + 0.1, A = 109, P = 6;
+		const sx = (s) => 280 + A * io(clamp((s - S0) / 1)) * Math.sin((2 * Math.PI * Math.max(0, s - S0)) / P);
+		// Cursor flees the line along the bottom of the card, passing under the "AI" circle on a
+		// soft curve. Right: points up-left (0 deg). Left: points up-right (90 deg).
 		const curPos = (s) => {
-			const u = ((s % 6) + 6) % 6;
-			if (u >= 1.35 && u < 4.35) {
-				const q = clamp((u - 1.35) / 1.1), e = spring(q);
-				return [200 + 160 * e, 238 - 64 * Math.sin(Math.PI * clamp(q * 1.25)), 90 * (1 - e)];
-			}
-			const q = clamp((((u - 4.35) % 6) + 6) % 6 / 1.1), e = spring(q);
-			return [360 - 160 * e, 238 + 34 * Math.sin(Math.PI * clamp(q * 1.25)), 90 * e];
+			const j1 = S0 + 0.55, j2 = S0 + 3.1;
+			const go = (q, x0, x1, r0, r1) => { const e = spring(q); return [x0 + (x1 - x0) * e, 250 + 42 * Math.sin(Math.PI * clamp(q * 1.25)), r0 + (r1 - r0) * e]; };
+			if (s < j2) return go(clamp((s - j1) / 1.1), 381, 196, 0, 90);
+			return go(clamp((s - j2) / 1.1), 196, 381, 90, 0);
 		};
 		function scene1(s, T) {
 			const n = typeAt.filter((v) => v <= s).length;
@@ -417,7 +416,8 @@ let di = 0;
 			const T = t;
 			let current = 0;
 			scenes.forEach((sc, k) => {
-				let s = ((T - k * DUR) % LOOP + LOOP) % LOOP;
+				const DUR = DURS[k];
+				let s = ((T - START[k]) % LOOP + LOOP) % LOOP;
 				if (s > LOOP - TR / 2) s -= LOOP; // entering just before its start
 				const active = s > -TR / 2 && s < DUR + TR / 2;
 				sc.g.style.display = active ? '' : 'none';
@@ -459,9 +459,9 @@ let di = 0;
 		}
 		document.addEventListener('visibilitychange', schedule);
 		new IntersectionObserver((es) => { onScreen = es[0].isIntersecting; schedule(); }).observe(root);
-		// Reduced motion: each scene shown still. Scene 1 at a moment that shows both the wireframe and the UI.
-		const still = (k) => (k === 0 ? 3.9 : k * DUR + 5.2);
-		dots.forEach((d) => d.addEventListener('click', () => { const k = +d.dataset.go; t = reduce.matches ? still(k) : k * DUR + TR / 2 + 0.01; render(); schedule(); }));
+		// Reduced motion: each scene shown still. Scene 1: prompt typed, line in the middle, wireframe left, UI right.
+		const still = (k) => (k === 0 ? S0 - 0.05 : START[k] + DURS[k] - 0.8);
+		dots.forEach((d) => d.addEventListener('click', () => { const k = +d.dataset.go; t = reduce.matches ? still(k) : START[k] + TR / 2 + 0.01; render(); schedule(); }));
 		if (reduce.matches) t = still(0);
 		render();
 		schedule();
