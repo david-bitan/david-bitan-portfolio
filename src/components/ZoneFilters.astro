@@ -61,7 +61,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 				<a
 					href="/#work"
 					aria-label="Back to projects"
-					class="zone-filters-back absolute inset-y-0 left-0 z-20 flex items-center bg-bg pl-6 pr-3 lg:pl-0"
+					class="zone-filters-back absolute inset-y-0 left-0 z-20 flex items-center bg-bg pl-6 pr-3 min-[1248px]:pl-0"
 				>
 					<span class="flex h-8 w-8 items-center justify-center rounded-full border border-ink/15 text-muted transition-colors hover:border-accent hover:text-accent-text">
 						<svg
@@ -85,7 +85,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 					edge and its two "All" pills read as the same button. The
 					captions say what each "All" resets; on narrow screens the
 					Theme group simply drops to a second line. */}
-				<div class="zone-filters-scroll flex min-h-14 flex-wrap items-center gap-x-6 gap-y-2 py-2.5 pl-6 pr-6 lg:pl-0 lg:pr-0">
+				<div class="zone-filters-scroll flex min-h-14 flex-wrap items-center gap-x-6 gap-y-2 py-2.5 pl-6 pr-6 min-[1248px]:pl-0 min-[1248px]:pr-0">
 					{deviceOptions.length > 1 && (
 						<div role="group" aria-labelledby="zf-device" class="flex flex-wrap items-center gap-2">
 							<span id="zf-device" class="mr-1 text-xs font-semibold uppercase tracking-widest text-muted">Device</span>
@@ -228,7 +228,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 	#zone-filters-bar.is-stuck .zone-filters-scroll {
 		padding-left: 76px;
 	}
-	@media (min-width: 1024px) {
+	@media (min-width: 1248px) {
 		#zone-filters-bar.is-stuck .zone-filters-scroll {
 			padding-left: 52px;
 		}

@@ -165,7 +165,7 @@ const languages = [
 	<Nav />
 	<main id="main" tabindex="-1">
 
-	<section class="mx-auto max-w-[1200px] px-6 pt-16 pb-10 sm:pt-20 lg:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 pt-16 pb-10 sm:pt-20 min-[1248px]:px-0" data-reveal>
 		<p class="text-sm font-semibold uppercase tracking-widest text-muted">About me</p>
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
 			Product design craft, now <span class="whitespace-nowrap">AI-native.</span>
@@ -175,14 +175,14 @@ const languages = [
 			focused on AI-augmented product design and AI UX. At Ryze Beyond (2019 – 2026), the design team ranged from 1 to 4 people over the years, so I often owned my projects alone.
 		</p>
 		<p class="mt-4 text-sm font-semibold text-ink">Available now · <span class="whitespace-nowrap">Ashkelon, Israel</span> · <span class="whitespace-nowrap">Hybrid or remote, Tel Aviv area</span></p>
-		<div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold">
+		<div class="mt-6 flex flex-wrap gap-x-6 gap-y-6 text-sm font-semibold">
 			<a href={linkedinUrl} target="_blank" rel="noopener" class="text-accent-text hover:underline">LinkedIn ↗</a>
 			<a href="/cv/CV-David-Bitan.pdf" class="text-accent-text hover:underline">Download CV (PDF)</a>
 			<a href="/cv/CV-David-Bitan.docx" class="text-accent-text hover:underline">Download CV (DOCX)</a>
 		</div>
 	</section>
 
-	<section class="mx-auto max-w-[1200px] px-6 pt-6 lg:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 pt-6 min-[1248px]:px-0" data-reveal>
 		<div class="max-w-2xl border-l-2 border-accent pl-6">
 			<p class="text-lg font-semibold">Mentor at heart.</p>
 			<p class="mt-2 text-muted">
@@ -193,7 +193,7 @@ const languages = [
 		</div>
 	</section>
 
-	<section class="mx-auto max-w-[1200px] px-6 py-16 lg:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 py-16 min-[1248px]:px-0" data-reveal>
 		<div class="rounded-lg border border-ink/10 bg-card p-8 sm:p-10">
 			<p class="text-sm font-semibold uppercase tracking-widest text-accent-text">How this site was built</p>
 			<p class="mt-4 max-w-2xl text-lg">
@@ -224,13 +224,13 @@ const languages = [
 		</div>
 	</section>
 
-	<section class="mx-auto max-w-[1200px] px-6 py-16 lg:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 py-16 min-[1248px]:px-0" data-reveal>
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Experience</h2>
 		<div class="mt-10 flex flex-col">
 			{
 				timeline.map((entry) => (
 					<div class="grid grid-cols-1 gap-2 border-t border-ink/5 py-8 sm:grid-cols-[160px_1fr] sm:gap-8">
-						<p class="font-semibold text-muted">{entry.range}</p>
+						<p class="whitespace-nowrap font-semibold text-muted">{entry.range}</p>
 						<div>
 							<p class="text-lg font-semibold">
 								{entry.role} <span class="font-normal text-muted">· {entry.company}</span>
@@ -250,7 +250,7 @@ const languages = [
 		</div>
 	</section>
 
-	<section id="recommendations" class="mx-auto max-w-[1200px] scroll-mt-24 px-6 py-16 lg:px-0" data-reveal>
+	<section id="recommendations" class="mx-auto max-w-[1200px] scroll-mt-24 px-6 py-16 min-[1248px]:px-0" data-reveal>
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Recommendations</h2>
 		<p class="mt-3 max-w-2xl text-muted">
 			Quoted in full from LinkedIn, in the authors' own words.
@@ -272,7 +272,7 @@ const languages = [
 		</a>
 	</section>
 
-	<section class="mx-auto max-w-[1200px] px-6 py-16 lg:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 py-16 min-[1248px]:px-0" data-reveal>
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Skills</h2>
 		<div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{
@@ -290,7 +290,7 @@ const languages = [
 		</div>
 	</section>
 
-	<section class="mx-auto max-w-[1200px] px-6 py-16 lg:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 py-16 min-[1248px]:px-0" data-reveal>
 		<div class="grid grid-cols-1 gap-12 sm:grid-cols-2 sm:gap-24">
 			<div>
 				<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Languages</h2>

@@ -11,16 +11,28 @@
 // Scenes: 1 prompt to product, 2 one system many brands (Top5),
 // 3 comparison (Top5, Sonary), 4 chatbot (APEX, Facet), 5 SaaS dashboard
 // (Sonary Software Stack Manager).
+// Squircle (super-ellipse corners, like iPhone icons): corner curve from the squircle-svg skill (after
+// Arlan Marat's "squircle", MIT), spread over 1.6 x the radius like Figma's 60 % corner smoothing and
+// never past half the short side. Near a full pill the corner eases into a true quarter circle, so pills
+// and circles stay round. Always 18 commands, so a shape can be recomputed every frame while it morphs.
+const SQC = [[[0.3, 0], [0.473, 0], [0.619, 0.039]], [[0.804, 0.088], [0.912, 0.196], [0.961, 0.381]], [[1, 0.527], [1, 0.7], [1, 1]]];
+const ARC = [0, 1, 2].map((i) => { const k = (4 / 3) * Math.tan(Math.PI / 24), a0 = -Math.PI / 2 + (i * Math.PI) / 6, a1 = a0 + Math.PI / 6, p = (a: number) => [Math.cos(a), 1 + Math.sin(a)]; const [x0, y0] = p(a0), [x1, y1] = p(a1); return [[x0 - k * Math.sin(a0), y0 + k * Math.cos(a0)], [x1 + k * Math.sin(a1), y1 - k * Math.cos(a1)], [x1, y1]]; });
 const sq = (x: number, y: number, w: number, h: number, r: number) => {
-	const p = Math.min(r * 1.6, w / 2, h / 2), k = p * 0.38;
-	return `M${x + p} ${y} H${x + w - p} C${x + w - k} ${y} ${x + w} ${y + k} ${x + w} ${y + p} V${y + h - p} C${x + w} ${y + h - k} ${x + w - k} ${y + h} ${x + w - p} ${y + h} H${x + p} C${x + k} ${y + h} ${x} ${y + h - k} ${x} ${y + h - p} V${y + p} C${x} ${y + k} ${x + k} ${y} ${x + p} ${y} Z`;
+	w = Math.max(w, 0); h = Math.max(h, 0);
+	const m = Math.min(w, h) / 2, e = Math.max(0.01, Math.min(1.6 * r, m)), t = m > 0 ? Math.min(1, Math.max(0, (r - m / 1.6) / (m - m / 1.6))) : 1, f = (v: number) => +v.toFixed(2);
+	const C = SQC.map((seg, i) => seg.map(([a, b], j) => [a + (ARC[i][j][0] - a) * t, b + (ARC[i][j][1] - b) * t]));
+	const rot = ([a, b]: number[], k: number) => [[a, b], [b, -a], [-a, -b], [-b, a]][k];
+	const c = (sx: number, sy: number, k: number) => C.map((seg) => 'C' + seg.map((pt) => { const [u, v] = rot(pt, k); return `${f(x + sx + u * e)} ${f(y + sy + v * e)}`; }).join(' ')).join(' ');
+	return `M${f(x + e)} ${f(y)} L${f(x + w - e)} ${f(y)} ${c(w - e, 0, 0)} L${f(x + w)} ${f(y + h - e)} ${c(w, h - e, 3)} L${f(x + e)} ${f(y + h)} ${c(e, h, 2)} L${f(x)} ${f(y + e)} ${c(0, e, 1)} Z`;
 };
+// Corner radii follow the nested-radius law: inner radius = outer radius - gap, never under 4 (3 for
+// the thin chart bars), never over half the shape. Pills and circles stay round.
 // Scene 1 card: 420 x 216 at (70, 112). Blocks: [x, y, w, h, r, tone]
 const C1 = { x: 70, y: 112 };
 const blocks = [
-	[16, 14, 80, 22, 7, 'chip'], [112, 14, 196, 22, 7, 'soft'], [324, 14, 80, 22, 7, 'chip'],
-	[16, 48, 240, 90, 9, 'acc'], [272, 48, 132, 40, 9, 'soft'], [272, 98, 132, 40, 9, 'soft'],
-	[16, 152, 120, 50, 9, 'soft'], [150, 152, 120, 50, 9, 'soft'], [284, 152, 120, 50, 9, 'soft'],
+	[16, 14, 80, 22, 4, 'chip'], [112, 14, 196, 22, 4, 'soft'], [324, 14, 80, 22, 4, 'chip'],
+	[16, 48, 240, 90, 4, 'acc'], [272, 48, 132, 40, 4, 'soft'], [272, 98, 132, 40, 4, 'soft'],
+	[16, 152, 120, 50, 4, 'soft'], [150, 152, 120, 50, 4, 'soft'], [284, 152, 120, 50, 4, 'soft'],
 ] as const;
 const D: Record<string, string> = {
 	robot: '<path d="M4 14 q0-12 12-12 h24 q12 0 12 12 v18 q0 12-12 12 h-24 q-12 0-12-12z"/><path d="M28 2 v-9"/><circle cx="28" cy="-11" r="3.5"/><path d="M4 18 q-7 0 -7 6 q0 6 7 6 M52 18 q7 0 7 6 q0 6 -7 6"/><path d="M14 23 q5 -5 10 0 M32 23 q5 -5 10 0"/><path d="M20 32 q8 6 16 0"/>',
@@ -107,27 +119,27 @@ let di = 0;
 		<g class="ha-scene" data-scene="1" style="--ha-b:#f25c24">
 			<g class="ha-it">
 				<path data-m="card" data-r="16" data-bg d={sq(80, 62, 400, 276, 16)} class="ha-surface ha-card"></path>
-				<rect data-m="band" x="80" y="62" width="400" height="44" rx="16" class="ha-b-soft"></rect>
+				<path data-m="band" data-r="16" d={sq(80, 62, 400, 44, 16)} class="ha-b-soft"></path>
 				<rect data-m="btn" id="ha-logo" x="100" y="76" width="70" height="16" rx="8" style="fill:var(--ha-b)"></rect>
 				{[[300, 40], [352, 40], [404, 56]].map(([x, w]) => <rect data-m="pill" class="ha-nav ha-b-chip" x={x} y="80" width={w} height="8" rx="4"></rect>)}
 			</g>
 			{rowsA.map((y) => (
 				<g class="ha-it">
 					<g class="ha-row">
-						<rect data-m="row" class="ha-rbg ha-b-soft" x="100" y={y} width="360" height="56" rx="12"></rect>
-						<rect data-m="icon" class="ha-ric" x="114" y={y + 12} width="32" height="32" rx="8" style="fill:var(--ha-b)"></rect>
+						<path data-m="row" data-r="4" class="ha-rbg ha-b-soft" d={sq(100, y, 360, 56, 4)}></path>
+						<path data-m="icon" data-r="4" class="ha-ric" d={sq(114, y + 12, 32, 32, 4)} style="fill:var(--ha-b)"></path>
 						<rect data-m="pill" class="ha-rt1 ha-b-chip" x="160" y={y + 17} width="140" height="9" rx="4.5"></rect>
 						<rect data-m="pill" class="ha-rt2 ha-b-chip" x="160" y={y + 32} width="90" height="9" rx="4.5"></rect>
-						<rect data-m="btn" class="ha-btn" x="376" y={y + 16} width="68" height="24" rx="12" style="fill:var(--ha-b)"></rect>
+						<path data-m="btn" data-r="12" class="ha-btn" d={sq(376, y + 16, 68, 24, 12)} style="fill:var(--ha-b)"></path>
 					</g>
 				</g>
 			))}
 			<g class="ha-it">
 				<g id="ha-side" opacity="0">
-					<rect data-m="row" x="362" y="120" width="98" height="160" rx="12" class="ha-b-soft"></rect>
+					<path data-m="row" data-r="4" d={sq(362, 120, 98, 160, 4)} class="ha-b-soft"></path>
 					<rect data-m="pill" x="376" y="136" width="56" height="8" rx="4" class="ha-b-chip"></rect>
 					{[0, 1, 2].map((j) => <rect data-m="pill" x="376" y={158 + j * 20} width={[70, 52, 62][j]} height="7" rx="3.5" class="ha-b-soft2"></rect>)}
-					<rect data-m="btn" x="376" y="236" width="70" height="28" rx="9" style="fill:var(--ha-b)"></rect>
+					<path data-m="btn" data-r="4" d={sq(376, 236, 70, 28, 4)} style="fill:var(--ha-b)"></path>
 				</g>
 			</g>
 		</g>
@@ -140,7 +152,7 @@ let di = 0;
 						<path data-m="row" data-r="14" d={sq(110, 0, 340, 74, 14)} class="ha-surface ha-card"></path>
 						<circle data-m="dot" cx="140" cy="37" r="15" class="ha-b-soft"></circle>
 						<text x="140" y="42" class="ha-num">{rank}</text>
-						<rect data-m="icon" x="166" y="20" width="34" height="34" rx="9" class="ha-b-chip"></rect>
+						<path data-m="icon" data-r="4" d={sq(166, 20, 34, 34, 4)} class="ha-b-chip"></path>
 						<rect data-m="pill" x="212" y="24" width="96" height="9" rx="4.5" class="ha-b-chip"></rect>
 						<rect data-m="pill" x="212" y="41" width="60" height="9" rx="4.5" class="ha-b-soft2"></rect>
 						{[0, 1, 2, 3, 4].map((s) => (
@@ -169,22 +181,22 @@ let di = 0;
 			</g>
 			<g class="ha-it">
 				<g id="ha-user" opacity="0">
-					<rect data-m="bubble" x="234" y="120" width="214" height="40" rx="14" style="fill:var(--ha-acc)"></rect>
+					<path data-m="bubble" data-r="4" d={sq(234, 120, 214, 40, 4)} style="fill:var(--ha-acc)"></path>
 					<text id="ha-utext" x="250" y="145" class="ha-utext"></text>
 					<rect id="ha-ucaret" x="250" y="132" width="2" height="16" fill="#fff"></rect>
 				</g>
 			</g>
 			<g class="ha-it">
 				<g id="ha-typing" opacity="0">
-					<rect data-m="bubble" x="112" y="186" width="74" height="36" rx="14" class="ha-b-soft"></rect>
+					<path data-m="bubble" data-r="4" d={sq(112, 186, 74, 36, 4)} class="ha-b-soft"></path>
 					{[0, 1, 2].map((j) => <circle class="ha-tdot" cx={134 + j * 15} cy="204" r="4"></circle>)}
 				</g>
 				<g id="ha-bot" opacity="0">
-					<rect data-m="bubble" x="112" y="186" width="262" height="150" rx="14" class="ha-b-soft"></rect>
+					<path data-m="bubble" data-r="4" d={sq(112, 186, 262, 150, 4)} class="ha-b-soft"></path>
 					<rect data-m="pill" x="128" y="202" width="200" height="8" rx="4" class="ha-b-chip"></rect>
 					<rect data-m="pill" x="128" y="217" width="140" height="8" rx="4" class="ha-b-chip"></rect>
 					<line x1="130" y1="320" x2="356" y2="320" class="ha-hair"></line>
-					{[0, 1, 2, 3, 4, 5].map((j) => <rect data-m="col" class="ha-cbar" x={136 + j * 36} y="320" width="22" height="0" rx="4" data-h={[38, 56, 44, 72, 60, 84][j]} style={j === 5 ? 'fill:var(--ha-acc)' : ''}></rect>)}
+					{[0, 1, 2, 3, 4, 5].map((j) => <path data-m="col" data-r="3" class="ha-cbar" data-x={136 + j * 36} d="" data-h={[38, 56, 44, 72, 60, 84][j]} style={j === 5 ? 'fill:var(--ha-acc)' : ''}></path>)}
 				</g>
 			</g>
 		</g>
@@ -200,7 +212,7 @@ let di = 0;
 			<g class="ha-it">
 				{[0, 1, 2].map((j) => (
 					<g>
-						<rect data-m="row" x={186 + j * 92} y="104" width="80" height="54" rx="10" class="ha-dtile"></rect>
+						<path data-m="row" data-r="4" d={sq(186 + j * 92, 104, 80, 54, 4)} class="ha-dtile"></path>
 						<rect data-m="pill" x={198 + j * 92} y="118" width="36" height="7" rx="3.5" class="ha-dbar"></rect>
 						<rect data-m="pill" x={198 + j * 92} y="134" width="52" height="11" rx="5.5" class={j === 0 ? 'ha-dacc' : 'ha-dink'}></rect>
 					</g>
@@ -208,7 +220,7 @@ let di = 0;
 			</g>
 			<g class="ha-it">
 				<line x1="190" y1="330" x2="466" y2="330" class="ha-dline"></line>
-				{[0, 1, 2, 3, 4, 5, 6].map((j) => <rect data-m="col" class="ha-dcol" x={196 + j * 38} y="330" width="24" height="0" rx="5" data-h={[60, 92, 74, 118, 96, 140, 120][j]} style={j % 3 === 2 ? '' : ''}></rect>)}
+				{[0, 1, 2, 3, 4, 5, 6].map((j) => <path data-m="col" data-r="3" class="ha-dcol" data-x={196 + j * 38} d="" data-h={[60, 92, 74, 118, 96, 140, 120][j]}></path>)}
 			</g>
 			<g class="ha-it">
 				<rect data-m="btn" x="418" y="70" width="48" height="24" rx="12" id="ha-track"></rect>
@@ -273,7 +285,18 @@ let di = 0;
 			return 3 * y1 * t * (1 - t) ** 2 + 3 * y2 * t * t * (1 - t) + t ** 3;
 		};
 		const EM = bez(0.77, 0, 0.175, 1), EO = bez(0.23, 1, 0.32, 1);
-		const sq = (x, y, w, h, r) => { const p = Math.min(r * 1.6, w / 2, h / 2), k = p * 0.38; return `M${x + p} ${y} H${x + w - p} C${x + w - k} ${y} ${x + w} ${y + k} ${x + w} ${y + p} V${y + h - p} C${x + w} ${y + h - k} ${x + w - k} ${y + h} ${x + w - p} ${y + h} H${x + p} C${x + k} ${y + h} ${x} ${y + h - k} ${x} ${y + h - p} V${y + p} C${x} ${y + k} ${x + k} ${y} ${x + p} ${y} Z`; };
+		// Same squircle as in the markup (see the top of this file).
+		const SQC = [[[0.3, 0], [0.473, 0], [0.619, 0.039]], [[0.804, 0.088], [0.912, 0.196], [0.961, 0.381]], [[1, 0.527], [1, 0.7], [1, 1]]];
+		const ARC = [0, 1, 2].map((i) => { const k = (4 / 3) * Math.tan(Math.PI / 24), a0 = -Math.PI / 2 + (i * Math.PI) / 6, a1 = a0 + Math.PI / 6, p = (a) => [Math.cos(a), 1 + Math.sin(a)]; const [x0, y0] = p(a0), [x1, y1] = p(a1); return [[x0 - k * Math.sin(a0), y0 + k * Math.cos(a0)], [x1 + k * Math.sin(a1), y1 - k * Math.cos(a1)], [x1, y1]]; });
+		const sq = (x, y, w, h, r) => {
+			w = Math.max(w, 0); h = Math.max(h, 0);
+			const m = Math.min(w, h) / 2, e = Math.max(0.01, Math.min(1.6 * r, m)), t = m > 0 ? Math.min(1, Math.max(0, (r - m / 1.6) / (m - m / 1.6))) : 1, f = (v) => +v.toFixed(2);
+			const C = SQC.map((seg, i) => seg.map(([a, b], j) => [a + (ARC[i][j][0] - a) * t, b + (ARC[i][j][1] - b) * t]));
+			const rot = ([a, b], k) => [[a, b], [b, -a], [-a, -b], [-b, a]][k];
+			const c = (sx, sy, k) => C.map((seg) => 'C' + seg.map((pt) => { const [u, v] = rot(pt, k); return `${f(x + sx + u * e)} ${f(y + sy + v * e)}`; }).join(' ')).join(' ');
+			return `M${f(x + e)} ${f(y)} L${f(x + w - e)} ${f(y)} ${c(w - e, 0, 0)} L${f(x + w)} ${f(y + h - e)} ${c(w, h - e, 3)} L${f(x + e)} ${f(y + h)} ${c(e, h, 2)} L${f(x)} ${f(y + e)} ${c(0, e, 1)} Z`;
+		};
+		const sqEl = (el, x, y, w, h, r) => { el.setAttribute('d', sq(x, y, w, h, r)); const v = r.toFixed(2); if (el.dataset.r !== v) el.dataset.r = v; };
 		// Colours mixed in OKLab (no muddy grey, no green in between).
 		const parseC = (c) => { const m = String(c).match(/[\d.]+/g) || [0, 0, 0]; return [+m[0], +m[1], +m[2], m[3] != null ? +m[3] : 1]; };
 		const lin = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
@@ -373,18 +396,17 @@ let di = 0;
 			const L = (k) => lerp(a[k], b[k], m);
 			s2.style.setProperty('--ha-b', rgb(mix(a.c, b.c, m)));
 			logo.setAttribute('width', L('w').toFixed(1));
-			btns.forEach((el) => el.setAttribute('rx', L('r').toFixed(1)));
 			const navH = L('navH'), nw = a.nav.map((v, i) => lerp(v, b.nav[i], m));
 			let nx = 460;
 			for (let i = 2; i >= 0; i--) { nx -= nw[i]; set(navs[i], { x: nx, y: 84 - navH / 2, width: nw[i], height: navH, rx: navH / 2 }); nx -= 12; }
 			const rowH = L('rowH'), gap = L('gap'), rowW = L('rowW'), k = rowW / 360, ic = 32 * (rowH / 56);
 			rows.forEach(([bg, icon, t1, t2, btn], j) => {
 				const y = 120 + j * (rowH + gap);
-				set(bg, { y, width: rowW, height: rowH });
-				set(icon, { y: y + (rowH - ic) / 2, width: ic, height: ic });
+				sqEl(bg, 100, y, rowW, rowH, 4);
+				sqEl(icon, 114, y + (rowH - ic) / 2, ic, ic, 4);
 				set(t1, { y: y + rowH / 2 - 11, width: 140 * k });
 				set(t2, { y: y + rowH / 2 + 4, width: 90 * k });
-				set(btn, { x: 100 + rowW - 84, y: y + (rowH - 24) / 2 });
+				sqEl(btn, 100 + rowW - 84, y + (rowH - 24) / 2, 68, 24, L('r')); // each brand keeps its own button radius
 			});
 			const sd = L('side');
 			side.setAttribute('opacity', sd.toFixed(3));
@@ -429,7 +451,7 @@ let di = 0;
 			tdots.forEach((d, j) => d.setAttribute('transform', `translate(0 ${-3.5 * Math.max(0, Math.sin(2 * Math.PI * (s * 1.5 - j * 0.16)))})`));
 			const b = out(clamp((s - keyEnd - 1.15) / 0.45));
 			bot.setAttribute('opacity', b); bot.setAttribute('transform', `translate(0 ${8 * (1 - b)})`);
-			cbars.forEach((r, j) => { const h = +r.dataset.h * out(clamp((s - keyEnd - 1.45 - j * 0.12) / 0.5)); r.setAttribute('y', 320 - h); r.setAttribute('height', h); });
+			cbars.forEach((r, j) => { const h = +r.dataset.h * out(clamp((s - keyEnd - 1.45 - j * 0.12) / 0.5)); sqEl(r, +r.dataset.x, 320 - h, 22, h, 3); });
 		}
 
 		// ---- Scene 5
@@ -442,7 +464,7 @@ let di = 0;
 			for (const k of Object.keys(L5)) dash.style.setProperty(`--d-${k}`, rgb(mix(L5[k], D5[k], m)));
 			track.style.fill = rgb(mix(hex('#c9cfdb'), hex('#f25c24'), m));
 			knob.setAttribute('cx', 430 + 24 * io(clamp((s - 2.6) / 0.45)));
-			dcols.forEach((r, j) => { const h = +r.dataset.h * out(clamp((s - 0.3 - j * 0.08) / 0.6)) * (1 - 0.12 * Math.sin(Math.PI * clamp((s - 2.6 - j * 0.04) / 0.6))); r.setAttribute('y', 330 - h); r.setAttribute('height', h); r.style.fill = j === 5 || j === 3 ? 'var(--ha-acc)' : `var(--d-bar)`; });
+			dcols.forEach((r, j) => { const h = +r.dataset.h * out(clamp((s - 0.3 - j * 0.08) / 0.6)) * (1 - 0.12 * Math.sin(Math.PI * clamp((s - 2.6 - j * 0.04) / 0.6))); sqEl(r, +r.dataset.x, 330 - h, 24, h, 3); r.style.fill = j === 5 || j === 3 ? 'var(--ha-acc)' : `var(--d-bar)`; });
 			sun.forEach((d) => (d.el.style.opacity = 1 - m));
 			moon.forEach((d) => (d.el.style.opacity = m));
 		}
@@ -465,9 +487,9 @@ let di = 0;
 
 		// ---- Version B: morphing. Each rounded rectangle of the outgoing scene becomes one of the
 		// next scene (same role: card, bar, button, row...). Real width, height and corner radius are
-		// interpolated (never a scale), colours in OKLab. A shape without a partner shrinks into
-		// (or grows from) the nearest shape while fading. Texts, lines, stars and doodles are not
-		// morphed: they fade out before and appear / draw after.
+		// interpolated (never a scale), colours in OKLab. Everything moves inside its box: a shape
+		// without a partner fades out (or in) in place, at its real size, following its box.
+		// Texts, lines, stars and doodles are not morphed: they fade out before and appear / draw after.
 		const morphG = $('#ha-morph'), pool = [];
 		const svgInv = () => svg.getScreenCTM().inverse();
 		function measure(k, s, T) {
@@ -487,65 +509,128 @@ let di = 0;
 				if (w < 0.5 || h < 0.5) return;
 				let r;
 				if (el.tagName === 'circle') r = w / 2;
-				else if (el.dataset.r) r = Math.min(+el.dataset.r * 1.6, w / 2, h / 2) * 0.75;
+				else if (el.dataset.r) r = Math.min(+el.dataset.r, w / 2, h / 2);
 				else r = (+el.getAttribute('rx') || 0) * mt.a;
 				const cs = getComputedStyle(el);
 				const st = cs.stroke && cs.stroke !== 'none' ? cs.stroke : null;
-				list.push({ idx, role: el.dataset.m, x, y, w, h, r, f: toLab(parseC(cs.fill)), op, s: st ? toLab(parseC(st)) : null, sw: st ? parseFloat(cs.strokeWidth) || 0 : 0 });
+				list.push({ idx, role: el.dataset.m, x, y, w, h, r, c: parseC(cs.fill), f: toLab(parseC(cs.fill)), op, s: st ? toLab(parseC(st)) : null, sw: st ? parseFloat(cs.strokeWidth) || 0 : 0 });
 			});
 			return list;
 		}
 		function pairUp(A, B) {
-			const res = [], roles = new Set([...A, ...B].map((o) => o.role));
-			const ctr = (o) => [o.x + o.w / 2, o.y + o.h / 2];
-			const near = (o, L) => L.reduce((best, c) => { const [ax, ay] = ctr(o), [bx, by] = ctr(c), d = (ax - bx) ** 2 + (ay - by) ** 2; return !best || d < best.d ? { c, d } : best; }, null)?.c;
-			const dot = (o, src) => { const [cx, cy] = ctr(o); return { ...src, x: cx - 2, y: cy - 2, w: 4, h: 4, r: 2, op: 0 }; };
-			for (const role of roles) {
-				const sort = (L) => L.filter((o) => o.role === role).sort((a, b) => a.y - b.y || a.x - b.x);
-				const As = sort(A), Bs = sort(B), n = Math.min(As.length, Bs.length);
-				for (let i = 0; i < n; i++) res.push({ a: As[i], b: Bs[i] });
-				As.slice(n).forEach((a) => { const t = near(a, B) || a; res.push({ a, b: dot(t, a) }); });
-				Bs.slice(n).forEach((b) => { const t = near(b, A) || b; res.push({ a: dot(t, b), b }); });
-			}
-			// big shapes first in the drawing order, small ones on top
-			res.sort((p, q) => q.b.w * q.b.h + q.a.w * q.a.h - (p.b.w * p.b.h + p.a.w * p.a.h));
-			res.forEach((pr) => (pr.delay = 0.15 * clamp((Math.min(pr.a.y, pr.b.y) - 40) / 300))); // top rows first, about 40 ms apart
-			// Stacking, fixed once for the whole passage: a shape that arrives or morphs takes its order in the
-			// arrival scene (content above its card); a shape that leaves sits just above the pair of its own
-			// card, or at the bottom, in departure order, when that card leaves too.
+			// Boxes first. A shape's box is the smallest shape that contains it. Shapes are paired by role (top to
+			// bottom, then left to right), first the boxes of a level, then the shapes inside two paired boxes.
+			// When a box has no partner, the boxes inside it may still pair at its level (the rows of scene 2
+			// when its page leaves). A shape that would change box never travels: it fades out in its old box
+			// and in in its new one, at its real size.
 			const inside = (r, c) => r !== c && c.w * c.h > r.w * r.h && r.x >= c.x - 0.5 && r.y >= c.y - 0.5 && r.x + r.w <= c.x + c.w + 0.5 && r.y + r.h <= c.y + c.h + 0.5;
+			const hide = (o, k, v) => Object.defineProperty(o, k, { value: v, enumerable: false, writable: true });
+			for (const L of [A, B]) {
+				L.forEach((o) => hide(o, 'box', L.filter((c) => inside(o, c)).sort((m, k) => m.w * m.h - k.w * k.h)[0] || null));
+				L.forEach((o) => hide(o, 'kids', L.filter((c) => c.box === o)));
+			}
+			const res = [], ofA = new Map(), ofB = new Map();
+			const add = (a, b) => { const pr = { a, b }; res.push(pr); if (a) ofA.set(a, pr); if (b) ofB.set(b, pr); };
+			const match = (As, Bs) => {
+				const la = [], lb = [];
+				for (const role of new Set([...As, ...Bs].map((o) => o.role))) {
+					const sort = (L) => L.filter((o) => o.role === role && !ofA.has(o) && !ofB.has(o)).sort((a, b) => a.y - b.y || a.x - b.x);
+					const as = sort(As), bs = sort(Bs), n = Math.min(as.length, bs.length);
+					for (let i = 0; i < n; i++) { add(as[i], bs[i]); level(as[i].kids, bs[i].kids); }
+					la.push(...as.slice(n)); lb.push(...bs.slice(n));
+				}
+				return [la, lb];
+			};
+			const level = (As, Bs) => {
+				const box = (o) => o.kids.length > 0, [la, lb] = match(As, Bs), inner = (L) => [...L, ...L.flatMap((o) => o.kids)].filter(box);
+				if (la.length || lb.length) match(inner(la), inner(lb));
+			};
+			level(A.filter((o) => !o.box), B.filter((o) => !o.box));
+			A.forEach((a) => ofA.has(a) || add(a, null));
+			B.forEach((b) => ofB.has(b) || add(null, b));
+			// up = the pair of the box the shape follows (none for a box that pairs outside its own box)
+			const rel = (o, c) => [c.w - o.w > 0.5 ? (o.x - c.x) / (c.w - o.w) : 0.5, c.h - o.h > 0.5 ? (o.y - c.y) / (c.h - o.h) : 0.5];
+			const ups = (o) => { const L = []; for (let c = o.box; c; c = c.box) L.push(c); return L; };
+			res.forEach((pr) => {
+				const { a, b } = pr, pa = a && a.box && ofA.get(a.box), pb = b && b.box && ofB.get(b.box);
+				// a box that pairs outside its own box follows the nearest box around both ends that stays, if any
+				const common = a && b && ups(a).map((c) => ofA.get(c)).find((u) => u && u.b && ups(b).includes(u.b));
+				pr.up = a && b ? (pa && pa === pb ? pa : common || null) : pa || pb || null;
+				if (pr.up) { pr.ra = a ? rel(a, pr.up.a) : rel(b, pr.up.b); pr.rb = b ? rel(b, pr.up.b) : pr.ra; }
+				if (!b) pr.b = { ...a, op: 0 };
+				if (!a) pr.a = { ...b, op: 0 };
+			});
+			const depth = (pr) => (pr.up ? 1 + depth(pr.up) : 0);
+			res.forEach((pr) => (pr.depth = depth(pr)));
+			order = [...res].sort((m, k) => m.depth - k.depth);
+			// top rows first, about 40 ms apart; what leaves (or arrives) with its box keeps the box's timing.
+			// Rows that change together move together (one delay) and arrive aligned; their content follows them.
+			const alone = (pr) => !pr.a.op || !pr.b.op, own = (pr) => 0.15 * clamp((Math.min(pr.a.y, pr.b.y) - 40) / 300);
+			const isRow = (pr) => pr.a.op && pr.b.op && pr.a.role === 'row' && pr.b.role === 'row', rowD = new Map();
+			res.forEach((pr) => isRow(pr) && rowD.set(pr.up, Math.min(rowD.has(pr.up) ? rowD.get(pr.up) : 1, own(pr))));
+			order.forEach((pr) => (pr.delay = pr.up && ((alone(pr) && alone(pr.up)) || isRow(pr.up)) ? pr.up.delay : isRow(pr) ? rowD.get(pr.up) : own(pr)));
+			// Stacking, fixed once for the whole passage: a shape that arrives or morphs takes its order in the
+			// arrival scene (content above its card); a shape that leaves sits just above the pair of the box
+			// it is in, or at the bottom, in departure order, when no box around it stays.
 			const zOf = (pr) => {
 				if (pr.b.op > 0) return pr.b.idx;
-				const card = A.filter((c) => inside(pr.a, c)).sort((m, k) => m.w * m.h - k.w * k.h)[0];
-				const cp = card && res.find((o) => o.a === card);
-				return cp && cp.b.op > 0 ? cp.b.idx + 0.5 + pr.a.idx / 1e4 : -1e4 + pr.a.idx;
+				for (let u = pr.up; u; u = u.up) if (u.a.op > 0 && u.b.op > 0) return u.b.idx + 0.5 + pr.a.idx / 1e4;
+				pr.low = true; return -1e4 + pr.a.idx;
 			};
 			res.forEach((pr) => (pr.z = zOf(pr)));
 			res.sort((m, k) => m.z - k.z);
+			// a box that holds shapes can clip them: only a shape larger than its box at that moment needs it
+			let c = 0;
+			res.forEach((pr) => (pr.clip = res.some((o) => o.up === pr) ? clipOf(c++) : null));
 			return res;
 		}
-		let morphKey = '', pairs = [];
+		const clipDefs = svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'defs')), clips = [];
+		function clipOf(k) {
+			if (!clips[k]) { const cp = clipDefs.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'clipPath')); cp.id = `ha-mc${k}`; clips[k] = { cp, r: cp.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'path')) }; }
+			return clips[k];
+		}
+		let morphKey = '', pairs = [], order = [];
 		function drawMorph(tau) {
 			morphG.style.display = '';
-			while (pool.length < pairs.length) { const el = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); morphG.appendChild(el); pool.push(el); }
+			while (pool.length < pairs.length) { const el = document.createElementNS('http://www.w3.org/2000/svg', 'path'); morphG.appendChild(el); pool.push(el); }
+			// boxes before the shapes they hold: a shape's place = its box now + its relative place, kept inside
+			order.forEach((pr) => {
+				const q = EM(clamp((tau - 0.15 - pr.delay) / 0.9)), a = pr.a, b = pr.b, F = pr.up && pr.up.vis;
+				const w = lerp(a.w, b.w, q), h = lerp(a.h, b.h, q);
+				let x = lerp(a.x, b.x, q), y = lerp(a.y, b.y, q);
+				if (F) {
+					const u = lerp(pr.ra[0], pr.rb[0], q), v = lerp(pr.ra[1], pr.rb[1], q);
+					x = F.x + (F.w >= w ? clamp(u) : 0.5) * (F.w - w); y = F.y + (F.h >= h ? clamp(v) : 0.5) * (F.h - h);
+				}
+				pr.q = q; pr.now = { x, y, w, h, r: Math.min(lerp(a.r, b.r, q), w / 2, h / 2) };
+				// the part of the box that shows (inside its own box): where the shapes it holds may go
+				const V = pr.up ? pr.up.vis : null, x0 = V ? Math.max(x, V.x) : x, y0 = V ? Math.max(y, V.y) : y;
+				pr.vis = V ? { x: x0, y: y0, w: Math.max(0, Math.min(x + w, V.x + V.w) - x0), h: Math.max(0, Math.min(y + h, V.y + V.h) - y0) } : pr.now;
+				if (pr.clip) { const v = pr.vis; pr.clip.r.setAttribute('d', sq(v.x, v.y, v.w, v.h, pr.now.r)); }
+				pr.cut = !!F && (x < F.x - 0.01 || y < F.y - 0.01 || x + w > F.x + F.w + 0.01 || y + h > F.y + F.h + 0.01);
+			});
 			pool.forEach((el, i) => {
 				const pr = pairs[i];
-				if (!pr) { el.style.display = 'none'; return; }
-				const q = EM(clamp((tau - 0.15 - pr.delay) / 0.9)), a = pr.a, b = pr.b;
-				const w = lerp(a.w, b.w, q), h = lerp(a.h, b.h, q), r = Math.min(lerp(a.r, b.r, q), w / 2, h / 2);
+				if (!pr) { el.style.display = 'none'; if (el.__cut) { el.__cut = null; el.removeAttribute('clip-path'); } return; }
+				const q = pr.q, a = pr.a, b = pr.b, { x, y, w, h, r } = pr.now;
 				el.style.display = '';
-				el.setAttribute('x', lerp(a.x, b.x, q).toFixed(2)); el.setAttribute('y', lerp(a.y, b.y, q).toFixed(2));
-				el.setAttribute('width', w.toFixed(2)); el.setAttribute('height', h.toFixed(2));
-				el.setAttribute('rx', r.toFixed(2)); el.setAttribute('ry', r.toFixed(2));
-				el.style.fill = mixLab(a.f, b.f, q);
-				// a shape without partner fades early (shrinking) or late (growing): less clutter mid-way.
+				el.setAttribute('d', sq(x, y, w, h, r)); // a squircle (pills and circles stay round)
+				const cut = pr.cut ? `url(#${pr.up.clip.cp.id})` : null;
+				if (el.__cut !== cut) { el.__cut = cut; if (cut) el.setAttribute('clip-path', cut); else el.removeAttribute('clip-path'); }
+				// dark to light (or back): no muddy grey mix; the old colour fades out over the new one in about
+				// 0.27 s in the middle of the move (same pixels as an old layer fading over the new), outline too
+				const flip = Math.abs(a.f[0] - b.f[0]) > 0.35, m = sm(clamp(((tau - 0.15 - pr.delay) / 0.9 - 0.35) / 0.3)); // about 0.27 s
+				if (flip) { el.style.fill = `rgba(${a.c.slice(0, 3).map((v, i) => Math.round(v + (b.c[i] - v) * m)).join(',')},${(a.c[3] + (b.c[3] - a.c[3]) * m).toFixed(3)})`; }
+				else el.style.fill = mixLab(a.f, b.f, q);
+				// a shape without partner fades early (leaving) or late (arriving): less clutter mid-way.
 				// Same fade curves, moved in time: leaving shapes 0.15 s earlier, appearing ones 0.05 s later, so a
-				// leaving shape has faded out before a new shape appears over it (paths and timings of motion unchanged).
+				// leaving shape has faded out before a new shape appears over it. Shapes at the bottom (no box
+				// around them stays) keep the unshifted fade: what arrives covers them in a cross-fade.
 				const qo = (shift) => EM(clamp((tau - 0.15 - pr.delay - shift) / 0.9));
-				const oq = b.op === 0 ? clamp(qo(-0.15) * 1.8) : a.op === 0 ? clamp((qo(0.05) - 0.4) / 0.6) : q;
+				const oq = b.op === 0 ? clamp(qo(pr.low ? 0 : -0.15) * 1.8) : a.op === 0 ? clamp((qo(0.05) - 0.4) / 0.6) : q;
 				el.style.opacity = lerp(a.op, b.op, oq).toFixed(3);
 				const sa = a.s || (b.s && [...b.s.slice(0, 3), 0]), sb = b.s || (a.s && [...a.s.slice(0, 3), 0]);
-				if (sa) { el.style.stroke = mixLab(sa, sb, q); el.style.strokeWidth = lerp(a.sw || b.sw, b.sw || a.sw, q).toFixed(2); } else el.style.stroke = 'none';
+				if (sa) { el.style.stroke = mixLab(sa, sb, flip ? m : q); el.style.strokeWidth = lerp(a.sw || b.sw, b.sw || a.sw, q).toFixed(2); } else el.style.stroke = 'none';
 			});
 		}
 		function transB(p, n, tau, T, key) {

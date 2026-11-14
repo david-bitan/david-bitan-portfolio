@@ -273,3 +273,36 @@ main:focus { outline: none; }
   font-size: 14px;
 }
 .skip-link:focus { top: 12px; }
+
+/* Comfortable tap areas (étape 7, P6): every small link or button gets an invisible layer,
+   centred on it, of at least 44 x 44 px, so nothing moves and nothing changes colour.
+   In the components layer so a Tailwind position utility (absolute, fixed) still wins. */
+@layer components {
+  :where(.skip-link, #nav-close, #theme-toggle, header nav > a.text-lg, .home-filter-btn, .craft-filter-btn, .zone-filter-btn,
+    #case-study-toggle, #intro-toggle, .ai-more summary, main a.text-accent-text:not(p a, li a), footer a) {
+    position: relative;
+  }
+  :where(.skip-link, #nav-close, #theme-toggle, header nav > a.text-lg, .home-filter-btn, .craft-filter-btn, .zone-filter-btn,
+    #case-study-toggle, #intro-toggle, .ai-more summary, main a.text-accent-text:not(p a, li a), footer a)::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}
+/* Same invisible layer for links whose ::after already draws something (active underline, …). */
+@layer components {
+  :where(.nav-link:not(.nav-link-active), .mobile-nav-link:not(.nav-link-active), .craft-filters-back) { position: relative; }
+  :where(.nav-link:not(.nav-link-active), .mobile-nav-link:not(.nav-link-active), .craft-filters-back)::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}

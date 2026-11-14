@@ -69,7 +69,7 @@ const projectJsonLd: Record<string, unknown> = {
 	<Nav />
 	<main id="main" tabindex="-1">
 
-	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 lg:px-0" data-reveal>
+	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 min-[1248px]:px-0" data-reveal>
 		<a href="/#work" class="text-sm font-semibold text-accent-text hover:underline">← Back to work</a>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">{project.category}</p>
@@ -268,7 +268,7 @@ const projectJsonLd: Record<string, unknown> = {
 		Zones are wrapped in an inner max-w-1200 container below. */}
 	<div class="mt-8">
 		<ZoneFilters zones={zones} />
-		<div class="mx-auto max-w-[1200px] px-6 lg:px-0">
+		<div class="mx-auto max-w-[1200px] px-6 min-[1248px]:px-0">
 
 		{
 			zones.map((zone, zoneIdx) => {
