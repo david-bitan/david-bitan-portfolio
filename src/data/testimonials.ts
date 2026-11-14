@@ -21,6 +21,7 @@ export interface Testimonial {
 export const testimonials: Testimonial[] = [
 	{
 		name: 'Leah Grantz',
+		photo: '/recommendations/leah-grantz.webp',
 		role: 'Product Manager, Ryze Beyond',
 		relation: 'Worked with David on the same team',
 		featured: true,
@@ -34,6 +35,7 @@ export const testimonials: Testimonial[] = [
 	},
 	{
 		name: 'Daniel Zvi',
+		photo: '/recommendations/daniel-zvi.webp',
 		role: 'Product Manager, Ryze Beyond',
 		relation: 'Worked with David on the same team',
 		featured: true,
@@ -46,6 +48,7 @@ export const testimonials: Testimonial[] = [
 	},
 	{
 		name: 'Hadas Blitz',
+		photo: '/recommendations/hadas-blitz.webp',
 		role: 'Product Manager, Playright (Ryze Beyond)',
 		relation: 'Worked with David on the same team',
 		featured: true,
@@ -59,6 +62,7 @@ export const testimonials: Testimonial[] = [
 	},
 	{
 		name: 'Shir Shukrun',
+		photo: '/recommendations/shir-shukrun.webp',
 		role: 'HRBP & Recruitment Manager, Ryze Beyond',
 		relation: 'Senior to David, not his direct manager',
 		text: [
@@ -69,6 +73,7 @@ export const testimonials: Testimonial[] = [
 	},
 	{
 		name: 'Liska Oz',
+		photo: '/recommendations/liska-oz.webp',
 		role: 'Product Manager, Ryze Beyond',
 		relation: 'Worked with David on the same team',
 		text: [
@@ -79,6 +84,7 @@ export const testimonials: Testimonial[] = [
 	},
 	{
 		name: 'Hagay Dubinsky',
+		photo: '/recommendations/hagay-dubinsky.webp',
 		role: 'UI/UX Designer, Animator & Art',
 		relation: 'Worked with David at GamingTech (SBTech Group), on different teams',
 		text: [

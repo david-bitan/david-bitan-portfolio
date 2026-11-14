@@ -554,7 +554,7 @@
 			<label class="fld"><span>${t(up ? "Choose a password" : "Password")}</span><input id="acPass" type="password" autocomplete="off" dir="ltr"></label>
 			<p class="auth-err" id="acErr" role="alert" hidden></p>
 			<p class="fine">${ic("info")}<span>${t("Demo: passwords aren’t checked and nothing is sent. Your account stays in this browser, signed in until you sign out.")}</span></p>
-			<div class="row acrow"><button type="button" class="btn btn-text btn-sm" data-close>${t("Cancel")}</button><button type="button" class="btn btn-sm" id="acDemo">${t("Use the demo account")}</button><button type="button" class="btn btn-ink btn-sm" id="acGo">${t(up ? "Create my account" : "Sign in")}</button></div></div>`;
+			<div class="row acrow"><button type="button" class="btn btn-text btn-sm" data-close>${t("Cancel")}</button><button type="button" class="btn btn-sm" id="acDemo">${t("Use demo account")}</button><button type="button" class="btn btn-ink btn-sm" id="acGo">${t(up ? "Create my account" : "Sign in")}</button></div></div>`;
 		const close = () => { scrim.remove(); v.remove(); document.removeEventListener("keydown", key); opener?.focus?.(); }, key = (e) => { if (e.key === "Escape") close(); };
 		const err = (m, link) => { const e = v.querySelector("#acErr"); e.hidden = false; e.innerHTML = `<span>${esc(t(m))}</span>${link ? ` <button type="button" class="lnk" data-auth="${link[0]}">${t(link[1])}</button>` : ""}`; };
 		v.addEventListener("click", (e) => {

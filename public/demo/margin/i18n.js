@@ -1621,7 +1621,7 @@ window.MARGIN_I18N = (() => {
 	  "id": "Nama depan",
 	  "he": "שם פרטי"
 	 },
-	 "Use the demo account": {
+	 "Use demo account": {
 	  "fr": "Utiliser le compte démo",
 	  "es": "Usar la cuenta demo",
 	  "pt": "Usar a conta demo",

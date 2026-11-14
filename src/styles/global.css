@@ -6,14 +6,13 @@
   --color-ink: #0a0a0a;
   --color-muted: #4b5563;
   --color-card: #ffffff;
-  /* Bright brand orange for buttons with WHITE labels: David's explicit
-     choice (12/11, confirmed 13/11), never change it. Small orange text
-     uses the deeper accent-text (4.7:1 on the page). */
+  /* One orange everywhere, #F25C24 (David, 13/11): buttons, orange text,
+     links and outlines, light and dark. Button labels stay WHITE (David's
+     explicit choice, never change it). */
   --color-accent: #f25c24;
   --color-accent-ink: #ffffff;
-  --color-accent-text: #c2410c;
-  /* Text of the outlined secondary button (CL1, 13/11). */
-  --color-accent-secondary: #c9461a;
+  --color-accent-text: #f25c24;
+  --color-accent-secondary: #f25c24;
 
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 

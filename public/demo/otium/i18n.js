@@ -158,7 +158,7 @@
 		"Your details and card are filled in for you when Otium books.": ["Vos informations et votre carte sont remplies pour vous quand Otium réserve.", "Tus datos y tu tarjeta se rellenan solos cuando Otium reserva.", "Dati e carta vengono compilati per te quando Otium prenota.", "הפרטים והכרטיס שלכם ימולאו אוטומטית כש-Otium מזמין."],
 		"Password": ["Mot de passe", "Contraseña", "Password", "סיסמה"],
 		"Demo: passwords aren’t checked and nothing is sent. Your account stays in this browser, signed in until you sign out.": ["Démo : le mot de passe n’est pas vérifié et rien n’est envoyé. Votre compte reste dans ce navigateur, connecté jusqu’à la déconnexion.", "Demo: la contraseña no se comprueba y no se envía nada. Tu cuenta queda en este navegador, conectada hasta que cierres sesión.", "Demo: la password non viene controllata e non viene inviato nulla. Il tuo account resta in questo browser, connesso finché non esci.", "דמו: הסיסמה לא נבדקת ושום דבר לא נשלח. החשבון נשמר בדפדפן הזה ונשאר מחובר עד שתתנתקו."],
-		"Use a demo account": ["Utiliser un compte démo", "Usar una cuenta demo", "Usa un account demo", "שימוש בחשבון דמו"],
+		"Use demo account": ["Utiliser un compte démo", "Usar una cuenta demo", "Usa un account demo", "שימוש בחשבון דמו"],
 		"Enter an email and a password.": ["Saisissez un email et un mot de passe.", "Escribe un email y una contraseña.", "Inserisci email e password.", "הזינו אימייל וסיסמה."],
 		"Signed in": ["Connecté", "Sesión iniciada", "Accesso effettuato", "התחברת"],
 		"Signed in as {x}": ["Connecté en tant que {x}", "Sesión iniciada como {x}", "Accesso come {x}", "מחובר/ת בתור {x}"],

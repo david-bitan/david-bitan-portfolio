@@ -1285,7 +1285,7 @@
 			<label class="fld"><span>${t(up ? "Choose a password" : "Password")}</span><input id="siPass" type="password" autocomplete="off"></label></div>
 			<p class="err" id="siErr" hidden></p>
 			<p class="fine">${ICON.info}<span>${t("Demo: passwords aren’t checked and nothing is sent. Your account stays in this browser, signed in until you sign out.")}</span></p>
-			<div class="row"><button class="btn btn-text btn-sm" data-m="cancel">${t("Cancel")}</button><button class="btn btn-ghost btn-sm" id="siDemo" type="button">${t("Use a demo account")}</button><button class="btn btn-primary btn-sm" id="siGo" type="button">${t(up ? "Create my account" : "Sign in")}</button></div>`, () => {});
+			<div class="row"><button class="btn btn-text btn-sm" data-m="cancel">${t("Cancel")}</button><button class="btn btn-ghost btn-sm" id="siDemo" type="button">${t("Use demo account")}</button><button class="btn btn-primary btn-sm" id="siGo" type="button">${t(up ? "Create my account" : "Sign in")}</button></div>`, () => {});
 		const err = (m, link) => { const e = $("#siErr"); e.hidden = false; e.innerHTML = `${esc(t(m))}${link ? ` <button type="button" class="btn-text auth-sw" data-auth="${link[0]}">${t(link[1])}</button>` : ""}`; };
 		const done = (em, msg) => {
 			ME.signedIn = true; ME.email = em;

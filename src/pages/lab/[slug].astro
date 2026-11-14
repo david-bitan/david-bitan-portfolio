@@ -49,6 +49,7 @@ const projectJsonLd = {
 };
 
 const ds = project.designSystem;
+import MasonryGallery from '../../components/MasonryGallery.astro';
 ---
 
 <Layout
@@ -308,18 +309,7 @@ const ds = project.designSystem;
 		project.mobileGallery && project.mobileGallery.length > 0 && (
 			<section class="mx-auto max-w-[1200px] px-6 pb-8 sm:pb-12 lg:px-0" data-reveal>
 				<p class="mb-4 text-sm font-semibold uppercase tracking-widest text-muted">On mobile</p>
-				<div class="grid grid-cols-2 items-start gap-4 sm:grid-cols-4 sm:gap-6">
-					{project.mobileGallery.map((src, i) => (
-						<div class="ai-lab-shot block overflow-hidden rounded-md border border-ink/10 bg-card">
-							<img
-								src={src}
-								alt={`${project.title}: mobile screenshot ${i + 1}`}
-								loading="lazy"
-								class="h-auto w-full object-cover"
-							/>
-						</div>
-					))}
-				</div>
+				<MasonryGallery urls={project.mobileGallery} alt={`${project.title}: mobile screenshot`} />
 			</section>
 		)
 	}

@@ -89,3 +89,46 @@ export function landscapeSrcset(url: string): string {
 		.map((w) => `${cld(url, `c_limit,w_${w},q_100,f_auto,fl_progressive`)} ${w}w`)
 		.join(', ');
 }
+
+// ---- Masonry galleries (MasonryGallery.astro, CL2 13/11) ----
+// Key of an image in src/data/imageSizes.ts: the Cloudinary public id with its
+// folder (no version, no transform), or the path of a file in public/.
+export function imageKey(url: string): string {
+	const i = url.indexOf('/upload/');
+	if (i < 0) return url;
+	return url.slice(i + 8).replace(/^(?:[a-z]{1,3}_[^/]+\/)*/, '').replace(/^v\d+\//, '');
+}
+
+// Pixel size of a gallery image as served, crop included. A crop in the URL
+// must give both w_ and h_: with one side only, Cloudinary shrinks the other
+// side too and cuts the top and bottom of the capture.
+export function sizeOf(url: string, table: Record<string, [number, number]>): [number, number] | undefined {
+	const s = table[imageKey(url)];
+	if (!s) return undefined;
+	let [w, h] = s;
+	const i = url.indexOf('/upload/');
+	const pre = url.slice(i + 8).match(/^(?:[a-z]{1,3}_[^/]+\/)*/)![0].split('/').filter(Boolean);
+	// Crops and pads change the size; a layer (l_…) and its fl_layer_apply do not.
+	for (const seg of pre) {
+		if (seg.startsWith('l_') || seg.startsWith('fl_')) continue;
+		const p = Object.fromEntries(seg.split(',').map((t) => [t.slice(0, t.indexOf('_')), t.slice(t.indexOf('_') + 1)]));
+		if (p.c === 'crop') [w, h] = [p.w ? Math.min(+p.w, w) : w, p.h ? Math.min(+p.h, h) : h];
+		if (p.c === 'pad') [w, h] = [p.w ? +p.w : w, p.h ? +p.h : h];
+	}
+	return [w, h];
+}
+
+// Source and srcset for a masonry card: every width offered is a real width
+// of the served file (never above the source), so the browser picks a sharp
+// 1x or 2x file and never shows the image wider than its own pixels.
+const SHOT = 'q_100,f_auto,fl_progressive';
+export function shotSrc(url: string, size?: [number, number]): string {
+	if (!url.includes('/upload/')) return url;
+	return cld(url, `c_limit,w_${Math.min(size ? size[0] : 750, 750)},${SHOT}`);
+}
+export function shotSrcset(url: string, size?: [number, number]): string | undefined {
+	if (!url.includes('/upload/') || !size) return undefined;
+	const max = Math.min(size[0], 2000);
+	const widths = [282, 375, 564, 750, 1125, 1500].filter((w) => w < max).concat(max);
+	return widths.map((w) => `${cld(url, `c_limit,w_${w},${SHOT}`)} ${w}w`).join(', ');
+}

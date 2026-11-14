@@ -1,0 +1,179 @@
+---
+// The one gallery for phone captures (project and Lab pages) and for narrow
+// desktop items such as email templates (CL2, 13/11).
+// - Every image is shown whole: no crop, no object-fit, no fixed height.
+//   Width follows the column, height follows the image.
+// - The image touches the edges of its card (rounded corners kept); the
+//   frame of light captures is a ring drawn outside the image.
+// - Never shown wider than its own pixels; srcset serves sharp 1x/2x files.
+// - Masonry: 4 columns on desktop, 2 on tablets, 1 on phones (more only when
+//   a column would be wider than the images). In gallery order, each card
+//   goes into the shortest column; everything starts on the left.
+// - Wide compositions (wider than tall) follow under the columns, each on
+//   its own row, left-aligned, at most their own width.
+import { imageSizes } from '../data/imageSizes';
+import { cld, sizeOf, shotSrc, shotSrcset } from '../lib/cloudinary';
+
+interface Props {
+	urls: string[];
+	alt: string;
+	framed?: boolean;
+	priority?: boolean;
+}
+const { urls, alt, framed = true, priority = false } = Astro.props;
+const items = urls.map((url) => ({ url, size: sizeOf(url, imageSizes) }));
+const tall = items.filter((i) => !i.size || i.size[0] <= i.size[1]);
+const wide = items.filter((i) => i.size && i.size[0] > i.size[1]);
+const wideSrcset = (url: string, w: number) =>
+	url.includes('/upload/')
+		? [1200, 1600, 2000]
+				.filter((x) => x < w)
+				.concat(Math.min(w, 2000))
+				.map((x) => `${cld(url, `c_limit,w_${x},q_100,f_auto,fl_progressive`)} ${x}w`)
+				.join(', ')
+		: undefined;
+---
+
+{
+	tall.length > 0 && (
+		<div class="mg" data-mg>
+			{tall.map(({ url, size }, i) => (
+				<figure
+					class:list={['mg-card', { 'mg-framed': framed }]}
+					data-w={size?.[0]}
+					data-h={size?.[1]}
+					style={size ? `aspect-ratio: ${size[0]} / ${size[1]}; max-width: ${size[0]}px` : undefined}
+				>
+					<img
+						src={shotSrc(url, size)}
+						srcset={shotSrcset(url, size)}
+						sizes="(min-width: 1024px) 282px, (min-width: 640px) 50vw, 100vw"
+						width={size?.[0]}
+						height={size?.[1]}
+						alt={alt}
+						loading={priority && i < 2 ? 'eager' : 'lazy'}
+						decoding="async"
+					/>
+				</figure>
+			))}
+		</div>
+	)
+}
+<script is:inline>
+	(() => {
+		const el = document.currentScript && document.currentScript.previousElementSibling;
+		if (!el || !el.hasAttribute('data-mg')) return;
+		const GAP = 24;
+		const cards = Array.from(el.children);
+		const sizeOf = (c) => {
+			const w = +c.dataset.w, h = +c.dataset.h;
+			if (w && h) return [w, h];
+			const img = c.querySelector('img');
+			return img && img.naturalWidth ? [img.naturalWidth, img.naturalHeight] : [375, 812];
+		};
+		function layout() {
+			const W = el.clientWidth;
+			if (!W) return;
+			const vw = window.innerWidth;
+			const widths = cards.map((c) => sizeOf(c)[0]).sort((a, b) => a - b);
+			const typical = widths[Math.floor(widths.length / 2)];
+			// 4 / 2 / 1 by screen; one more column only if a column would be
+			// wider than the images (no image is ever shown past its pixels).
+			const cols = Math.max(vw >= 1024 ? 4 : vw >= 640 ? 2 : 1, Math.ceil((W + GAP) / (typical + GAP)));
+			const cw = (W - GAP * (cols - 1)) / cols;
+			const heights = new Array(cols).fill(0);
+			cards.forEach((c) => {
+				const [w, h] = sizeOf(c);
+				const width = Math.min(cw, w);
+				let k = 0;
+				for (let j = 1; j < cols; j++) if (heights[j] < heights[k] - 0.5) k = j;
+				c.style.left = k * (cw + GAP) + 'px';
+				c.style.top = heights[k] + 'px';
+				c.style.width = width + 'px';
+				heights[k] += (width * h) / w + GAP;
+				c.querySelector('img').sizes = Math.ceil(width) + 'px';
+			});
+			el.style.height = Math.max(...heights) - GAP + 'px';
+			el.classList.add('is-laid');
+		}
+		let raf = 0;
+		const queue = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(layout); };
+		layout();
+		new ResizeObserver(queue).observe(el);
+		cards.forEach((c) => {
+			if (!c.dataset.w) c.querySelector('img').addEventListener('load', queue, { once: true });
+		});
+	})();
+</script>
+{
+	wide.length > 0 && (
+		<div class:list={['mg-wide', { 'mt-10': tall.length > 0 }]}>
+			{wide.map(({ url, size }) => (
+				<img
+					src={url.includes('/upload/') ? cld(url, 'c_limit,w_2000,q_100,f_auto,fl_progressive') : url}
+					srcset={wideSrcset(url, size![0])}
+					sizes="(min-width: 1280px) 1200px, 100vw"
+					width={size![0]}
+					height={size![1]}
+					style={`max-width: min(100%, ${size![0]}px)`}
+					alt={alt}
+					loading="lazy"
+					decoding="async"
+				/>
+			))}
+		</div>
+	)
+}
+
+<style>
+	/* Before the script runs (or without it): a plain 1 / 2 / 4 column grid. */
+	.mg {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 24px;
+		align-items: start;
+	}
+	@media (min-width: 640px) {
+		.mg { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	}
+	@media (min-width: 1024px) {
+		.mg { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+	}
+	.mg.is-laid {
+		display: block;
+		position: relative;
+	}
+	.mg.is-laid > .mg-card {
+		position: absolute;
+	}
+	.mg-card {
+		margin: 0;
+		overflow: hidden;
+		border-radius: 12px;
+		/* Quiet placeholder while the image loads; the card already has the
+		   image's exact shape, so nothing moves when it arrives. */
+		background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+	}
+	.mg-framed {
+		box-shadow:
+			0 0 0 1px color-mix(in srgb, var(--color-ink) 15%, transparent),
+			0 4px 6px -1px rgb(0 0 0 / 0.1),
+			0 2px 4px -2px rgb(0 0 0 / 0.1);
+	}
+	.mg-card > img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+	.mg-wide {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 40px;
+	}
+	.mg-wide > img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+</style>

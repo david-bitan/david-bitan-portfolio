@@ -3,8 +3,10 @@ import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import ZoneFilters from '../../components/ZoneFilters.astro';
+import MasonryGallery from '../../components/MasonryGallery.astro';
+import { imageSizes } from '../../data/imageSizes';
 import { allProjects } from '../../data/allProjects';
-import { cld, FULL, LANDSCAPE, MOBILE, landscapeSrcset, mobileSrcset } from '../../lib/cloudinary';
+import { cld, FULL, LANDSCAPE, landscapeSrcset, sizeOf } from '../../lib/cloudinary';
 import { groupImagesByZone, zoneDescription } from '../../lib/zones';
 
 export function getStaticPaths() {
@@ -22,6 +24,12 @@ const { project } = Astro.props;
 // No in-page lightbox — clicking an image opens the full Cloudinary URL in a
 // new tab so the visitor gets the browser's native zoom / download UI.
 const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
+// Desktop items narrower than 900px whose size is known (email templates)
+// go to the masonry gallery under the full-width stack (CL2, 13/11).
+const isNarrow = (url: string) => {
+	const s = sizeOf(url, imageSizes);
+	return !!s && s[0] < 900;
+};
 
 // SEO — per-project meta. Description falls back to shortDesc; OG image is
 // the same landscape thumbnail crop used on the Selected Work grid so social
@@ -295,86 +303,10 @@ const projectJsonLd: Record<string, unknown> = {
 
 					{
 						zone.isMobile ? (
-							// Mobile shots at native 375px. 3-col grid on ≥lg,
-							// 2-col tablet, 1-col mobile. Dark mockups render on
-							// a naked slot (their own dark bg is enough); light
-							// mockups get the card treatment so their white edges
-							// stay visible against the near-white body.
-							// Client script (see bottom of file) reads each image's
-							// naturalWidth/naturalHeight after load:
-							//   - Wide (W/H > 1) = multi-screen composition/planche →
-							//     moved to the full-width stack below the grid,
-							//     src/srcset swapped to landscape presets for sharpness.
-							//   - Portrait = real mobile capture → sorted by height DESC
-							//     (via CSS order = -height) so similar heights sit
-							//     side-by-side and the grid packs cleanly.
-							<div class="mt-12" data-mobile-zone>
-								{/* v093: switched from fixed 1/2/3 col grid to
-								    auto-fit cells of exactly 375px (the mobile
-								    design width). Cells never grow past 375, so
-								    images never get stretched by the layout.
-								    Rows center-align, so no wasted "gray strip"
-								    between image and cell edge — the cell IS
-								    the image slot. Gap tightened 24→12. */}
-								{/* 4 per row on desktop, 2 on tablets, 1 on phones (CL1, 13/11).
-								    Rows are centred, so a short last row sits in the middle
-								    instead of leaving empty slots on the right. */}
-								<div
-									class="flex flex-wrap items-start justify-center gap-6"
-									data-mobile-grid
-								>
-									{zone.images.map(({ url }, imgIdx) =>
-										isDarkZone ? (
-											// Dark mobile: image fills the 375-wide cell exactly
-											// (cell = image slot). No border — dark mockup provides
-											// its own contrast against the near-white body.
-											<span
-												class="mobile-cell img-skeleton block rounded-xl overflow-hidden"
-												data-mobile-item
-												data-is-dark="1"
-											>
-												<img
-													src={cld(url, MOBILE)}
-													srcset={mobileSrcset(url)}
-													sizes="(min-width: 1024px) 282px, (min-width: 640px) 50vw, 100vw"
-													alt={project.title}
-													loading="lazy"
-													fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
-													width="375"
-													class="block h-auto w-full"
-													data-full-src={cld(url, FULL)}
-													data-full-srcset={landscapeSrcset(url)}
-													onload="this.parentElement.classList.add('is-loaded')"
-													onerror="this.parentElement.classList.add('is-loaded')"
-												/>
-											</span>
-										) : (
-											// Light mobile: image fills its 375-wide cell exactly.
-											// Border + shadow directly on <img> — the visible frame
-											// is the image's edge, no padded gray strip anywhere.
-											<span
-												class="mobile-cell img-skeleton block rounded-xl border border-ink/15 shadow-md overflow-hidden"
-												data-mobile-item
-											>
-												<img
-													src={cld(url, MOBILE)}
-													srcset={mobileSrcset(url)}
-													sizes="(min-width: 1024px) 282px, (min-width: 640px) 50vw, 100vw"
-													alt={project.title}
-													loading="lazy"
-													fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
-													width="375"
-													class="block h-auto w-full"
-													data-full-src={cld(url, FULL)}
-													data-full-srcset={landscapeSrcset(url)}
-													onload="this.parentElement.classList.add('is-loaded')"
-													onerror="this.parentElement.classList.add('is-loaded')"
-												/>
-											</span>
-										),
-									)}
-								</div>
-								<div class="mt-10 space-y-10" data-mobile-wide-stack></div>
+							// Phone captures: one masonry gallery for the whole site
+							// (components/MasonryGallery.astro). Dark mockups have no frame.
+							<div class="mt-12">
+								<MasonryGallery urls={zone.images.map((i) => i.url)} alt={project.title} framed={!isDarkZone} priority={zoneIdx === 0} />
 							</div>
 						) : zone.label === 'Other' ? (
 							// Fallback for unclassified images. No bg wrapper
@@ -413,7 +345,7 @@ const projectJsonLd: Record<string, unknown> = {
 							//     full-width in the stack.
 							<div class="mt-12" data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
 								<div class="space-y-10" data-desktop-stack>
-									{zone.images.map(({ url }, imgIdx) => (
+									{zone.images.filter(({ url }) => !isNarrow(url)).map(({ url }, imgIdx) => (
 										<div
 											class="w-full max-w-full img-skeleton"
 											data-desktop-item
@@ -451,7 +383,12 @@ const projectJsonLd: Record<string, unknown> = {
 								    tablets, 1 on phones. Each item sits right under the previous
 								    one in its column, so templates of different heights leave
 								    no holes. */}
-								<div class="narrow-masonry mt-10" data-desktop-narrow-grid></div>
+								<div class:list={['narrow-masonry', { 'mt-10': zone.images.some(({ url }) => !isNarrow(url)) }]} data-desktop-narrow-grid></div>
+								{zone.images.some(({ url }) => isNarrow(url)) && (
+									<div class:list={{ 'mt-10': zone.images.some(({ url }) => !isNarrow(url)) }}>
+										<MasonryGallery urls={zone.images.filter(({ url }) => isNarrow(url)).map((i) => i.url)} alt={project.title} framed={!isDarkZone} />
+									</div>
+								)}
 							</div>
 						)
 					}
@@ -507,44 +444,6 @@ const projectJsonLd: Record<string, unknown> = {
 		@media (min-width: 640px) { .narrow-masonry { columns: 2; } }
 		@media (min-width: 1024px) { .narrow-masonry { columns: 3; } }
 		.narrow-masonry > * { display: block; break-inside: avoid; margin-bottom: 32px; }
-		/* Mobile captures: 4 per row ≥1024px, 2 ≥640px, 1 below (gap 24px). */
-		.mobile-cell { width: 100%; }
-		@media (min-width: 640px) { .mobile-cell { width: calc((100% - 24px) / 2); } }
-		@media (min-width: 1024px) { .mobile-cell { width: calc((100% - 72px) / 4); } }
-		[data-mobile-wide-stack] > .mobile-cell { width: 100%; }
-		/* Wide (multi-screen composition) items moved out of the mobile grid
-		   into the full-width stack. v092: no more forced width:100% — the
-		   mobile script probes each composition's TRUE source width and sets
-		   `max-width: <sourceW>px` inline. That means the browser NEVER
-		   upscales past source pixels; a 900-wide composition displays at
-		   900 CSS max, centered. Border/shadow/rounded stripped so planches
-		   (which usually come with their own designed background) render
-		   cleanly edge-to-edge. */
-		/* Wide (multi-screen composition) items moved out of the mobile grid.
-		   v127: since mobile items are now <span> wrappers (for skeleton shimmer),
-		   the wide-stack override targets the span + its inner img. Kill min-height
-		   and shimmer bg on the span (image is already loaded when script moves it). */
-		[data-mobile-wide-stack] > [data-mobile-item] {
-			display: block;
-			width: 100%;
-			margin-left: auto;
-			margin-right: auto;
-			border: 0;
-			border-radius: 0;
-			box-shadow: none;
-			min-height: 0;
-			background: none;
-			animation: none;
-			overflow: visible;
-		}
-		[data-mobile-wide-stack] > [data-mobile-item] > img {
-			display: block;
-			width: 100%;
-			height: auto;
-			margin-left: auto;
-			margin-right: auto;
-		}
-
 		/* Narrow desktop items (e.g. email templates 400px wide) moved out
 		   of the full-width stack into a 2-col grid, capped at their natural
 		   width so the browser never upscales. Wrapper drops the full-width
@@ -559,106 +458,6 @@ const projectJsonLd: Record<string, unknown> = {
 			height: auto;
 		}
 	</style>
-
-	<script is:inline>
-		// Mobile zone layout: detect wide compositions vs portrait captures,
-		// AND cap CSS width to the TRUE source width so the browser never
-		// upscales past source pixels (David's rule: no upscale ever).
-		//
-		//   - Aspect ratio > 1 → composition/planche → moved to full-width
-		//     wide stack; src/srcset swapped to the FULL/landscape presets;
-		//     inline `max-width: <sourceW>px` caps the render to source width.
-		//   - Portrait (ratio < 1) → stays in the grid; sorted by height
-		//     DESC via CSS `order = -Math.round(naturalHeight)` so tallest
-		//     items sit adjacent; if the probed source width is below 375,
-		//     inline max-width caps the item so the grid slot never stretches
-		//     the image past its native pixel count.
-		//
-		// Why the probe: `img.naturalWidth` reflects the served srcset variant,
-		// not the Cloudinary source. `c_limit,w_9999` returns the true source
-		// width (never upscales, never downscales below source).
-		(() => {
-			const zones = document.querySelectorAll('[data-mobile-zone]');
-			if (!zones.length) return;
-
-			// Probe true source width (same pattern as the desktop narrow-grid
-			// script). Cached per-URL so re-probes across zones are free.
-			const probeCache = new Map();
-			function probeSourceWidth(imgSrc) {
-				const probeSrc = imgSrc.replace(
-					/\/upload\/(c_[^/]+\/)?/,
-					'/upload/c_limit,w_9999,q_100,f_auto/'
-				);
-				if (probeCache.has(probeSrc)) return probeCache.get(probeSrc);
-				const p = new Promise((resolve) => {
-					const probe = new Image();
-					probe.onload = () => resolve(probe.naturalWidth || 0);
-					probe.onerror = () => resolve(0);
-					probe.src = probeSrc;
-				});
-				probeCache.set(probeSrc, p);
-				return p;
-			}
-
-			zones.forEach((zone) => {
-				const grid = zone.querySelector('[data-mobile-grid]');
-				const wideStack = zone.querySelector('[data-mobile-wide-stack]');
-				if (!grid || !wideStack) return;
-
-				const items = Array.from(grid.querySelectorAll('[data-mobile-item]'));
-
-				items.forEach((item) => {
-					const img = item.tagName === 'IMG' ? item : item.querySelector('img');
-					if (!img) return;
-
-					const handle = async () => {
-						const w = img.naturalWidth;
-						const h = img.naturalHeight;
-						if (!w || !h) return;
-
-						const ratio = w / h;
-
-						if (ratio > 1) {
-							// Wide composition: swap to landscape srcset for sharpness,
-							// move item to wide stack, then probe true source width
-							// and cap max-width so we never upscale past source.
-							const fullSrc = img.dataset.fullSrc;
-							const fullSrcset = img.dataset.fullSrcset;
-							if (fullSrc) img.src = fullSrc;
-							if (fullSrcset) {
-								img.srcset = fullSrcset;
-								img.sizes = '(min-width: 1280px) 1200px, 100vw';
-							}
-							img.removeAttribute('width');
-							wideStack.appendChild(item);
-
-							const trueW = await probeSourceWidth(img.src);
-							if (trueW > 0) {
-								const target = item.tagName === 'IMG' ? item : img;
-								target.style.maxWidth = trueW + 'px';
-							}
-						} else {
-							// Portrait: sort by height DESC via CSS order.
-							// Negative value → CSS treats as smaller → renders first.
-							item.style.order = String(-Math.round(h));
-
-							// No width cap any more: every capture fills its cell like
-							// its neighbours (CL1, 13/11). A narrower source used to be
-							// capped to its own width, which left a blank band inside
-							// the card.
-						}
-					};
-
-					if (img.complete && img.naturalWidth) {
-						handle();
-					} else {
-						img.addEventListener('load', handle, { once: true });
-						img.addEventListener('error', () => {}, { once: true });
-					}
-				});
-			});
-		})();
-	</script>
 
 	<script is:inline>
 		// Desktop zone: split narrow images (e.g. Sonary Email Templates, 400px
