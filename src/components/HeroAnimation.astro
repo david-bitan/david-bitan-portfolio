@@ -326,7 +326,7 @@ let di = 0;
 		const bzp = (p0, p1, u) => { const c = [(p0[0] + p1[0]) / 2, CY]; const v = 1 - u; return [v * v * p0[0] + 2 * v * u * c[0] + u * u * p1[0], v * v * p0[1] + 2 * v * u * c[1] + u * u * p1[1], 2 * v * (c[0] - p0[0]) + 2 * u * (p1[0] - c[0]), 2 * v * (c[1] - p0[1]) + 2 * u * (p1[1] - c[1])]; };
 		const trip = (q, p0, p1, r0, r1) => {
 			const u = EM(clamp(q / 0.85));
-			const ov = 0.014 * Math.sin(Math.PI * clamp((q - 0.78) / 0.22));
+			const ov = 0.014 * Math.sin(Math.PI * clamp((q - 0.78) / 0.22)) ** 2; // overshoot and return, ending at zero speed
 			const [x, y, tx, ty] = bzp(p0, p1, u + ov);
 			let d = Math.atan2(ty, tx) - Math.atan2(p1[1] - p0[1], p1[0] - p0[0]);
 			d = Math.atan2(Math.sin(d), Math.cos(d));
@@ -347,7 +347,9 @@ let di = 0;
 			clipUI.setAttribute('width', Math.max(0, 494 - x));
 			scan.setAttribute('transform', `translate(${x} 0)`);
 			const [cx, cy, cr, cq] = curPos(s), [ax, ay] = curPos(s - 0.03), [bx, by] = curPos(s + 0.03);
-			const f = float(40, T), fa = 1 - 0.6 * Math.sin(Math.PI * cq); // float keeps going, smaller during a trip
+			// the cursor's own small, calm float (about 3.5 s), smaller during a trip, so it never stands still
+			const P2 = 2 * Math.PI, fa = 1 - 0.6 * Math.sin(Math.PI * cq);
+			const f = { dx: 2 * Math.sin((P2 * T) / 3.5), dy: 1.5 * Math.sin((P2 * T) / 2.9 + 1), dr: 1.2 * Math.sin((P2 * T) / 4.3 + 2) };
 			cur.setAttribute('transform', `translate(${cx + fa * f.dx} ${cy + fa * f.dy}) rotate(${cr + fa * f.dr})`);
 			let vx = bx - ax, vy = by - ay; const sp = Math.hypot(vx, vy);
 			if (sp > 1.2) {
@@ -475,7 +477,7 @@ let di = 0;
 			update[k](s, T);
 			const inv = svgInv(), list = [];
 			const clipX = +clipUI.getAttribute('x');
-			sc.g.querySelectorAll('[data-m]').forEach((el) => {
+			sc.g.querySelectorAll('[data-m]').forEach((el, idx) => {
 				let op = 1;
 				for (let e = el; e && e !== sc.g; e = e.parentElement) { const o = parseFloat(getComputedStyle(e).opacity); if (!isNaN(o)) op *= o; }
 				if (op < 0.03) return;
@@ -489,7 +491,7 @@ let di = 0;
 				else r = (+el.getAttribute('rx') || 0) * mt.a;
 				const cs = getComputedStyle(el);
 				const st = cs.stroke && cs.stroke !== 'none' ? cs.stroke : null;
-				list.push({ role: el.dataset.m, x, y, w, h, r, f: toLab(parseC(cs.fill)), op, s: st ? toLab(parseC(st)) : null, sw: st ? parseFloat(cs.strokeWidth) || 0 : 0 });
+				list.push({ idx, role: el.dataset.m, x, y, w, h, r, f: toLab(parseC(cs.fill)), op, s: st ? toLab(parseC(st)) : null, sw: st ? parseFloat(cs.strokeWidth) || 0 : 0 });
 			});
 			return list;
 		}
@@ -508,6 +510,18 @@ let di = 0;
 			// big shapes first in the drawing order, small ones on top
 			res.sort((p, q) => q.b.w * q.b.h + q.a.w * q.a.h - (p.b.w * p.b.h + p.a.w * p.a.h));
 			res.forEach((pr) => (pr.delay = 0.15 * clamp((Math.min(pr.a.y, pr.b.y) - 40) / 300))); // top rows first, about 40 ms apart
+			// Stacking, fixed once for the whole passage: a shape that arrives or morphs takes its order in the
+			// arrival scene (content above its card); a shape that leaves sits just above the pair of its own
+			// card, or at the bottom, in departure order, when that card leaves too.
+			const inside = (r, c) => r !== c && c.w * c.h > r.w * r.h && r.x >= c.x - 0.5 && r.y >= c.y - 0.5 && r.x + r.w <= c.x + c.w + 0.5 && r.y + r.h <= c.y + c.h + 0.5;
+			const zOf = (pr) => {
+				if (pr.b.op > 0) return pr.b.idx;
+				const card = A.filter((c) => inside(pr.a, c)).sort((m, k) => m.w * m.h - k.w * k.h)[0];
+				const cp = card && res.find((o) => o.a === card);
+				return cp && cp.b.op > 0 ? cp.b.idx + 0.5 + pr.a.idx / 1e4 : -1e4 + pr.a.idx;
+			};
+			res.forEach((pr) => (pr.z = zOf(pr)));
+			res.sort((m, k) => m.z - k.z);
 			return res;
 		}
 		let morphKey = '', pairs = [];
@@ -524,8 +538,11 @@ let di = 0;
 				el.setAttribute('width', w.toFixed(2)); el.setAttribute('height', h.toFixed(2));
 				el.setAttribute('rx', r.toFixed(2)); el.setAttribute('ry', r.toFixed(2));
 				el.style.fill = mixLab(a.f, b.f, q);
-				// a shape without partner fades early (shrinking) or late (growing): less clutter mid-way
-				const oq = b.op === 0 ? clamp(q * 1.8) : a.op === 0 ? clamp((q - 0.4) / 0.6) : q;
+				// a shape without partner fades early (shrinking) or late (growing): less clutter mid-way.
+				// Same fade curves, moved in time: leaving shapes 0.15 s earlier, appearing ones 0.05 s later, so a
+				// leaving shape has faded out before a new shape appears over it (paths and timings of motion unchanged).
+				const qo = (shift) => EM(clamp((tau - 0.15 - pr.delay - shift) / 0.9));
+				const oq = b.op === 0 ? clamp(qo(-0.15) * 1.8) : a.op === 0 ? clamp((qo(0.05) - 0.4) / 0.6) : q;
 				el.style.opacity = lerp(a.op, b.op, oq).toFixed(3);
 				const sa = a.s || (b.s && [...b.s.slice(0, 3), 0]), sb = b.s || (a.s && [...a.s.slice(0, 3), 0]);
 				if (sa) { el.style.stroke = mixLab(sa, sb, q); el.style.strokeWidth = lerp(a.sw || b.sw, b.sw || a.sw, q).toFixed(2); } else el.style.stroke = 'none';
@@ -569,8 +586,11 @@ let di = 0;
 			if (!inTrans) morphG.style.display = 'none';
 			doodles.forEach((d) => {
 				if (doodleSets[+d.el.closest('.ha-doodles').dataset.scene].style.display === 'none') return;
-				const f = float(d.i, T), a = d.tag === 'pin' ? 0.3 : 1; // the "live UI" arrow keeps its tail on the design
-				d.el.setAttribute('transform', `translate(${d.x + a * f.dx} ${d.y + a * f.dy}) rotate(${d.r + a * f.dr}) scale(${d.s})`);
+				let f = float(d.i, T);
+				// the "live UI" arrow: its own gentle sway (about 1.6 px, 4 to 5 s), held 1.8 to 3.4 px to the right so it
+				// stays at least 17 px from the scan line; it turns around its tail, which stays on the design
+				if (d.tag === 'pin') { const P2 = 2 * Math.PI; f = { dx: 2.6 + 0.8 * Math.sin((P2 * T) / 4.6), dy: 1.2 * Math.sin((P2 * T) / 3.9 + 1), dr: 0.6 * Math.sin((P2 * T) / 4.4 + 2) }; }
+				d.el.setAttribute('transform', `translate(${d.x + f.dx} ${d.y + f.dy}) rotate(${d.r + f.dr}) scale(${d.s})`);
 			});
 			dots.forEach((d, k) => d.setAttribute('aria-current', k === current ? 'true' : 'false'));
 		}
