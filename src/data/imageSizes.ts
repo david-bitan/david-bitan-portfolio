@@ -18,7 +18,6 @@ export const imageSizes: Record<string, [number, number]> = {
 	'portfolio/ryze/07---partner-with-us/partner-with-us---mobile---1.png': [375, 3158],
 	'portfolio/ryze/08---error-404/error-404---mobile.png': [375, 3185],
 	'portfolio/ryze/09---legal/legal-page-mobile---1.png': [375, 17683],
-	'portfolio/ryze-hub/mobile/company-hub---innerpage---step-04.webp': [398, 11545],
 	'portfolio/sonary-dashboard/01---software-stack-page/mobile/dark-mode/dashboard---empty---mobile.webp': [375, 800],
 	'portfolio/sonary-dashboard/01---software-stack-page/mobile/dark-mode/dashboard---grid---colapsed.webp': [375, 1143],
 	'portfolio/sonary-dashboard/01---software-stack-page/mobile/dark-mode/dashboard---grid---mobile---bottom-menu.webp': [375, 800],

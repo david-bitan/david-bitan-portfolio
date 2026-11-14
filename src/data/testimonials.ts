@@ -18,6 +18,8 @@ export interface Testimonial {
 	featured?: boolean;
 }
 
+// Order validated by David (14/11): left to right, then the next row, on
+// the home page and on /about#recommendations.
 export const testimonials: Testimonial[] = [
 	{
 		name: 'Leah Grantz',
@@ -31,19 +33,6 @@ export const testimonials: Testimonial[] = [
 			'Working with people who really know their craft makes you better at yours. That’s something I appreciated about working with David at Ryze Beyond.',
 			'David was quick to recognise the potential of AI and has continued to explore and integrate it into his design work. I also valued his ability to turn ideas into clean, sophisticated UI/UX designs that balanced aesthetics with usability. He’s fast, reliable, approachable and great at communicating the thinking behind his designs.',
 			'David knows his craft, and it shows.',
-		],
-	},
-	{
-		name: 'Daniel Zvi',
-		photo: '/recommendations/daniel-zvi.webp',
-		role: 'Product Manager, Ryze Beyond',
-		relation: 'Worked with David on the same team',
-		featured: true,
-		excerpt:
-			'He’s a true professional and a perfectionist in the best sense: every design choice he makes has clear logic behind it, and he always takes the time to explain his thinking.',
-		text: [
-			'I had the pleasure of working alongside David at ryze, and I can’t recommend him enough. He’s a true professional and a perfectionist in the best sense: every design choice he makes has clear logic behind it, and he always takes the time to explain his thinking. Working with him meant you didn’t just get great design, you understood why it worked, and that made collaborating with him easy and genuinely valuable.',
-			'He’s thoughtful, reliable, and cares deeply about getting the details right. Any team would be lucky to have him.',
 		],
 	},
 	{
@@ -61,14 +50,16 @@ export const testimonials: Testimonial[] = [
 		],
 	},
 	{
-		name: 'Shir Shukrun',
-		photo: '/recommendations/shir-shukrun.webp',
-		role: 'HRBP & Recruitment Manager, Ryze Beyond',
-		relation: 'Senior to David, not his direct manager',
+		name: 'Daniel Zvi',
+		photo: '/recommendations/daniel-zvi.webp',
+		role: 'Product Manager, Ryze Beyond',
+		relation: 'Worked with David on the same team',
+		featured: true,
+		excerpt:
+			'He’s a true professional and a perfectionist in the best sense: every design choice he makes has clear logic behind it, and he always takes the time to explain his thinking.',
 		text: [
-			'Accompanying David’s department as their HR at Ryze Beyond for most of his nearly 7 years at the company was a true privilege, both professionally and personally.',
-			'David is a rare and special combination of a top-tier professional and a person with a huge heart and remarkable emotional intelligence. Throughout his entire time with the company, he showed deep devotion, unwavering loyalty, and genuine commitment to every task and project. Beyond his professional skills, David is defined by extraordinary interpersonal relations: endless patience, an uncommon level of respect for everyone around him, and the rare ability to bring so much soul, warmth, and true human connection into the daily work.',
-			'He is someone who does everything with all his heart, making him a tremendous asset to any team and company culture. I recommend David with the warmest enthusiasm and full confidence that any company fortunate enough to have him will gain a devoted partner and a truly special human being.',
+			'I had the pleasure of working alongside David at ryze, and I can’t recommend him enough. He’s a true professional and a perfectionist in the best sense: every design choice he makes has clear logic behind it, and he always takes the time to explain his thinking. Working with him meant you didn’t just get great design, you understood why it worked, and that made collaborating with him easy and genuinely valuable.',
+			'He’s thoughtful, reliable, and cares deeply about getting the details right. Any team would be lucky to have him.',
 		],
 	},
 	{
@@ -80,6 +71,17 @@ export const testimonials: Testimonial[] = [
 			'I’ve had the pleasure of working with David for over six years at Ryze Beyond and it’s been a great experience.',
 			'David is a talented UX/UI designer who combines creativity, professionalism, and a strong understanding of product and user experience. He always keeps up with the latest trends and technologies in the design world, including new AI tools, and is great at finding ways to incorporate them into his work.',
 			'I’ve really enjoyed working with David over the years and would highly recommend him to any team looking for a skilled and forward-thinking UX/UI designer.',
+		],
+	},
+	{
+		name: 'Shir Shukrun',
+		photo: '/recommendations/shir-shukrun.webp',
+		role: 'HRBP & Recruitment Manager, Ryze Beyond',
+		relation: 'Senior to David, not his direct manager',
+		text: [
+			'Accompanying David’s department as their HR at Ryze Beyond for most of his nearly 7 years at the company was a true privilege, both professionally and personally.',
+			'David is a rare and special combination of a top-tier professional and a person with a huge heart and remarkable emotional intelligence. Throughout his entire time with the company, he showed deep devotion, unwavering loyalty, and genuine commitment to every task and project. Beyond his professional skills, David is defined by extraordinary interpersonal relations: endless patience, an uncommon level of respect for everyone around him, and the rare ability to bring so much soul, warmth, and true human connection into the daily work.',
+			'He is someone who does everything with all his heart, making him a tremendous asset to any team and company culture. I recommend David with the warmest enthusiasm and full confidence that any company fortunate enough to have him will gain a devoted partner and a truly special human being.',
 		],
 	},
 	{

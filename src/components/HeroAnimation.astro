@@ -1,0 +1,527 @@
+---
+// Home hero animation (CL2 étape 6, lot 4, phase D). Decorative (aria-hidden):
+// five scenes from David's work, about 6 s each, looping in about 30 s.
+// Coded SVG + a small requestAnimationFrame engine (no GSAP: its licence is
+// not on the project's free-licence list). Colours come from CSS variables, so
+// the same drawing follows the light and dark themes. Pencil-style doodles
+// reuse the filters of David's animated LinkedIn banner and float all the
+// time, each at its own slow rhythm, never stopping.
+// Scenes: 1 prompt to product, 2 one system many brands (Top5),
+// 3 comparison (Top5, Sonary), 4 chatbot (APEX, Facet), 5 SaaS dashboard
+// (Sonary Software Stack Manager).
+const sq = (x: number, y: number, w: number, h: number, r: number) => {
+	const p = Math.min(r * 1.6, w / 2, h / 2), k = p * 0.38;
+	return `M${x + p} ${y} H${x + w - p} C${x + w - k} ${y} ${x + w} ${y + k} ${x + w} ${y + p} V${y + h - p} C${x + w} ${y + h - k} ${x + w - k} ${y + h} ${x + w - p} ${y + h} H${x + p} C${x + k} ${y + h} ${x} ${y + h - k} ${x} ${y + h - p} V${y + p} C${x} ${y + k} ${x + k} ${y} ${x + p} ${y} Z`;
+};
+// Scene 1 card: 420 x 216 at (70, 112). Blocks: [x, y, w, h, r, tone]
+const C1 = { x: 70, y: 112 };
+const blocks = [
+	[16, 14, 80, 22, 7, 'chip'], [112, 14, 196, 22, 7, 'soft'], [324, 14, 80, 22, 7, 'chip'],
+	[16, 48, 240, 90, 9, 'acc'], [272, 48, 132, 40, 9, 'soft'], [272, 98, 132, 40, 9, 'soft'],
+	[16, 152, 120, 50, 9, 'soft'], [150, 152, 120, 50, 9, 'soft'], [284, 152, 120, 50, 9, 'soft'],
+] as const;
+const D: Record<string, string> = {
+	robot: '<path d="M4 14 q0-12 12-12 h24 q12 0 12 12 v18 q0 12-12 12 h-24 q-12 0-12-12z"/><path d="M28 2 v-9"/><circle cx="28" cy="-11" r="3.5"/><path d="M4 18 q-7 0 -7 6 q0 6 7 6 M52 18 q7 0 7 6 q0 6 -7 6"/><path d="M14 23 q5 -5 10 0 M32 23 q5 -5 10 0"/><path d="M20 32 q8 6 16 0"/>',
+	arrow3: '<path d="M0 0 C -3 15, 6 27, 26 30"/><path d="M17.7 24.5 L26 30 L17 34.5"/>',
+	dollar: '<path d="M19 9 C 13 2, 0 2, 0 11 C 0 20, 21 18, 21 28 C 21 38, 6 40, -1 33"/><path d="M10 -5 V 3 M10 38 V 46"/>',
+	spark: '<path d="M0 -15 Q2 -2 15 0 Q2 2 0 15 Q-2 2 -15 0 Q-2 -2 0 -15z"/>',
+	check: '<path d="M0 9 L7 17 L22 0"/>',
+	cursor: '<path d="M0 0 L20 7.8 L11 11 L7.8 20 Z"/>',
+	cup: '<path d="M-12 -14 h24 v6 q0 14 -12 14 q-12 0 -12 -14z"/><path d="M-12 -10 q-9 0 -8 7 q1 6 9 6 M12 -10 q9 0 8 7 q-1 6 -9 6"/><path d="M0 6 v8 M-8 16 h16"/>',
+	bubble: '<path d="M-22 -14 h44 q8 0 8 8 v14 q0 8 -8 8 h-26 l-10 9 v-9 h-8 q-8 0 -8 -8 v-14 q0 -8 8 -8z"/>',
+	sun: '<circle r="8"/><path d="M0 -15 v-5 M0 15 v5 M-15 0 h-5 M15 0 h5 M-11 -11 l-3 -3 M11 11 l3 3 M-11 11 l-3 3 M11 -11 l3 -3"/>',
+	moon: '<path d="M6 -14 a14 14 0 1 0 8 22 a11 11 0 1 1 -8 -22z"/>',
+	swatch: '<circle cx="0" cy="0" r="7"/>',
+};
+// [key, x, y, rotation, scale, orange]
+type Dd = [string, number, number, number, number, boolean, string?];
+const doodles: Dd[][] = [
+	[['robot', 14, 96, -8, 0.7, false], ['dollar', 516, 196, 8, 0.9, true], ['arrow3', 130, 346, 0, 0.75, false]],
+	[['swatch', 506, 92, 0, 1, false, 'a'], ['swatch', 526, 114, 0, 1, false, 'b'], ['swatch', 504, 134, 0, 1, false, 'c'], ['arrow3', 470, 352, 180, 0.7, false]],
+	[['cup', 506, 96, -6, 1, true], ['check', 476, 196, -8, 1, false], ['check', 476, 286, 6, 1, false]],
+	[['bubble', 510, 112, 6, 0.9, false], ['spark', 52, 330, 0, 1, true]],
+	[['sun', 520, 92, 0, 1, false, 'sun'], ['moon', 520, 92, 0, 1, false, 'moon'], ['spark', 40, 120, 0, 0.8, true]],
+];
+const texts: [number, string, number, number, number, number, boolean][] = [
+	[0, 'live UI', 66, 372, -4, 26, false],
+	[0, 'wireframe', 372, 372, 4, 26, true],
+	[1, '1 system', 404, 384, -5, 28, true],
+];
+const PROMPT = 'Design an AI-powered SaaS dashboard';
+let di = 0;
+---
+
+<div class="ha" data-hero-anim>
+	<svg class="ha-svg" viewBox="0 0 560 440" aria-hidden="true" focusable="false">
+		<defs>
+			<filter id="ha-pencil" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="5" result="w"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="w" scale="1.4" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="2" seed="11" result="g"></feTurbulence><feColorMatrix in="g" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.9 0.45" result="gm"></feColorMatrix><feComposite in="d" in2="gm" operator="in"></feComposite></filter>
+			<filter id="ha-pencil2" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="2" seed="21" result="w"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="w" scale="2.2" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="1" seed="2" result="g"></feTurbulence><feColorMatrix in="g" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0.2" result="gm"></feColorMatrix><feComposite in="d" in2="gm" operator="in"></feComposite></filter>
+			<filter id="ha-chalk" x="-10%" y="-20%" width="120%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="3" result="g"></feTurbulence><feColorMatrix in="g" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.9 1.6" result="gm"></feColorMatrix><feComposite in="SourceGraphic" in2="gm" operator="in"></feComposite></filter>
+			<pattern id="ha-grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0 H0 V28" fill="none" class="ha-gridline"></path></pattern>
+			<radialGradient id="ha-fade" cx="50%" cy="50%" r="60%"><stop offset="30%" stop-color="#fff"></stop><stop offset="100%" stop-color="#fff" stop-opacity="0"></stop></radialGradient>
+			<mask id="ha-mask"><rect width="560" height="440" fill="url(#ha-fade)"></rect></mask>
+			<clipPath id="ha-clip-ui"><rect id="ha-clip-ui-r" x={C1.x - 4} y={C1.y - 4} width="0" height="224"></rect></clipPath>
+			<clipPath id="ha-clip-wire"><rect id="ha-clip-wire-r" x={C1.x} y={C1.y - 4} width="424" height="224"></rect></clipPath>
+		</defs>
+
+		<rect width="560" height="440" fill="url(#ha-grid)" mask="url(#ha-mask)"></rect>
+
+		<!-- 1 · From prompt to product -->
+		<g class="ha-scene" data-scene="0">
+			<g class="ha-it">
+				<rect x="60" y="34" width="440" height="46" rx="23" class="ha-surface" style="stroke:var(--ha-acc);stroke-width:2"></rect>
+				<text x="84" y="62" class="ha-ptext" id="ha-ptext"></text>
+				<rect id="ha-caret" x="84" y="47" width="2" height="18" style="fill:var(--ha-acc)"></rect>
+				<circle cx="477" cy="57" r="16" style="fill:var(--ha-acc)"></circle>
+				<path d="M477 64 V50 M471 56 L477 50 L483 56" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+			</g>
+			<g class="ha-it">
+				<g clip-path="url(#ha-clip-ui)">
+					<path d={sq(C1.x, C1.y, 420, 216, 17)} class="ha-surface ha-card"></path>
+					{blocks.map(([x, y, w, h, r, tone]) => <path d={sq(C1.x + x, C1.y + y, w, h, r)} class={`ha-b-${tone}`}></path>)}
+				</g>
+				<g clip-path="url(#ha-clip-wire)" class="ha-wire">
+					<path d={sq(C1.x + 1, C1.y + 1, 418, 214, 17)}></path>
+					{blocks.map(([x, y, w, h, r]) => <path d={sq(C1.x + x, C1.y + y, w, h, r)}></path>)}
+				</g>
+				<g id="ha-scan" opacity="0">
+					<rect x="-1" y={C1.y - 14} width="2" height="244" class="ha-scanfill"></rect>
+					<circle cx="0" cy={C1.y + 108} r="17" class="ha-scanfill"></circle>
+					<text x="0" y={C1.y + 112} class="ha-ai">AI</text>
+				</g>
+			</g>
+			<g class="ha-it" id="ha-cursor">
+				<g id="ha-cur-lines" class="ha-ds" filter="url(#ha-pencil)" style="stroke-width:2.4"></g>
+				<g id="ha-cur" class="ha-ds">
+					<g filter="url(#ha-pencil)" style="stroke-width:3.4" set:html={D.cursor}></g>
+				</g>
+			</g>
+		</g>
+
+		<!-- 2 · One system, several brands (Top5) -->
+		<g class="ha-scene" data-scene="1" style="--ha-b:#f25c24">
+			<g class="ha-it">
+				<path d={sq(80, 62, 400, 276, 16)} class="ha-surface ha-card"></path>
+				<rect x="80" y="62" width="400" height="44" rx="16" class="ha-b-soft"></rect>
+				<rect id="ha-logo" x="100" y="76" width="70" height="16" rx="8" style="fill:var(--ha-b)"></rect>
+				<rect x="300" y="80" width="40" height="8" rx="4" class="ha-b-chip"></rect>
+				<rect x="352" y="80" width="40" height="8" rx="4" class="ha-b-chip"></rect>
+				<rect x="404" y="80" width="56" height="8" rx="4" class="ha-b-chip"></rect>
+			</g>
+			{[124, 192, 260].map((y) => (
+				<g class="ha-it">
+					<rect x="100" y={y} width="360" height="56" rx="12" class="ha-b-soft"></rect>
+					<rect x="114" y={y + 12} width="32" height="32" rx="8" style="fill:var(--ha-b)"></rect>
+					<rect x="160" y={y + 15} width="140" height="9" rx="4.5" class="ha-b-chip"></rect>
+					<rect x="160" y={y + 32} width="90" height="9" rx="4.5" class="ha-b-chip"></rect>
+					<rect class="ha-btn" x="376" y={y + 16} width="68" height="24" rx="12" style="fill:var(--ha-b)"></rect>
+				</g>
+			))}
+		</g>
+
+		<!-- 3 · Comparison (Top5, Sonary) -->
+		<g class="ha-scene" data-scene="2">
+			{[2, 3, 1].map((rank, i) => (
+				<g class="ha-it">
+					<g class="ha-rank" data-rank={rank} transform={`translate(0 ${70 + i * 90})`}>
+						<path d={sq(110, 0, 340, 74, 14)} class="ha-surface ha-card"></path>
+						<circle cx="140" cy="37" r="15" class="ha-b-soft"></circle>
+						<text x="140" y="42" class="ha-num">{rank}</text>
+						<rect x="166" y="20" width="34" height="34" rx="9" class="ha-b-chip"></rect>
+						<rect x="212" y="24" width="96" height="9" rx="4.5" class="ha-b-chip"></rect>
+						<rect x="212" y="41" width="60" height="9" rx="4.5" class="ha-b-soft2"></rect>
+						{[0, 1, 2, 3, 4].map((s) => (
+							<path class="ha-star" data-star={s} transform={`translate(${330 + s * 20} 37)`} d="M0 -7 L2.1 -2.2 L7 -2.2 L3 1 L4.5 6.2 L0 3.2 L-4.5 6.2 L-3 1 L-7 -2.2 L-2.1 -2.2 Z"></path>
+						))}
+						{rank === 1 && (
+							<g class="ha-badge" opacity="0">
+								<rect x="342" y="-12" width="96" height="24" rx="12" style="fill:var(--ha-acc)"></rect>
+								<text x="390" y="4" class="ha-badgetxt">Best for…</text>
+							</g>
+						)}
+					</g>
+				</g>
+			))}
+		</g>
+
+		<!-- 4 · Chatbot (APEX, Facet) -->
+		<g class="ha-scene" data-scene="3">
+			<g class="ha-it">
+				<path d={sq(90, 52, 380, 304, 16)} class="ha-surface ha-card"></path>
+				<circle cx="114" cy="78" r="5" style="fill:var(--ha-acc)"></circle>
+				<rect x="128" y="74" width="90" height="8" rx="4" class="ha-b-chip"></rect>
+				<line x1="90" y1="100" x2="470" y2="100" class="ha-hair"></line>
+			</g>
+			<g class="ha-it">
+				<g id="ha-user" opacity="0">
+					<rect x="262" y="118" width="186" height="48" rx="14" style="fill:var(--ha-acc)"></rect>
+					<rect x="278" y="132" width="150" height="8" rx="4" fill="#fff" opacity="0.9"></rect>
+					<rect x="278" y="147" width="96" height="8" rx="4" fill="#fff" opacity="0.9"></rect>
+				</g>
+			</g>
+			<g class="ha-it">
+				<g id="ha-typing" opacity="0">
+					<rect x="112" y="184" width="74" height="36" rx="14" class="ha-b-soft"></rect>
+					{[0, 1, 2].map((j) => <circle class="ha-tdot" cx={134 + j * 15} cy="202" r="4"></circle>)}
+				</g>
+				<g id="ha-bot" opacity="0">
+					<rect x="112" y="184" width="262" height="150" rx="14" class="ha-b-soft"></rect>
+					<rect x="128" y="200" width="200" height="8" rx="4" class="ha-b-chip"></rect>
+					<rect x="128" y="215" width="140" height="8" rx="4" class="ha-b-chip"></rect>
+					<line x1="130" y1="318" x2="356" y2="318" class="ha-hair"></line>
+					{[0, 1, 2, 3, 4, 5].map((j) => <rect class="ha-cbar" x={136 + j * 36} y="318" width="22" height="0" rx="4" data-h={[38, 56, 44, 72, 60, 84][j]} style={j === 5 ? 'fill:var(--ha-acc)' : ''}></rect>)}
+				</g>
+			</g>
+		</g>
+
+		<!-- 5 · SaaS dashboard, light and dark (Sonary Software Stack Manager) -->
+		<g class="ha-scene" data-scene="4" id="ha-dash">
+			<g class="ha-it">
+				<path d={sq(70, 56, 420, 296, 16)} class="ha-dbg"></path>
+				<path d={sq(70, 56, 96, 296, 16)} class="ha-dside"></path>
+				{[0, 1, 2, 3, 4].map((j) => <rect x="88" y={96 + j * 26} width={j === 0 ? 60 : 48} height="8" rx="4" class={j === 0 ? 'ha-dacc' : 'ha-dbar'}></rect>)}
+				<rect x="88" y="72" width="34" height="10" rx="5" class="ha-dacc"></rect>
+			</g>
+			<g class="ha-it">
+				{[0, 1, 2].map((j) => (
+					<g>
+						<rect x={186 + j * 92} y="104" width="80" height="54" rx="10" class="ha-dtile"></rect>
+						<rect x={198 + j * 92} y="118" width="36" height="7" rx="3.5" class="ha-dbar"></rect>
+						<rect x={198 + j * 92} y="134" width="52" height="11" rx="5.5" class={j === 0 ? 'ha-dacc' : 'ha-dink'}></rect>
+					</g>
+				))}
+			</g>
+			<g class="ha-it">
+				<line x1="190" y1="330" x2="466" y2="330" class="ha-dline"></line>
+				{[0, 1, 2, 3, 4, 5, 6].map((j) => <rect class="ha-dcol" x={196 + j * 38} y="330" width="24" height="0" rx="5" data-h={[60, 92, 74, 118, 96, 140, 120][j]} style={j % 3 === 2 ? '' : ''}></rect>)}
+			</g>
+			<g class="ha-it">
+				<rect x="418" y="70" width="48" height="24" rx="12" id="ha-track"></rect>
+				<circle cx="430" cy="82" r="9" id="ha-knob" fill="#fff"></circle>
+			</g>
+		</g>
+
+		<!-- Doodles: pencil-style, always floating -->
+		{doodles.map((list, k) => (
+			<g class="ha-doodles" data-scene={k}>
+				{list.map(([key, x, y, r, s, o, tag]) => (
+					<g class:list={['ha-d', { 'ha-o': o }]} data-x={x} data-y={y} data-r={r} data-s={s} data-i={di++} data-tag={tag}>
+						<g filter="url(#ha-pencil)" class="ha-ds" style="stroke-width:3.4" set:html={D[key]}></g>
+						<g transform="translate(.9 .7)" filter="url(#ha-pencil2)" class="ha-ds" style="stroke-width:1.4;opacity:.5" set:html={D[key]}></g>
+					</g>
+				))}
+				{texts.filter((t) => t[0] === k).map(([, txt, x, y, r, size, o]) => (
+					<g class="ha-d" data-x={x} data-y={y} data-r={r} data-s="1" data-i={di++}>
+						<text class:list={['ha-dt', { 'ha-o': o }]} font-size={size} filter="url(#ha-chalk)">{txt}</text>
+					</g>
+				))}
+			</g>
+		))}
+
+		<!-- Transition: the "AI" line sweeps across, background stays still -->
+		<g id="ha-sweep" opacity="0">
+			<rect x="-1" y="20" width="2" height="400" class="ha-scanfill"></rect>
+			<circle cx="0" cy="220" r="17" class="ha-scanfill"></circle>
+			<text x="0" y="224" class="ha-ai">AI</text>
+		</g>
+	</svg>
+	<div class="ha-dots" role="group" aria-label="Hero animation scenes">
+		{['From prompt to product', 'One system, several brands', 'Comparison', 'Chatbot', 'SaaS dashboard'].map((label, k) => (
+			<button type="button" class="ha-dot" data-go={k} aria-label={`Show scene ${k + 1}: ${label}`}></button>
+		))}
+	</div>
+</div>
+
+<script define:vars={{ PROMPT }}>
+	(() => {
+		const root = document.querySelector('[data-hero-anim]');
+		if (!root) return;
+		const svg = root.querySelector('svg');
+		const $ = (s) => svg.querySelector(s);
+		const $$ = (s) => Array.from(svg.querySelectorAll(s));
+		const N = 5, DUR = 6, TR = 0.8, LOOP = N * DUR;
+		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+		const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+		const io = (q) => (q < 0.5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2); // ease in-out
+		const out = (q) => 1 - Math.pow(1 - q, 3);
+		// Damped spring: soft start, long slow arrival, 2 to 3 px overshoot.
+		const spring = (q) => (q >= 1 ? 1 : 1 - Math.exp(-7 * q) * (Math.cos(6 * q) + (7 / 6) * Math.sin(6 * q)));
+		const mix = (a, b, m) => a.map((v, i) => Math.round(v + (b[i] - v) * m));
+		const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+		const rgb = (c) => `rgb(${c[0]},${c[1]},${c[2]})`;
+
+		const scenes = $$('.ha-scene').map((g) => ({ g, items: Array.from(g.querySelectorAll(':scope > .ha-it')) }));
+		const doodleSets = $$('.ha-doodles');
+		const doodles = $$('.ha-d').map((el) => ({ el, i: +el.dataset.i, x: +el.dataset.x, y: +el.dataset.y, r: +el.dataset.r, s: +el.dataset.s, tag: el.dataset.tag }));
+		const dots = Array.from(root.querySelectorAll('.ha-dot'));
+
+		// Slow, never-stopping float (time warp from the LinkedIn banner).
+		function float(i, T) {
+			const P = 2 * Math.PI, ph = (i * 2.39) % P, f = T / 11;
+			const tw = (k, a, o) => f * k + (a * Math.sin(P * f * k + o)) / P;
+			return { dx: 5 * Math.sin(P * tw(1, 0.8, ph) + ph), dy: 3.5 * Math.sin(P * tw(i % 2 ? 2 : 1, 0.8, ph + 1) + ph + 1.7), dr: 2.5 * Math.sin(P * tw(i % 3 ? 1 : 2, 0.8, ph + 2) + ph + 0.9) };
+		}
+
+		// ---- Scene 1
+		const ptext = $('#ha-ptext'), caret = $('#ha-caret'), scan = $('#ha-scan');
+		const clipUI = $('#ha-clip-ui-r'), clipW = $('#ha-clip-wire-r');
+		const cur = $('#ha-cur'), curLines = $('#ha-cur-lines');
+		const typeAt = [];
+		let acc = 0.3;
+		for (let k = 0; k < PROMPT.length; k++) { acc += 0.038 + 0.03 * Math.abs(Math.sin(k * 12.9898) * 43758.5453 % 1); if (PROMPT[k] === ' ') acc += 0.03; typeAt.push(acc); }
+		const typeEnd = acc;
+		let lastN = -1, caretX = 84;
+		const sx = (s) => 70 + 420 * io(clamp((s - 2.3) / 2.5));
+		const curPos = (s) => {
+			const q = clamp((s - 3.55) / 1.1);
+			const e = spring(q);
+			const x = 398 + (244 - 398) * e;
+			const y = 238 - 64 * Math.sin(Math.PI * clamp(q * 1.25));
+			return [x, y, 90 * e];
+		};
+		function scene1(s, T) {
+			const n = typeAt.filter((v) => v <= s).length;
+			if (n !== lastN) { ptext.textContent = PROMPT.slice(0, n); caretX = 84 + (n ? ptext.getComputedTextLength() + 2 : 0); caret.setAttribute('x', caretX); lastN = n; }
+			caret.style.opacity = s < typeEnd + 0.2 ? 1 : (Math.floor((s - typeEnd) / 0.53) % 2 ? 0 : 1);
+			const x = sx(s);
+			clipUI.setAttribute('width', Math.max(0, x - 66));
+			clipW.setAttribute('x', x);
+			clipW.setAttribute('width', Math.max(0, 494 - x));
+			scan.setAttribute('transform', `translate(${x} 0)`);
+			scan.setAttribute('opacity', clamp((s - 2.0) / 0.3) * (1 - clamp((s - 5.0) / 0.4)));
+			const f = float(40, T);
+			const [cx, cy, cr] = curPos(s), [ax, ay] = curPos(s - 0.03), [bx, by] = curPos(s + 0.03);
+			cur.setAttribute('transform', `translate(${cx + f.dx} ${cy + f.dy}) rotate(${cr + f.dr})`);
+			let vx = bx - ax, vy = by - ay; const sp = Math.hypot(vx, vy);
+			if (sp > 1.2) {
+				vx /= sp; vy /= sp; const k = Math.min(1, sp / 12), px = -vy, py = vx;
+				curLines.innerHTML = [[-7, 14], [0, 22], [7, 12]].map(([o, L]) => { const x0 = cx + 8 - vx * 16 + px * o, y0 = cy + 8 - vy * 16 + py * o; return `<path d="M${x0} ${y0} L${x0 - vx * L * k} ${y0 - vy * L * k}" style="opacity:${(0.75 * k).toFixed(2)}"/>`; }).join('');
+			} else if (curLines.firstChild) curLines.innerHTML = '';
+		}
+
+		// ---- Scene 2
+		const s2 = scenes[1].g, logo = $('#ha-logo'), btns = $$('.ha-btn');
+		const brands = [{ c: hex('#f25c24'), w: 70, r: 12 }, { c: hex('#2f6feb'), w: 54, r: 5 }, { c: hex('#c2367a'), w: 86, r: 8 }];
+		function scene2(s) {
+			const m1 = io(clamp((s - 2) / 0.6)), m2 = io(clamp((s - 4) / 0.6));
+			const a = brands[0], b = brands[1], c = brands[2];
+			const col = m2 > 0 ? mix(b.c, c.c, m2) : mix(a.c, b.c, m1);
+			const w = m2 > 0 ? b.w + (c.w - b.w) * m2 : a.w + (b.w - a.w) * m1;
+			const r = m2 > 0 ? b.r + (c.r - b.r) * m2 : a.r + (b.r - a.r) * m1;
+			s2.style.setProperty('--ha-b', rgb(col));
+			logo.setAttribute('width', w.toFixed(1));
+			btns.forEach((el) => el.setAttribute('rx', r.toFixed(1)));
+		}
+
+		// ---- Scene 3
+		const cards = $$('.ha-rank').map((g) => ({ g, rank: +g.dataset.rank, stars: Array.from(g.querySelectorAll('.ha-star')), badge: g.querySelector('.ha-badge') }));
+		const startSlot = { 2: 0, 3: 1, 1: 2 };
+		function scene3(s) {
+			cards.forEach((c, i) => {
+				const q = io(clamp((s - 1.2 - i * 0.08) / 0.8));
+				const from = 70 + startSlot[c.rank] * 90, to = 70 + (c.rank - 1) * 90;
+				const y = from + (to - from) * q;
+				c.g.setAttribute('transform', `translate(${(c.rank === 1 ? -10 : 6) * Math.sin(Math.PI * q)} ${y})`);
+				const n = 6 - c.rank;
+				c.stars.forEach((st, j) => {
+					const p = j < n ? out(clamp((s - 2.3 - j * 0.12 - (c.rank - 1) * 0.15) / 0.3)) : 0;
+					st.style.fill = p > 0.5 ? 'var(--ha-acc)' : '';
+					st.setAttribute('transform', `translate(${330 + j * 20} 37) scale(${0.85 + 0.15 * (p > 0 ? p : 1) + (p > 0 && p < 1 ? 0.15 * Math.sin(Math.PI * p) : 0)})`);
+				});
+				if (c.badge) { const b = clamp((s - 3.9) / 0.4); c.badge.setAttribute('opacity', b); c.badge.setAttribute('transform', `translate(390 0) scale(${0.9 + 0.1 * out(b)}) translate(-390 0)`); }
+			});
+		}
+
+		// ---- Scene 4
+		const user = $('#ha-user'), typing = $('#ha-typing'), bot = $('#ha-bot'), tdots = $$('.ha-tdot'), cbars = $$('.ha-cbar');
+		function scene4(s) {
+			const u = out(clamp((s - 0.4) / 0.45));
+			user.setAttribute('opacity', u); user.setAttribute('transform', `translate(0 ${8 * (1 - u)})`);
+			const ty = clamp((s - 1.2) / 0.3) * (1 - clamp((s - 2.6) / 0.25));
+			typing.setAttribute('opacity', ty);
+			tdots.forEach((d, j) => d.setAttribute('transform', `translate(0 ${-3.5 * Math.max(0, Math.sin(2 * Math.PI * (s * 1.5 - j * 0.16)))})`));
+			const b = out(clamp((s - 2.75) / 0.45));
+			bot.setAttribute('opacity', b); bot.setAttribute('transform', `translate(0 ${8 * (1 - b)})`);
+			cbars.forEach((r, j) => { const h = +r.dataset.h * out(clamp((s - 3.1 - j * 0.12) / 0.5)); r.setAttribute('y', 318 - h); r.setAttribute('height', h); });
+		}
+
+		// ---- Scene 5
+		const dash = scenes[4].g, track = $('#ha-track'), knob = $('#ha-knob'), dcols = $$('.ha-dcol');
+		const L5 = { bg: hex('#ffffff'), side: hex('#eef1f6'), bar: hex('#c9cfdb'), ink: hex('#1d2334'), tile: hex('#f4f6fa'), line: hex('#d7dce6') };
+		const D5 = { bg: hex('#151a28'), side: hex('#1d2334'), bar: hex('#2e3650'), ink: hex('#eef0f4'), tile: hex('#1d2334'), line: hex('#2e3650') };
+		const sun = doodles.filter((d) => d.tag === 'sun'), moon = doodles.filter((d) => d.tag === 'moon');
+		function scene5(s) {
+			const m = io(clamp((s - 2.6) / 0.6));
+			for (const k of Object.keys(L5)) dash.style.setProperty(`--d-${k}`, rgb(mix(L5[k], D5[k], m)));
+			track.style.fill = rgb(mix(hex('#c9cfdb'), hex('#f25c24'), m));
+			knob.setAttribute('cx', 430 + 24 * io(clamp((s - 2.6) / 0.45)));
+			dcols.forEach((r, j) => { const h = +r.dataset.h * out(clamp((s - 0.3 - j * 0.08) / 0.6)) * (1 - 0.12 * Math.sin(Math.PI * clamp((s - 2.6 - j * 0.04) / 0.6))); r.setAttribute('y', 330 - h); r.setAttribute('height', h); r.style.fill = j === 5 || j === 3 ? 'var(--ha-acc)' : `var(--d-bar)`; });
+			sun.forEach((d) => (d.el.style.opacity = 1 - m));
+			moon.forEach((d) => (d.el.style.opacity = m));
+		}
+		const update = [scene1, scene2, scene3, scene4, scene5];
+
+		// ---- Timeline
+		const sweep = $('#ha-sweep');
+		let t = 0.5, last = null, hover = false, onScreen = true, raf = 0;
+		function render() {
+			const T = t;
+			let current = 0;
+			scenes.forEach((sc, k) => {
+				let s = ((T - k * DUR) % LOOP + LOOP) % LOOP;
+				if (s > LOOP - TR) s -= LOOP; // entering just before its start
+				const active = s > -TR / 2 && s < DUR + TR / 2;
+				sc.g.style.display = active ? '' : 'none';
+				doodleSets[k].style.display = active ? '' : 'none';
+				if (!active) return;
+				if (s >= 0 && s < DUR) current = k;
+				const e = clamp((s + TR / 2) / TR), x = clamp((s - (DUR - TR / 2)) / TR);
+				const n = sc.items.length;
+				sc.items.forEach((it, j) => {
+					const qe = io(clamp((e * TR - j * 0.06) / (TR - (n - 1) * 0.06 || TR)));
+					const qx = io(clamp((x * TR - j * 0.06) / (TR - (n - 1) * 0.06 || TR)));
+					it.style.opacity = qe * (1 - qx);
+					it.setAttribute('transform', `translate(${24 * (1 - qe) - 24 * qx} 0)`);
+				});
+				const vis = io(e) * (1 - io(x));
+				doodleSets[k].style.opacity = vis;
+				update[k](s, T);
+			});
+			doodles.forEach((d) => {
+				if (d.el.closest('.ha-doodles').style.display === 'none') return;
+				const f = float(d.i, T);
+				d.el.setAttribute('transform', `translate(${d.x + f.dx} ${d.y + f.dy}) rotate(${d.r + f.dr}) scale(${d.s})`);
+			});
+			const w = (T + TR / 2) % DUR;
+			if (w < TR && !reduce.matches) { sweep.setAttribute('opacity', Math.sin(Math.PI * w / TR)); sweep.setAttribute('transform', `translate(${-30 + 620 * io(w / TR)} 0)`); }
+			else sweep.setAttribute('opacity', 0);
+			dots.forEach((d, k) => d.setAttribute('aria-current', k === current ? 'true' : 'false'));
+		}
+		function frame(now) {
+			raf = 0;
+			if (last != null) t = (t + Math.min(0.05, (now - last) / 1000)) % LOOP;
+			last = now;
+			render();
+			schedule();
+		}
+		function schedule() {
+			if (raf || reduce.matches || hover || !onScreen || document.hidden) { last = null; return; }
+			raf = requestAnimationFrame(frame);
+		}
+		root.addEventListener('mouseenter', () => { hover = true; });
+		root.addEventListener('mouseleave', () => { hover = false; schedule(); });
+		document.addEventListener('visibilitychange', schedule);
+		new IntersectionObserver((es) => { onScreen = es[0].isIntersecting; schedule(); }).observe(root);
+		dots.forEach((d) => d.addEventListener('click', () => { t = +d.dataset.go * DUR + (reduce.matches ? 5.6 : TR / 2 + 0.01); render(); schedule(); }));
+		// Reduced motion: scene 1, still, finished state.
+		if (reduce.matches) t = 5.6;
+		render();
+		schedule();
+	})();
+</script>
+
+<style>
+	@font-face {
+		font-family: 'Caveat';
+		src: url('/fonts/caveat/caveat-latin-600-normal.woff2') format('woff2');
+		font-weight: 600;
+		font-display: swap;
+	}
+	.ha {
+		--ha-acc: #f25c24;
+		--ha-surface: #ffffff;
+		--ha-soft: #eef1f6;
+		--ha-chip: #d9dee8;
+		--ha-soft2: #e6eaf1;
+		--ha-line: #9aa3b8;
+		--ha-ink: #5a6378;
+		--ha-text: #1d2334;
+		--ha-scan: #1d2334;
+		--ha-scan-ink: #ffffff;
+		--ha-grid: #e3e7ef;
+		--ha-stroke: rgba(29, 35, 52, 0.12);
+		position: relative;
+		width: 100%;
+	}
+	:global(:root[data-theme='dark']) .ha {
+		--ha-surface: #151a28;
+		--ha-soft: #1d2334;
+		--ha-chip: #2e3650;
+		--ha-soft2: #262d42;
+		--ha-line: #7380ab;
+		--ha-ink: #b8bdc8;
+		--ha-text: #eef0f4;
+		--ha-scan: #eef1f7;
+		--ha-scan-ink: #0d101a;
+		--ha-grid: #1a2131;
+		--ha-stroke: rgba(255, 255, 255, 0.12);
+	}
+	.ha-svg {
+		display: block;
+		width: 100%;
+		height: auto;
+		overflow: visible;
+	}
+	.ha-gridline { stroke: var(--ha-grid); stroke-width: 1; }
+	.ha-surface { fill: var(--ha-surface); }
+	.ha-card { stroke: var(--ha-stroke); stroke-width: 1.2; }
+	.ha-b-soft { fill: var(--ha-soft); }
+	.ha-b-chip { fill: var(--ha-chip); }
+	.ha-b-soft2 { fill: var(--ha-soft2); }
+	.ha-b-acc { fill: var(--ha-acc); }
+	.ha-hair { stroke: var(--ha-stroke); stroke-width: 1.2; }
+	.ha-wire path { fill: none; stroke: var(--ha-line); stroke-width: 1.6; stroke-dasharray: 9 6; stroke-linecap: round; }
+	.ha-scanfill { fill: var(--ha-scan); }
+	.ha-ai { fill: var(--ha-scan-ink); font: 800 12px Manrope, sans-serif; text-anchor: middle; letter-spacing: 0.04em; }
+	.ha-ptext { fill: var(--ha-text); font: 500 15px Manrope, sans-serif; }
+	.ha-num { fill: var(--ha-text); font: 800 14px Manrope, sans-serif; text-anchor: middle; }
+	.ha-star { fill: var(--ha-chip); }
+	.ha-badgetxt { fill: #fff; font: 700 12px Manrope, sans-serif; text-anchor: middle; }
+	.ha-tdot { fill: var(--ha-ink); }
+	.ha-cbar { fill: var(--ha-chip); }
+	.ha-ds { fill: none; stroke: var(--ha-ink); stroke-linecap: round; stroke-linejoin: round; opacity: 0.85; }
+	.ha-o .ha-ds, .ha-o.ha-ds { stroke: var(--ha-acc); opacity: 0.95; }
+	.ha-d[data-tag='a'] .ha-ds:first-child { fill: #f25c24; }
+	.ha-d[data-tag='b'] .ha-ds:first-child { fill: #2f6feb; }
+	.ha-d[data-tag='c'] .ha-ds:first-child { fill: #c2367a; }
+	.ha-dt { font-family: 'Caveat', cursive; font-weight: 600; fill: var(--ha-ink); opacity: 0.9; }
+	.ha-dt.ha-o { fill: var(--ha-acc); }
+	/* Scene 5 keeps its own light / dark palette (it shows the switch). */
+	#ha-dash { --d-bg: #fff; --d-side: #eef1f6; --d-bar: #c9cfdb; --d-ink: #1d2334; --d-tile: #f4f6fa; --d-line: #d7dce6; }
+	.ha-dbg { fill: var(--d-bg); stroke: var(--ha-stroke); stroke-width: 1.2; }
+	.ha-dside { fill: var(--d-side); }
+	.ha-dbar { fill: var(--d-bar); }
+	.ha-dink { fill: var(--d-ink); }
+	.ha-dtile { fill: var(--d-tile); }
+	.ha-dline { stroke: var(--d-line); stroke-width: 1.2; }
+	.ha-dacc { fill: var(--ha-acc); }
+	.ha-dots {
+		display: flex;
+		justify-content: center;
+		gap: 4px;
+		margin-top: 8px;
+	}
+	/* 24 px hit area around an 8 px dot. */
+	.ha-dot {
+		width: 24px;
+		height: 24px;
+		border-radius: 999px;
+		display: grid;
+		place-items: center;
+	}
+	.ha-dot::before {
+		content: '';
+		width: 7px;
+		height: 7px;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--color-ink) 22%, transparent);
+		transition: width 300ms cubic-bezier(0.23, 1, 0.32, 1), background-color 300ms ease;
+	}
+	.ha-dot[aria-current='true']::before {
+		width: 20px;
+		background: var(--ha-acc);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.ha-dot::before { transition: none; }
+	}
+</style>

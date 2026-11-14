@@ -1,22 +1,32 @@
 ---
-const skills = [
-	'User Research & Usability Testing',
-	'A/B Testing, Personas, Journey Mapping',
-	'Design systems (variants, auto layout, nested components)',
-	'WCAG accessibility',
-	'AI-augmented workflow (Claude, ChatGPT, Midjourney, Figma AI, Adobe AI, Firefly)',
-	'HTML5 / CSS3 (Flexbox & Grid)',
-	'3D & motion (Cinema 4D, ZBrush, After Effects, SVGator)',
+// Home About block (CL2 étape 6, lot 1): David's validated paragraph, the
+// mentor note under it, then the skills already shown here, sorted into three
+// titled groups (none added, none removed). One skill fits none of the three
+// groups; it stays visible on its own line, as it was.
+const groups = [
+	{
+		title: 'Product & UX',
+		skills: ['User Research & Usability Testing', 'A/B Testing, Personas, Journey Mapping', 'WCAG accessibility'],
+	},
+	{
+		title: 'Design systems & build',
+		skills: ['Design systems (variants, auto layout, nested components)', 'HTML5 / CSS3 (Flexbox & Grid)'],
+	},
+	{
+		title: 'AI',
+		skills: ['AI-augmented workflow (Claude, ChatGPT, Midjourney, Figma AI, Adobe AI, Firefly)'],
+	},
 ];
+const ungrouped = ['3D & motion (Cinema 4D, ZBrush, After Effects, SVGator)'];
 ---
 
 <section id="about" class="mx-auto max-w-[1200px] px-6 py-20 sm:py-28 lg:px-0" data-reveal>
-	<div class="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
-		<div>
-		<p class="text-2xl font-medium leading-relaxed tracking-tight sm:text-3xl">
-			Product design across SaaS, fintech, iGaming and digital advertising. At Ryze Beyond, often the only
-			product designer on my projects, within a design team of 1 to 4, while the company grew from 32 to 110+
-			people, held together by an AI-augmented workflow.
+	<div class="max-w-3xl">
+		<p class="text-base leading-relaxed sm:text-lg">
+			I design products end to end, from research to shipped product, and today mostly AI products. My
+			experience spans SaaS, fintech and iGaming products, game interfaces, and complex systems built to stay
+			simple, like a multi-brand design system for ~40 verticals. At Ryze Beyond, the design team ranged from 1
+			to 4 people over the years, so I often owned my projects alone.
 		</p>
 		<div class="mt-8 border-l-2 border-accent pl-5">
 			<p class="font-semibold">Mentor at heart.</p>
@@ -26,22 +36,36 @@ const skills = [
 				with them.
 			</p>
 		</div>
-		</div>
-
-		<div>
-			<ul class="flex flex-col gap-4">
-				{
-					skills.map((skill) => (
-						<li class="flex items-start gap-3 text-muted">
-							<span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-							<span>{skill}</span>
-						</li>
-					))
-				}
-			</ul>
-			<a href="/about" class="mt-6 inline-block text-sm font-semibold text-accent-text hover:underline">
-				More about me →
-			</a>
-		</div>
 	</div>
+
+	<div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+		{
+			groups.map((g) => (
+				<div class="rounded-lg border border-ink/10 bg-card p-6">
+					<h3 class="text-sm font-semibold uppercase tracking-widest text-muted">{g.title}</h3>
+					<ul class="mt-4 flex flex-col gap-3">
+						{g.skills.map((skill) => (
+							<li class="flex items-start gap-3">
+								<span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+								<span>{skill}</span>
+							</li>
+						))}
+					</ul>
+				</div>
+			))
+		}
+	</div>
+	<ul class="mt-6 flex flex-col gap-3">
+		{
+			ungrouped.map((skill) => (
+				<li class="flex items-start gap-3 text-muted">
+					<span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+					<span>{skill}</span>
+				</li>
+			))
+		}
+	</ul>
+	<a href="/about" class="mt-6 inline-block text-sm font-semibold text-accent-text hover:underline">
+		More about me →
+	</a>
 </section>

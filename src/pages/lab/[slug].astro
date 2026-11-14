@@ -50,6 +50,7 @@ const projectJsonLd = {
 
 const ds = project.designSystem;
 import MasonryGallery from '../../components/MasonryGallery.astro';
+import Lightbox from '../../components/Lightbox.astro';
 ---
 
 <Layout
@@ -298,6 +299,11 @@ import MasonryGallery from '../../components/MasonryGallery.astro';
 							alt={`${project.title}: screenshot ${i + 1}`}
 							loading={i === 0 ? 'eager' : 'lazy'}
 							class="h-auto w-full object-cover"
+							data-lb
+							data-lb-kind="desktop"
+							tabindex="0"
+							role="button"
+							aria-label={`${project.title}: open screenshot ${i + 1} full size`}
 						/>
 					</div>
 				))
@@ -360,6 +366,7 @@ import MasonryGallery from '../../components/MasonryGallery.astro';
 	</section>
 
 	</main>
+	<Lightbox />
 	<Footer />
 </Layout>
 
@@ -438,6 +445,9 @@ import MasonryGallery from '../../components/MasonryGallery.astro';
 		color: var(--color-ink);
 	}
 	.ds-list li {
+		/* Long file paths (e.g. /demo/otium/media/CREDITS.txt) may break so the
+		   list never widens the page (Otium at 768 px, CL2 14/11). */
+		overflow-wrap: anywhere;
 		font-size: 0.9375rem;
 		line-height: 1.55;
 		margin-top: 0.5rem;

@@ -1,17 +1,28 @@
 ---
+import HeroAnimation from './HeroAnimation.astro';
 ---
 
-<section class="mx-auto max-w-[1200px] px-6 pt-10 pb-12 sm:pt-12 sm:pb-16 lg:px-0" data-reveal>
+<section class="mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-10 px-6 pt-10 pb-12 sm:pt-12 sm:pb-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] lg:gap-12 lg:px-0" data-reveal>
+	<div>
 	<p class="text-sm font-semibold uppercase tracking-widest text-muted">
-		Senior AI Product Designer
+		Product Design · UX/UI
 	</p>
 
-	<h1 class="mt-4 max-w-4xl text-[1.8rem] min-[374px]:text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
-		Product designer shipping <span class="whitespace-nowrap"><span class="text-accent whitespace-nowrap">AI-native</span> products.</span>
+	<h1 class="mt-4 max-w-4xl text-[1.8rem] min-[374px]:text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl">
+		Senior <span class="text-accent">AI</span> Product Designer
 	</h1>
 
+	<!-- Specialties, laid out as on the LinkedIn banner: the first on its own
+	     line, then the two others with a round orange separator, twice a text
+	     dot (CL2 phase D). The dot stays with "Web & Mobile". -->
+	<p class="mt-4 text-base font-semibold leading-relaxed text-muted sm:text-lg">
+		<span class="block">AI Features &amp; Chatbots</span>
+		<span>Multi-brand Design Systems</span>
+		<span class="whitespace-nowrap"><span class="mx-3 inline-block size-2 rounded-full bg-accent align-middle" aria-hidden="true"></span>Web &amp; Mobile</span>
+	</p>
+
 	<p class="mt-4 max-w-xl text-lg text-muted">
-		I design SaaS, fintech and gaming products, from user research to shipped design systems,
+		Product designer shipping AI-native products. I design SaaS, fintech and gaming products, from user research to shipped design systems,
 		and now build AI products end to end.
 	</p>
 
@@ -66,5 +77,12 @@
 				or download .docx
 			</a>
 		</p>
+	</div>
+	</div>
+
+	<!-- Decorative animation: beside the text on desktop, under it (smaller)
+	     on phones; the text stays what you read first. -->
+	<div class="mx-auto w-full max-w-[420px] lg:max-w-none">
+		<HeroAnimation />
 	</div>
 </section>

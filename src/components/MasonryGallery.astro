@@ -1,16 +1,16 @@
 ---
 // The one gallery for phone captures (project and Lab pages) and for narrow
-// desktop items such as email templates (CL2, 13/11).
-// - Every image is shown whole: no crop, no object-fit, no fixed height.
-//   Width follows the column, height follows the image.
-// - The image touches the edges of its card (rounded corners kept); the
-//   frame of light captures is a ring drawn outside the image.
-// - Never shown wider than its own pixels; srcset serves sharp 1x/2x files.
-// - Masonry: 4 columns on desktop, 2 on tablets, 1 on phones (more only when
-//   a column would be wider than the images). In gallery order, each card
-//   goes into the shortest column; everything starts on the left.
-// - Wide compositions (wider than tall) follow under the columns, each on
-//   its own row, left-aligned, at most their own width.
+// desktop items such as email templates. Every image opens full size in the
+// viewer (Lightbox.astro).
+// layout="phone" (CL2, étape 5): identical cases shaped like a phone screen
+//   (375:800), showing the TOP of each capture with a clean cut at the bottom;
+//   4 columns on desktop, 2 on tablets, 1 on phones, left-aligned. A case is
+//   never wider than the narrowest capture of its gallery, so nothing is
+//   ever enlarged.
+// layout="masonry" (email templates): each image whole, in the shortest
+//   column, 4 / 2 / 1 columns, never wider than its own pixels.
+// Wide compositions (wider than tall) follow under the cases, each on its
+// own row, left-aligned, at most their own width.
 import { imageSizes } from '../data/imageSizes';
 import { cld, sizeOf, shotSrc, shotSrcset } from '../lib/cloudinary';
 
@@ -19,11 +19,19 @@ interface Props {
 	alt: string;
 	framed?: boolean;
 	priority?: boolean;
+	layout?: 'phone' | 'masonry';
+	/** Kind given to the viewer: phone captures show at phone width. */
+	kind?: 'mobile' | 'desktop';
 }
-const { urls, alt, framed = true, priority = false } = Astro.props;
+const { urls, alt, framed = true, priority = false, layout = 'phone', kind = 'mobile' } = Astro.props;
 const items = urls.map((url) => ({ url, size: sizeOf(url, imageSizes) }));
 const tall = items.filter((i) => !i.size || i.size[0] <= i.size[1]);
 const wide = items.filter((i) => i.size && i.size[0] > i.size[1]);
+const caseMax = Math.min(...tall.map((i) => (i.size ? i.size[0] : 375)));
+// File opened in the viewer: up to 750 px wide for a phone capture (sharp
+// at phone width on HD screens), the usual full preset otherwise.
+const lbSrc = (url: string, k: string) =>
+	!url.includes('/upload/') ? url : cld(url, k === 'mobile' ? 'c_limit,w_750,q_100,f_auto,fl_progressive' : 'c_limit,w_2000,q_100,f_auto,fl_progressive');
 const wideSrcset = (url: string, w: number) =>
 	url.includes('/upload/')
 		? [1200, 1600, 2000]
@@ -35,7 +43,33 @@ const wideSrcset = (url: string, w: number) =>
 ---
 
 {
-	tall.length > 0 && (
+	layout === 'phone' && tall.length > 0 && (
+		<div class="pg" style={`--pg-max: ${caseMax}px`}>
+			{tall.map(({ url, size }, i) => (
+				<figure class:list={['pg-card', { 'mg-framed': framed }]}>
+					<img
+						src={shotSrc(url, size)}
+						srcset={shotSrcset(url, size)}
+						sizes="(min-width: 1024px) 282px, (min-width: 640px) 348px, 100vw"
+						width={size?.[0]}
+						height={size?.[1]}
+						alt={alt}
+						loading={priority && i < 2 ? 'eager' : 'lazy'}
+						decoding="async"
+						data-lb
+						data-lb-kind={kind}
+						data-lb-src={lbSrc(url, kind)}
+						tabindex="0"
+						role="button"
+						aria-label={`${alt}: open capture ${i + 1} full size`}
+					/>
+				</figure>
+			))}
+		</div>
+	)
+}
+{
+	layout === 'masonry' && tall.length > 0 && (
 		<div class="mg" data-mg>
 			{tall.map(({ url, size }, i) => (
 				<figure
@@ -53,6 +87,12 @@ const wideSrcset = (url: string, w: number) =>
 						alt={alt}
 						loading={priority && i < 2 ? 'eager' : 'lazy'}
 						decoding="async"
+						data-lb
+						data-lb-kind={kind}
+						data-lb-src={lbSrc(url, kind)}
+						tabindex="0"
+						role="button"
+						aria-label={`${alt}: open image ${i + 1} full size`}
 					/>
 				</figure>
 			))}
@@ -119,6 +159,12 @@ const wideSrcset = (url: string, w: number) =>
 					alt={alt}
 					loading="lazy"
 					decoding="async"
+					data-lb
+					data-lb-kind="desktop"
+					data-lb-src={lbSrc(url, 'desktop')}
+					tabindex="0"
+					role="button"
+					aria-label={`${alt}: open image full size`}
 				/>
 			))}
 		</div>
@@ -138,6 +184,31 @@ const wideSrcset = (url: string, w: number) =>
 	}
 	@media (min-width: 1024px) {
 		.mg { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+	}
+	/* Phone cases: same size everywhere, top of the capture, clean cut. */
+	.pg {
+		display: grid;
+		grid-template-columns: minmax(0, var(--pg-max));
+		justify-content: start;
+		gap: 24px;
+	}
+	@media (min-width: 640px) {
+		.pg { grid-template-columns: repeat(2, minmax(0, var(--pg-max))); }
+	}
+	@media (min-width: 1024px) {
+		.pg { grid-template-columns: repeat(4, minmax(0, var(--pg-max))); }
+	}
+	.pg-card {
+		margin: 0;
+		aspect-ratio: 375 / 800;
+		overflow: hidden;
+		border-radius: 12px;
+		background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+	}
+	.pg-card > img {
+		display: block;
+		width: 100%;
+		height: auto;
 	}
 	.mg.is-laid {
 		display: block;

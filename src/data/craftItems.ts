@@ -18,7 +18,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Hard-surface study of a two-seat body with an exposed intake spine. Lighting kept deliberately flat so the panel breaks carry the form.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345911/portfolio/old-wix/3d/3d-03.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345911/portfolio/old-wix/3d/3d-03.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -27,7 +27,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Rear three-quarter, framed to show how the roofline resolves into the wheel arch.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345920/portfolio/old-wix/3d/3d-09.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345920/portfolio/old-wix/3d/3d-09.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -36,7 +36,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `The same shell in black. Stripping the colour puts the whole read on the highlights and the gap lines.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345933/portfolio/old-wix/3d/3d-18.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345933/portfolio/old-wix/3d/3d-18.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -45,7 +45,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `The angle that sells a car: three-quarter front, low horizon, wheels turned just enough to show the arch.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345937/portfolio/old-wix/3d/3d-20.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345937/portfolio/old-wix/3d/3d-20.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -54,7 +54,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Chrome bodyshell over a suspension built rather than faked: springs, dampers and linkages all modelled.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345914/portfolio/old-wix/3d/3d-05.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345914/portfolio/old-wix/3d/3d-05.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -63,7 +63,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Shot from the dirt so the tyres dominate the frame, with an open sky to throw the chrome into contrast.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345926/portfolio/old-wix/3d/3d-13.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345926/portfolio/old-wix/3d/3d-13.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -72,7 +72,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Anatomy pass on a bipedal reptile. Scales sculpted as overlapping plates instead of a tiled texture.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345912/portfolio/old-wix/3d/3d-04.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345912/portfolio/old-wix/3d/3d-04.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -81,7 +81,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Closer crop onto the head and shoulder mass, where the plate layering has to survive the light.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345929/portfolio/old-wix/3d/3d-15.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345929/portfolio/old-wix/3d/3d-15.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -90,7 +90,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Three-quarter portrait with a rim light along the jaw to lift the silhouette off the background.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345931/portfolio/old-wix/3d/3d-16.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345931/portfolio/old-wix/3d/3d-16.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -99,7 +99,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Enclosed twin-rotor bike. Clean white surfacing on black, lit to keep the intake shapes readable.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345943/portfolio/old-wix/3d/3d-24.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345943/portfolio/old-wix/3d/3d-24.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -108,7 +108,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Speed pass on a charging creature: the form deliberately half-lost in the smear, lit from inside the frame.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345909/portfolio/old-wix/3d/3d-02.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345909/portfolio/old-wix/3d/3d-02.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -117,7 +117,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Turbine and tether rig close up, with the cockpit sled trailing behind on its cables.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345938/portfolio/old-wix/3d/3d-21.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345938/portfolio/old-wix/3d/3d-21.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -126,7 +126,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Untextured clay pass. At this stage the only thing that matters is whether the muscle groups hold together.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345935/portfolio/old-wix/3d/3d-19.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345935/portfolio/old-wix/3d/3d-19.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -135,7 +135,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Panelled casing inside its retaining ring, with decals worn back to keep it from looking freshly built.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345941/portfolio/old-wix/3d/3d-23.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345941/portfolio/old-wix/3d/3d-23.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -144,7 +144,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Rear view onto the four exhausts, where all the mechanical detail of the piece is concentrated.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345944/portfolio/old-wix/3d/3d-25.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345944/portfolio/old-wix/3d/3d-25.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -153,7 +153,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Sculpt pass on a horned head. The horns are modelled as one continuous sweep so they read as grown, not attached.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345916/portfolio/old-wix/3d/3d-06.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345916/portfolio/old-wix/3d/3d-06.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -162,7 +162,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Full figure, symmetrical stance, cape falling straight so the proportions can be checked against the centre line.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345919/portfolio/old-wix/3d/3d-08.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345919/portfolio/old-wix/3d/3d-08.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -171,7 +171,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Turned into a walk, where the cape stops being a flat plane and has to behave like cloth.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345923/portfolio/old-wix/3d/3d-11.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345923/portfolio/old-wix/3d/3d-11.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -180,7 +180,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Product-style render on white. The guard and pommel carry the detail; the blade stays plain to hold the light.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345924/portfolio/old-wix/3d/3d-12.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345924/portfolio/old-wix/3d/3d-12.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -189,7 +189,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Two eyes, one turned away. Sclera, iris depth and the wet edge of the cornea are the whole exercise.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345939/portfolio/old-wix/3d/3d-22.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345939/portfolio/old-wix/3d/3d-22.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -198,7 +198,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `The angle that tests the horn silhouette, and where the brow and cheek planes have to resolve.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345917/portfolio/old-wix/3d/3d-07.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345917/portfolio/old-wix/3d/3d-07.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -207,7 +207,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Wide shot across the dunes. The vehicle sits small in frame on purpose: the landscape is the speed.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345932/portfolio/old-wix/3d/3d-17.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345932/portfolio/old-wix/3d/3d-17.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -216,7 +216,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `The energy tether between the two engines, which is what makes the whole rig read as one machine.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345908/portfolio/old-wix/3d/3d-01.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345908/portfolio/old-wix/3d/3d-01.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -225,7 +225,7 @@ export const craftItems: CraftItem[] = [
 		year: '2014',
 		category: '3D',
 		description: `Straight down the line at full tilt, motion blur pulled through the background to a low sun.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785345928/portfolio/old-wix/3d/3d-14.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785345928/portfolio/old-wix/3d/3d-14.webp',
 		tags: ['3D', 'ZBrush', 'Cinema 4D'],
 	},
 	{
@@ -234,7 +234,7 @@ export const craftItems: CraftItem[] = [
 		year: '2013',
 		category: 'Digital Painting',
 		description: `Sixteen expressions painted as a single family: consistent light, consistent gloss, distinct at small sizes.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785346035/portfolio/old-wix/digital-painting/digital-painting-01.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785346035/portfolio/old-wix/digital-painting/digital-painting-01.webp',
 		tags: ['Digital Art', 'Painting'],
 	},
 	{
@@ -243,7 +243,7 @@ export const craftItems: CraftItem[] = [
 		year: '2013',
 		category: 'Digital Painting',
 		description: `Likeness work in digital paint. It stands or falls on the asymmetry of a real face, not on rendering skin.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785346036/portfolio/old-wix/digital-painting/digital-painting-02.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785346036/portfolio/old-wix/digital-painting/digital-painting-02.webp',
 		tags: ['Digital Art', 'Painting'],
 	},
 	{
@@ -252,7 +252,7 @@ export const craftItems: CraftItem[] = [
 		year: '2013',
 		category: 'Digital Painting',
 		description: `The same painting at three stages: sketch and colour choice, mixing, then texture and finish.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785346037/portfolio/old-wix/digital-painting/digital-painting-03.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785346037/portfolio/old-wix/digital-painting/digital-painting-03.webp',
 		tags: ['Digital Art', 'Painting'],
 	},
 	{
@@ -261,7 +261,7 @@ export const craftItems: CraftItem[] = [
 		year: '2013',
 		category: 'Digital Painting',
 		description: `Sphere, ice and metal on one gradient: a test of how three surfaces handle the same single light.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785346039/portfolio/old-wix/digital-painting/digital-painting-04.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785346039/portfolio/old-wix/digital-painting/digital-painting-04.webp',
 		tags: ['Digital Art', 'Painting'],
 	},
 	{
@@ -270,7 +270,7 @@ export const craftItems: CraftItem[] = [
 		year: '2013',
 		category: 'Digital Painting',
 		description: `The finished piece from the breakdown. White on black, where every petal edge has to be found in value alone.`,
-		image: 'https://res.cloudinary.com/akael/image/upload/v1785346040/portfolio/old-wix/digital-painting/digital-painting-05.webp',
+		image: 'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785346040/portfolio/old-wix/digital-painting/digital-painting-05.webp',
 		tags: ['Digital Art', 'Painting'],
 	},
 

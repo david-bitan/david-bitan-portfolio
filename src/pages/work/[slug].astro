@@ -4,6 +4,7 @@ import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import ZoneFilters from '../../components/ZoneFilters.astro';
 import MasonryGallery from '../../components/MasonryGallery.astro';
+import Lightbox from '../../components/Lightbox.astro';
 import { imageSizes } from '../../data/imageSizes';
 import { allProjects } from '../../data/allProjects';
 import { cld, FULL, LANDSCAPE, landscapeSrcset, sizeOf } from '../../lib/cloudinary';
@@ -306,7 +307,8 @@ const projectJsonLd: Record<string, unknown> = {
 							// Phone captures: one masonry gallery for the whole site
 							// (components/MasonryGallery.astro). Dark mockups have no frame.
 							<div class="mt-12">
-								<MasonryGallery urls={zone.images.map((i) => i.url)} alt={project.title} framed={!isDarkZone} priority={zoneIdx === 0} />
+								{/* Sonary Mailer keeps its email layout (David, étape 5): masonry. */}
+								<MasonryGallery urls={zone.images.map((i) => i.url)} alt={project.title} framed={!isDarkZone} priority={zoneIdx === 0} layout={project.slug === 'sonary-mailer' ? 'masonry' : 'phone'} />
 							</div>
 						) : zone.label === 'Other' ? (
 							// Fallback for unclassified images. No bg wrapper
@@ -324,6 +326,12 @@ const projectJsonLd: Record<string, unknown> = {
 											loading="lazy"
 											fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
 											class="mx-auto block h-auto max-h-[720px] w-auto max-w-full rounded-lg object-contain shadow-md ring-1 ring-ink/15"
+											data-lb
+											data-lb-kind="desktop"
+											data-lb-src={cld(url, FULL)}
+											tabindex="0"
+											role="button"
+											aria-label={`${project.title}: open image full size`}
 											onload="this.parentElement.classList.add('is-loaded')"
 											onerror="this.parentElement.classList.add('is-loaded')"
 										/>
@@ -358,6 +366,12 @@ const projectJsonLd: Record<string, unknown> = {
 												loading="lazy"
 												fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
 												class={'block h-auto w-full' + (isDarkZone ? '' : ' border border-ink/15 shadow-md')}
+												data-lb
+												data-lb-kind="desktop"
+												data-lb-src={cld(url, FULL)}
+												tabindex="0"
+												role="button"
+												aria-label={`${project.title}: open image full size`}
 												onload="this.parentElement.classList.add('is-loaded')"
 												onerror="this.parentElement.classList.add('is-loaded')"
 											/>
@@ -386,7 +400,7 @@ const projectJsonLd: Record<string, unknown> = {
 								<div class:list={['narrow-masonry', { 'mt-10': zone.images.some(({ url }) => !isNarrow(url)) }]} data-desktop-narrow-grid></div>
 								{zone.images.some(({ url }) => isNarrow(url)) && (
 									<div class:list={{ 'mt-10': zone.images.some(({ url }) => !isNarrow(url)) }}>
-										<MasonryGallery urls={zone.images.filter(({ url }) => isNarrow(url)).map((i) => i.url)} alt={project.title} framed={!isDarkZone} />
+										<MasonryGallery urls={zone.images.filter(({ url }) => isNarrow(url)).map((i) => i.url)} alt={project.title} framed={!isDarkZone} layout="masonry" kind="desktop" />
 									</div>
 								)}
 							</div>
@@ -564,5 +578,6 @@ const projectJsonLd: Record<string, unknown> = {
 	</script>
 
 	</main>
+	<Lightbox />
 	<Footer />
 </Layout>
