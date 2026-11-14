@@ -1,12 +1,12 @@
 ---
 // Recent, verifiable figures only (2026-11-12): no years-of-experience
 // count (age bias) and the Cactus awards live on /about.
-type Metric = { value: string; label: string; sub?: string };
+type Metric = { value: string; label: string; sub?: string; note?: string };
 
 const metrics: Metric[] = [
 	{ value: '~40', label: 'Verticals on one design system', sub: 'Top5 comparison family' },
 	{ value: '96', label: 'Screens shipped', sub: 'Sonary SaaS, from a 2,000+ frame Figma project' },
-	{ value: '4', label: 'AI products with live demos', sub: 'APEX Athletic Club · Otium · Facet · Margin' },
+	{ value: '4', label: 'AI products with live demos', sub: 'APEX Athletic Club · Otium · Facet · Margin', note: 'D2 Manager coming soon' },
 ];
 ---
 
@@ -19,6 +19,9 @@ const metrics: Metric[] = [
 					<p class="mt-2 text-sm text-muted">{metric.label}</p>
 					{metric.sub && (
 						<p class="mt-1 text-xs text-muted">{metric.sub}</p>
+					)}
+					{metric.note && (
+						<p class="mt-1 text-xs text-muted">{metric.note}</p>
 					)}
 				</div>
 			))

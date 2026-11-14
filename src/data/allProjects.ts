@@ -375,7 +375,6 @@ Addressed through a parametric design system in Figma: each smart component read
 		liveUrl: 'https://ryzebeyond.com/',
 		scope: [
 			`Full marketing website, delivered in 2026`,
-			`About two months from research to design QA`,
 			`Design system and illustration system built for the project`,
 			`5 breakpoints, light and dark modes`,
 		],
@@ -567,11 +566,11 @@ The project also held a particular status in the Ryze roadmap: design often ran 
 	},
 	{
 		slug: 'ui-ux-vintage',
-		title: `UI/UX Work (2011-2018)`,
+		title: `UI/UX Work (2011 – 2018)`,
 		client: `Multiple clients`,
 		year: '2011 – 2018',
 		category: 'UI/UX',
-		shortDesc: `Selection of UI/UX work from 2011-2018: Wochat instant translation app, a full SaaS dashboard, plus personal explorations in music apps, landing concepts and wireframes.`,
+		shortDesc: `Selection of UI/UX work from 2011 – 2018: Wochat instant translation app, a full SaaS dashboard, plus personal explorations in music apps, landing concepts and wireframes.`,
 		fullDesc: `Selection of UI/UX work produced between 2011 and 2018, before Ryze Beyond. This period spanned several companies I worked at: notably a mobile instant translation app (Wochat, voice + text + video) and a full SaaS dashboard for customer / product / invoicing management with an integrated chat room. Every project covered the full cycle: research, low-fi wireframes, high-fidelity design, iteration, and dev handoff.
 
 The remaining captures gather more personal designs: music apps (MUSIK, HitShot, ALEXIA), landing page concepts (Ultra Bright System, Model Photos Creation) and wireframe explorations, produced outside any professional brief, to test visual directions, keep the practice sharp, and explore more experimental palettes than the ones allowed in a professional context.`,
@@ -604,7 +603,7 @@ The remaining captures gather more personal designs: music apps (MUSIK, HitShot,
 	},
 	{
 		slug: 'branding-old',
-		title: `Digital Campaigns & Ad Design (2006-2011)`,
+		title: `Digital Campaigns & Ad Design (2006 – 2011)`,
 		client: `Arc Interactive / Publicis`,
 		year: '2006 – 2011',
 		category: 'Branding',
@@ -703,7 +702,7 @@ Deliverables covered game lobbies, bonus systems, deposit funnels, promotional b
 		client: `Tradologic`,
 		year: '2011 – 2013',
 		category: 'iGaming',
-		shortDesc: `Casino platform work at Tradologic (2011–2013): white-label backend for Crown Europe, City Club Casino, City Tower Casino and other operators.`,
+		shortDesc: `Casino platform work at Tradologic (2011 – 2013): white-label backend for Crown Europe, City Club Casino, City Tower Casino and other operators.`,
 		fullDesc: `Selection of work produced at Tradologic between 2011 and 2013 (about a year and a half to two years), within a team of several designers. Tradologic supplied white-label casino platforms to multiple operators: notably Crown Europe, City Club Casino and City Tower Casino, whose captures appear in this selection.
 
 My work quickly took on the most visible projects. Deliverables covered game lobbies, promotional banners, desktop interfaces, and animations produced as videos and Flash (SWF) files.`,
