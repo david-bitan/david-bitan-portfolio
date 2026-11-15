@@ -50,13 +50,15 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 	class:list={['z-30 w-full border-y border-ink/10 bg-bg', showBar ? 'sticky zf-sticky' : 'zf-bare']}
 >
 	<div class="relative mx-auto max-w-[1200px]">
-		<div class="zone-filters-back absolute inset-y-0 left-0 z-20 flex items-center bg-bg pl-6 min-[1248px]:pl-0">
+		{/* Étape 9, I1: back to the round pill with a small chevron (no word, it
+		    took too much room); its name stays for screen readers; 44px tap area. */}
+		<div class="zone-filters-back absolute inset-y-0 left-0 z-20 flex items-center pl-6 min-[1248px]:pl-0">
 			<a
 				href={backHref}
-				class="zf-back-link inline-flex h-9 items-center gap-1.5 rounded-pill border border-ink/15 px-3.5 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent-text"
+				aria-label={showBar ? 'Back' : backLabel}
+				class="zf-back-link flex h-8 w-8 items-center justify-center rounded-full border border-ink/15 text-muted transition-colors hover:border-accent hover:text-accent-text"
 			>
-				<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M19 12H5" /><path d="M11 18l-6-6 6-6" /></svg>
-				<span>{showBar ? 'Back' : backLabel}</span>
+				<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M15 18l-6-6 6-6" /></svg>
 			</a>
 			{showBar && <span class="zf-divider ml-3 h-5 w-px bg-ink/15" aria-hidden="true" />}
 		</div>
@@ -197,8 +199,10 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 
 <style is:global>
 	html.has-zf { scroll-padding-top: calc(var(--header-h, 77px) + 72px); }
+	/* Étape 9, I3: 1 px under the header (the header is drawn above it), so no
+	   gap ever shows between the two, at any width or zoom level. */
 	.zf-sticky,
-	.zf-bare { top: var(--header-h, 77px); }
+	.zf-bare { top: calc(var(--header-h, 77px) - 1px); }
 	/* Bare bar: out of the flow, pinned, hidden until the top link is gone. */
 	.zf-bare {
 		position: fixed;
@@ -206,12 +210,12 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 		right: 0;
 		opacity: 0;
 		visibility: hidden;
-		transition: opacity 300ms cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s linear 300ms;
+		transition: opacity 160ms ease-out, visibility 0s linear 160ms;
 	}
 	.zf-bare.is-stuck {
 		opacity: 1;
 		visibility: visible;
-		transition: opacity 300ms cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s;
+		transition: opacity 160ms ease-out, visibility 0s;
 	}
 
 	/* Swipe sideways, no visible scrollbar. */
@@ -222,33 +226,62 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 	}
 	.zone-filters-scroll::-webkit-scrollbar { display: none; }
 
-	/* "← Back" pinned on the left of the stuck bar; only the filters move. */
-	.zf-sticky .zone-filters-back {
+	/* Étape 9, I2: when the bar sticks, the filters slide right to make room
+	   while the round pill grows from tiny and clear (scale 0.2, opacity 0) to
+	   its size, 280 ms on a soft ease-out; unsticking plays it backwards. The
+	   pill starts 80 ms after the filters (and leaves 80 ms before them), so
+	   the two never overlap. */
+	.zone-filters-back { visibility: hidden; transition: visibility 0s linear 360ms; }
+	.zone-filters-back .zf-back-link,
+	.zone-filters-back .zf-divider {
 		opacity: 0;
-		visibility: hidden;
-		transform: translateX(-6px);
-		pointer-events: none;
+		transform: scale(0.2);
 		transition:
-			opacity 400ms cubic-bezier(0.22, 0.61, 0.36, 1),
-			transform 400ms cubic-bezier(0.22, 0.61, 0.36, 1),
-			visibility 0s linear 400ms;
+			opacity 240ms cubic-bezier(0.4, 0, 1, 1),
+			transform 240ms cubic-bezier(0.4, 0, 1, 1),
+			border-color 200ms ease,
+			color 200ms ease;
 	}
-	.zf-sticky.is-stuck .zone-filters-back {
+	.zone-filters-back .zf-divider { transform: none; }
+	/* its ground (which hides the filters scrolled under it) fades with the
+	   pill, so it never cuts a filter while they move */
+	.zone-filters-back::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background: var(--color-bg);
+		opacity: 0;
+		transition: opacity 200ms ease;
+	}
+	.is-stuck .zone-filters-back::before {
 		opacity: 1;
-		visibility: visible;
+		transition: opacity 200ms ease 200ms;
+	}
+	.is-stuck .zone-filters-back { visibility: visible; transition: visibility 0s; }
+	.is-stuck .zone-filters-back .zf-back-link,
+	.is-stuck .zone-filters-back .zf-divider {
+		opacity: 1;
 		transform: none;
-		pointer-events: auto;
 		transition:
-			opacity 400ms cubic-bezier(0.22, 0.61, 0.36, 1),
-			transform 400ms cubic-bezier(0.22, 0.61, 0.36, 1),
-			visibility 0s;
+			opacity 280ms cubic-bezier(0.22, 1, 0.36, 1) 80ms,
+			transform 280ms cubic-bezier(0.22, 1, 0.36, 1) 80ms,
+			border-color 200ms ease,
+			color 200ms ease;
+	}
+	.zone-filters-scroll {
+		transition: padding-left 280ms cubic-bezier(0.22, 1, 0.36, 1) 80ms;
 	}
 	.zf-sticky.is-stuck .zone-filters-scroll {
-		padding-left: calc(var(--zf-back-w, 112px) + 12px);
+		padding-left: calc(var(--zf-back-w, 72px) + 12px);
+		transition: padding-left 280ms cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.zone-filters-back,
+		.zone-filters-back .zf-back-link,
+		.zone-filters-back .zf-divider,
+		.zone-filters-back::before,
 		.zone-filters-scroll,
 		.zf-bare {
 			transition: none !important;

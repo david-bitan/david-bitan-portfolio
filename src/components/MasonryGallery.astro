@@ -208,7 +208,8 @@ const wideSrcset = (url: string, w: number) =>
 		margin: 0;
 		aspect-ratio: 375 / 800;
 		overflow: hidden;
-		border-radius: 12px;
+		border-radius: var(--radius-box);
+		corner-shape: superellipse(3);
 		background: color-mix(in srgb, var(--color-ink) 6%, transparent);
 	}
 	.pg-card > img {
@@ -226,7 +227,8 @@ const wideSrcset = (url: string, w: number) =>
 	.mg-card {
 		margin: 0;
 		overflow: hidden;
-		border-radius: 12px;
+		border-radius: var(--radius-box);
+		corner-shape: superellipse(3);
 		/* Quiet placeholder while the image loads; the card already has the
 		   image's exact shape, so nothing moves when it arrives. */
 		background: color-mix(in srgb, var(--color-ink) 6%, transparent);

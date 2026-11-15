@@ -14,8 +14,9 @@ const links = [
 	{ href: '/#about', label: 'About', spy: 'about' },
 	{ href: '/#craft', label: 'Craft', spy: 'craft' },
 ];
-const contact = { href: '/#contact', label: 'Contact', spy: 'contact' };
-const btnCls = 'rounded-pill bg-accent font-semibold text-accent-ink transition-colors hover:bg-ink hover:text-bg';
+// Étape 9, F1: Contact is a link like the others and opens the /contact page
+// (its form); its underline shows only on that page.
+const onContact = Astro.url.pathname.replace(/\/$/, '') === '/contact';
 ---
 
 <header id="site-header" class="sticky top-0 z-50 border-b border-ink/5 bg-bg">
@@ -30,7 +31,7 @@ const btnCls = 'rounded-pill bg-accent font-semibold text-accent-ink transition-
 					</a>
 				))
 			}
-			<a href={contact.href} data-spy-btn={contact.spy} class={`inline-flex h-10 items-center px-5 text-sm ${btnCls}`}>{contact.label}</a>
+			<a href="/contact" class:list={['nav-link text-sm transition-colors', onContact ? 'nav-link-active font-semibold' : 'font-medium text-muted hover:text-ink']} aria-current={onContact ? 'page' : undefined}>Contact</a>
 		</div>
 
 		<div class="flex items-center gap-3">
@@ -83,7 +84,7 @@ const btnCls = 'rounded-pill bg-accent font-semibold text-accent-ink transition-
 			</a>
 		))
 	}
-	<a href={contact.href} data-spy-btn={contact.spy} class={`mobile-nav-link mt-2 inline-flex min-h-14 items-center px-9 text-2xl ${btnCls}`}>{contact.label}</a>
+	<a href="/contact" class:list={['mobile-nav-link text-3xl font-semibold', { 'nav-link-active': onContact }]} aria-current={onContact ? 'page' : undefined}>Contact</a>
 </div>
 
 <style>
@@ -194,7 +195,8 @@ const btnCls = 'rounded-pill bg-accent font-semibold text-accent-ink transition-
 	// Real header height for every sticky bar under it (85px on phones,
 	// 77px on desktop). Hard-coded tops slid the bars under the hairline.
 	if (header) {
-		const setH = () => document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
+		// exact height (a fraction of a pixel at some widths and zoom levels)
+		const setH = () => document.documentElement.style.setProperty('--header-h', header.getBoundingClientRect().height + 'px');
 		setH();
 		new ResizeObserver(setH).observe(header);
 	}
@@ -250,11 +252,11 @@ const btnCls = 'rounded-pill bg-accent font-semibold text-accent-ink transition-
 	// --- Scroll spy (home only) ---
 	// The section whose top has passed a line ~140px under the header is the
 	// current one; nothing is underlined above Work (hero, figures, logos);
-	// at the very bottom of the page, Contact (the closing block) wins.
+	// at the very bottom of the page, the last section (Craft) stays on.
 	(function initScrollSpy() {
 		const path = window.location.pathname.replace(/\/$/, '') || '/';
 		if (path !== '/') return;
-		const ids = ['work', 'ai-lab', 'testimonials', 'about', 'craft', 'contact'];
+		const ids = ['work', 'ai-lab', 'testimonials', 'about', 'craft'];
 		const sections = ids.map((id) => ({ id, el: document.getElementById(id) })).filter((x) => x.el);
 		if (!sections.length) return;
 		const linksFor = (id: string) => document.querySelectorAll<HTMLElement>(`[data-spy="${id}"], [data-spy-mobile="${id}"], [data-spy-btn="${id}"]`);
@@ -282,7 +284,7 @@ const btnCls = 'rounded-pill bg-accent font-semibold text-accent-ink transition-
 		function pick() {
 			const line = 140;
 			const doc = document.documentElement;
-			if (window.innerHeight + window.scrollY >= doc.scrollHeight - 4) return setActive('contact');
+			if (window.innerHeight + window.scrollY >= doc.scrollHeight - 4) return setActive('craft');
 			let picked: string | null = null;
 			for (const sec of sections) {
 				if (sec.el!.getBoundingClientRect().top <= line) picked = sec.id;

@@ -1,46 +1,54 @@
 ---
 // hideCta: /contact already opens with its own headline, so the closing
 // "Let's talk product design." would repeat it there (2026-11-12 brief).
-// id="contact": target of the "Contact" button of the top menu (étape 8, M).
+// id="contact": kept as an anchor for old links (/#contact); the menu's Contact
+// opens the /contact page since étape 9 (F1).
+import { SITE_VERSION } from '../data/siteVersion';
 const { hideCta = false } = Astro.props;
+// on /contact itself the address leads to the form below
+const emailHref = Astro.url.pathname.replace(/\/$/, '') === '/contact' ? '#contact-form' : '/contact';
 const email = 'advance26@gmail.com';
 const linkedinUrl = 'https://www.linkedin.com/in/david-bitan';
 const year = new Date().getFullYear();
+const links = [['Work', '/#work'], ['AI Lab', '/#ai-lab'], ['About me', '/about'], ['Craft', '/craft'], ['Contact', '/contact'], ['Colophon', '/colophon']];
 ---
 
-<footer id="contact" class:list={['scroll-mt-20 bg-footer-bg px-6 text-center', hideCta ? 'py-14 sm:py-16' : 'py-24 sm:py-32']}>
+<footer id="contact" class:list={['scroll-mt-20 bg-footer-bg px-6 text-center', hideCta ? 'py-12 sm:py-14' : 'py-16 sm:py-20']}>
 	{!hideCta && <h2 class="text-4xl font-extrabold tracking-tight text-footer-ink sm:text-6xl">Let's talk product design.</h2>}
 
-	{/* Mobile: stacks vertically (email / LinkedIn / location on their own
-		lines) so nothing clips off-screen on 375px width.
-		sm+ : single-line inline with `·` separators (previous behaviour). */}
-	<p class="mt-10 flex flex-col items-center gap-y-6 text-sm font-medium text-footer-muted sm:block">
-		<a href={`mailto:${email}`} class="text-accent-text hover:underline">{email}</a>
-		<span class="mx-3 hidden sm:inline">·</span>
-		<a href={linkedinUrl} target="_blank" rel="noopener" class="text-accent-text hover:underline">LinkedIn</a>
-		<span class="mx-3 hidden sm:inline">·</span>
-		<span class="text-footer-ink">Ashkelon, Israel · Hybrid or remote, Tel Aviv area</span>
+	{/* Étape 9, E1: one line of contacts and CV, like the top of the About
+	    page; on phones it wraps cleanly. The e-mail opens the contact form
+	    (F3), not a mail app. */}
+	<p class:list={['mx-auto flex max-w-2xl flex-wrap items-center justify-center gap-x-6 text-sm font-semibold', hideCta ? 'mt-0' : 'mt-8']}>
+		<a href={emailHref} class="inline-flex min-h-11 items-center text-accent-text hover:underline">{email}</a>
+		<a href={linkedinUrl} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center text-accent-text hover:underline">LinkedIn&nbsp;↗</a>
+		<a href="/cv/CV-David-Bitan.pdf" download class="inline-flex min-h-11 items-center text-accent-text hover:underline">Download CV (PDF)</a>
+		<a href="/cv/CV-David-Bitan.docx" download class="inline-flex min-h-11 items-center text-accent-text hover:underline">Download CV (DOCX)</a>
 	</p>
+	<p class="mt-1 text-sm font-medium text-footer-ink">Ashkelon, Israel<span class="mx-2" aria-hidden="true">·</span>Hybrid or remote, Tel Aviv area</p>
 
-	{/* Étape 8, O: quiet links to every part, and the CV in both formats.
-	    No form, no columns. */}
-	<nav aria-label="Footer" class="mx-auto mt-10 flex max-w-xl flex-wrap justify-center gap-x-5 gap-y-1 text-sm font-medium text-footer-muted">
-		{[['Work', '/#work'], ['AI Lab', '/#ai-lab'], ['About me', '/about'], ['Craft', '/craft'], ['Contact', '/contact'], ['Colophon', '/colophon']].map(([label, href]) => (
-			<a href={href} class="inline-flex min-h-11 items-center hover:text-footer-ink hover:underline underline-offset-4">{label}</a>
+	{/* Quiet links to every part (étape 8, O). E2: every dot has the same
+	    space on both sides. E3: the release marker after "Colophon". */}
+	<nav aria-label="Footer" class="mx-auto mt-4 flex max-w-2xl flex-wrap items-center justify-center text-sm font-medium text-footer-muted">
+		{/* each dot stays with the link after it, so no line ever ends on a dot;
+		    phones: two even lines of three, the second with no leading dot */}
+		{links.map(([label, href], i) => (
+			<>
+			{i === 3 && <span class="basis-full sm:hidden" aria-hidden="true" />}
+			<span class="inline-flex items-center whitespace-nowrap">
+				{i > 0 && <span class:list={['mx-2', { 'max-sm:hidden': i === 3 }]} aria-hidden="true">·</span>}
+				<a href={href} class="inline-flex min-h-11 items-center hover:text-footer-ink hover:underline underline-offset-4">{label}</a>
+				{i === links.length - 1 && <span class="ml-4 text-xs text-footer-muted" title="Site version">{SITE_VERSION}</span>}
+			</span>
+			</>
 		))}
 	</nav>
-	<p class="mt-2 text-sm text-footer-muted">
-		Download CV: <a href="/cv/CV-David-Bitan.pdf" download class="inline-flex min-h-11 items-center text-accent-text hover:underline">PDF</a>
-		<span class="mx-1.5" aria-hidden="true">·</span>
-		<a href="/cv/CV-David-Bitan.docx" download class="inline-flex min-h-11 items-center text-accent-text hover:underline">Word</a>
-	</p>
 
-	<p class="mt-8 text-xs text-footer-muted">© {year} David Bitan. All rights reserved.</p>
+	<p class="mt-4 text-xs text-footer-muted">© {year} David Bitan. All rights reserved.</p>
 
 	{/* Micro-mention: subtle nod to the AI-native workflow this site is built with.
 		Links to /colophon for the full breakdown. */}
-	<p class="mt-3 text-xs text-footer-muted">
-		Designed and built with Astro, Tailwind CSS, and <span class="whitespace-nowrap">Claude ·
-		<a href="/colophon" class="text-accent-text underline underline-offset-2 hover:no-underline">Colophon</a></span>
+	<p class="mt-2 text-xs text-footer-muted">
+		Designed and built with Astro, Tailwind CSS, and <span class="whitespace-nowrap">Claude<span class="mx-2" aria-hidden="true">·</span><a href="/colophon" class="text-accent-text underline underline-offset-2 hover:no-underline">Colophon</a></span>
 	</p>
 </footer>

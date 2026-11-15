@@ -1,64 +1,99 @@
 ---
-// Home Craft block. Since 15/11 (David): a small swipeable strip of real
-// craft pieces so the block says what it is at a glance, and "See craft →"
-// as an orange-outline button. Phones: horizontal swipe with snap (no
-// visible scrollbar, the next tile peeks in). Desktop (lg+): six equal
-// tiles across the 1200 grid, nothing to scroll.
+// Home Craft block (étape 8, P7; étape 9, B2): a real two-line title like the
+// other home sections, and the strip of craft pieces running on its own, in a
+// loop, exactly like the company-name marquee (same speed in px/s, same soft
+// fades on both edges, pause on hover or focus; still under reduced motion).
+// A click opens the Craft page straight on that piece, in the viewer.
+// Phones: "See craft →" under the strip, centred.
 import { craftItems } from '../data/craftItems';
 import { cld } from '../lib/cloudinary';
 
 const picks = ['3d-03', 'paint-02', '3d-04', '3d-24', 'paint-05', '3d-05', '3d-17', '3d-12'];
 const items = picks.map((s) => craftItems.find((c) => c.slug === s)!).filter(Boolean);
 const sq = (url: string, w: number) => cld(url, `c_fill,ar_1:1,g_center,w_${w},q_auto:best,f_auto`);
+// Three copies back to back, like the marquee: translating one third loops
+// without a seam. Only the first copy is read out and reachable by keyboard.
+const track = [...items, ...items, ...items];
 ---
 
 <section id="craft" class="mx-auto max-w-[1200px] scroll-mt-24 px-6 pb-20 sm:pb-24 min-[1248px]:px-0" data-reveal>
 	<div class="border-t border-ink/10 pt-14 sm:pt-8">
-		<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-			<p class="text-muted">Outside product work: 3D and digital painting.</p>
+		<div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+			<h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+				<span class="block">Outside product work</span>
+				<span class="block">3D and digital painting</span>
+			</h2>
 			<a
 				href="/craft"
-				class="btn-secondary inline-flex min-h-11 shrink-0 items-center justify-center self-start whitespace-nowrap rounded-pill px-6 text-sm font-semibold sm:self-auto"
+				class="btn-secondary hidden min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-pill px-6 text-sm font-semibold sm:inline-flex"
 			>
-				See craft →
+				See craft&nbsp;<span class="arr" aria-hidden="true">→</span>
 			</a>
 		</div>
 
-		<ul class="craft-strip -mx-6 mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-1 sm:gap-4 lg:mx-0 lg:grid lg:grid-cols-6 lg:overflow-visible lg:px-0" aria-label="A few craft pieces">
-			{
-				items.map((item, i) => (
-					<li class:list={['w-[148px] shrink-0 snap-start sm:w-[200px] lg:w-auto', { 'lg:hidden': i > 5 }]}>
-						<a href="/craft" class="group block overflow-hidden rounded-md bg-card" tabindex={i === 0 ? undefined : -1}>
-							<img
-								src={sq(item.image, 400)}
-								srcset={`${sq(item.image, 300)} 300w, ${sq(item.image, 400)} 400w, ${sq(item.image, 600)} 600w`}
-								sizes="(min-width: 1248px) 186px, (min-width: 1024px) calc((100vw - 128px) / 6), (min-width: 640px) 200px, 148px"
-								alt={item.title}
-								width="400"
-								height="400"
-								loading="lazy"
-								decoding="async"
-								class="thumb-hover-zoom aspect-square h-auto w-full object-cover"
-							/>
-						</a>
-					</li>
-				))
-			}
-		</ul>
+		{/* Full width like the names strip (its fades sit on the screen edges on phones). */}
+		<div class="-mx-6 mt-8 min-[1248px]:mx-0">
+		<div class="marquee-mask craft-marquee" tabindex="0" role="region" aria-label="A few craft pieces">
+			<ul class="marquee-track craft-track">
+				{
+					track.map((item, i) => (
+						<li class="craft-tile shrink-0" aria-hidden={i >= items.length ? 'true' : undefined}>
+							<a href={`/craft#${item.slug}`} class="group block overflow-hidden rounded-md bg-card" tabindex={i >= items.length ? -1 : undefined}>
+								<img
+									src={sq(item.image, 400)}
+									srcset={`${sq(item.image, 300)} 300w, ${sq(item.image, 400)} 400w, ${sq(item.image, 600)} 600w`}
+									sizes="(min-width: 640px) 200px, 148px"
+									alt={i >= items.length ? '' : item.title}
+									width="400"
+									height="400"
+									loading="lazy"
+									decoding="async"
+									class="thumb-hover-zoom aspect-square h-auto w-full object-cover"
+								/>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+		</div>
+
+		<div class="mt-8 flex justify-center sm:hidden">
+			<a href="/craft" class="btn-secondary inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-pill px-6 text-sm font-semibold">
+				See craft&nbsp;<span class="arr" aria-hidden="true">→</span>
+			</a>
+		</div>
 	</div>
 </section>
 
 <style>
-	.craft-strip {
-		scrollbar-width: none;
-		scroll-padding-inline: 24px;
+	/* Same speed as the names (one copy of names = 1,555 px in 28 s, about
+	   55.5 px/s): 8 tiles of 148 + 16 px = 1,312 px in 23.6 s on phones,
+	   8 x (200 + 16) = 1,728 px in 31.1 s from 640 px. */
+	.craft-tile {
+		width: 164px;
+		padding-inline: 8px;
 	}
-	.craft-strip::-webkit-scrollbar {
-		display: none;
+	.craft-track {
+		animation-duration: 23.6s;
+		/* room for the focus ring, which the mask would cut */
+		padding-block: 4px;
 	}
-	@media (min-width: 1024px) {
-		.craft-strip {
-			scroll-padding-inline: 0;
+	@media (min-width: 640px) {
+		.craft-tile {
+			width: 216px;
+		}
+		.craft-track {
+			animation-duration: 31.1s;
 		}
 	}
 </style>
+
+<script>
+	// Keyboard focus may scroll the strip sideways: put it back once the focus leaves.
+	document.querySelectorAll<HTMLElement>('.craft-marquee').forEach((m) =>
+		m.addEventListener('focusout', (e) => {
+			if (!m.contains(e.relatedTarget as Node)) m.scrollLeft = 0;
+		}),
+	);
+</script>

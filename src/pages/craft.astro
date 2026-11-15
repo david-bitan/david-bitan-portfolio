@@ -4,7 +4,8 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import CraftFilters from '../components/CraftFilters.astro';
 import { craftItems } from '../data/craftItems';
-import { cld, FULL, landscapeSrcset } from '../lib/cloudinary';
+import { cld, FULL, landscapeSrcset, fullSrcset } from '../lib/cloudinary';
+import Lightbox from '../components/Lightbox.astro';
 
 // Distinct categories in first-appearance order — auto-updates when the data
 // source gets new categories (Drawings, Icons, etc.).
@@ -44,7 +45,14 @@ const categories = Array.from(new Set(craftItems.map((i) => i.category)));
 							sizes="(min-width: 1280px) 1200px, 100vw"
 							alt={item.title}
 							loading="lazy"
-							class="craft-img mx-auto block h-auto w-full rounded-md"
+							data-lb
+							tabindex="0"
+							role="button"
+							aria-label={`${item.title}: open full size`}
+							data-lb-kind="desktop"
+							data-lb-src={cld(item.image, FULL)}
+							data-lb-srcset={fullSrcset(item.image)}
+							class="craft-img mx-auto block h-auto w-full cursor-zoom-in rounded-md"
 						/>
 						<figcaption class="mt-4 flex flex-wrap items-baseline gap-x-4">
 							<h2 class="text-lg font-bold tracking-tight text-ink">{item.title}</h2>
@@ -60,7 +68,20 @@ const categories = Array.from(new Set(craftItems.map((i) => i.category)));
 
 	<div class="pb-24"></div>
 	</main>
+	<Lightbox />
 	<Footer />
+
+	<script>
+		// Étape 9, B2: /craft#<piece> (from the home strip) opens the viewer on
+		// that piece, the page scrolled to it underneath.
+		window.addEventListener('load', () => {
+			const id = decodeURIComponent(location.hash.slice(1));
+			const img = id ? document.getElementById(id)?.querySelector<HTMLImageElement>('img[data-lb]') : null;
+			if (!img) return;
+			img.scrollIntoView({ block: 'center', behavior: 'instant' });
+			img.click();
+		});
+	</script>
 
 	<script>
 		// Prevent CSS upscale of low-resolution sources — cap each image's

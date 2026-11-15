@@ -306,11 +306,11 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 		year: '2020 – 2026',
 		category: 'SaaS',
 		categories: ['SaaS', 'B2B', 'UI/UX'],
-		shortDesc: `One parametric Figma design system behind ~40 verticals, from mattresses and POS providers to dating.`,
-		fullDesc: `Product designer on Top5 since 2020: a family of comparison sites, ~40 verticals all powered by one parametric Figma design system (smart components that inherit color tokens from their parent frame). See structured case study below.`,
+		shortDesc: `One parametric Figma design system behind 40+ verticals, from mattresses and POS providers to dating.`,
+		fullDesc: `Product designer on Top5 since 2020: a family of comparison sites, 40+ verticals all powered by one parametric Figma design system (smart components that inherit color tokens from their parent frame). See structured case study below.`,
 		liveUrl: 'https://top5-mattresses.com',
 		scope: [
-			`~40 verticals on one parametric Figma design system`,
+			`40+ verticals on one parametric Figma design system`,
 			`Shared templates from homepage to review and lineup pages`,
 			`5 breakpoints`,
 			`WordPress to Webflow migration, with the design system rebuilt in Webflow`,
@@ -330,17 +330,17 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 			},
 			{
 				heading: 'Key challenge',
-				body: `Designing a system that could serve ~40 distinct verticals (entirely different content, its own color identity per site), without duplicating components manually. Every site needed its own accent (from four base themes, extensible to more) while sharing the same UI architecture and behavior.
+				body: `Designing a system that could serve 40+ distinct verticals (entirely different content, its own color identity per site), without duplicating components manually. Every site needed its own accent (from four base themes, extensible to more) while sharing the same UI architecture and behavior.
 
-Addressed through a parametric design system in Figma: each smart component reads its color tokens from its parent frame via Figma variables. Result: a drag-and-drop into a pre-themed section re-skins all colored elements automatically (buttons, chips, cards, accents): a single asset serving all ~40 verticals, just by changing the parent container.`,
+Addressed through a parametric design system in Figma: each smart component reads its color tokens from its parent frame via Figma variables. Result: a drag-and-drop into a pre-themed section re-skins all colored elements automatically (buttons, chips, cards, accents): a single asset serving all 40+ verticals, just by changing the parent container.`,
 			},
 			{
 				heading: 'Deliverables',
-				body: `Parametric design system covering homepage, article, comparison, lineup, review, about and category pages, deployed across ~40 verticals. Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress to Webflow migration on the latest redesign, with a full design system rebuild in Webflow and handoff to the content team. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
+				body: `Parametric design system covering homepage, article, comparison, lineup, review, about and category pages, deployed across 40+ verticals. Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress to Webflow migration on the latest redesign, with a full design system rebuild in Webflow and handoff to the content team. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
 			},
 			{
 				heading: 'What I took from it',
-				body: `A well-architected smart component system (one that inherits tokens from its container rather than binding manually) multiplies production velocity. What could have cost ~40 verticals × N components becomes one design system × ~40 parametric variants. The discipline required upfront (structured Figma variables, container-first thinking) pays off across the entire lifespan of the project.`,
+				body: `A well-architected smart component system (one that inherits tokens from its container rather than binding manually) multiplies production velocity. What could have cost 40+ verticals × N components becomes one design system × 40+ parametric variants. The discipline required upfront (structured Figma variables, container-first thinking) pays off across the entire lifespan of the project.`,
 			},
 		],
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/portfolio/top5/homepage/mattresses-desktop-1920.webp',

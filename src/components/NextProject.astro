@@ -12,6 +12,6 @@ const { href, title } = Astro.props;
 	<a href={href} class="group flex min-h-11 flex-wrap items-baseline gap-x-2 border-t border-ink/10 pt-8 text-2xl font-extrabold tracking-tight sm:text-3xl">
 		<span class="text-base font-semibold text-muted sm:text-lg">Next project ·</span>
 		<span class="transition-colors group-hover:text-accent-text">{title}</span>
-		<span class="text-accent transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
+		<span class="text-accent transition-transform group-hover:translate-x-1" aria-hidden="true"><span class="arr">→</span></span>
 	</a>
 </nav>

@@ -14,6 +14,9 @@
   /* Metrics block lines 2 and 3: unchanged in light (muted). */
   --color-metric-label: #4b5563;
   --color-metric-sub: #4b5563;
+  /* Recommendation bylines, company and "worked with" lines (étape 9, C1):
+     a darker blue-grey than muted, 9.5:1 on white cards. */
+  --color-reco-sub: #3f4a5c;
   /* One orange everywhere, #F25C24 (David, 13/11): buttons, orange text,
      links and outlines, light and dark. Button labels stay WHITE (David's
      explicit choice, never change it). */
@@ -25,13 +28,20 @@
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 
   --radius-sm: 8px;
-  --radius-md: 12px;
+  /* Étape 9, D (David): ONE corner radius for every main box (cards, blocks,
+     recommendation cards, thumbnails, figure boxes), on every page and every
+     size, as a squircle. Set here only. Nested boxes follow the concentric law
+     (inner = outer - gap); pills and buttons are not boxes. */
+  --radius-box: 16px;
+  --radius-md: var(--radius-box);
+  --radius-lg: var(--radius-box);
   --radius-pill: 999px;
 
-  /* Footer: neutral graphite, same family as dark mode (#191919) */
-  --color-footer-bg: #191919;
-  --color-footer-ink: #f5f5f5;
-  --color-footer-muted: #8f8f8f;
+  /* Footer: the same night blue in both themes (David, étape 9 ajout 1), so
+     it keeps the dark-mode texts: ink 15.2:1, muted 5.7:1, orange 5.2:1. */
+  --color-footer-bg: #151a28;
+  --color-footer-ink: #eef0f4;
+  --color-footer-muted: #8e94a2;
 }
 
 /* Dark mode: night blue (CL1 brief, 2026-11-13). Page #0D101A, cards
@@ -53,6 +63,7 @@
   --color-quiet: #8a93a6;
   --color-metric-label: #8a93a6;
   --color-metric-sub: #7f889b;
+  --color-reco-sub: #8f99ad; /* 5.6:1 on #1A2033 cards */
   --color-footer-bg: #151a28;
   --color-footer-ink: #eef0f4;
   --color-footer-muted: #8e94a2;
@@ -167,9 +178,30 @@ select:not(:disabled) {
   .rounded-lg,
   .rounded-xl,
   .rounded-2xl,
-  .rounded-3xl {
+  .rounded-3xl,
+  .radius-box {
     corner-shape: superellipse(3);
   }
+}
+
+/* Recommendation bylines (étape 9, C1). */
+.reco-sub {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-reco-sub);
+}
+
+/* Text arrow "→" (étape 9, B3): Manrope draws it low (its middle at 0.165 em
+   above the baseline, measured at 200 px); lifted 0.1 em, it sits on the
+   middle of the lowercase letters (the "a" is centred at 0.27 em). */
+.arr {
+  display: inline-block;
+  transform: translateY(-0.1em);
+}
+
+/* Same box radius for boxes styled in page CSS (galleries, swatches). */
+.radius-box {
+  border-radius: var(--radius-box);
 }
 
 /* Thumbnail hover zoom — used on Selected Work + Craft home cards.
@@ -269,6 +301,13 @@ select:not(:disabled) {
 }
 .btn-secondary:active {
   transform: scale(0.97);
+}
+/* Étape 9, G (David): orange border kept, text and arrow WHITE. Applied in
+   dark mode, where every one of these buttons sits on a dark ground. In
+   light mode white would be unreadable on the light grounds: left as it is,
+   David decides (see the étape 9 report). */
+:root[data-theme='dark'] .btn-secondary {
+  color: #fff;
 }
 
 /* Keyboard focus: one clear ring everywhere (CL1 phase C, 13/11). */

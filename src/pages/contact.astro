@@ -93,7 +93,8 @@ const defaultNote = hasFormspree
 			<div class="flex flex-col gap-8">
 				<div>
 					<p class="text-sm font-semibold uppercase tracking-widest text-muted">Email</p>
-					<a href={`mailto:${email}`} class="mt-2 block font-semibold text-accent-text hover:underline">
+					{/* Étape 9, F3: the address leads to the form, not to a mail app. */}
+					<a href="#contact-form" class="mt-2 block font-semibold text-accent-text hover:underline">
 						{email}
 					</a>
 				</div>

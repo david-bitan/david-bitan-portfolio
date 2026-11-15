@@ -262,9 +262,32 @@ const projectJsonLd: Record<string, unknown> = {
 				}
 			}
 
+			// Étape 9, J: "Show less" closes the case study and brings the page
+			// back, softly, to the button, at the height where it was clicked to
+			// open (instead of leaving the page down in the galleries).
+			let openedAt = null;
+			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 			btn.addEventListener('click', () => {
 				const expanded = btn.getAttribute('aria-expanded') === 'true';
-				setExpanded(!expanded);
+				if (!expanded) {
+					openedAt = btn.getBoundingClientRect().top;
+					setExpanded(true);
+					return;
+				}
+				// Close at once while the button stays under the finger, then glide
+				// the page back to where the button was when it was clicked to open.
+				const keep = openedAt ?? window.innerHeight * 0.4;
+				const underFinger = btn.getBoundingClientRect().top;
+				const saved = body.style.transition;
+				body.style.transition = 'none';
+				setExpanded(false);
+				void body.offsetHeight;
+				const btnDocTop = btn.getBoundingClientRect().top + window.scrollY;
+				window.scrollTo({ top: Math.max(0, btnDocTop - underFinger), behavior: 'instant' });
+				requestAnimationFrame(() => {
+					body.style.transition = saved;
+					window.scrollTo({ top: Math.max(0, btnDocTop - keep), behavior: reduce.matches ? 'instant' : 'smooth' });
+				});
 			});
 		})();
 	</script>

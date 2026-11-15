@@ -33,7 +33,10 @@ const featured = testimonials.filter((t) => t.featured);
 		}
 	</div>
 
-	<a href="/about#recommendations" class="mt-8 inline-block text-sm font-semibold text-accent-text hover:underline">
-		Read all {testimonials.length} recommendations →
+	{/* Phones: centred in the page (étape 9, B4). */}
+	<div class="mt-8 text-center sm:text-left">
+	<a href="/about#recommendations" class="inline-flex min-h-11 items-center text-sm font-semibold text-accent-text hover:underline">
+		Read all {testimonials.length} recommendations&nbsp;<span class="arr" aria-hidden="true">→</span>
 	</a>
+	</div>
 </section>

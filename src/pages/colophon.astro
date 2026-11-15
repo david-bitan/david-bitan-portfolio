@@ -55,7 +55,7 @@ const palette = [
 
 const shape = [
 	{ label: 'Typeface', value: 'Manrope 400 / 500 / 700 / 800', why: 'Geometric sans with tight tracking on headlines: modern without being sterile.' },
-	{ label: 'Radius', value: '8px · 12px · pill', why: 'Buttons 8, cards 12, CTAs full-round. Kept small tokens; no random values.' },
+	{ label: 'Radius', value: '8px · 16px · pill', why: 'Buttons 8, cards 16, CTAs full-round. Kept small tokens; no random values.' },
 	{ label: 'Corners', value: 'Squircle (superellipse 3)', why: 'iOS-style corner-shape on rounded cards where supported: quiet upgrade, falls back to normal radius elsewhere.' },
 	{ label: 'Dark mode', value: 'Warm charcoal, orange kept', why: 'Same family as the footer, never navy. Accent orange is identical in both modes, so the brand reads the same.' },
 ];
@@ -133,7 +133,7 @@ const method = [
 				palette.map((c) => (
 					<div class="rounded-lg border border-ink/10 bg-card p-4">
 						<div
-							class="h-16 w-full rounded-md ring-1 ring-ink/10"
+							class="h-16 w-full rounded-[4px] ring-1 ring-ink/10"
 							style={`background-color: ${c.swatch};`}
 							aria-hidden="true"
 						/>

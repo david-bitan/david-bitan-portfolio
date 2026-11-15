@@ -48,11 +48,53 @@ const workCategories = Array.from(
 </section>
 
 <script>
-	// Hide the "Earlier work" heading when the active filter leaves it empty.
-	document.addEventListener('home-filter:change', () => {
-		const block = document.getElementById('earlier-work');
-		const cards = document.querySelectorAll('#earlier-grid > [data-categories]');
-		const visible = Array.from(cards).some((c) => !c.classList.contains('home-filter-hidden'));
-		block?.classList.toggle('hidden', !visible);
+	// Étape 9, B5: each filter has its own order, its most representative
+	// projects first, so the first cards on a phone always change (David).
+	// "All" keeps the home order (recent grid, then "Earlier work"). Any other
+	// filter shows its projects in ONE list, in its own order, in the first
+	// grid; the earlier block hides. The cards then fade in (0.28 s), at once
+	// under reduced motion.
+	const ORDER: Record<string, string[]> = {
+		SaaS: ['sonary-website', 'sonary-mailer', 'sonary-dashboard', 'top5'],
+		'UI/UX': ['ui-ux-vintage', 'branding-old', 'sonary-dashboard', 'sonary-website', 'top5', 'playright', 'ryze-brand', 'sonary-mailer'],
+		B2B: ['top5'],
+		Branding: ['ryze-brand', 'branding-old'],
+		iGaming: ['gamingtech', 'playright', 'tradologic'],
+	};
+	const grid = document.getElementById('work-grid')!;
+	const earlierGrid = document.getElementById('earlier-grid')!;
+	const block = document.getElementById('earlier-work');
+	const slugOf = (el: Element) => (el.getAttribute('href') || '').split('/').filter(Boolean).pop() || '';
+	// the home order, to come back to it on "All"
+	const home = [
+		...Array.from(grid.children).map((el) => ({ el, parent: grid })),
+		...Array.from(earlierGrid.children).map((el) => ({ el, parent: earlierGrid })),
+	];
+	const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+	document.addEventListener('home-filter:change', (e) => {
+		const filter = (e as CustomEvent).detail?.filter as string;
+		if (!filter) return;
+		if (filter === '__all__' || !ORDER[filter]) {
+			home.forEach(({ el, parent }) => parent.appendChild(el));
+			const visible = Array.from(earlierGrid.children).some((c) => !c.classList.contains('home-filter-hidden'));
+			block?.classList.toggle('hidden', !visible);
+		} else {
+			const bySlug = new Map(home.map(({ el }) => [slugOf(el), el]));
+			ORDER[filter].forEach((slug) => { const el = bySlug.get(slug); if (el) grid.appendChild(el); });
+			// anything in the category but missing from the list keeps its place after it
+			home.forEach(({ el }) => { if (!ORDER[filter].includes(slugOf(el)) && !el.classList.contains('home-filter-hidden')) grid.appendChild(el); });
+			home.forEach(({ el }) => { if (el.classList.contains('home-filter-hidden')) earlierGrid.appendChild(el); });
+			block?.classList.add('hidden');
+		}
+		if (reduce.matches) return;
+		Array.from(grid.children)
+			.filter((el) => !el.classList.contains('home-filter-hidden'))
+			.forEach((el, i) =>
+				(el as HTMLElement).animate(
+					[{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }],
+					{ duration: 280, delay: Math.min(i, 3) * 40, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'backwards' },
+				),
+			);
 	});
 </script>
