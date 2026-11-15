@@ -1,14 +1,15 @@
 ---
 // hideCta: /contact already opens with its own headline, so the closing
-// "Let's build something." would repeat it there (2026-11-12 brief).
+// "Let's talk product design." would repeat it there (2026-11-12 brief).
+// id="contact": target of the "Contact" button of the top menu (étape 8, M).
 const { hideCta = false } = Astro.props;
 const email = 'advance26@gmail.com';
 const linkedinUrl = 'https://www.linkedin.com/in/david-bitan';
 const year = new Date().getFullYear();
 ---
 
-<footer class:list={['bg-footer-bg px-6 text-center', hideCta ? 'py-14 sm:py-16' : 'py-24 sm:py-32']}>
-	{!hideCta && <h2 class="text-4xl font-extrabold tracking-tight text-footer-ink sm:text-6xl">Let's build something.</h2>}
+<footer id="contact" class:list={['scroll-mt-20 bg-footer-bg px-6 text-center', hideCta ? 'py-14 sm:py-16' : 'py-24 sm:py-32']}>
+	{!hideCta && <h2 class="text-4xl font-extrabold tracking-tight text-footer-ink sm:text-6xl">Let's talk product design.</h2>}
 
 	{/* Mobile: stacks vertically (email / LinkedIn / location on their own
 		lines) so nothing clips off-screen on 375px width.
@@ -21,7 +22,20 @@ const year = new Date().getFullYear();
 		<span class="text-footer-ink">Ashkelon, Israel · Hybrid or remote, Tel Aviv area</span>
 	</p>
 
-	<p class="mt-10 text-xs text-footer-muted">© {year} David Bitan. All rights reserved.</p>
+	{/* Étape 8, O: quiet links to every part, and the CV in both formats.
+	    No form, no columns. */}
+	<nav aria-label="Footer" class="mx-auto mt-10 flex max-w-xl flex-wrap justify-center gap-x-5 gap-y-1 text-sm font-medium text-footer-muted">
+		{[['Work', '/#work'], ['AI Lab', '/#ai-lab'], ['About me', '/about'], ['Craft', '/craft'], ['Contact', '/contact'], ['Colophon', '/colophon']].map(([label, href]) => (
+			<a href={href} class="inline-flex min-h-11 items-center hover:text-footer-ink hover:underline underline-offset-4">{label}</a>
+		))}
+	</nav>
+	<p class="mt-2 text-sm text-footer-muted">
+		Download CV: <a href="/cv/CV-David-Bitan.pdf" download class="inline-flex min-h-11 items-center text-accent-text hover:underline">PDF</a>
+		<span class="mx-1.5" aria-hidden="true">·</span>
+		<a href="/cv/CV-David-Bitan.docx" download class="inline-flex min-h-11 items-center text-accent-text hover:underline">Word</a>
+	</p>
+
+	<p class="mt-8 text-xs text-footer-muted">© {year} David Bitan. All rights reserved.</p>
 
 	{/* Micro-mention: subtle nod to the AI-native workflow this site is built with.
 		Links to /colophon for the full breakdown. */}

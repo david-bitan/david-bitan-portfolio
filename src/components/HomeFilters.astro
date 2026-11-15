@@ -25,11 +25,13 @@ const { id, categories, target } = Astro.props;
 	class="home-filters mb-6"
 	data-target={target}
 >
-	<div class="flex flex-wrap items-center gap-2">
+	{/* Phones: 3 equal columns over the full content width, everything
+	    visible, no swipe; 44px tall (David, 15/11). sm+: unchanged row. */}
+	<div class="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
 		<button
 			type="button"
 			data-home-filter="__all__"
-			class="home-filter-btn cursor-pointer rounded-pill border border-ink/15 bg-ink px-4 py-2 text-sm font-semibold text-bg transition-colors"
+			class="home-filter-btn flex min-h-11 items-center justify-center whitespace-nowrap cursor-pointer rounded-pill border border-ink/15 bg-ink px-2 py-2 text-sm sm:inline-flex sm:min-h-0 sm:px-4 font-semibold text-bg transition-colors"
 			aria-pressed="true"
 		>
 			All
@@ -39,7 +41,7 @@ const { id, categories, target } = Astro.props;
 				<button
 					type="button"
 					data-home-filter={cat}
-					class="home-filter-btn cursor-pointer rounded-pill border border-ink/15 bg-transparent px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent-text"
+					class="home-filter-btn flex min-h-11 items-center justify-center whitespace-nowrap cursor-pointer rounded-pill border border-ink/15 bg-transparent px-2 py-2 text-sm sm:inline-flex sm:min-h-0 sm:px-4 font-semibold text-ink transition-colors hover:border-accent hover:text-accent-text"
 					aria-pressed="false"
 				>
 					{cat}

@@ -132,3 +132,18 @@ export function shotSrcset(url: string, size?: [number, number]): string | undef
 	const widths = [282, 375, 564, 750, 1125, 1500].filter((w) => w < max).concat(max);
 	return widths.map((w) => `${cld(url, `c_limit,w_${w},${SHOT}`)} ${w}w`).join(', ');
 }
+
+// Étape 8, E: every width the screen may need, up to the original file
+// (Top5 originals are 3,840 px wide, Sonary 1,920), never past it. Used in the
+// pages (sizes picks the right one) and in the image viewer. Width unknown:
+// up to 3,840; c_limit never enlarges, so a smaller original simply comes back
+// at its own size (the viewer then reads it and caps the display).
+const FULL_WIDTHS = [640, 960, 1280, 1600, 2000, 2560, 3200, 3840];
+export function fullSrcset(url: string, origW?: number): string | undefined {
+	if (!url.includes('/upload/')) return undefined;
+	const max = Math.min(origW || 3840, 3840);
+	return FULL_WIDTHS.filter((w) => w < max)
+		.concat(max)
+		.map((w) => `${cld(url, `c_limit,w_${w},q_100,f_auto,fl_progressive`)} ${w}w`)
+		.join(', ');
+}

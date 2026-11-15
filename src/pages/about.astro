@@ -3,6 +3,7 @@ import { testimonials, LINKEDIN_RECOMMENDATIONS_URL } from '../data/testimonials
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import ZoneFilters from '../components/ZoneFilters.astro';
 import RecByline from '../components/RecByline.astro';
 
 // Sourced from ../../CV_David_Bitan_2026_v3.docx and ../../portfolio-cms-v2.xlsx (Timeline sheet).
@@ -164,6 +165,7 @@ const languages = [
 >
 	<Nav />
 	<main id="main" tabindex="-1">
+	<ZoneFilters backHref="/" backLabel="Back to home" />
 
 	<section class="mx-auto max-w-[1200px] px-6 pt-16 pb-10 sm:pt-20 min-[1248px]:px-0" data-reveal>
 		<p class="text-sm font-semibold uppercase tracking-widest text-muted">About me</p>
@@ -258,7 +260,7 @@ const languages = [
 		<div class="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
 			{
 				testimonials.map((t) => (
-					<figure class="flex flex-col rounded-md bg-card p-6 sm:p-8">
+					<figure class="row-span-2 grid grid-rows-subgrid gap-0 rounded-md bg-card p-6 sm:p-8">
 						<blockquote class="flex-1 space-y-4 leading-relaxed text-ink">
 							{t.text.map((para) => <p>{para}</p>)}
 						</blockquote>

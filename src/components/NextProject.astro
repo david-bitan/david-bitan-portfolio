@@ -1,0 +1,17 @@
+---
+// Étape 8, K: one link at the bottom of a project page, above the contact
+// block: the next project in the home page's order. No "Previous".
+interface Props {
+	href: string;
+	title: string;
+}
+const { href, title } = Astro.props;
+---
+
+<nav aria-label="Next project" class="mx-auto max-w-[1200px] px-6 pt-8 pb-20 sm:pb-24 min-[1248px]:px-0">
+	<a href={href} class="group flex min-h-11 flex-wrap items-baseline gap-x-2 border-t border-ink/10 pt-8 text-2xl font-extrabold tracking-tight sm:text-3xl">
+		<span class="text-base font-semibold text-muted sm:text-lg">Next project ·</span>
+		<span class="transition-colors group-hover:text-accent-text">{title}</span>
+		<span class="text-accent transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
+	</a>
+</nav>

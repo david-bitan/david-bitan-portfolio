@@ -1,65 +1,43 @@
 ---
 /**
- * Top nav.
- * Five items: Work, AI Lab (home anchors), Craft, About me, Contact (pages).
- * Craft is its own page since the home keeps it to one line (2026-11-12).
- *
- * Active state:
- *  - /about and /contact → server-side, rendered as <span aria-current="page">
- *  - Home hash links (#work, #ai-lab, #craft) → client-side scroll spy on
- *    the home page: whichever section the user is currently reading gets
- *    `.nav-link-active` promoted onto its <a>. Same look as the server
- *    active state (orange text + underline + not clickable).
+ * Top nav (étape 8, M, David 15/11): every entry scrolls the home page down to
+ * its section, in the home's own order (Work · AI Lab · Testimonials · About ·
+ * Craft · Contact). From an inner page it goes back to the home at that
+ * section (/#…). Contact is the orange button on the right. The underline
+ * follows the section in view (scroll spy, home only). The full /about, /craft
+ * and /contact pages stay reachable from the home blocks and the footer.
  */
 const links = [
 	{ href: '/#work', label: 'Work', spy: 'work' },
 	{ href: '/#ai-lab', label: 'AI Lab', spy: 'ai-lab' },
-	{ href: '/craft', label: 'Craft', spy: null },
-	{ href: '/about', label: 'About me', spy: null },
-	{ href: '/contact', label: 'Contact', spy: null },
+	{ href: '/#testimonials', label: 'Testimonials', spy: 'testimonials' },
+	{ href: '/#about', label: 'About', spy: 'about' },
+	{ href: '/#craft', label: 'Craft', spy: 'craft' },
 ];
-
-const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
-
-// Server-side active for /about and /contact only. Home hash links get
-// their active state from the scroll spy on the client.
-function isActive(href: string) {
-	if (href === '/about') return pathname === '/about';
-	if (href === '/contact') return pathname === '/contact';
-	if (href === '/craft') return pathname === '/craft';
-	return false;
-}
+const contact = { href: '/#contact', label: 'Contact', spy: 'contact' };
+const btnCls = 'rounded-pill bg-accent font-semibold text-accent-ink transition-colors hover:bg-ink hover:text-bg';
 ---
 
-<header class="sticky top-0 z-50 border-b border-ink/5 bg-bg">
+<header id="site-header" class="sticky top-0 z-50 border-b border-ink/5 bg-bg">
 	<nav class="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-5 min-[1248px]:px-0">
-		<a href="/" class="text-lg font-extrabold tracking-tight">David Bitan</a>
+		<a href="/" data-menu-fade class="text-lg font-extrabold tracking-tight">David Bitan</a>
 
 		<div class="hidden items-center gap-8 lg:flex">
 			{
-				links.map((link) => {
-					const active = isActive(link.href);
-					const cls = active
-						? 'nav-link nav-link-active text-sm font-semibold text-accent-text'
-						: 'nav-link text-sm font-medium text-muted hover:text-ink transition-colors';
-					const dataSpy = link.spy ? { 'data-spy': link.spy } : {};
-					return active ? (
-						<span aria-current="page" class={cls} {...dataSpy}>
-							{link.label}
-						</span>
-					) : (
-						<a href={link.href} class={cls} {...dataSpy}>
-							{link.label}
-						</a>
-					);
-				})
+				links.map((link) => (
+					<a href={link.href} class="nav-link text-sm font-medium text-muted hover:text-ink transition-colors" data-spy={link.spy}>
+						{link.label}
+					</a>
+				))
 			}
+			<a href={contact.href} data-spy-btn={contact.spy} class={`inline-flex h-10 items-center px-5 text-sm ${btnCls}`}>{contact.label}</a>
 		</div>
 
 		<div class="flex items-center gap-3">
 			<button
 				id="theme-toggle"
 				type="button"
+				data-menu-fade
 				aria-label="Toggle dark mode"
 				class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ink/15 text-ink hover:border-ink/40 transition-colors"
 			>
@@ -74,16 +52,21 @@ function isActive(href: string) {
 
 			<button
 				id="nav-toggle"
-			type="button"
-			aria-label="Open menu"
-			aria-expanded="false"
-			aria-controls="mobile-nav"
-			class="flex h-11 w-11 flex-col items-center justify-center gap-1.5 lg:hidden"
-		>
-			<span class="block h-0.5 w-6 bg-ink"></span>
-			<span class="block h-0.5 w-6 bg-ink"></span>
-			<span class="block h-0.5 w-6 bg-ink"></span>
-		</button>
+				type="button"
+				aria-label="Open menu"
+				aria-expanded="false"
+				aria-controls="mobile-nav"
+				class="nav-burger relative flex h-11 w-11 items-center justify-center lg:hidden"
+			>
+				{/* One button that morphs (David, 15/11): the 3 bars meet in the
+				    middle, then two of them turn into the X; closing is the exact
+				    reverse. Ink box 24 x 18, like the old burger. */}
+				<span class="nav-burger-box" aria-hidden="true">
+					<span class="nav-bar nav-bar-1"></span>
+					<span class="nav-bar nav-bar-2"></span>
+					<span class="nav-bar nav-bar-3"></span>
+				</span>
+			</button>
 		</div>
 	</nav>
 </header>
@@ -91,47 +74,33 @@ function isActive(href: string) {
 <div
 	id="mobile-nav"
 	inert
-	class="mobile-nav-panel fixed inset-0 z-[60] flex translate-x-full flex-col items-center justify-center gap-8 bg-bg transition-transform duration-[620ms] lg:hidden"
+	class="mobile-nav-panel fixed inset-0 z-[60] flex flex-col items-center justify-center gap-8 bg-bg lg:hidden"
 >
-	<button id="nav-close" type="button" aria-label="Close menu" class="absolute right-6 top-5 flex items-center justify-center">
-		<!-- What matters is the INK, not the svg box. Both buttons are 44x44 and
-		     both svgs are 24x24, which is why every getBoundingClientRect probe
-		     said they matched while the eye kept saying otherwise. The burger
-		     paints 24 wide by 18 tall (3 bars of 2px, two 6px gaps). The stock
-		     X path runs 6->18, a 12px span that with a 2px stroke paints only
-		     14x14 — visibly the smaller mark. Drawn 4->20 it paints 18x18, the
-		     same height as the burger. Change the path, not the svg size. -->
-		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-			<path d="M4 4l16 16M20 4L4 20"></path>
-		</svg>
-	</button>
 	{
-		links.map((link) => {
-			const active = isActive(link.href);
-			const cls = active
-				? 'mobile-nav-link nav-link-active text-3xl font-semibold text-accent-text'
-				: 'mobile-nav-link text-3xl font-semibold';
-			const dataSpy = link.spy ? { 'data-spy-mobile': link.spy } : {};
-			return active ? (
-				<span aria-current="page" class={cls} {...dataSpy}>
-					{link.label}
-				</span>
-			) : (
-				<a href={link.href} class={cls} {...dataSpy}>
-					{link.label}
-				</a>
-			);
-		})
+		links.map((link) => (
+			<a href={link.href} class="mobile-nav-link text-3xl font-semibold" data-spy-mobile={link.spy}>
+				{link.label}
+			</a>
+		))
 	}
+	<a href={contact.href} data-spy-btn={contact.spy} class={`mobile-nav-link mt-2 inline-flex min-h-14 items-center px-9 text-2xl ${btnCls}`}>{contact.label}</a>
 </div>
 
 <style>
-	/* Mobile menu motion — matched to the APEX demos so the two feel like one
-	   hand. The panel slides in (620ms), then the links rise in sequence just
-	   behind it. Without the stagger the panel arrives fully formed and the
-	   whole thing reads as an instant swap, however long the slide lasts.
-	   The close button is deliberately excluded: it must be usable on the
-	   first frame. */
+	/* Mobile menu (David, 15/11): the panel FADES in and out, opacity only,
+	   no slide. The links keep their own rise-in sequence (unchanged, David
+	   likes it). Closing is a touch faster than opening. Visibility flips
+	   after the fade so the closed panel never catches taps. */
+	.mobile-nav-panel {
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 320ms cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 320ms;
+	}
+	.mobile-nav-panel.is-open {
+		opacity: 1;
+		visibility: visible;
+		transition: opacity 420ms cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s;
+	}
 	.mobile-nav-panel .mobile-nav-link {
 		opacity: 0;
 		transform: translateY(18px);
@@ -142,30 +111,66 @@ function isActive(href: string) {
 		transform: none;
 	}
 	/* nth-child, not nth-of-type: the current page renders as <span aria-current>
-	   among <a> siblings, and nth-of-type counts each tag in its own sequence —
-	   so every delay after the active item was wrong. Child 1 is the close
-	   button, hence the offset. */
-	.mobile-nav-panel.is-open > :nth-child(2) { transition-delay: 150ms; }
-	.mobile-nav-panel.is-open > :nth-child(3) { transition-delay: 250ms; }
-	.mobile-nav-panel.is-open > :nth-child(4) { transition-delay: 350ms; }
-	.mobile-nav-panel.is-open > :nth-child(5) { transition-delay: 450ms; }
-	.mobile-nav-panel.is-open > :nth-child(6) { transition-delay: 550ms; }
-	.mobile-nav-panel.is-open > :nth-child(7) { transition-delay: 650ms; }
+	   among <a> siblings, and nth-of-type counts each tag in its own sequence. */
+	.mobile-nav-panel.is-open > :nth-child(1) { transition-delay: 150ms; }
+	.mobile-nav-panel.is-open > :nth-child(2) { transition-delay: 250ms; }
+	.mobile-nav-panel.is-open > :nth-child(3) { transition-delay: 350ms; }
+	.mobile-nav-panel.is-open > :nth-child(4) { transition-delay: 450ms; }
+	.mobile-nav-panel.is-open > :nth-child(5) { transition-delay: 550ms; }
+	.mobile-nav-panel.is-open > :nth-child(6) { transition-delay: 650ms; }
 
-	@media (prefers-reduced-motion: reduce) {
-		.mobile-nav-panel { transition-duration: 200ms; }
-		.mobile-nav-panel .mobile-nav-link { transition: opacity 160ms ease; transform: none; }
-		.mobile-nav-panel.is-open .mobile-nav-link { transition-delay: 0s; }
+	/* While the menu is open the header sits above the panel so the burger
+	   itself becomes the X. Logo, theme button and hairline fade with it. */
+	#site-header.menu-open { z-index: 70; border-bottom-color: transparent; }
+	#site-header [data-menu-fade] { transition: opacity 320ms ease, border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease; }
+	@media (max-width: 1023.98px) {
+		#site-header.menu-open [data-menu-fade] { opacity: 0; pointer-events: none; }
 	}
 
-	/* Active nav item — orange text + underline bar + non-clickable.
-	   Applies to both <span aria-current> (server-rendered for /about,
-	   /contact) and <a> promoted by the scroll spy on the home page. */
+	/* Burger -> X. Stage 1: the outer bars slide to the middle (translate).
+	   Stage 2: they turn from their centre (rotate) while the middle bar goes.
+	   Closing plays the same two stages backwards. */
+	.nav-burger-box { position: relative; display: block; width: 24px; height: 18px; }
+	.nav-bar {
+		position: absolute;
+		left: 0;
+		top: 8px;
+		width: 24px;
+		height: 2px;
+		border-radius: 1px;
+		background: var(--color-ink);
+		transition:
+			translate 200ms cubic-bezier(0.65, 0, 0.35, 1) 200ms,
+			rotate 200ms cubic-bezier(0.65, 0, 0.35, 1) 0ms,
+			opacity 0ms linear 200ms,
+			background-color 0.3s ease;
+	}
+	.nav-bar-1 { translate: 0 -8px; }
+	.nav-bar-3 { translate: 0 8px; }
+	.nav-burger[aria-expanded='true'] .nav-bar {
+		translate: 0 0;
+		transition:
+			translate 200ms cubic-bezier(0.65, 0, 0.35, 1) 0ms,
+			rotate 200ms cubic-bezier(0.65, 0, 0.35, 1) 200ms,
+			opacity 0ms linear 200ms,
+			background-color 0.3s ease;
+	}
+	.nav-burger[aria-expanded='true'] .nav-bar-1 { rotate: 45deg; }
+	.nav-burger[aria-expanded='true'] .nav-bar-3 { rotate: -45deg; }
+	.nav-burger[aria-expanded='true'] .nav-bar-2 { opacity: 0; }
+
+	@media (prefers-reduced-motion: reduce) {
+		.mobile-nav-panel, .mobile-nav-panel.is-open { transition: opacity 200ms ease, visibility 0s linear; }
+		.mobile-nav-panel .mobile-nav-link { transition: opacity 160ms ease; transform: none; }
+		.mobile-nav-panel.is-open .mobile-nav-link { transition-delay: 0s; }
+		.nav-bar, .nav-burger[aria-expanded='true'] .nav-bar { transition: none; }
+	}
+
+	/* Active nav item: orange text + underline bar, set by the scroll spy on
+	   the home page. Stays clickable (a click scrolls back to the section). */
 	.nav-link-active {
 		position: relative;
 		color: var(--color-accent-text) !important;
-		cursor: default;
-		pointer-events: none;
 	}
 	.nav-link-active::after {
 		content: '';
@@ -180,61 +185,42 @@ function isActive(href: string) {
 </style>
 
 <script>
-	// --- Mobile menu open/close ---
+	// --- Mobile menu open/close (one burger button that morphs into the X) ---
 	const toggle = document.getElementById('nav-toggle');
-	const close = document.getElementById('nav-close');
 	const overlay = document.getElementById('mobile-nav');
+	const header = document.getElementById('site-header');
+	const isOpen = () => !!overlay?.classList.contains('is-open');
 
-	// The close button must land exactly where the burger is, at every width.
-	// Hard-coded offsets drift the moment the header padding or the icon size
-	// changes, so the burger's own box is measured and copied instead.
-	function syncClosePosition() {
-		if (!toggle || !close) return;
-		const r = toggle.getBoundingClientRect();
-		if (!r.width) return;
-		// Absolute, not fixed. The panel animates with a transform, and a
-		// transformed ancestor becomes the containing block for fixed children:
-		// the button would ride along with the slide and then jump to the
-		// viewport the moment the transform resolved to none. The panel is
-		// inset-0, so viewport coordinates and panel coordinates are the same
-		// thing and absolute positioning lands in exactly the right place.
-		// No scroll offset: the panel is `fixed inset-0`, so its origin is the
-		// viewport corner, exactly what getBoundingClientRect already returns.
-		close.style.top = r.top + 'px';
-		close.style.left = r.left + 'px';
-		close.style.right = 'auto';
-		close.style.width = r.width + 'px';
-		close.style.height = r.height + 'px';
+	// Real header height for every sticky bar under it (85px on phones,
+	// 77px on desktop). Hard-coded tops slid the bars under the hairline.
+	if (header) {
+		const setH = () => document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
+		setH();
+		new ResizeObserver(setH).observe(header);
 	}
 
 	function openMenu() {
-		syncClosePosition();
-		overlay?.classList.remove('translate-x-full');
 		overlay?.classList.add('is-open');
+		header?.classList.add('menu-open');
 		toggle?.setAttribute('aria-expanded', 'true');
-		document.body.style.overflow = 'hidden';
-		// Reachable only while open (inert when closed), focus moves inside.
+		toggle?.setAttribute('aria-label', 'Close menu');
+		document.documentElement.style.overflowY = 'hidden';
 		if (overlay) overlay.inert = false;
-		(overlay?.querySelector('.mobile-nav-link') as HTMLElement | null)?.focus();
+		document.querySelectorAll<HTMLElement>('#site-header [data-menu-fade], body > main, body > footer, #back-to-top, .skip-link').forEach((el) => (el.inert = true));
 	}
 	function closeMenu() {
-		overlay?.classList.add('translate-x-full');
 		overlay?.classList.remove('is-open');
+		header?.classList.remove('menu-open');
 		toggle?.setAttribute('aria-expanded', 'false');
-		document.body.style.overflow = '';
-		if (overlay && !overlay.inert) {
-			overlay.inert = true;
-			toggle?.focus();
-		}
+		toggle?.setAttribute('aria-label', 'Open menu');
+		document.documentElement.style.overflowY = '';
+		if (overlay) overlay.inert = true;
+		document.querySelectorAll<HTMLElement>('#site-header [data-menu-fade], body > main, body > footer, #back-to-top, .skip-link').forEach((el) => (el.inert = false));
 	}
 	document.addEventListener('keydown', (e) => {
-		if (e.key === 'Escape' && overlay?.classList.contains('is-open')) closeMenu();
+		if (e.key === 'Escape' && isOpen()) { closeMenu(); toggle?.focus(); }
 	});
-	window.addEventListener('resize', () => {
-		if (overlay?.classList.contains('is-open')) syncClosePosition();
-	});
-	toggle?.addEventListener('click', openMenu);
-	close?.addEventListener('click', closeMenu);
+	toggle?.addEventListener('click', () => (isOpen() ? closeMenu() : openMenu()));
 	overlay?.querySelectorAll('.mobile-nav-link').forEach((link) => link.addEventListener('click', closeMenu));
 
 	// --- Theme toggle ---
@@ -262,116 +248,63 @@ function isActive(href: string) {
 	});
 
 	// --- Scroll spy (home only) ---
-	// Not IntersectionObserver — plain scroll listener with a small rAF
-	// throttle. We compute which section top is closest above an activation
-	// line placed ~120px under the nav (so the flip happens as the section
-	// heading crosses under the nav). Simpler and more predictable than
-	// IO rootMargin tuning at page top/bottom edges.
+	// The section whose top has passed a line ~140px under the header is the
+	// current one; nothing is underlined above Work (hero, figures, logos);
+	// at the very bottom of the page, Contact (the closing block) wins.
 	(function initScrollSpy() {
 		const path = window.location.pathname.replace(/\/$/, '') || '/';
 		if (path !== '/') return;
-
-		const spyLinks = new Map();
-		document.querySelectorAll('[data-spy]').forEach((el) => {
-			spyLinks.set(el.getAttribute('data-spy'), el);
-		});
-		document.querySelectorAll('[data-spy-mobile]').forEach((el) => {
-			// Store mobile counterparts under a distinct key so setActive
-			// can find both together.
-			const id = el.getAttribute('data-spy-mobile');
-			const bucket = spyLinks.get(id + ':all') || [spyLinks.get(id)].filter(Boolean);
-			bucket.push(el);
-			spyLinks.set(id + ':all', bucket);
-		});
-
-		const sectionIds = ['work', 'ai-lab'];
-		const sections = sectionIds
-			.map((id) => ({ id, el: document.getElementById(id) }))
-			.filter((s) => s.el);
+		const ids = ['work', 'ai-lab', 'testimonials', 'about', 'craft', 'contact'];
+		const sections = ids.map((id) => ({ id, el: document.getElementById(id) })).filter((x) => x.el);
 		if (!sections.length) return;
+		const linksFor = (id: string) => document.querySelectorAll<HTMLElement>(`[data-spy="${id}"], [data-spy-mobile="${id}"], [data-spy-btn="${id}"]`);
+		let currentId: string | null = null;
 
-		let currentId = null;
-
-		function applyActive(el, active) {
-			if (!el) return;
-			if (active) {
-				el.classList.add('nav-link-active', 'text-accent-text', 'font-semibold');
-				el.classList.remove('text-muted', 'hover:text-ink', 'transition-colors', 'font-medium');
-			} else {
-				el.classList.remove('nav-link-active', 'text-accent-text');
-				// Desktop-only default classes — mobile links stay font-semibold.
-				if (el.classList.contains('nav-link')) {
-					el.classList.add('text-muted', 'hover:text-ink', 'transition-colors', 'font-medium');
-					el.classList.remove('font-semibold');
-				}
-			}
-		}
-
-		function setActive(id) {
+		function setActive(id: string | null) {
 			if (id === currentId) return;
 			currentId = id;
-			sectionIds.forEach((sid) => {
-				const bucket = spyLinks.get(sid + ':all');
-				if (bucket) {
-					bucket.forEach((el) => applyActive(el, sid === id));
-				} else {
-					// Fallback if mobile counterpart is missing
-					applyActive(spyLinks.get(sid), sid === id);
-				}
-			});
+			ids.forEach((sid) =>
+				linksFor(sid).forEach((el) => {
+					const on = sid === id;
+					if (on) el.setAttribute('aria-current', 'location');
+					else el.removeAttribute('aria-current');
+					// the orange Contact button keeps its look; links get the orange underline
+					if (el.hasAttribute('data-spy-btn')) return;
+					el.classList.toggle('nav-link-active', on);
+					if (el.classList.contains('nav-link')) {
+						el.classList.toggle('text-muted', !on);
+						el.classList.toggle('font-medium', !on);
+						el.classList.toggle('font-semibold', on);
+					}
+				}),
+			);
 		}
-
-		function pickActive() {
-			// Activation line: 140px under the top of the viewport (~ nav
-			// height + a small buffer). Section is "current" when its top
-			// is at or above the line and next section's top is below.
+		function pick() {
 			const line = 140;
-			let picked = sections[0].id;
-			for (let i = 0; i < sections.length; i++) {
-				const top = sections[i].el.getBoundingClientRect().top;
-				if (top <= line) {
-					picked = sections[i].id;
-				} else {
-					break;
-				}
+			const doc = document.documentElement;
+			if (window.innerHeight + window.scrollY >= doc.scrollHeight - 4) return setActive('contact');
+			let picked: string | null = null;
+			for (const sec of sections) {
+				if (sec.el!.getBoundingClientRect().top <= line) picked = sec.id;
+				else break;
 			}
 			setActive(picked);
 		}
-
-		// Lock: when the user clicks a nav anchor, we flip the active state
-		// *immediately* (no wait for the smooth scroll to finish). During
-		// the scroll animation, ignore pickActive() so we don't flicker
-		// through intermediate sections the scroll passes over.
-		let lockUntil = 0;
-
-		let ticking = false;
-		function onScroll() {
+		// A click flips the state at once; the smooth scroll that follows does
+		// not flicker through the sections it passes.
+		let lockUntil = 0, ticking = false;
+		window.addEventListener('scroll', () => {
 			if (ticking) return;
 			ticking = true;
-			window.requestAnimationFrame(() => {
-				if (Date.now() >= lockUntil) pickActive();
-				ticking = false;
-			});
-		}
-
-		window.addEventListener('scroll', onScroll, { passive: true });
-		window.addEventListener('resize', onScroll);
-
-		// Instant click feedback — same behaviour as the server-rendered
-		// active state for /about and /contact.
-		function bindClickInstant(el) {
-			if (!el) return;
-			const id = el.getAttribute('data-spy') || el.getAttribute('data-spy-mobile');
-			if (!id) return;
+			requestAnimationFrame(() => { if (Date.now() >= lockUntil) pick(); ticking = false; });
+		}, { passive: true });
+		window.addEventListener('resize', pick);
+		document.querySelectorAll<HTMLElement>('[data-spy], [data-spy-mobile], [data-spy-btn]').forEach((el) =>
 			el.addEventListener('click', () => {
-				setActive(id);
-				lockUntil = Date.now() + 800; // cover a smooth-scroll pass
-			});
-		}
-		document.querySelectorAll('[data-spy]').forEach(bindClickInstant);
-		document.querySelectorAll('[data-spy-mobile]').forEach(bindClickInstant);
-
-		// Run once on load so the initial paint has an active item.
-		pickActive();
+				setActive(el.dataset.spy || el.dataset.spyMobile || el.dataset.spyBtn || null);
+				lockUntil = Date.now() + 1000;
+			}),
+		);
+		pick();
 	})();
 </script>

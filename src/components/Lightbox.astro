@@ -1,11 +1,13 @@
 ---
 // Full-size viewer for every gallery image on project and Lab pages
-// (CL2, étape 5). Opens on click (or Enter / Space) on any [data-lb] image:
-// the image at its real size on a dark veil, vertical scroll only; close with
-// Esc, the cross or a click on the veil; previous / next as two round
-// buttons side by side (beside a phone capture, bottom right otherwise) and
-// with the arrow keys. A native <dialog>: the page behind is inert and keeps
-// the keyboard focus inside.
+// (CL2, étape 5; étape 8, E + F). Opens on click (or Enter / Space) on any
+// [data-lb] image, on a dark veil, vertical scroll only. Size: a moderate
+// zoom (a little larger than in the page), never larger than the original
+// file divided by the screen density, so it stays sharp up to a 4K screen;
+// the file is picked from a srcset that goes up to the original. Close with
+// Esc, the cross or a click on the veil. Previous / next: one pill fixed at
+// the bottom centre of the screen ("← 3 / 12 →"), the arrow keys, or a swipe
+// on a phone. A native <dialog>: the page behind is inert.
 ---
 
 <dialog class="lb" aria-label="Image viewer">
@@ -15,12 +17,13 @@
 	<button class="lb-btn lb-close" type="button" aria-label="Close">
 		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
 	</button>
-	<div class="lb-nav">
-		<button class="lb-btn lb-prev" type="button" aria-label="Previous image">
-			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+	<div class="lb-nav" role="group" aria-label="Images">
+		<button class="lb-arrow lb-prev" type="button" aria-label="Previous image">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"></path><path d="M11 18l-6-6 6-6"></path></svg>
 		</button>
-		<button class="lb-btn lb-next" type="button" aria-label="Next image">
-			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+		<span class="lb-count" aria-live="polite"></span>
+		<button class="lb-arrow lb-next" type="button" aria-label="Next image">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
 		</button>
 	</div>
 </dialog>
@@ -32,68 +35,92 @@
 		const img = dlg.querySelector<HTMLImageElement>('.lb-img')!;
 		const nav = dlg.querySelector<HTMLElement>('.lb-nav')!;
 		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-		const items = () => Array.from(document.querySelectorAll<HTMLImageElement>('[data-lb]'));
+		// only the images that show (a filter may hide whole zones)
+		const items = () => Array.from(document.querySelectorAll<HTMLImageElement>('[data-lb]')).filter((el) => el.getClientRects().length > 0);
 		let index = 0;
 		let opener: HTMLElement | null = null;
 
-		// Real size: a phone capture at phone width (a 2x file shows at half
-		// its pixels), anything else at 100 %; smaller only if the screen is.
-		// On a phone the image takes the width of the screen.
+		const count = dlg.querySelector<HTMLElement>('.lb-count')!;
+		let inPage = 0;
 		function size() {
-			const nw = img.naturalWidth;
-			if (!nw) return place();
+			const t = opener;
+			// original width: known from the data, or learnt once from the first file loaded (see learn())
+			const nat = +(t?.dataset.lbW || 0) || +(t?.dataset.lbOrig || 0) || Infinity;
+			const vw = document.documentElement.clientWidth;
+			let w: number;
 			if (window.innerWidth < 640) {
-				img.style.width = window.innerWidth + 'px';
+				w = window.innerWidth;
 			} else {
-				const real = img.dataset.kind === 'mobile' && nw > 500 ? nw / 2 : nw;
-				img.style.width = Math.min(real, document.documentElement.clientWidth - 48) + 'px';
+				const dpr = window.devicePixelRatio || 1;
+				const want = Math.max(inPage * 1.25, img.dataset.kind === 'mobile' ? 390 : 0);
+				w = Math.min(want, vw - 48);
+				if (nat < w * dpr) w = nat / dpr;
 			}
+			img.sizes = Math.ceil(w) + 'px';
+			img.style.width = Math.round(w) + 'px';
 			place();
 		}
 		function place() {
 			nav.hidden = items().length < 2;
-			const phone = window.innerWidth < 640;
-			const r = img.getBoundingClientRect();
-			const side = !phone && img.dataset.kind === 'mobile' && r.right + 16 + 112 < window.innerWidth - 16;
-			nav.dataset.pos = phone ? 'phone' : side ? 'side' : 'corner';
-			nav.style.left = side ? r.right + 16 + 'px' : '';
 		}
 		function show(k: number) {
 			const list = items();
 			if (!list.length) return;
 			index = (k + list.length) % list.length;
 			const t = list[index];
+			opener = t;
+			inPage = t.getBoundingClientRect().width;
 			img.removeAttribute('style');
 			img.dataset.kind = t.dataset.lbKind || 'desktop';
 			img.alt = t.alt;
+			if (t.dataset.lbSrcset) img.srcset = t.dataset.lbSrcset; else img.removeAttribute('srcset');
 			img.src = t.dataset.lbSrc || t.currentSrc || t.src;
+			count.textContent = `${index + 1} / ${list.length}`;
 			scroll.scrollTop = 0;
-			if (img.complete) size(); else place();
+			size();
 			if (!reduce.matches) img.animate([{ opacity: 0, transform: 'scale(0.98)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
 		}
+		let returnTo: HTMLElement | null = null;
 		function open(t: HTMLImageElement) {
-			opener = t;
+			returnTo = t;
 			show(items().indexOf(t));
 			document.documentElement.style.overflow = 'hidden';
 			dlg!.showModal();
 			scroll.focus({ preventScroll: true });
 			if (!reduce.matches) dlg!.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
 		}
-		img.addEventListener('load', size);
+		// Unknown original width: the file asked for is "w_N" (c_limit never enlarges), its real pixel
+		// width is naturalWidth x N / sizes (a srcset image reports a density-corrected width). A file
+		// narrower than N is the original itself: remember it on the thumbnail, once.
+		function learn() {
+			const t = opener;
+			if (!t || t.dataset.lbW || t.dataset.lbOrig || !img.naturalWidth) return;
+			const n = +((img.currentSrc.match(/[,/]w_(\d+)/) || [])[1] || 0), sz = parseFloat(img.sizes);
+			const file = n && sz && img.srcset ? (img.naturalWidth * n) / sz : img.naturalWidth;
+			t.dataset.lbOrig = n && file < n - 2 ? String(Math.round(file)) : img.srcset ? '1e5' : String(img.naturalWidth);
+		}
+		img.addEventListener('load', () => { learn(); size(); });
 		window.addEventListener('resize', () => dlg.open && size());
 		dlg.addEventListener('close', () => {
 			document.documentElement.style.overflow = '';
-			opener?.focus({ preventScroll: true });
+			returnTo?.focus({ preventScroll: true });
 		});
 		// A click anywhere but on the image or a button closes (the veil).
 		dlg.addEventListener('click', (e) => {
 			const el = e.target as HTMLElement;
-			if (el === img || el.closest('.lb-btn')) return;
+			if (el === img || el.closest('.lb-btn, .lb-nav')) return;
 			dlg.close();
 		});
 		dlg.querySelector('.lb-close')!.addEventListener('click', () => dlg.close());
 		dlg.querySelector('.lb-prev')!.addEventListener('click', () => show(index - 1));
 		dlg.querySelector('.lb-next')!.addEventListener('click', () => show(index + 1));
+		// Swipe sideways on a phone: previous / next (a vertical move scrolls).
+		let x0 = 0, y0 = 0;
+		scroll.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+		scroll.addEventListener('touchend', (e) => {
+			const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+			if (Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy) && items().length > 1) show(index + (dx < 0 ? 1 : -1));
+		}, { passive: true });
 		dlg.addEventListener('keydown', (e) => {
 			if (e.key === 'ArrowLeft') { e.preventDefault(); show(index - 1); }
 			if (e.key === 'ArrowRight') { e.preventDefault(); show(index + 1); }
@@ -140,7 +167,7 @@
 	.lb-stage {
 		min-height: 100%;
 		display: flex;
-		padding: 56px 24px;
+		padding: 56px 24px 96px;
 		box-sizing: border-box;
 	}
 	.lb-img {
@@ -170,26 +197,53 @@
 		top: 16px;
 		right: 16px;
 	}
+	/* One pill fixed to the screen, bottom centre, visible while a long image
+	   scrolls: dark, a little see-through and blurred, squircle corners, soft
+	   shadow, white arrows that turn orange on hover, 44 px tap areas. */
 	.lb-nav {
 		position: fixed;
+		left: 50%;
+		bottom: 24px;
+		transform: translateX(-50%);
 		display: flex;
-		gap: 12px;
+		align-items: center;
+		gap: 2px;
+		padding: 2px;
+		border-radius: 20px;
+		corner-shape: superellipse(3);
+		background: rgb(13 16 26 / 0.72);
+		-webkit-backdrop-filter: blur(12px);
+		backdrop-filter: blur(12px);
+		box-shadow: 0 8px 24px rgb(0 0 0 / 0.3);
+		color: #fff;
 	}
 	.lb-nav[hidden] { display: none; }
-	.lb-nav[data-pos='side'] {
-		top: 50%;
-		transform: translateY(-50%);
+	.lb-arrow {
+		display: grid;
+		place-items: center;
+		width: 44px;
+		height: 44px;
+		border-radius: 999px;
+		color: #fff;
+		transition: color 160ms ease, transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
 	}
-	.lb-nav[data-pos='corner'],
-	.lb-nav[data-pos='phone'] {
-		right: 24px;
-		bottom: 24px;
+	@media (hover: hover) {
+		.lb-arrow:hover { color: #f25c24; }
+	}
+	.lb-arrow:active { transform: scale(0.95); }
+	.lb-arrow:focus-visible { outline: 2px solid #f25c24; outline-offset: -2px; }
+	.lb-count {
+		min-width: 64px;
+		text-align: center;
+		font-size: 14px;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.02em;
 	}
 	@media (max-width: 639px) {
-		.lb-stage { padding: 0; }
-		.lb-nav[data-pos='phone'] { right: 16px; bottom: 16px; }
+		.lb-stage { padding: 0 0 80px; }
 	}
 	@media (prefers-reduced-motion: reduce) {
-		.lb-btn { transition: none; }
+		.lb-btn, .lb-arrow { transition: none; }
 	}
 </style>

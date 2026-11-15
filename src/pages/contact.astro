@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import ZoneFilters from '../components/ZoneFilters.astro';
 
 const email = 'advance26@gmail.com';
 const linkedinUrl = 'https://www.linkedin.com/in/david-bitan';
@@ -24,6 +25,7 @@ const defaultNote = hasFormspree
 >
 	<Nav />
 	<main id="main" tabindex="-1">
+	<ZoneFilters backHref="/" backLabel="Back to home" />
 
 	<section class="mx-auto max-w-[1200px] px-6 pt-16 pb-24 sm:pt-20 min-[1248px]:px-0" data-reveal>
 		<p class="text-sm font-semibold uppercase tracking-widest text-muted">Contact</p>

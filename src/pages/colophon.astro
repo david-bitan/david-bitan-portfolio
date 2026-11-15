@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import ZoneFilters from '../components/ZoneFilters.astro';
 
 // Dedicated page for the "how this site was built" story. Linked from the
 // /about AI section + the footer micro-mention. Kept medium-length (2-3
@@ -45,11 +46,11 @@ const buildStats: BuildStat[] = [
 // Design tokens actually shipped — kept in sync with src/styles/global.css.
 // Split into two blocks so the layout reads as "colors first, then shape".
 const palette = [
-	{ swatch: '#F3F4F6', name: 'Background', role: 'Near-white canvas: launchnow.design-inspired, easy on the eyes' },
+	{ swatch: '#EAEDF2', name: 'Background', role: 'Near-white canvas: launchnow.design-inspired, easy on the eyes' },
 	{ swatch: '#0A0A0A', name: 'Ink', role: 'Body copy + headlines, high contrast on the light bg' },
 	{ swatch: '#4B5563', name: 'Muted', role: 'Secondary text, metadata, captions' },
 	{ swatch: '#F25C24', name: 'Accent (dark)', role: 'Same role in dark mode: the brand orange itself passes AA on night blue' },
-	{ swatch: '#0D101A', name: 'Dark mode', role: 'Night blue: page #0D101A, cards #151A28, blue-grey text #EEF0F4 and #B8BDC8' },
+	{ swatch: '#0D101A', name: 'Dark mode', role: 'Night blue: page #0D101A, cards #1A2033, blue-grey text #EEF0F4 and #B8BDC8' },
 ];
 
 const shape = [
@@ -90,9 +91,10 @@ const method = [
 <Layout title="Colophon · How this site was built">
 	<Nav />
 	<main id="main" tabindex="-1">
+	<ZoneFilters backHref="/about" backLabel="Back to About me" />
 
 	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 min-[1248px]:px-0" data-reveal>
-		<a href="/about" class="text-sm font-semibold text-accent-text hover:underline">← Back to About me</a>
+		<a href="/about" data-top-back class="text-sm font-semibold text-accent-text hover:underline">← Back to About me</a>
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">Colophon</p>
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
 			How this site was built.

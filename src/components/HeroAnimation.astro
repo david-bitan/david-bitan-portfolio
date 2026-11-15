@@ -25,14 +25,16 @@ const sq = (x: number, y: number, w: number, h: number, r: number) => {
 	const c = (sx: number, sy: number, k: number) => C.map((seg) => 'C' + seg.map((pt) => { const [u, v] = rot(pt, k); return `${f(x + sx + u * e)} ${f(y + sy + v * e)}`; }).join(' ')).join(' ');
 	return `M${f(x + e)} ${f(y)} L${f(x + w - e)} ${f(y)} ${c(w - e, 0, 0)} L${f(x + w)} ${f(y + h - e)} ${c(w, h - e, 3)} L${f(x + e)} ${f(y + h)} ${c(e, h, 2)} L${f(x)} ${f(y + e)} ${c(0, e, 1)} Z`;
 };
-// Corner radii follow the nested-radius law: inner radius = outer radius - gap, never under 4 (3 for
-// the thin chart bars), never over half the shape. Pills and circles stay round.
+// Corner radii (étape 8, H4): concentric corners follow the nested-radius law (inner radius = outer radius
+// - gap, never negative); shapes that do not share a corner with their frame keep the radius of their role:
+// rows, tiles and UI blocks 12, chat bubbles 14, icon tiles 8, small chips 6, chart bars 3. Pills and circles
+// stay round. Scene 2's brand buttons keep their brand radius.
 // Scene 1 card: 420 x 216 at (70, 112). Blocks: [x, y, w, h, r, tone]
 const C1 = { x: 70, y: 112 };
 const blocks = [
-	[16, 14, 80, 22, 4, 'chip'], [112, 14, 196, 22, 4, 'soft'], [324, 14, 80, 22, 4, 'chip'],
-	[16, 48, 240, 90, 4, 'acc'], [272, 48, 132, 40, 4, 'soft'], [272, 98, 132, 40, 4, 'soft'],
-	[16, 152, 120, 50, 4, 'soft'], [150, 152, 120, 50, 4, 'soft'], [284, 152, 120, 50, 4, 'soft'],
+	[16, 14, 80, 22, 6, 'chip'], [112, 14, 196, 22, 6, 'soft'], [324, 14, 80, 22, 6, 'chip'],
+	[16, 48, 240, 90, 12, 'acc'], [272, 48, 132, 40, 12, 'soft'], [272, 98, 132, 40, 12, 'soft'],
+	[16, 152, 120, 50, 12, 'soft'], [150, 152, 120, 50, 12, 'soft'], [284, 152, 120, 50, 12, 'soft'],
 ] as const;
 const D: Record<string, string> = {
 	robot: '<path d="M4 14 q0-12 12-12 h24 q12 0 12 12 v18 q0 12-12 12 h-24 q-12 0-12-12z"/><path d="M28 2 v-9"/><circle cx="28" cy="-11" r="3.5"/><path d="M4 18 q-7 0 -7 6 q0 6 7 6 M52 18 q7 0 7 6 q0 6 -7 6"/><path d="M14 23 q5 -5 10 0 M32 23 q5 -5 10 0"/><path d="M20 32 q8 6 16 0"/>',
@@ -84,6 +86,9 @@ let di = 0;
 		<rect width="560" height="440" fill="url(#ha-grid)" mask="url(#ha-mask)"></rect>
 
 		<!-- 1 · From prompt to product -->
+		{/* Morph layer UNDER the scenes (étape 8, H3): what is not morphed (texts, icons) stays above the
+		    moving boxes, so the arriving texts fade in on top instead of popping out at the end. */}
+		<g id="ha-morph" style="display:none"></g>
 		<g class="ha-scene" data-scene="0">
 			<g class="ha-it">
 				<rect data-m="band" x="60" y="34" width="440" height="46" rx="23" class="ha-surface" style="stroke:var(--ha-acc);stroke-width:2"></rect>
@@ -126,8 +131,8 @@ let di = 0;
 			{rowsA.map((y) => (
 				<g class="ha-it">
 					<g class="ha-row">
-						<path data-m="row" data-r="4" class="ha-rbg ha-b-soft" d={sq(100, y, 360, 56, 4)}></path>
-						<path data-m="icon" data-r="4" class="ha-ric" d={sq(114, y + 12, 32, 32, 4)} style="fill:var(--ha-b)"></path>
+						<path data-m="row" data-r="12" class="ha-rbg ha-b-soft" d={sq(100, y, 360, 56, 12)}></path>
+						<path data-m="icon" data-r="8" class="ha-ric" d={sq(114, y + 12, 32, 32, 8)} style="fill:var(--ha-b)"></path>
 						<rect data-m="pill" class="ha-rt1 ha-b-chip" x="160" y={y + 17} width="140" height="9" rx="4.5"></rect>
 						<rect data-m="pill" class="ha-rt2 ha-b-chip" x="160" y={y + 32} width="90" height="9" rx="4.5"></rect>
 						<path data-m="btn" data-r="12" class="ha-btn" d={sq(376, y + 16, 68, 24, 12)} style="fill:var(--ha-b)"></path>
@@ -136,7 +141,7 @@ let di = 0;
 			))}
 			<g class="ha-it">
 				<g id="ha-side" opacity="0">
-					<path data-m="row" data-r="4" d={sq(362, 120, 98, 160, 4)} class="ha-b-soft"></path>
+					<path data-m="row" data-r="12" d={sq(362, 120, 98, 160, 12)} class="ha-b-soft"></path>
 					<rect data-m="pill" x="376" y="136" width="56" height="8" rx="4" class="ha-b-chip"></rect>
 					{[0, 1, 2].map((j) => <rect data-m="pill" x="376" y={158 + j * 20} width={[70, 52, 62][j]} height="7" rx="3.5" class="ha-b-soft2"></rect>)}
 					<path data-m="btn" data-r="4" d={sq(376, 236, 70, 28, 4)} style="fill:var(--ha-b)"></path>
@@ -152,7 +157,7 @@ let di = 0;
 						<path data-m="row" data-r="14" d={sq(110, 0, 340, 74, 14)} class="ha-surface ha-card"></path>
 						<circle data-m="dot" cx="140" cy="37" r="15" class="ha-b-soft"></circle>
 						<text x="140" y="42" class="ha-num">{rank}</text>
-						<path data-m="icon" data-r="4" d={sq(166, 20, 34, 34, 4)} class="ha-b-chip"></path>
+						<path data-m="icon" data-r="8" d={sq(166, 20, 34, 34, 8)} class="ha-b-chip"></path>
 						<rect data-m="pill" x="212" y="24" width="96" height="9" rx="4.5" class="ha-b-chip"></rect>
 						<rect data-m="pill" x="212" y="41" width="60" height="9" rx="4.5" class="ha-b-soft2"></rect>
 						{[0, 1, 2, 3, 4].map((s) => (
@@ -181,18 +186,18 @@ let di = 0;
 			</g>
 			<g class="ha-it">
 				<g id="ha-user" opacity="0">
-					<path data-m="bubble" data-r="4" d={sq(234, 120, 214, 40, 4)} style="fill:var(--ha-acc)"></path>
+					<path data-m="bubble" data-r="14" d={sq(234, 120, 214, 40, 14)} style="fill:var(--ha-acc)"></path>
 					<text id="ha-utext" x="250" y="145" class="ha-utext"></text>
 					<rect id="ha-ucaret" x="250" y="132" width="2" height="16" fill="#fff"></rect>
 				</g>
 			</g>
 			<g class="ha-it">
 				<g id="ha-typing" opacity="0">
-					<path data-m="bubble" data-r="4" d={sq(112, 186, 74, 36, 4)} class="ha-b-soft"></path>
+					<path data-m="bubble" data-r="14" d={sq(112, 186, 74, 36, 14)} class="ha-b-soft"></path>
 					{[0, 1, 2].map((j) => <circle class="ha-tdot" cx={134 + j * 15} cy="204" r="4"></circle>)}
 				</g>
 				<g id="ha-bot" opacity="0">
-					<path data-m="bubble" data-r="4" d={sq(112, 186, 262, 150, 4)} class="ha-b-soft"></path>
+					<path data-m="bubble" data-r="14" d={sq(112, 186, 262, 150, 14)} class="ha-b-soft"></path>
 					<rect data-m="pill" x="128" y="202" width="200" height="8" rx="4" class="ha-b-chip"></rect>
 					<rect data-m="pill" x="128" y="217" width="140" height="8" rx="4" class="ha-b-chip"></rect>
 					<line x1="130" y1="320" x2="356" y2="320" class="ha-hair"></line>
@@ -212,7 +217,7 @@ let di = 0;
 			<g class="ha-it">
 				{[0, 1, 2].map((j) => (
 					<g>
-						<path data-m="row" data-r="4" d={sq(186 + j * 92, 104, 80, 54, 4)} class="ha-dtile"></path>
+						<path data-m="row" data-r="12" d={sq(186 + j * 92, 104, 80, 54, 12)} class="ha-dtile"></path>
 						<rect data-m="pill" x={198 + j * 92} y="118" width="36" height="7" rx="3.5" class="ha-dbar"></rect>
 						<rect data-m="pill" x={198 + j * 92} y="134" width="52" height="11" rx="5.5" class={j === 0 ? 'ha-dacc' : 'ha-dink'}></rect>
 					</g>
@@ -229,7 +234,6 @@ let di = 0;
 		</g>
 
 		<!-- Transition B: shapes that morph from one scene to the next -->
-		<g id="ha-morph" style="display:none"></g>
 
 		<!-- Doodles: pencil-style, always floating -->
 		{doodles.map((list, k) => (
@@ -402,8 +406,8 @@ let di = 0;
 			const rowH = L('rowH'), gap = L('gap'), rowW = L('rowW'), k = rowW / 360, ic = 32 * (rowH / 56);
 			rows.forEach(([bg, icon, t1, t2, btn], j) => {
 				const y = 120 + j * (rowH + gap);
-				sqEl(bg, 100, y, rowW, rowH, 4);
-				sqEl(icon, 114, y + (rowH - ic) / 2, ic, ic, 4);
+				sqEl(bg, 100, y, rowW, rowH, 12);
+				sqEl(icon, 114, y + (rowH - ic) / 2, ic, ic, 8);
 				set(t1, { y: y + rowH / 2 - 11, width: 140 * k });
 				set(t2, { y: y + rowH / 2 + 4, width: 90 * k });
 				sqEl(btn, 100 + rowW - 84, y + (rowH - 24) / 2, 68, 24, L('r')); // each brand keeps its own button radius
@@ -484,6 +488,18 @@ let di = 0;
 			doodleSets[k].style.opacity = Math.min(1, tr * 4).toFixed(3);
 		}
 		const TRACE_AT = 1.25; // in the transition window, then about 0.4 s of drawing
+
+		// ---- Soft exits and entries (étape 8, A). p = progress of a box's own move (0 to 1 over 0.9 s,
+		// after its delay). Exit 0.33 s (p 0.25 to 0.62), entry 0.5 s (p 0.30 to 0.85): the exit is about
+		// two thirds of the entry, both on a soft cosine curve, inside the morph. Old and new content
+		// overlap around the middle so a card never looks empty (at least half of it shows) and never
+		// shows both at more than a third. Four settings were measured, this one is the only one that
+		// keeps the card filled with no double image.
+		const FADE = { out: [0.25, 0.62], low: [0.45, 1], in: [0.3, 0.85], long: [0.05, 0.35] };
+		const prog = (tau, d) => (tau - 0.15 - d) / 0.9;
+		const win = (p, [a, b]) => sm(clamp((p - a) / (b - a)));
+		const fadeOut = (tau, d, low) => 1 - win(prog(tau, d), low ? FADE.low : FADE.out);
+		const fadeIn = (tau, d) => win(prog(tau, d), FADE.in);
 
 		// ---- Version B: morphing. Each rounded rectangle of the outgoing scene becomes one of the
 		// next scene (same role: card, bar, button, row...). Real width, height and corner radius are
@@ -578,6 +594,21 @@ let di = 0;
 				pr.low = true; return -1e4 + pr.a.idx;
 			};
 			res.forEach((pr) => (pr.z = zOf(pr)));
+			// A shape that travels far across the card (more than 60 px, holding nothing) passes OVER the
+			// others for its whole trip, the longest trip on top: in 5 -> 1 the orange theme switch that
+			// becomes the orange block slid under the KPI tiles (étape 8, H2).
+			res.forEach((pr) => {
+				const kids = res.filter((o) => o.up === pr);
+				if (!(pr.a.op > 0 && pr.b.op > 0) || kids.some((o) => o.a.op > 0 && o.b.op > 0)) return;
+				const d = Math.hypot(pr.a.x + pr.a.w / 2 - pr.b.x - pr.b.w / 2, pr.a.y + pr.a.h / 2 - pr.b.y - pr.b.h / 2);
+				if (d <= 60) return;
+				// only when, on its way, it would pass under another shape drawn above it
+				const at = (o, m) => ({ x: lerp(o.a.x, o.b.x, m), y: lerp(o.a.y, o.b.y, m), w: lerp(o.a.w, o.b.w, m), h: lerp(o.a.h, o.b.h, m) });
+				const hit = (r, k) => r.x < k.x + k.w - 1 && k.x < r.x + r.w - 1 && r.y < k.y + k.h - 1 && k.y < r.y + r.h - 1;
+				const under = [0.25, 0.5, 0.75].some((m) => res.some((o) => o !== pr && o.z > pr.z && o.up !== pr && o.a.op > 0 && o.b.op > 0 && hit(at(pr, m), at(o, m))));
+				if (under) { pr.z = 1e4 + d; pr.travel = true; kids.forEach((o, i) => (o.z = pr.z + 0.5 + i / 100)); }
+			});
+			mapA = ofA; mapB = ofB;
 			res.sort((m, k) => m.z - k.z);
 			// a box that holds shapes can clip them: only a shape larger than its box at that moment needs it
 			let c = 0;
@@ -589,7 +620,47 @@ let di = 0;
 			if (!clips[k]) { const cp = clipDefs.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'clipPath')); cp.id = `ha-mc${k}`; clips[k] = { cp, r: cp.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'path')) }; }
 			return clips[k];
 		}
-		let morphKey = '', pairs = [], order = [];
+		let morphKey = '', pairs = [], order = [], mapA = new Map(), mapB = new Map(), folA = [], folB = [];
+		// ---- Followers (étape 8, A + H3): texts, lines, icons and other small parts that are not morphed.
+		// Each one follows the box it sits in (its relative place in the box, its own size) and fades out
+		// (leaving scene) or in (arriving scene) at the box's rhythm, never all at once.
+		function followers(k, list) {
+			const sc = scenes[k], inv = svgInv(), out = [];
+			sc.g.querySelectorAll('text, line, polyline, polygon, ellipse, image, use, path:not([data-m]), circle:not([data-m]), rect:not([data-m])').forEach((el) => {
+				if (el.closest('clipPath, defs, mask') || el.parentElement.closest('[data-m]')) return;
+				// parents only: an element that blinks (the text carets) may be off at the moment of measuring
+				let op = 1;
+				for (let e = el.parentElement; e && e !== sc.g; e = e.parentElement) { const o = parseFloat(getComputedStyle(e).opacity); if (!isNaN(o)) op *= o; }
+				if (op < 0.03) return;
+				let bb;
+				try { bb = el.getBBox(); } catch (e) { return; }
+				if (bb.width <= 0 && bb.height <= 0) return;
+				const mt = inv.multiply(el.getScreenCTM()), pm = inv.multiply(el.parentElement.getScreenCTM()).inverse();
+				const x = mt.a * bb.x + mt.e, y = mt.d * bb.y + mt.f, cx = x + (bb.width * mt.a) / 2, cy = y + (bb.height * mt.d) / 2;
+				const box = list.filter((o) => cx >= o.x && cx <= o.x + o.w && cy >= o.y && cy <= o.y + o.h).sort((m, n) => m.w * m.h - n.w * n.h)[0] || null;
+				// long parts (chart axis lines) keep their length: they leave early, before their box has shrunk
+				const long = !!box && bb.width * mt.a > 0.6 * box.w;
+				out.push({ el, cx, cy, m: [pm.a, pm.b, pm.c, pm.d], box, u: box ? (cx - box.x) / box.w : 0.5, v: box ? (cy - box.y) / box.h : 0.5, long });
+			});
+			return out;
+		}
+		function follow(F, map, tau, leaving) {
+			F.forEach((f) => {
+				const pr = f.box && map.get(f.box), n = pr && pr.now;
+				const dx = n ? n.x + f.u * n.w - f.cx : 0, dy = n ? n.y + f.v * n.h - f.cy : 0;
+				const d = pr ? pr.delay : 0, o = leaving ? (f.long ? 1 - win(prog(tau, d), FADE.long) : fadeOut(tau, d, false)) : fadeIn(tau, d);
+				// the move is turned into the parent's own axes (rotation and scale included)
+				const [a, b, c, e] = f.m, lx = a * dx + c * dy, ly = b * dx + e * dy;
+				f.el.style.translate = Math.abs(lx) + Math.abs(ly) > 0.01 ? `${lx.toFixed(2)}px ${ly.toFixed(2)}px` : '';
+				// opacity, not filter (Safari ignores CSS filters on SVG shapes). The carets blink: their own
+				// opacity, set by the scene this frame, is kept and multiplied.
+				const base = f.el.id === 'ha-caret' ? parseFloat(f.el.style.opacity) : f.el.hasAttribute('opacity') ? +f.el.getAttribute('opacity') : 1;
+				f.el.style.opacity = o > 0.999 && f.el.id !== 'ha-caret' ? '' : ((isNaN(base) ? 1 : base) * o).toFixed(3);
+			});
+		}
+		function unfollow(F) {
+			F.forEach((f) => { f.el.style.translate = ''; if (f.el.id !== 'ha-caret') f.el.style.opacity = ''; });
+		}
 		function drawMorph(tau) {
 			morphG.style.display = '';
 			while (pool.length < pairs.length) { const el = document.createElementNS('http://www.w3.org/2000/svg', 'path'); morphG.appendChild(el); pool.push(el); }
@@ -626,26 +697,37 @@ let di = 0;
 				// Same fade curves, moved in time: leaving shapes 0.15 s earlier, appearing ones 0.05 s later, so a
 				// leaving shape has faded out before a new shape appears over it. Shapes at the bottom (no box
 				// around them stays) keep the unshifted fade: what arrives covers them in a cross-fade.
-				const qo = (shift) => EM(clamp((tau - 0.15 - pr.delay - shift) / 0.9));
-				const oq = b.op === 0 ? clamp(qo(pr.low ? 0 : -0.15) * 1.8) : a.op === 0 ? clamp((qo(0.05) - 0.4) / 0.6) : q;
-				el.style.opacity = lerp(a.op, b.op, oq).toFixed(3);
+				// Leaving content goes out by the middle of its box's move, arriving content comes in from the
+				// middle, with a small overlap so a card is never empty (étape 8, A + H1). Shapes at the bottom
+				// (no box around them stays) go out late, under what arrives over them: no dip (B).
+				el.style.opacity = (b.op === 0 ? a.op * fadeOut(tau, pr.delay, pr.low) : a.op === 0 ? b.op * fadeIn(tau, pr.delay) : lerp(a.op, b.op, q)).toFixed(3);
 				const sa = a.s || (b.s && [...b.s.slice(0, 3), 0]), sb = b.s || (a.s && [...a.s.slice(0, 3), 0]);
 				if (sa) { el.style.stroke = mixLab(sa, sb, flip ? m : q); el.style.strokeWidth = lerp(a.sw || b.sw, b.sw || a.sw, q).toFixed(2); } else el.style.stroke = 'none';
 			});
 		}
+		// a theme change during a passage: measure again with the new colours
+		new MutationObserver(() => { morphKey = ''; }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 		function transB(p, n, tau, T, key) {
 			if (key !== morphKey) {
-				const A = measure(p, DURS[p] - H, T), B = measure(n, 1.25 - H, T);
+				unfollow(folA); unfollow(folB);
+				const A = measure(p, DURS[p] - H, T);
+				folA = followers(p, A);
+				const B = measure(n, 1.25 - H, T);
+				folB = followers(n, B);
 				pairs = pairUp(A, B); morphKey = key;
 				scenes[n].g.style.display = 'none';
 			}
 			const sp = scenes[p], sn = scenes[n];
-			if (tau < 0.15) { sp.g.style.display = ''; sp.g.classList.add('ha-hide-m'); sp.g.style.opacity = (1 - sm(tau / 0.15)).toFixed(3); }
+			// leaving scene: its shapes are drawn by the morph; its other parts follow their box and fade
+			if (tau < 0.87) { sp.g.style.display = ''; sp.g.classList.add('ha-hide-m'); sp.g.style.opacity = 1; }
 			else sp.g.style.display = 'none';
-			doodleSets[p].style.opacity = (1 - sm(clamp(tau / 0.15))).toFixed(3); lastTrace[p] = -1;
-			if (tau >= 1.05) { sn.g.style.display = ''; sn.g.classList.toggle('ha-hide-m', tau < 1.25); sn.g.style.opacity = tau < 1.25 ? sm((tau - 1.05) / 0.2).toFixed(3) : 1; }
+			doodleSets[p].style.opacity = fadeOut(tau, 0, false).toFixed(3); lastTrace[p] = -1;
+			// arriving scene: its parts come in from the middle of the move, above the morphing boxes
+			if (tau >= 0.4) { sn.g.style.display = ''; sn.g.classList.toggle('ha-hide-m', tau < 1.25); sn.g.style.opacity = 1; }
 			else sn.g.style.display = 'none';
 			if (tau < 1.25) drawMorph(tau); else morphG.style.display = 'none';
+			if (tau < 0.87) follow(folA, mapA, tau, true);
+			if (tau < 1.25) follow(folB, mapB, tau, false); else { unfollow(folB); folB = []; }
 		}
 
 		// ---- Timeline
@@ -668,7 +750,7 @@ let di = 0;
 				if (!inTrans || k === n) trace(k, clamp((s + H - TRACE_AT) / 0.4));
 			});
 			if (inTrans) transB(p, n, tau, T, `${p}-${n}-${Math.floor(T / LOOP)}`);
-			if (!inTrans) morphG.style.display = 'none';
+			if (!inTrans) { morphG.style.display = 'none'; if (folA.length || folB.length) { unfollow(folA); unfollow(folB); folA = []; folB = []; morphKey = ''; } }
 			doodles.forEach((d) => {
 				if (doodleSets[+d.el.closest('.ha-doodles').dataset.scene].style.display === 'none') return;
 				let f = float(d.i, T);
@@ -696,6 +778,8 @@ let di = 0;
 		const still = (k) => (k === 0 ? S0 - 0.05 : START[k] + DURS[k] - 0.8);
 		dots.forEach((d) => d.addEventListener('click', () => { const k = +d.dataset.go; t = reduce.matches ? still(k) : START[k] + H + 0.01; render(); schedule(); }));
 		if (reduce.matches) t = still(0);
+		// the setting can change while the page is open: settle on a still scene, or start again
+		reduce.addEventListener?.('change', () => { const k = dots.findIndex((d) => d.getAttribute('aria-current') === 'true'); if (reduce.matches) t = still(Math.max(0, k)); render(); schedule(); });
 		render();
 		schedule();
 	})();
@@ -779,16 +863,19 @@ let di = 0;
 	.ha-dtile { fill: var(--d-tile); }
 	.ha-dline { stroke: var(--d-line); stroke-width: 1.2; }
 	.ha-dacc { fill: var(--ha-acc); }
+	/* Étape 8, H5: each dot has a 44 x 44 px tap area, side by side with no overlap. The dots look the
+	   same and sit at the same height (negative margins keep the layout); only their spacing follows the
+	   44 px areas. */
 	.ha-dots {
 		display: flex;
 		justify-content: center;
-		gap: 4px;
-		margin-top: 8px;
+		gap: 0;
+		margin-top: -2px;
+		margin-bottom: -10px;
 	}
-	/* 24 px hit area around an 8 px dot. */
 	.ha-dot {
-		width: 24px;
-		height: 24px;
+		width: 44px;
+		height: 44px;
 		border-radius: 999px;
 		display: grid;
 		place-items: center;

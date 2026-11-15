@@ -2,10 +2,18 @@
 
 @theme {
   /* Design tokens extracted from launchnow.design + brand accent */
-  --color-bg: #f3f4f6;
+  /* Page background, light: #EAEDF2 (David, 15/11, picked side by side with
+     #F3F4F6) so white cards and blocks stand out a little. */
+  --color-bg: #eaedf2;
   --color-ink: #0a0a0a;
   --color-muted: #4b5563;
   --color-card: #ffffff;
+  /* Quiet blue-grey for secondary lines (hero specialties, Metrics):
+     5.0:1 on #EAEDF2 light, 6.2:1 on #0D101A dark (David, 15/11). */
+  --color-quiet: #5a6577;
+  /* Metrics block lines 2 and 3: unchanged in light (muted). */
+  --color-metric-label: #4b5563;
+  --color-metric-sub: #4b5563;
   /* One orange everywhere, #F25C24 (David, 13/11): buttons, orange text,
      links and outlines, light and dark. Button labels stay WHITE (David's
      explicit choice, never change it). */
@@ -39,7 +47,12 @@
   --color-bg: #0d101a;
   --color-ink: #eef0f4;
   --color-muted: #b8bdc8;
-  --color-card: #151a28;
+  /* Cards one step lighter than #151A28 so they do not melt into the page
+     (David, 15/11, no border): ink 14.2:1, muted 8.6:1, orange 4.9:1. */
+  --color-card: #1a2033;
+  --color-quiet: #8a93a6;
+  --color-metric-label: #8a93a6;
+  --color-metric-sub: #7f889b;
   --color-footer-bg: #151a28;
   --color-footer-ink: #eef0f4;
   --color-footer-muted: #8e94a2;
@@ -62,6 +75,11 @@ p, li, figcaption, blockquote {
 h1, h2, h3, h4 {
   text-wrap: balance;
 }
+
+/* Header height before Nav's script measures it (85px phones, 77px lg+),
+   so a sticky bar never starts under the header hairline. */
+:root { --header-h: 85px; }
+@media (min-width: 1024px) { :root { --header-h: 77px; } }
 
 html {
   /* Prevents the off-canvas mobile nav (translate-x-full) from creating
@@ -278,11 +296,11 @@ main:focus { outline: none; }
    centred on it, of at least 44 x 44 px, so nothing moves and nothing changes colour.
    In the components layer so a Tailwind position utility (absolute, fixed) still wins. */
 @layer components {
-  :where(.skip-link, #nav-close, #theme-toggle, header nav > a.text-lg, .home-filter-btn, .craft-filter-btn, .zone-filter-btn,
+  :where(.skip-link, .zf-back-link, header [data-spy-btn], #theme-toggle, header nav > a.text-lg, .home-filter-btn, .craft-filter-btn, .zone-filter-btn,
     #case-study-toggle, #intro-toggle, .ai-more summary, main a.text-accent-text:not(p a, li a), footer a) {
     position: relative;
   }
-  :where(.skip-link, #nav-close, #theme-toggle, header nav > a.text-lg, .home-filter-btn, .craft-filter-btn, .zone-filter-btn,
+  :where(.skip-link, .zf-back-link, header [data-spy-btn], #theme-toggle, header nav > a.text-lg, .home-filter-btn, .craft-filter-btn, .zone-filter-btn,
     #case-study-toggle, #intro-toggle, .ai-more summary, main a.text-accent-text:not(p a, li a), footer a)::after {
     content: '';
     position: absolute;
@@ -305,4 +323,39 @@ main:focus { outline: none; }
     height: max(100%, 44px);
     transform: translate(-50%, -50%);
   }
+}
+
+/* Page changes (étape 8, C): cross-document view transitions in CSS only
+   (never Astro's ClientRouter, which broke the page scripts). The header has
+   its own name, so it stays still while the content fades softly. Browsers
+   without support (Firefox today) keep the normal page load. */
+@view-transition {
+  navigation: auto;
+}
+#site-header {
+  view-transition-name: site-header;
+}
+::view-transition-old(root) {
+  animation: 160ms cubic-bezier(0.4, 0, 1, 1) both vt-fade-out;
+}
+::view-transition-new(root) {
+  animation: 260ms cubic-bezier(0, 0, 0.2, 1) 60ms both vt-fade-in;
+}
+::view-transition-group(site-header) {
+  animation-duration: 0s;
+}
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-fade-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
 }

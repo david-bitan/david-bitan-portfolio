@@ -2,6 +2,7 @@
 import ProjectCard from './ProjectCard.astro';
 import HomeFilters from './HomeFilters.astro';
 import { allProjects } from '../data/allProjects';
+import { WORK_RECENT, WORK_EARLIER } from '../data/caseLines';
 
 // Categories built dynamically from data — adding a new project category
 // (or renaming one) in allProjects.ts automatically updates the pill row.
@@ -9,8 +10,9 @@ import { allProjects } from '../data/allProjects';
 // Uses `categories` (multi-tag) when present, else falls back to `category`.
 // "Selected work" = recent projects (Ryze Beyond era); older work sits in its
 // own block below (2026-11-12 recruiter brief). Same filter bar drives both.
-const EARLIER = ['ui-ux-vintage', 'branding-old', 'gamingtech', 'tradologic'];
-const RECENT = ['sonary-dashboard', 'top5', 'sonary-website', 'playright', 'ryze-brand', 'sonary-mailer'];
+// One order for the home grid and the "Next project" links (data/caseLines.ts).
+const EARLIER = WORK_EARLIER;
+const RECENT = WORK_RECENT;
 const recent = [
 	...RECENT.map((slug) => allProjects.find((p) => p.slug === slug)!).filter(Boolean),
 	...allProjects.filter((p) => !EARLIER.includes(p.slug) && !RECENT.includes(p.slug)),
@@ -33,13 +35,13 @@ const workCategories = Array.from(
 		target="#work-grid > [data-categories], #earlier-grid > [data-categories]"
 	/>
 
-	<div id="work-grid" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+	<div id="work-grid" class="grid grid-cols-1 gap-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
 		{recent.map((project) => <ProjectCard project={project} />)}
 	</div>
 
 	<div id="earlier-work" class="mt-16 sm:mt-20">
 		<h3 class="text-xl font-extrabold tracking-tight sm:text-2xl">Earlier work (2006 – 2018)</h3>
-		<div id="earlier-grid" class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+		<div id="earlier-grid" class="mt-6 grid grid-cols-1 gap-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
 			{earlier.map((project) => <ProjectCard project={project} />)}
 		</div>
 	</div>

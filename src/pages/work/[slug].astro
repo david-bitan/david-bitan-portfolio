@@ -7,8 +7,11 @@ import MasonryGallery from '../../components/MasonryGallery.astro';
 import Lightbox from '../../components/Lightbox.astro';
 import { imageSizes } from '../../data/imageSizes';
 import { allProjects } from '../../data/allProjects';
-import { cld, FULL, LANDSCAPE, landscapeSrcset, sizeOf } from '../../lib/cloudinary';
+import { cld, FULL, LANDSCAPE, landscapeSrcset, sizeOf, fullSrcset } from '../../lib/cloudinary';
 import { groupImagesByZone, zoneDescription } from '../../lib/zones';
+import { caseLines, nextOf, WORK_ORDER } from '../../data/caseLines';
+import CaseLines from '../../components/CaseLines.astro';
+import NextProject from '../../components/NextProject.astro';
 
 export function getStaticPaths() {
 	return allProjects.map((project) => ({
@@ -18,6 +21,11 @@ export function getStaticPaths() {
 }
 
 const { project } = Astro.props;
+const lines = caseLines[project.slug];
+const nextSlug = nextOf(project.slug, WORK_ORDER);
+const next = nextSlug ? allProjects.find((p) => p.slug === nextSlug) : null;
+// Playright: the first UKGC on the page is spelled out (étape 8).
+const intro = project.slug === 'playright' ? project.shortDesc.replace('UKGC', "UKGC (UK Gambling Commission, the UK's gambling regulator)") : project.shortDesc;
 // Phase D — Behance-style layout: each project page is split into responsive
 // "zones" (Desktop·Light / Desktop·Dark / Mobile·Light / Mobile·Dark for
 // Sonary Dashboard; Desktop / Mobile for simpler projects; a single Gallery
@@ -70,24 +78,27 @@ const projectJsonLd: Record<string, unknown> = {
 	<main id="main" tabindex="-1">
 
 	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 min-[1248px]:px-0" data-reveal>
-		<a href="/#work" class="text-sm font-semibold text-accent-text hover:underline">← Back to work</a>
+		<a href="/#work" data-top-back class="text-sm font-semibold text-accent-text hover:underline">← Back to work</a>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">{project.category}</p>
 		<h1 class="mt-4 max-w-3xl text-[1.85rem] font-extrabold tracking-tight min-[374px]:text-4xl sm:text-5xl">{project.title}</h1>
-		<p class="mt-4 max-w-2xl text-lg text-muted">{project.shortDesc}</p>
+		<p class="mt-4 max-w-2xl text-lg text-muted">{intro}</p>
 
 		<div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
 			<span><span class="font-semibold text-ink">Client</span> · {project.client}</span>
 			<span><span class="font-semibold text-ink">Year</span> · {project.year}</span>
+			{lines && <span><span class="font-semibold text-ink">Role</span> · {lines.role}</span>}
 		</div>
 
 		{/* Tags as plain text with separators: they aren't clickable, so they
 		    must not look like pills or buttons (David's rule). */}
 		<p class="mt-4 text-sm text-muted">{project.tags.join(' · ')}</p>
 
+		{lines && <CaseLines lines={lines} />}
+
 		{project.scope && (
 			<section class="mt-8 max-w-3xl" aria-labelledby="scope-heading">
-				<h2 id="scope-heading" class="text-sm font-semibold uppercase tracking-widest text-muted">Scope &amp; outcome</h2>
+				<h2 id="scope-heading" class="text-sm font-semibold uppercase tracking-widest text-muted">Scope</h2>
 				{/* Plain text with markers, never pills: these are facts to read,
 				    not filters to click. */}
 				<ul class="mt-3 grid grid-cols-1 gap-x-8 gap-y-2 sm:grid-cols-2">
@@ -107,7 +118,7 @@ const projectJsonLd: Record<string, unknown> = {
 			   the sections and switches to "Show less". Falls back to the
 			   legacy fullDesc paragraph when sections are absent. */
 			project.sections ? (
-				<div class="mt-8 max-w-3xl pb-4">
+				<div class="mt-8 max-w-3xl sm:pb-4">
 					<div
 						id="case-study-body"
 						class="case-study-body"
@@ -162,7 +173,7 @@ const projectJsonLd: Record<string, unknown> = {
 						id="case-study-toggle"
 						aria-controls="case-study-body"
 						aria-expanded="false"
-						class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-accent-text hover:underline"
+						class="mt-0 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text hover:underline aria-expanded:mt-8 sm:mt-8"
 					>
 						<span data-toggle-label>Read the full case study</span>
 						<svg
@@ -266,8 +277,8 @@ const projectJsonLd: Record<string, unknown> = {
 	{/* mt-8 wrapper — spans full viewport (no max-w constraint) so
 		ZoneFilters bar can extend edge-to-edge viewport (David's ask).
 		Zones are wrapped in an inner max-w-1200 container below. */}
-	<div class="mt-8">
-		<ZoneFilters zones={zones} />
+	<div class="mt-0 sm:mt-8">
+		<ZoneFilters zones={zones} backHref="/#work" backLabel="Back to work" />
 		<div class="mx-auto max-w-[1200px] px-6 min-[1248px]:px-0">
 
 		{
@@ -329,6 +340,8 @@ const projectJsonLd: Record<string, unknown> = {
 											data-lb
 											data-lb-kind="desktop"
 											data-lb-src={cld(url, FULL)}
+												data-lb-srcset={fullSrcset(url, sizeOf(url, imageSizes)?.[0])}
+												data-lb-w={sizeOf(url, imageSizes)?.[0]}
 											tabindex="0"
 											role="button"
 											aria-label={`${project.title}: open image full size`}
@@ -360,7 +373,7 @@ const projectJsonLd: Record<string, unknown> = {
 										>
 											<img
 												src={cld(url, FULL)}
-												srcset={landscapeSrcset(url)}
+												srcset={fullSrcset(url, sizeOf(url, imageSizes)?.[0]) ?? landscapeSrcset(url)}
 												sizes="(min-width: 1280px) 1200px, 100vw"
 												alt={project.title}
 												loading="lazy"
@@ -369,6 +382,8 @@ const projectJsonLd: Record<string, unknown> = {
 												data-lb
 												data-lb-kind="desktop"
 												data-lb-src={cld(url, FULL)}
+												data-lb-srcset={fullSrcset(url, sizeOf(url, imageSizes)?.[0])}
+												data-lb-w={sizeOf(url, imageSizes)?.[0]}
 												tabindex="0"
 												role="button"
 												aria-label={`${project.title}: open image full size`}
@@ -577,6 +592,7 @@ const projectJsonLd: Record<string, unknown> = {
 		})();
 	</script>
 
+	{next && <NextProject href={`/work/${next.slug}`} title={next.title} />}
 	</main>
 	<Lightbox />
 	<Footer />

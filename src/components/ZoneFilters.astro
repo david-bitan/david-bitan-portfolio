@@ -2,15 +2,18 @@
 import type { Zone } from '../lib/zones';
 
 interface Props {
-	zones: Zone[];
+	zones?: Zone[];
+	/** Where the sticky back link goes, and its label in the bare bar. */
+	backHref?: string;
+	backLabel?: string;
 }
 
-const { zones } = Astro.props;
+const { zones = [], backHref = '/#work', backLabel = 'Back to work' } = Astro.props;
 
-// Two independent filter groups — a Device choice AND a Theme choice can be
-// combined (e.g. Desktop + Dark → shows only the "Desktop · Dark" zone).
-// Sonary Dashboard shows both groups. A 2-zone project without theme split
-// shows only the Device group. A Gallery-only project shows nothing.
+// Two independent filter groups: a Device choice AND a Theme choice can be
+// combined (e.g. Desktop + Dark shows only the "Desktop · Dark" zone).
+// One single row since 15/11 (David): no "DEVICE" / "THEME" captions, a thin
+// grey divider between the groups, swipe sideways when it does not fit.
 const labels = zones.map((z) => z.label);
 const hasDesktop = labels.some((l) => /desktop/i.test(l));
 const hasMobile = labels.some((l) => /mobile/i.test(l));
@@ -36,59 +39,33 @@ if (hasLight || hasDark) {
 const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 ---
 
-{/* The bar is always rendered so every project page keeps the sticky back
-    arrow (CL1, 13/11). Without filters it stays invisible until it sticks. */}
-{
-	(
-		<div
-			id="zone-filters-bar"
-			class:list={['sticky top-[76px] z-30 w-full border-y border-ink/10 bg-bg', { 'zf-bare': !showBar }]}
-		>
-			{/* Bar bg spans FULL viewport (w-full outer). Inner container
-				max-w-[1200px] mx-auto centres the content (pills + arrows)
-				and matches the site-wide 1200 alignment.
-				This ensures the bar bg opacity cover ANY content that scrolls
-				underneath on wide viewports (>1200 CSS), preventing image
-				bleed / shadow visible on the sides. */}
-			<div class="relative mx-auto max-w-[1200px]">
-				{/* Back arrow — ABSOLUTE positioned (not a flex item), so it
-					takes no space in the scroll flow. Invisible by default via
-					opacity, revealed with fade + slide animation when the bar
-					becomes sticky. bg-bg opaque + z-20 so pills passing behind
-					during horizontal scroll are visually hidden.
-					Mobile : left-6 (24 from viewport edge).
-					Desktop lg+ : left-0 (pile 1200 edge). */}
-				<a
-					href="/#work"
-					aria-label="Back to projects"
-					class="zone-filters-back absolute inset-y-0 left-0 z-20 flex items-center bg-bg pl-6 pr-3 min-[1248px]:pl-0"
-				>
-					<span class="flex h-8 w-8 items-center justify-center rounded-full border border-ink/15 text-muted transition-colors hover:border-accent hover:text-accent-text">
-						<svg
-							aria-hidden="true"
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2.2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="h-4 w-4"
-						>
-							<path d="M15 18l-6-6 6-6" />
-						</svg>
-					</span>
-				</a>
+{/* Always rendered, so every project page keeps a sticky way back.
+    With filters: the bar sticks under the header and "← Back" appears pinned
+    on its left; only the filters scroll behind it (David, 15/11).
+    Without filters ("bare"): a thin bar with "← Back to …" fades in, pinned
+    under the header, once the page's own top back link has scrolled away. */}
+<div
+	id="zone-filters-bar"
+	data-zf
+	class:list={['z-30 w-full border-y border-ink/10 bg-bg', showBar ? 'sticky zf-sticky' : 'zf-bare']}
+>
+	<div class="relative mx-auto max-w-[1200px]">
+		<div class="zone-filters-back absolute inset-y-0 left-0 z-20 flex items-center bg-bg pl-6 min-[1248px]:pl-0">
+			<a
+				href={backHref}
+				class="zf-back-link inline-flex h-9 items-center gap-1.5 rounded-pill border border-ink/15 px-3.5 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent-text"
+			>
+				<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M19 12H5" /><path d="M11 18l-6-6 6-6" /></svg>
+				<span>{showBar ? 'Back' : backLabel}</span>
+			</a>
+			{showBar && <span class="zf-divider ml-3 h-5 w-px bg-ink/15" aria-hidden="true" />}
+		</div>
 
-				{/* Two labelled groups that WRAP instead of one scrolling row
-					(2026-11-12 brief): on phones the old row was cut at the right
-					edge and its two "All" pills read as the same button. The
-					captions say what each "All" resets; on narrow screens the
-					Theme group simply drops to a second line. */}
-				<div class="zone-filters-scroll flex min-h-14 flex-wrap items-center gap-x-6 gap-y-2 py-2.5 pl-6 pr-6 min-[1248px]:pl-0 min-[1248px]:pr-0">
+		{showBar && (
+			<div class="zone-filters-scroll flex flex-nowrap items-center gap-3 overflow-x-auto py-3 pl-6 min-[1248px]:pl-0">
 					{deviceOptions.length > 1 && (
-						<div role="group" aria-labelledby="zf-device" class="flex flex-wrap items-center gap-2">
-							<span id="zf-device" class="mr-1 text-xs font-semibold uppercase tracking-widest text-muted">Device</span>
+						<div role="group" aria-labelledby="zf-device" class="flex shrink-0 items-center gap-2">
+							<span id="zf-device" class="sr-only">Device</span>
 							{deviceOptions.map((f, i) => (
 								<button
 									type="button"
@@ -104,9 +81,12 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 						</div>
 					)}
 
+					{deviceOptions.length > 1 && themeOptions.length > 1 && (
+						<span class="h-5 w-px shrink-0 bg-ink/15" aria-hidden="true" />
+					)}
 					{themeOptions.length > 1 && (
-						<div role="group" aria-labelledby="zf-theme" class="flex flex-wrap items-center gap-2">
-							<span id="zf-theme" class="mr-1 text-xs font-semibold uppercase tracking-widest text-muted">Theme</span>
+						<div role="group" aria-labelledby="zf-theme" class="flex shrink-0 items-center gap-2">
+							<span id="zf-theme" class="sr-only">Theme</span>
 							{themeOptions.map((f, i) => (
 								<button
 									type="button"
@@ -121,11 +101,15 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 							))}
 						</div>
 					)}
-				</div>
+
+				{/* End margin: the last pill never sits flush on the edge, so a
+				    cut pill reads as "there is more". */}
+				<span class="block w-3 shrink-0 min-[1248px]:w-0" aria-hidden="true" />
 			</div>
-		</div>
-	)
-}
+		)}
+		{!showBar && <div class="h-[60px]" aria-hidden="true" />}
+	</div>
+</div>
 
 <script>
 	const deviceBtns = Array.from(
@@ -171,81 +155,102 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 		}),
 	);
 
-	// Sticky detection — toggle `.is-stuck` on the bar when it pins to
-	// top-[68px]. IntersectionObserver rootMargin -69px fires when bar top
-	// edge crosses the 68px line under the nav.
+	// Sticky state. The header height changes with the breakpoint (85px on
+	// phones, 77px on desktop): it is read from --header-h (set by Nav) so the
+	// bar never slides under the header hairline (P5, 15/11).
 	const bar = document.getElementById('zone-filters-bar');
-	if (bar && 'IntersectionObserver' in window) {
-		const io = new IntersectionObserver(
-			([entry]) => {
-				bar.classList.toggle('is-stuck', entry.intersectionRatio < 1);
-			},
-			{ rootMargin: '-77px 0px 0px 0px', threshold: [1] },
-		);
-		io.observe(bar);
+	const back = bar?.querySelector<HTMLElement>('.zone-filters-back');
+	const headerH = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 77;
+	// The top-of-page back link (first one in <main>): once it is under the
+	// header, the bare bar shows up.
+	const topLink = document.querySelector<HTMLElement>('main [data-top-back]');
+	function measure() {
+		if (back && bar) bar.style.setProperty('--zf-back-w', back.offsetWidth + 'px');
+	}
+	function update() {
+		if (!bar) return;
+		let stuck: boolean;
+		if (bar.classList.contains('zf-bare')) {
+			const anchor = topLink || document.querySelector<HTMLElement>('main h1');
+			stuck = anchor ? anchor.getBoundingClientRect().bottom <= headerH() : window.scrollY > 200;
+		} else {
+			stuck = bar.getBoundingClientRect().top <= headerH() + 0.5;
+		}
+		bar.classList.toggle('is-stuck', stuck);
+	}
+	let ticking = false;
+	const onScroll = () => {
+		if (ticking) return;
+		ticking = true;
+		requestAnimationFrame(() => { update(); ticking = false; });
+	};
+	if (bar) {
+		// keyboard focus never lands hidden under the header + this bar (WCAG 2.4.11)
+		document.documentElement.classList.add('has-zf');
+		measure();
+		update();
+		window.addEventListener('scroll', onScroll, { passive: true });
+		window.addEventListener('resize', () => { measure(); onScroll(); });
+		document.fonts?.ready.then(measure);
 	}
 </script>
 
 <style is:global>
-	/* Hide horizontal scrollbar (touch/trackpad/wheel scroll still works). */
-	.zone-filters-scroll {
-		scrollbar-width: none;
+	html.has-zf { scroll-padding-top: calc(var(--header-h, 77px) + 72px); }
+	.zf-sticky,
+	.zf-bare { top: var(--header-h, 77px); }
+	/* Bare bar: out of the flow, pinned, hidden until the top link is gone. */
+	.zf-bare {
+		position: fixed;
+		left: 0;
+		right: 0;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 300ms cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s linear 300ms;
 	}
-	.zone-filters-scroll::-webkit-scrollbar {
-		display: none;
+	.zf-bare.is-stuck {
+		opacity: 1;
+		visibility: visible;
+		transition: opacity 300ms cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s;
 	}
 
-	/* Back arrow reveal animation.
-	   Non-sticky : opacity 0 + slight translateX(-6px) + translateY(-50%) to
-	     keep vertical centering (absolute + top-1/2 needs Y translate).
-	     pointer-events none so clicks pass through (no interaction area).
-	   Sticky : opacity 1 + translateX(0). */
-	.zone-filters-back {
+	/* Swipe sideways, no visible scrollbar. */
+	.zone-filters-scroll {
+		scrollbar-width: none;
+		-webkit-overflow-scrolling: touch;
+		transition: padding-left 400ms cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	.zone-filters-scroll::-webkit-scrollbar { display: none; }
+
+	/* "← Back" pinned on the left of the stuck bar; only the filters move. */
+	.zf-sticky .zone-filters-back {
 		opacity: 0;
+		visibility: hidden;
 		transform: translateX(-6px);
 		pointer-events: none;
 		transition:
 			opacity 400ms cubic-bezier(0.22, 0.61, 0.36, 1),
 			transform 400ms cubic-bezier(0.22, 0.61, 0.36, 1),
-			border-color 200ms ease,
-			color 200ms ease;
-		will-change: opacity, transform;
+			visibility 0s linear 400ms;
 	}
-	#zone-filters-bar.is-stuck .zone-filters-back {
+	.zf-sticky.is-stuck .zone-filters-back {
 		opacity: 1;
-		transform: translateX(0);
+		visibility: visible;
+		transform: none;
 		pointer-events: auto;
+		transition:
+			opacity 400ms cubic-bezier(0.22, 0.61, 0.36, 1),
+			transform 400ms cubic-bezier(0.22, 0.61, 0.36, 1),
+			visibility 0s;
 	}
-
-	/* Content shift : padding-left animates to make room for back arrow when
-	   sticky. Small enough shift (mobile : 24 → 64, lg : 0 → 40) so most of
-	   the row content stays visible after the shift, minimising the amount of
-	   pills that get pushed off-screen to the right. */
-	.zone-filters-scroll {
-		transition: padding-left 400ms cubic-bezier(0.22, 0.61, 0.36, 1);
-		will-change: padding-left;
-	}
-	#zone-filters-bar.is-stuck .zone-filters-scroll {
-		padding-left: 76px;
-	}
-	@media (min-width: 1248px) {
-		#zone-filters-bar.is-stuck .zone-filters-scroll {
-			padding-left: 52px;
-		}
-	}
-
-	/* No filters: no visible bar until it sticks, then just the back arrow. */
-	#zone-filters-bar.zf-bare:not(.is-stuck) {
-		border-color: transparent;
-		background: transparent;
-	}
-	#zone-filters-bar.zf-bare .zone-filters-scroll {
-		min-height: 3rem;
+	.zf-sticky.is-stuck .zone-filters-scroll {
+		padding-left: calc(var(--zf-back-w, 112px) + 12px);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.zone-filters-back,
-		.zone-filters-scroll {
+		.zone-filters-scroll,
+		.zf-bare {
 			transition: none !important;
 		}
 	}

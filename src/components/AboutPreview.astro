@@ -1,8 +1,8 @@
 ---
-// Home About block (CL2 étape 6, lot 1): David's validated paragraph, the
-// mentor note under it, then the skills already shown here, sorted into three
-// titled groups (none added, none removed). One skill fits none of the three
-// groups; it stays visible on its own line, as it was.
+// Home About block (CL2 étape 6, lot 1; layout étape 8, N): David's validated
+// paragraph, the mentor note, then the skills already shown here, sorted into
+// three titled groups (none added, none removed). One skill fits none of the
+// three groups; it closes the skills block on its own line.
 const groups = [
 	{
 		title: 'Product & UX',
@@ -20,52 +20,66 @@ const groups = [
 const ungrouped = ['3D & motion (Cinema 4D, ZBrush, After Effects, SVGator)'];
 ---
 
-<section id="about" class="mx-auto max-w-[1200px] px-6 py-20 sm:py-28 min-[1248px]:px-0" data-reveal>
-	<div class="max-w-3xl">
-		<p class="text-base leading-relaxed sm:text-lg">
-			I design products end to end, from research to shipped product, and today mostly AI products. My
-			experience spans SaaS, fintech and iGaming products, game interfaces, and complex systems built to stay
-			simple, like a multi-brand design system for ~40 verticals. At Ryze Beyond, the design team ranged from 1
-			to 4 people over the years, so I often owned my projects alone.
-		</p>
-		<div class="mt-8 border-l-2 border-accent pl-5">
-			<p class="font-semibold">Mentor at heart.</p>
-			<p class="mt-1.5 text-muted">
-				At every company I've worked for, I helped onboard the designers who joined the team,
-				with honest, encouraging design reviews, and shared tips and design-system practices
-				with them.
+<section id="about" class="mx-auto max-w-[1200px] scroll-mt-24 px-6 pt-10 pb-14 sm:scroll-mt-0 sm:py-28 min-[1248px]:px-0" data-reveal>
+	{/* Étape 8, N (David 15/11): a real title like the other sections; on desktop two balanced
+	    columns, the text on the left, every skill in one clean block on the right (three groups of
+	    the same height, "3D & motion" filed inside); "More about me →" as an orange-outline button.
+	    Texts unchanged. */}
+	<h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">About me</h2>
+
+	<div class="mt-8 grid grid-cols-1 gap-10 lg:mt-10 lg:grid-cols-2 lg:gap-12">
+		<div class="flex flex-col">
+			<p class="text-base leading-relaxed sm:text-lg">
+				I design products end to end, from research to shipped product, and today mostly AI products. My
+				experience spans SaaS, fintech and iGaming products, game interfaces, and complex systems built to stay
+				simple, like a multi-brand design system for ~40 verticals. At Ryze Beyond, the design team ranged from 1
+				to 4 people over the years, so I often owned my projects alone.
 			</p>
+			<div class="mt-8 border-l-2 border-accent pl-5">
+				<p class="font-semibold">Mentor at heart.</p>
+				<p class="mt-1.5 text-muted">
+					At every company I've worked for, I helped onboard the designers who joined the team,
+					with honest, encouraging design reviews, and shared tips and design-system practices
+					with them.
+				</p>
+			</div>
+			<a href="/about" class="btn-secondary mt-8 hidden min-h-11 items-center justify-center self-start whitespace-nowrap rounded-pill px-6 text-sm font-semibold lg:inline-flex">
+				More about me →
+			</a>
+		</div>
+
+		<div class="rounded-lg border border-ink/10 bg-card p-6 sm:p-8">
+			<div class="grid divide-y divide-ink/10 lg:auto-rows-fr">
+				{
+					groups.map((g) => (
+						<div class="py-5 first:pt-0">
+							<h3 class="text-sm font-semibold uppercase tracking-widest text-muted">{g.title}</h3>
+							<ul class="mt-3 flex flex-col gap-2.5">
+								{g.skills.map((skill) => (
+									<li class="flex items-start gap-3">
+										<span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+										<span>{skill}</span>
+									</li>
+								))}
+							</ul>
+						</div>
+					))
+				}
+			</div>
+			<ul class="flex flex-col gap-2.5 border-t border-ink/10 pt-5">
+				{
+					ungrouped.map((skill) => (
+						<li class="flex items-start gap-3 text-muted">
+							<span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+							<span>{skill}</span>
+						</li>
+					))
+				}
+			</ul>
 		</div>
 	</div>
 
-	<div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
-		{
-			groups.map((g) => (
-				<div class="rounded-lg border border-ink/10 bg-card p-6">
-					<h3 class="text-sm font-semibold uppercase tracking-widest text-muted">{g.title}</h3>
-					<ul class="mt-4 flex flex-col gap-3">
-						{g.skills.map((skill) => (
-							<li class="flex items-start gap-3">
-								<span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
-								<span>{skill}</span>
-							</li>
-						))}
-					</ul>
-				</div>
-			))
-		}
-	</div>
-	<ul class="mt-6 flex flex-col gap-3">
-		{
-			ungrouped.map((skill) => (
-				<li class="flex items-start gap-3 text-muted">
-					<span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
-					<span>{skill}</span>
-				</li>
-			))
-		}
-	</ul>
-	<a href="/about" class="mt-6 inline-block text-sm font-semibold text-accent-text hover:underline">
+	<a href="/about" class="btn-secondary mt-8 inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-pill px-6 text-sm font-semibold lg:hidden">
 		More about me →
 	</a>
 </section>

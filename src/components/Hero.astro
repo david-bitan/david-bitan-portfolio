@@ -14,8 +14,10 @@ import HeroAnimation from './HeroAnimation.astro';
 
 	<!-- Specialties, laid out as on the LinkedIn banner: the first on its own
 	     line, then the two others with a round orange separator, twice a text
-	     dot (CL2 phase D). The dot stays with "Web & Mobile". -->
-	<p class="mt-4 text-base font-semibold leading-relaxed text-muted sm:text-lg">
+	     dot (CL2 phase D). The dot stays with "Web & Mobile". Phones: 14px under
+	     390px, 15px from 390px, so the second line fits even at 360px (measured
+	     309px for 312px of room); desktop unchanged (David, 15/11). -->
+	<p class="mt-4 text-[14px] font-semibold leading-relaxed text-quiet min-[390px]:text-[15px] sm:text-lg">
 		<span class="block">AI Features &amp; Chatbots</span>
 		<span>Multi-brand Design Systems</span>
 		<span class="whitespace-nowrap"><span class="mx-3 inline-block size-2 rounded-full bg-accent align-middle" aria-hidden="true"></span>Web &amp; Mobile</span>
@@ -34,14 +36,14 @@ import HeroAnimation from './HeroAnimation.astro';
 	     line end, and "Hybrid or remote, Tel Aviv area" sits on its own line. -->
 	<p class="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium text-ink">
 		<span class="order-1 inline-flex items-center gap-2">
-			<span class="size-2.5 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
+			<span class="size-2 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
 			Available now
 		</span>
 		<span class="order-2 text-muted" aria-hidden="true">·</span>
 		<span class="order-3 whitespace-nowrap">Ashkelon, Israel</span>
 		<span class="order-4 basis-full sm:hidden" aria-hidden="true"></span>
 		<span class="order-5 hidden text-muted sm:inline" aria-hidden="true">·</span>
-		<span class="order-6 whitespace-nowrap pl-[18px] sm:pl-0">Hybrid or remote, Tel Aviv area</span>
+		<span class="order-6 whitespace-nowrap pl-4 sm:pl-0">Hybrid or remote, Tel Aviv area</span>
 	</p>
 
 	<div class="mt-7 flex flex-col gap-4 sm:flex-row sm:items-center">

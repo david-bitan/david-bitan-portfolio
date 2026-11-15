@@ -14,7 +14,8 @@ const { categories } = Astro.props;
 
 <div
 	id="craft-filters"
-	class="sticky top-[68px] z-30 border-y border-ink/10 bg-bg/95 backdrop-blur"
+	style="top: var(--header-h, 77px)"
+	class="sticky z-30 border-y border-ink/10 bg-bg/95 backdrop-blur"
 >
 	<div class="relative mx-auto max-w-[1200px] px-6 py-4 min-[1248px]:px-0">
 		{/* Back-to-home link — appears only when the bar becomes sticky
@@ -113,14 +114,14 @@ const { categories } = Astro.props;
 	// on the bar when it pins under the nav. The back arrow + content
 	// padding animate off that class (see <style is:global> below).
 	const bar = document.getElementById('craft-filters');
-	if (bar && 'IntersectionObserver' in window) {
-		const io = new IntersectionObserver(
-			([entry]) => {
-				bar.classList.toggle('is-stuck', entry.intersectionRatio < 1);
-			},
-			{ rootMargin: '-69px 0px 0px 0px', threshold: [1] },
-		);
-		io.observe(bar);
+	if (bar) {
+		const headerH = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 77;
+		const update = () => bar.classList.toggle('is-stuck', bar.getBoundingClientRect().top <= headerH() + 0.5);
+		let ticking = false;
+		const onScroll = () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { update(); ticking = false; }); };
+		window.addEventListener('scroll', onScroll, { passive: true });
+		window.addEventListener('resize', onScroll);
+		update();
 	}
 </script>
 

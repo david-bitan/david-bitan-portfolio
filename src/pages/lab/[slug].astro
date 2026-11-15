@@ -27,6 +27,9 @@ export function getStaticPaths() {
 }
 
 const { project } = Astro.props;
+const lines = caseLines[project.slug];
+const nextSlug = nextOf(project.slug, LAB_ORDER);
+const next = nextSlug ? aiLabProjects.find((p) => p.slug === nextSlug) : null;
 
 const seoDescription = project.metaDesc ?? project.shortDesc;
 const seoOgImage = project.thumbnail;
@@ -51,6 +54,10 @@ const projectJsonLd = {
 const ds = project.designSystem;
 import MasonryGallery from '../../components/MasonryGallery.astro';
 import Lightbox from '../../components/Lightbox.astro';
+import ZoneFilters from '../../components/ZoneFilters.astro';
+import { caseLines, nextOf, LAB_ORDER } from '../../data/caseLines';
+import CaseLines from '../../components/CaseLines.astro';
+import NextProject from '../../components/NextProject.astro';
 ---
 
 <Layout
@@ -61,15 +68,18 @@ import Lightbox from '../../components/Lightbox.astro';
 >
 	<Nav />
 	<main id="main" tabindex="-1">
+	<ZoneFilters backHref="/#ai-lab" backLabel="Back to AI Lab" />
 
 	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-2 sm:pt-20 min-[1248px]:px-0" data-reveal>
-		<a href="/#ai-lab" class="text-sm font-semibold text-accent-text hover:underline"
+		<a href="/#ai-lab" data-top-back class="text-sm font-semibold text-accent-text hover:underline"
 			>← Back to AI Lab</a
 		>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">
 			{project.eyebrow}
 		</p>
+		{/* Role right under the eyebrow, same style as the Work pages' meta line (one clean line on phones). */}
+		{lines && <p class="mt-2 text-sm text-muted"><span class="font-semibold text-ink">Role</span> · {lines.role}</p>}
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
 			{project.title}
 		</h1>
@@ -142,6 +152,7 @@ import Lightbox from '../../components/Lightbox.astro';
 					</>
 				)
 			}
+			{lines && <CaseLines lines={lines} />}
 		</div>
 	</section>
 
@@ -163,9 +174,14 @@ import Lightbox from '../../components/Lightbox.astro';
 					</a>
 
 					<p class="mt-10 text-sm font-semibold uppercase tracking-widest text-muted">States designed</p>
-					<ul class="mt-4 flex flex-wrap gap-2">
+					{/* Bullets, not pills: long states overflowed their pill on phones
+					    (David, 15/11). Same orange dots as "Scope" on Work pages. */}
+					<ul class="mt-4 grid grid-cols-1 gap-x-8 gap-y-2 sm:grid-cols-2">
 						{project.aiFeature.states.map((s) => (
-							<li class="rounded-pill bg-bg px-3 py-1 text-xs font-medium text-muted">{s}</li>
+							<li class="flex items-start gap-3 text-sm text-ink">
+								<span class="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+								<span>{s}</span>
+							</li>
 						))}
 					</ul>
 
@@ -365,6 +381,7 @@ import Lightbox from '../../components/Lightbox.astro';
 		</a>
 	</section>
 
+	{next && <NextProject href={`/lab/${next.slug}`} title={next.title} />}
 	</main>
 	<Lightbox />
 	<Footer />
@@ -438,19 +455,32 @@ import Lightbox from '../../components/Lightbox.astro';
 		line-height: 1.2;
 		color: var(--color-ink);
 	}
+	/* Orange dots like the "Scope" list of the Work pages (David, 15/11). */
 	.ds-list {
 		margin-top: 0.9rem;
-		padding-left: 1rem;
-		list-style: disc;
+		list-style: none;
+		padding-left: 0;
 		color: var(--color-ink);
 	}
 	.ds-list li {
+		position: relative;
+		padding-left: 18px;
 		/* Long file paths (e.g. /demo/otium/media/CREDITS.txt) may break so the
 		   list never widens the page (Otium at 768 px, CL2 14/11). */
 		overflow-wrap: anywhere;
 		font-size: 0.9375rem;
 		line-height: 1.55;
 		margin-top: 0.5rem;
+	}
+	.ds-list li::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 0.62em;
+		width: 6px;
+		height: 6px;
+		border-radius: 999px;
+		background: var(--color-accent);
 	}
 
 	/* folded design decisions */

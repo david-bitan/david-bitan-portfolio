@@ -12,7 +12,7 @@
 // Wide compositions (wider than tall) follow under the cases, each on its
 // own row, left-aligned, at most their own width.
 import { imageSizes } from '../data/imageSizes';
-import { cld, sizeOf, shotSrc, shotSrcset } from '../lib/cloudinary';
+import { cld, sizeOf, shotSrc, shotSrcset, fullSrcset } from '../lib/cloudinary';
 
 interface Props {
 	urls: string[];
@@ -59,6 +59,8 @@ const wideSrcset = (url: string, w: number) =>
 						data-lb
 						data-lb-kind={kind}
 						data-lb-src={lbSrc(url, kind)}
+						data-lb-srcset={fullSrcset(url, size?.[0])}
+						data-lb-w={size?.[0]}
 						tabindex="0"
 						role="button"
 						aria-label={`${alt}: open capture ${i + 1} full size`}
@@ -90,6 +92,8 @@ const wideSrcset = (url: string, w: number) =>
 						data-lb
 						data-lb-kind={kind}
 						data-lb-src={lbSrc(url, kind)}
+						data-lb-srcset={fullSrcset(url, size?.[0])}
+						data-lb-w={size?.[0]}
 						tabindex="0"
 						role="button"
 						aria-label={`${alt}: open image ${i + 1} full size`}
@@ -162,6 +166,8 @@ const wideSrcset = (url: string, w: number) =>
 					data-lb
 					data-lb-kind="desktop"
 					data-lb-src={lbSrc(url, 'desktop')}
+					data-lb-srcset={fullSrcset(url, size![0])}
+					data-lb-w={size![0]}
 					tabindex="0"
 					role="button"
 					aria-label={`${alt}: open image full size`}
