@@ -13,8 +13,8 @@
   --color-quiet: #5a6577;
   /* Metrics block lines 2 and 3: unchanged in light (muted). */
   /* Étape 11, 8: the second small line is quieter than the first (both ≥ 4.5:1) */
-  --color-metric-label: #374151; /* 8.8:1 on #EAEDF2 */
-  --color-metric-sub: #5a6577; /* 5.0:1 on #EAEDF2, 5.9:1 on white */
+  --color-metric-label: #4b5563; /* étape 12, 3a: back to V2. 6.4:1 on #EAEDF2 */
+  --color-metric-sub: #636c7c; /* étape 12, 3a: quieter. 4.5:1 on #EAEDF2, 5.3:1 on white */
   /* Recommendation bylines, company and "worked with" lines (étape 9, C1):
      a darker blue-grey than muted, 9.5:1 on white cards. */
   --color-reco-sub: #3f4a5c;
@@ -62,8 +62,8 @@
      (David, 15/11, no border): ink 14.2:1, muted 8.6:1, orange 4.9:1. */
   --color-card: #1a2033;
   --color-quiet: #8a93a6;
-  --color-metric-label: #b8bdc8; /* 8.6:1 on #1A2033 */
-  --color-metric-sub: #8a93a6; /* 5.2:1 on #1A2033, 6.2:1 on #0D101A */
+  --color-metric-label: #8a93a6; /* étape 12, 3a: back to V2. 5.2:1 on #1A2033 */
+  --color-metric-sub: #7f889b; /* étape 12, 3a: darker, as far as 4.5:1 allows. 4.5:1 on #1A2033, 5.3:1 on #0D101A */
   --color-reco-sub: #8f99ad; /* 5.6:1 on #1A2033 cards */
   --color-footer-bg: #151a28;
   --color-footer-ink: #eef0f4;
@@ -88,9 +88,9 @@ h1, h2, h3, h4 {
   text-wrap: balance;
 }
 
-/* Header height before Nav's script measures it (73px phones, 65px lg+ since étape 11, 10),
+/* Header height before Nav's script measures it (60px phones, 65px lg+ since étape 12, 11),
    so a sticky bar never starts under the header hairline. */
-:root { --header-h: 73px; }
+:root { --header-h: 60px; }
 @media (min-width: 1024px) { :root { --header-h: 65px; } }
 
 html {
@@ -198,6 +198,18 @@ select:not(:disabled) {
 .arr {
   display: inline-block;
   transform: translateY(-0.1em);
+}
+
+/* Étape 12, 7: arrow of the "← Back…" links. A drawn arrow (Lucide), not
+   the text glyph (its height changes with the system font): vertical-align
+   middle puts its centre on the middle of the lowercase letters. */
+.arr-back {
+  display: inline-block;
+  width: 1.05em;
+  height: 1.05em;
+  margin-right: 0.3em;
+  vertical-align: middle;
+  stroke-width: 2.25;
 }
 
 /* Same box radius for boxes styled in page CSS (galleries, swatches). */

@@ -158,7 +158,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 	);
 
 	// Sticky state. The header height changes with the breakpoint (about 72px
-	// on phones, 64px on desktop since étape 11, 10): it is read from --header-h (set by Nav) so the
+	// on phones, 60px since étape 12, 11; 64px on desktop since étape 11, 10): it is read from --header-h (set by Nav) so the
 	// bar never slides under the header hairline (P5, 15/11).
 	const bar = document.getElementById('zone-filters-bar');
 	const back = bar?.querySelector<HTMLElement>('.zone-filters-back');

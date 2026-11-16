@@ -10,6 +10,7 @@ import Lightbox from '../components/Lightbox.astro';
 // Distinct categories in first-appearance order — auto-updates when the data
 // source gets new categories (Drawings, Icons, etc.).
 const categories = Array.from(new Set(craftItems.map((i) => i.category)));
+import Icon from '../components/Icon.astro';
 ---
 
 <Layout title="Personal work · David Bitan">
@@ -17,7 +18,7 @@ const categories = Array.from(new Set(craftItems.map((i) => i.category)));
 	<main id="main" tabindex="-1">
 
 	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 min-[1248px]:px-0" data-reveal>
-		<a href="/" class="text-sm font-semibold text-accent-text hover:underline">← Back</a>
+		<a href="/" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><Icon name="arrow-left" class="arr-back" />Back</a>
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">Craft</p>
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
 			Personal work

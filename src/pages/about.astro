@@ -92,6 +92,8 @@ const timeline = [
 	},
 ];
 
+// Étape 12, 9: tags of each card reordered to fill the lines (same groups,
+// same tags, first tag kept).
 const skillGroups = [
 	{
 		title: 'UX methods & design',
@@ -100,14 +102,14 @@ const skillGroups = [
 			'Usability Testing',
 			'A/B Testing',
 			'Personas',
+			'Wireframing',
 			'Journey Mapping',
 			'Competitive Analysis',
-			'Wireframing',
 			'Prototyping',
 			'Information Architecture',
 			'Interaction Design',
-			'Responsive & Mobile-First Design',
 			'Design Systems',
+			'Responsive & Mobile-First Design',
 		],
 	},
 	{
@@ -122,12 +124,12 @@ const skillGroups = [
 			'ChatGPT',
 			'Gemini',
 			'Midjourney',
+			'Gamma',
+			'Figma AI',
 			'Leonardo AI',
 			'Adobe Firefly',
-			'Figma AI',
 			'Adobe AI (Illustrator, Photoshop, After Effects)',
 			'Runway · Sora · Kling · Higgsfield (video gen)',
-			'Gamma',
 		],
 	},
 	{
@@ -156,6 +158,8 @@ const languages = [
 	{ lang: 'Hebrew', level: 'Fluent' },
 	{ lang: 'English', level: 'Professional working proficiency' },
 ];
+import DownloadCV from '../components/DownloadCV.astro';
+import Icon from '../components/Icon.astro';
 ---
 
 <Layout
@@ -167,7 +171,9 @@ const languages = [
 	<ZoneFilters backHref="/" backLabel="Back to home" />
 
 	<section class="mx-auto max-w-[1200px] px-6 pt-16 pb-10 sm:pt-20 min-[1248px]:px-0" data-reveal>
-		<p class="text-sm font-semibold uppercase tracking-widest text-muted">About me</p>
+		{/* Étape 12, 6: a "← Back" link at the top of every inner page. */}
+		<a href="/" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><Icon name="arrow-left" class="arr-back" />Back</a>
+		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">About me</p>
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
 			Product design craft, now <span class="whitespace-nowrap">AI-native.</span>
 		</h1>
@@ -175,10 +181,11 @@ const languages = [
 			Senior AI Product Designer for SaaS, fintech and iGaming products and websites, focused on AI-augmented design and AI UX. At Ryze Beyond (2019 – 2026), I owned my projects end to end. The design team ranged from 1 to 4 people: when designers joined, we split the projects, each very different from the others, to share the workload; when they moved on, I took them all back.
 		</p>
 		<p class="mt-4 text-sm font-semibold text-ink">Available now · <span class="whitespace-nowrap">Ashkelon, Israel</span> · <span class="whitespace-nowrap">Hybrid or remote, Tel Aviv area</span></p>
-		<div class="mt-6 flex flex-wrap gap-x-6 gap-y-6 text-sm font-semibold">
-			<a href={linkedinUrl} target="_blank" rel="noopener" class="text-accent-text hover:underline">LinkedIn ↗</a>
-			<a href="/cv/CV-David-Bitan.pdf" class="text-accent-text hover:underline">Download CV (PDF)</a>
-			<a href="/cv/CV-David-Bitan.docx" class="text-accent-text hover:underline">Download CV (DOCX)</a>
+		{/* Étape 12, 10: one line, LinkedIn ↗ · the common « Download CV » block. */}
+		<div class="mt-6 flex flex-wrap items-center gap-x-2 text-sm">
+			<a href={linkedinUrl} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-semibold text-accent-text hover:underline">LinkedIn<span class="sr-only"> (opens in a new tab)</span>&nbsp;<span aria-hidden="true">↗</span></a>
+			<span class="text-muted" aria-hidden="true">·</span>
+			<DownloadCV />
 		</div>
 	</section>
 

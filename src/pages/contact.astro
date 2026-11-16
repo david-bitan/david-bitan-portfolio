@@ -17,6 +17,7 @@ const hasFormspree = Boolean(formspreeId);
 const defaultNote = hasFormspree
 	? "I usually reply within 24 hours."
 	: 'Opens your email client, pre-filled and ready to send.';
+import Icon from '../components/Icon.astro';
 ---
 
 <Layout
@@ -28,7 +29,9 @@ const defaultNote = hasFormspree
 	<ZoneFilters backHref="/" backLabel="Back to home" />
 
 	<section class="mx-auto max-w-[1200px] px-6 pt-16 pb-24 sm:pt-20 min-[1248px]:px-0" data-reveal>
-		<p class="text-sm font-semibold uppercase tracking-widest text-muted">Contact</p>
+		{/* Étape 12, 6: a "← Back" link at the top of every inner page. */}
+		<a href="/" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><Icon name="arrow-left" class="arr-back" />Back</a>
+		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">Contact</p>
 		<h1 class="mt-4 max-w-2xl text-[1.85rem] font-extrabold tracking-tight min-[374px]:text-4xl sm:text-5xl">Hiring a senior product designer?</h1>
 		<p class="mt-6 max-w-xl text-lg text-muted">
 			I'm available now for senior and lead product design roles: based in Ashkelon, Israel,
@@ -96,6 +99,13 @@ const defaultNote = hasFormspree
 					{/* Étape 9, F3: the address leads to the form, not to a mail app. */}
 					<a href="#contact-form" class="mt-2 block font-semibold text-accent-text hover:underline">
 						{email}
+					</a>
+				</div>
+				{/* Étape 12, 16: the phone, next to the e-mail, same style. */}
+				<div>
+					<p class="text-sm font-semibold uppercase tracking-widest text-muted">Phone</p>
+					<a href="tel:+972549248520" class="mt-2 block font-semibold text-accent-text hover:underline">
+						+972 54-924-8520
 					</a>
 				</div>
 				<div>

@@ -1,5 +1,6 @@
 ---
 import HeroAnimation from './HeroAnimation.astro';
+import DownloadCV from './DownloadCV.astro';
 ---
 
 <section class="mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-10 px-6 pt-10 pb-12 sm:pt-12 sm:pb-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] lg:gap-12 min-[1248px]:px-0" data-reveal>
@@ -63,12 +64,8 @@ import HeroAnimation from './HeroAnimation.astro';
 				AI Lab
 			</a>
 		</div>
-		<p class="text-center text-sm text-muted sm:text-left">
-			Download CV:
-			<a href="/cv/CV-David-Bitan.pdf" download class="inline-flex min-h-11 min-w-11 items-center justify-center px-1 font-semibold text-ink underline underline-offset-4 hover:text-accent-text transition-colors">PDF</a>
-			<span aria-hidden="true">·</span>
-			<a href="/cv/CV-David-Bitan.docx" download class="inline-flex min-h-11 min-w-11 items-center justify-center px-1 font-semibold text-ink underline underline-offset-4 hover:text-accent-text transition-colors">DOCX</a>
-		</p>
+		{/* Étape 12, 4: the common « Download CV » block. */}
+		<div class="text-center sm:text-left"><DownloadCV /></div>
 	</div>
 	</div>
 

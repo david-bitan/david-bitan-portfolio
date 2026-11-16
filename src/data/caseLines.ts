@@ -9,7 +9,7 @@
 export const WORK_RECENT = ['sonary-dashboard', 'top5', 'sonary-website', 'playright', 'ryze-brand', 'sonary-mailer'];
 export const WORK_EARLIER = ['ui-ux-vintage', 'branding-old', 'gamingtech', 'tradologic'];
 export const WORK_ORDER = [...WORK_RECENT, ...WORK_EARLIER];
-export const LAB_ORDER = ['facet', 'margin', 'otium', 'apex-athletic-club', 'trattoria-fiori'];
+export const LAB_ORDER = ['apex-athletic-club', 'facet', 'margin', 'otium', 'trattoria-fiori']; // étape 12, 22
 
 export interface CaseLines {
 	role: string;

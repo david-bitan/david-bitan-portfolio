@@ -58,6 +58,7 @@ import ZoneFilters from '../../components/ZoneFilters.astro';
 import { caseLines, nextOf, LAB_ORDER } from '../../data/caseLines';
 import CaseLines from '../../components/CaseLines.astro';
 import NextProject from '../../components/NextProject.astro';
+import Icon from '../../components/Icon.astro';
 ---
 
 <Layout
@@ -72,7 +73,7 @@ import NextProject from '../../components/NextProject.astro';
 
 	<article class="mx-auto max-w-[1200px] px-6 pt-8 pb-2 sm:pt-10 min-[1248px]:px-0" data-reveal>
 		<a href="/#ai-lab" data-top-back class="text-sm font-semibold text-accent-text hover:underline"
-			>← Back to AI Lab</a
+			><Icon name="arrow-left" class="arr-back" />Back to AI Lab</a
 		>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">

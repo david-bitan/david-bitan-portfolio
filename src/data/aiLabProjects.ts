@@ -56,10 +56,106 @@ export interface AILabProject {
 	cardHref?: string;
 }
 
-// Order = display order. New AI Lab projects go at the TOP; the
+// Order = display order (étape 12, 22: APEX Athletic Club first, the others
+// unchanged). New AI Lab projects go at the TOP; the
 // `portfolio-colophon` card stays LAST, always — it is the site itself, not
 // one of the experiments, so it closes the row rather than opening it.
 export const aiLabProjects: AILabProject[] = [
+	{
+		slug: 'apex-athletic-club',
+		title: 'APEX Athletic Club',
+		subtitle: 'An oceanfront strength and recovery club in Miami Beach, invented and built out to five pages.',
+		eyebrow: 'Fitness · 2026',
+		shortDesc:
+			'A members club: five interlinked pages, a booking gate, a live timetable, a shop with a persistent cart, a QR guest pass, and APEX Coach, its AI chatbot, designed state by state.',
+		intro: `APEX Athletic Club is a private gym I invented and built end-to-end, and the brief I set myself was to go past the marketing page: a mini-site is easy to fake in one screen, and much harder to hold together across five.
+
+The visual language is the opposite of the wellness pastel most gyms reach for. Ink canvas, one hot pink accent, one mint signal, Space Grotesk for display and JetBrains Mono for anything numeric (times, prices, capacities), so the timetable reads like a schedule board rather than a brochure. The photography is stock, so the grid imposes its own treatment (grayscale, dimmed, colour returning on hover) instead of hoping six unrelated shoots agree with each other.
+
+Almost all of the work was in the parts that are usually faked. Booking a class is a member action, so the CTA opens an identity gate, not a payment funnel, and after signing in, the booking the visitor originally clicked resumes on its own. The seven-day timetable is generated from the real date, so it can never show a stale week. The shop derives its member discount from the list price at render time rather than storing a second number that could drift. The guest pass emits an actual ticket with a scannable QR, encoded by hand (around 200 lines of Reed-Solomon and mask scoring), and validated by decoding the rendered bitmap, because a QR that looks right and never scans is the easiest thing in the world to ship.`,
+		aiFeature: {
+			eyebrow: 'AI UX · Assistant',
+			title: 'APEX Coach',
+			lead: 'APEX Athletic Club: a fitness club website where the AI coach offers several tools, used separately or together: workout plan, meal plan, BMI, metabolism and macro calculations. Every result updates the member’s profile. Open questions about training, nutrition, BMI, body fat, hydration or recovery are answered live by an LLM (Llama 3.3 on Cloudflare Workers AI) with a coaching system prompt and the member’s own numbers. Tasks where numbers must be exact (programs, prices, warning signs) run through designed, deterministic flows.',
+			tryUrl: '/demo/apex-athletic-club/user.html?coach=open',
+			tryLabel: 'Try APEX Coach',
+			states: ['Empty state with starters', 'Thinking with visible steps', 'Streaming answer', 'Clarifying question', 'Structured plan with actions', 'Setup form for missing details', 'Body metrics: BMI, water, body fat', 'Diets, allergies & dislikes', 'Exercise demos for every muscle group, side + front, with tempo', 'Workout plan, meal plan or both, 1 to 4 weeks', 'Plans saved to the member profile, changed from the chat', 'PDF export with workout log', 'Low-confidence note', 'AI service offline fallback', 'Safety refusal', 'Out of scope', 'Error + retry', 'Stop · Regenerate · Copy', 'Feedback with reasons'],
+			decisions: [
+				{ title: 'Show what it uses', body: 'A context bar lists exactly what Coach can see: membership tier, calculator numbers, this week’s timetable. Users trust an answer more when they know where it comes from.' },
+				{ title: 'Ask before guessing', body: 'A vague goal like “lose weight” gets one clarifying question with tappable options instead of a generic plan. One question, not an interview.' },
+				{ title: 'Answers that lead to action', body: 'A training week comes back as a structured card where every session has a Book link into the real class flow, not a wall of text to copy.' },
+				{ title: 'Model for talk, code for numbers', body: 'The LLM handles open questions, but BMI, healthy weight range, water, protein and calorie targets are computed in code and passed to it as facts, so it explains numbers instead of guessing them. Programs and prices never go through the model.' },
+				{ title: 'One plan, not two', body: 'Workout and menu come from the same settings. Training days get more food, rest days less, so the weekly average hits the goal, and loads progress week by week with a lighter fourth week. Everything exports as a PDF with blank log sheets, like a real gym program.' },
+				{ title: 'Say when it’s unsure', body: 'Plans and nutrition answers carry a short note on their limits (no access to training history, not a meal prescription), and point to the human who can go further.' },
+				{ title: 'Refuse safely, then redirect', body: 'Warning signs like chest pain or fainting get a fixed, human-written answer, never a model guess. Injury and medical questions are redirected to the club doctor and physio by the system prompt.' },
+				{ title: 'The user stays in control', body: 'Stop mid-answer, regenerate, copy, or flag a bad reply with a reason. Billing changes are never done by the assistant: it links to the plan screen instead.' },
+			],
+		},
+		designSystem: {
+			colors: [
+				{ name: 'Ink', hex: '#0A0A0F', role: 'Canvas · nav · cards · modals' },
+				{ name: 'Hot pink', hex: '#FF2E7E', role: 'Primary action · active state · sliding indicator' },
+				{ name: 'Mint', hex: '#00E5A0', role: 'Eyebrows · availability · confirmation' },
+				{ name: 'Off-white', hex: '#F5F5F7', role: 'Type on ink, at three opacities' },
+			],
+			typography: [
+				{
+					family: 'Space Grotesk',
+					weights: '400 · 500 · 600 · 700',
+					role: 'Display · headings · nav · class names',
+					sample: 'Train where the ocean starts.',
+				},
+				{
+					family: 'Inter',
+					weights: '300 · 400 · 500 · 600 · 700',
+					role: 'Body copy · form fields · testimonials',
+					sample: 'Small membership, full team, direct beach access.',
+				},
+				{
+					family: 'JetBrains Mono',
+					weights: '400 · 500 · 700',
+					role: 'Times · prices · capacities · pass fields',
+					sample: '06:30 · 45 MIN · 3 of 8 left',
+				},
+			],
+			micro: [
+				'Every number set in mono so times and capacities align down a column',
+				'A single pink block that travels between tabs instead of backgrounds that blink',
+				'Cards entering in a 55ms cascade on filter change, skipped on first paint',
+				'Availability shifting mint to amber to pink as a class fills',
+				'Stock photography unified by the grid: grayscale and dimmed, colour on hover',
+			],
+			interactions: [
+				'Identity gate before any payment funnel, and the booking resumes after sign-in',
+				'Seven-day timetable generated from the current date, filtered by type and level',
+				'Cart and wishlist drawers persisted in localStorage across pages',
+				'Member pricing derived from list price at render time, never stored twice',
+				'Guest pass issued as a ticket: hand-written QR encoder, PNG export, print sheet',
+				'Custom date picker replacing the native control, positioned to escape modal overflow',
+			],
+			constraints: [
+				'Five self-contained HTML files: no framework, no bundler, no CDN',
+				'Vanilla JS only, including the QR encoder: Reed-Solomon over GF(256), all eight masks',
+				'localStorage as the only backend: account, cart and wishlist',
+				'Every QR decoded by machine before shipping, not eyeballed',
+				'Overflow detection run programmatically across 5 pages × 8 widths, overlays opened and measured individually',
+			],
+		},
+		gallery: [
+			'/lab-assets/apex-athletic-club/home.jpg',
+			'/lab-assets/apex-athletic-club/classes.jpg',
+			'/lab-assets/apex-athletic-club/shop.jpg',
+			'/lab-assets/apex-athletic-club/my-space.jpg',
+			'/lab-assets/apex-athletic-club/coach-welcome.jpg',
+			'/lab-assets/apex-athletic-club/coach-program.jpg',
+			'/lab-assets/apex-athletic-club/coach-profile.jpg',
+			'/lab-assets/apex-athletic-club/coach-safety.jpg',
+			'/lab-assets/apex-athletic-club/contact.jpg',
+		],
+		demoUrl: '/demo/apex-athletic-club/',
+		thumbnail: '/lab-assets/apex-athletic-club/thumbnail.jpg',
+		accent: '#FF2E7E',
+	},
 	{
 		slug: 'facet',
 		title: 'Facet',
@@ -344,101 +440,6 @@ The language model only reads the request. Prices, the plan, the budget check an
 		demoUrl: '/demo/otium/',
 		thumbnail: '/lab-assets/otium/thumbnail.jpg',
 		accent: '#C2344C',
-	},
-	{
-		slug: 'apex-athletic-club',
-		title: 'APEX Athletic Club',
-		subtitle: 'An oceanfront strength and recovery club in Miami Beach, invented and built out to five pages.',
-		eyebrow: 'Fitness · 2026',
-		shortDesc:
-			'A members club: five interlinked pages, a booking gate, a live timetable, a shop with a persistent cart, a QR guest pass, and APEX Coach, its AI chatbot, designed state by state.',
-		intro: `APEX Athletic Club is a private gym I invented and built end-to-end, and the brief I set myself was to go past the marketing page: a mini-site is easy to fake in one screen, and much harder to hold together across five.
-
-The visual language is the opposite of the wellness pastel most gyms reach for. Ink canvas, one hot pink accent, one mint signal, Space Grotesk for display and JetBrains Mono for anything numeric (times, prices, capacities), so the timetable reads like a schedule board rather than a brochure. The photography is stock, so the grid imposes its own treatment (grayscale, dimmed, colour returning on hover) instead of hoping six unrelated shoots agree with each other.
-
-Almost all of the work was in the parts that are usually faked. Booking a class is a member action, so the CTA opens an identity gate, not a payment funnel, and after signing in, the booking the visitor originally clicked resumes on its own. The seven-day timetable is generated from the real date, so it can never show a stale week. The shop derives its member discount from the list price at render time rather than storing a second number that could drift. The guest pass emits an actual ticket with a scannable QR, encoded by hand (around 200 lines of Reed-Solomon and mask scoring), and validated by decoding the rendered bitmap, because a QR that looks right and never scans is the easiest thing in the world to ship.`,
-		aiFeature: {
-			eyebrow: 'AI UX · Assistant',
-			title: 'APEX Coach',
-			lead: 'APEX Athletic Club: a fitness club website where the AI coach offers several tools, used separately or together: workout plan, meal plan, BMI, metabolism and macro calculations. Every result updates the member’s profile. Open questions about training, nutrition, BMI, body fat, hydration or recovery are answered live by an LLM (Llama 3.3 on Cloudflare Workers AI) with a coaching system prompt and the member’s own numbers. Tasks where numbers must be exact (programs, prices, warning signs) run through designed, deterministic flows.',
-			tryUrl: '/demo/apex-athletic-club/user.html?coach=open',
-			tryLabel: 'Try APEX Coach',
-			states: ['Empty state with starters', 'Thinking with visible steps', 'Streaming answer', 'Clarifying question', 'Structured plan with actions', 'Setup form for missing details', 'Body metrics: BMI, water, body fat', 'Diets, allergies & dislikes', 'Exercise demos for every muscle group, side + front, with tempo', 'Workout plan, meal plan or both, 1 to 4 weeks', 'Plans saved to the member profile, changed from the chat', 'PDF export with workout log', 'Low-confidence note', 'AI service offline fallback', 'Safety refusal', 'Out of scope', 'Error + retry', 'Stop · Regenerate · Copy', 'Feedback with reasons'],
-			decisions: [
-				{ title: 'Show what it uses', body: 'A context bar lists exactly what Coach can see: membership tier, calculator numbers, this week’s timetable. Users trust an answer more when they know where it comes from.' },
-				{ title: 'Ask before guessing', body: 'A vague goal like “lose weight” gets one clarifying question with tappable options instead of a generic plan. One question, not an interview.' },
-				{ title: 'Answers that lead to action', body: 'A training week comes back as a structured card where every session has a Book link into the real class flow, not a wall of text to copy.' },
-				{ title: 'Model for talk, code for numbers', body: 'The LLM handles open questions, but BMI, healthy weight range, water, protein and calorie targets are computed in code and passed to it as facts, so it explains numbers instead of guessing them. Programs and prices never go through the model.' },
-				{ title: 'One plan, not two', body: 'Workout and menu come from the same settings. Training days get more food, rest days less, so the weekly average hits the goal, and loads progress week by week with a lighter fourth week. Everything exports as a PDF with blank log sheets, like a real gym program.' },
-				{ title: 'Say when it’s unsure', body: 'Plans and nutrition answers carry a short note on their limits (no access to training history, not a meal prescription), and point to the human who can go further.' },
-				{ title: 'Refuse safely, then redirect', body: 'Warning signs like chest pain or fainting get a fixed, human-written answer, never a model guess. Injury and medical questions are redirected to the club doctor and physio by the system prompt.' },
-				{ title: 'The user stays in control', body: 'Stop mid-answer, regenerate, copy, or flag a bad reply with a reason. Billing changes are never done by the assistant: it links to the plan screen instead.' },
-			],
-		},
-		designSystem: {
-			colors: [
-				{ name: 'Ink', hex: '#0A0A0F', role: 'Canvas · nav · cards · modals' },
-				{ name: 'Hot pink', hex: '#FF2E7E', role: 'Primary action · active state · sliding indicator' },
-				{ name: 'Mint', hex: '#00E5A0', role: 'Eyebrows · availability · confirmation' },
-				{ name: 'Off-white', hex: '#F5F5F7', role: 'Type on ink, at three opacities' },
-			],
-			typography: [
-				{
-					family: 'Space Grotesk',
-					weights: '400 · 500 · 600 · 700',
-					role: 'Display · headings · nav · class names',
-					sample: 'Train where the ocean starts.',
-				},
-				{
-					family: 'Inter',
-					weights: '300 · 400 · 500 · 600 · 700',
-					role: 'Body copy · form fields · testimonials',
-					sample: 'Small membership, full team, direct beach access.',
-				},
-				{
-					family: 'JetBrains Mono',
-					weights: '400 · 500 · 700',
-					role: 'Times · prices · capacities · pass fields',
-					sample: '06:30 · 45 MIN · 3 of 8 left',
-				},
-			],
-			micro: [
-				'Every number set in mono so times and capacities align down a column',
-				'A single pink block that travels between tabs instead of backgrounds that blink',
-				'Cards entering in a 55ms cascade on filter change, skipped on first paint',
-				'Availability shifting mint to amber to pink as a class fills',
-				'Stock photography unified by the grid: grayscale and dimmed, colour on hover',
-			],
-			interactions: [
-				'Identity gate before any payment funnel, and the booking resumes after sign-in',
-				'Seven-day timetable generated from the current date, filtered by type and level',
-				'Cart and wishlist drawers persisted in localStorage across pages',
-				'Member pricing derived from list price at render time, never stored twice',
-				'Guest pass issued as a ticket: hand-written QR encoder, PNG export, print sheet',
-				'Custom date picker replacing the native control, positioned to escape modal overflow',
-			],
-			constraints: [
-				'Five self-contained HTML files: no framework, no bundler, no CDN',
-				'Vanilla JS only, including the QR encoder: Reed-Solomon over GF(256), all eight masks',
-				'localStorage as the only backend: account, cart and wishlist',
-				'Every QR decoded by machine before shipping, not eyeballed',
-				'Overflow detection run programmatically across 5 pages × 8 widths, overlays opened and measured individually',
-			],
-		},
-		gallery: [
-			'/lab-assets/apex-athletic-club/home.jpg',
-			'/lab-assets/apex-athletic-club/classes.jpg',
-			'/lab-assets/apex-athletic-club/shop.jpg',
-			'/lab-assets/apex-athletic-club/my-space.jpg',
-			'/lab-assets/apex-athletic-club/coach-welcome.jpg',
-			'/lab-assets/apex-athletic-club/coach-program.jpg',
-			'/lab-assets/apex-athletic-club/coach-profile.jpg',
-			'/lab-assets/apex-athletic-club/coach-safety.jpg',
-			'/lab-assets/apex-athletic-club/contact.jpg',
-		],
-		demoUrl: '/demo/apex-athletic-club/',
-		thumbnail: '/lab-assets/apex-athletic-club/thumbnail.jpg',
-		accent: '#FF2E7E',
 	},
 	{
 		slug: 'trattoria-fiori',

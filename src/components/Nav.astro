@@ -20,7 +20,9 @@ const onContact = Astro.url.pathname.replace(/\/$/, '') === '/contact';
 ---
 
 <header id="site-header" class="sticky top-0 z-50 border-b border-ink/5 bg-bg">
-	<nav class="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-3.5 min-[1248px]:px-0">
+	{/* Étape 12, 11: 60 px high on phones and tablets (44 px burger + 2 x 7.5 px
+	    + hairline); desktop unchanged (py-3.5). */}
+	<nav class="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-[7.5px] lg:py-3.5 min-[1248px]:px-0">
 		<a href="/" data-menu-fade class="text-lg font-extrabold tracking-tight">David Bitan</a>
 
 		<div class="hidden items-center gap-8 lg:flex">
@@ -182,6 +184,11 @@ const onContact = Astro.url.pathname.replace(/\/$/, '') === '/contact';
 		height: 2px;
 		background: var(--color-accent);
 		border-radius: 1px;
+	}
+	/* Étape 12, 12: in the phone menu the current section is orange text
+	   only, never underlined. */
+	.mobile-nav-panel .nav-link-active::after {
+		content: none;
 	}
 </style>
 

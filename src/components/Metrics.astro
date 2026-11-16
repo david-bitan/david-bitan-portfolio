@@ -17,25 +17,28 @@ const metrics: Metric[] = [
 ---
 
 {/* Étape 9, B6: on phones no hairlines, each figure in its own box (card
-    colour, the one box radius, squircle); tablet and desktop unchanged. */}
-<section class="sm:border-y sm:border-ink/5" data-reveal>
-	<div class="mx-auto grid max-w-[1200px] grid-cols-1 gap-y-4 px-6 py-8 sm:gap-y-8 sm:py-10 sm:grid-cols-3 min-[1248px]:px-0">
+    colour, the one box radius, squircle); tablet and desktop unchanged.
+    Étape 12, 3b-3c: from 768 px the 3 blocks share one row (from 640 two labels wrapped), their lines
+    aligned row by row (subgrid); phones: compact box, figure on the left,
+    text on the right. */}
+<section class="md:border-y md:border-ink/5" data-reveal>
+	<div class="mx-auto grid max-w-[1200px] grid-cols-1 gap-y-3 px-6 py-8 md:grid-cols-3 md:gap-y-0 md:py-10 min-[1248px]:px-0">
 		{
 			metrics.map((metric) => (
-				<div class="rounded-md bg-card px-3 py-6 text-center sm:rounded-none sm:bg-transparent sm:py-0 sm:border-l sm:border-ink/5 sm:first:border-l-0">
-					{/* Pencil-style icon, same hand-drawn line as the banner drawings:
-					    drawn stroke by stroke once when the block shows, then still. */}
-					<svg class="metric-icon mx-auto mb-3 h-8 w-8 text-accent" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-						{metric.icon.map((d, i) => <path d={d} pathLength="1" style={`--i:${i}`} />)}
-					</svg>
-					<p class="text-4xl font-extrabold tracking-tight sm:text-5xl">{metric.value}</p>
-					<p class="mt-2 text-sm text-metric-label">{metric.label}</p>
-					{metric.sub && (
-						<p class="mt-1 text-xs text-metric-sub">{metric.sub}</p>
-					)}
-					{metric.note && (
-						<p class="mt-1 text-xs text-metric-sub">{metric.note}</p>
-					)}
+				<div class="metric grid grid-cols-[5.5rem_1fr] items-center gap-x-4 rounded-md bg-card px-4 py-4 md:row-span-5 md:grid-cols-1 md:grid-rows-subgrid md:items-start md:gap-x-0 md:rounded-none md:bg-transparent md:px-3 md:py-0 md:text-center md:border-l md:border-ink/5 md:first:border-l-0">
+					<div class="flex flex-col items-center md:contents">
+						{/* Pencil-style icon, same hand-drawn line as the banner drawings:
+						    drawn stroke by stroke once when the block shows, then still. */}
+						<svg class="metric-icon mb-1 h-6 w-6 text-accent md:mx-auto md:mb-3 md:h-8 md:w-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							{metric.icon.map((d, i) => <path d={d} pathLength="1" style={`--i:${i}`} />)}
+						</svg>
+						<p class="text-4xl font-extrabold tracking-tight md:text-5xl">{metric.value}</p>
+					</div>
+					<div class="md:contents">
+						<p class="text-sm text-metric-label md:mt-2">{metric.label}</p>
+						{metric.sub ? <p class="metric-sub mt-1 text-xs text-metric-sub">{metric.sub}</p> : <span class="hidden md:block" />}
+						{metric.note ? <p class="metric-sub mt-1 text-xs text-metric-sub">{metric.note}</p> : <span class="hidden md:block" />}
+					</div>
 				</div>
 			))
 		}
@@ -53,6 +56,13 @@ const metrics: Metric[] = [
 		stroke-dashoffset: 0;
 		transition: stroke-dashoffset 700ms cubic-bezier(0.65, 0, 0.35, 1);
 		transition-delay: calc(150ms + var(--i) * 260ms);
+	}
+	/* Étape 12, 3a: from 768 px (no card, on #0D101A) the 2nd line can be
+	   clearly quieter in dark mode and still reach 4.5:1 (#737C8E = 4.5:1). */
+	@media (min-width: 768px) {
+		:global(:root[data-theme='dark']) .metric-sub {
+			color: #737c8e;
+		}
 	}
 	@media (prefers-reduced-motion: reduce) {
 		.metric-icon path,

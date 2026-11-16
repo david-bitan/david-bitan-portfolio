@@ -66,6 +66,7 @@ const projectJsonLd: Record<string, unknown> = {
 	...(project.client ? { publisher: { '@type': 'Organization', name: project.client } } : {}),
 	...(project.liveUrl ? { url: project.liveUrl } : {}),
 };
+import Icon from '../../components/Icon.astro';
 ---
 
 <Layout
@@ -78,7 +79,7 @@ const projectJsonLd: Record<string, unknown> = {
 	<main id="main" tabindex="-1">
 
 	<article class="mx-auto max-w-[1200px] px-6 pt-8 pb-8 sm:pt-10 min-[1248px]:px-0" data-reveal>
-		<a href="/#work" data-top-back class="text-sm font-semibold text-accent-text hover:underline">← Back to work</a>
+		<a href="/#work" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><Icon name="arrow-left" class="arr-back" />Back to work</a>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">{project.category}</p>
 		<h1 class="mt-4 max-w-3xl text-[1.85rem] font-extrabold tracking-tight min-[374px]:text-4xl sm:text-5xl">{project.title}</h1>
@@ -227,20 +228,26 @@ const projectJsonLd: Record<string, unknown> = {
 	<style>
 		/* Accordion body: animate expand/collapse using measured scrollHeight
 		   set inline by the toggle script. Fallback to auto so the layout
-		   still works without JS. */
+		   still works without JS. Étape 12, 8 (David's law): it opens AND
+		   closes smoothly, height + fade, same duration and curve both ways. */
 		.case-study-body {
 			overflow: hidden;
 			max-height: 0;
 			opacity: 0;
+			/* closing: a touch quicker than opening */
 			transition:
-				max-height 500ms cubic-bezier(0.22, 0.61, 0.36, 1),
-				opacity 350ms ease-out;
+				max-height 350ms cubic-bezier(0.22, 0.61, 0.36, 1),
+				opacity 250ms ease-out;
 		}
 		.case-study-body[aria-hidden='false'] {
 			opacity: 1;
+			transition:
+				max-height 450ms cubic-bezier(0.22, 0.61, 0.36, 1),
+				opacity 300ms ease-out 100ms;
 		}
 		@media (prefers-reduced-motion: reduce) {
-			.case-study-body {
+			.case-study-body,
+			.case-study-body[aria-hidden='false'] {
 				transition: none;
 			}
 		}
@@ -251,6 +258,8 @@ const projectJsonLd: Record<string, unknown> = {
 		// so the mockups (ZoneFilters + galleries below) sit above the fold.
 		// Uses measured scrollHeight (in px) rather than a magic max-height
 		// value so any content length animates smoothly.
+		// Étape 12, 8: closing is animated too (height + fade), from either
+		// "Show less"; under reduced motion everything is instant.
 		(() => {
 			const btn = document.getElementById('case-study-toggle');
 			const body = document.getElementById('case-study-body');
@@ -259,74 +268,116 @@ const projectJsonLd: Record<string, unknown> = {
 			const topBtn = document.getElementById('case-study-toggle-top');
 			const labelEl = btn.querySelector('[data-toggle-label]');
 			const chevron = btn.querySelector('[data-toggle-chevron]');
+			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+			const D_OPEN = 450;
+			const D = 350; // closing
+			const EASE = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+			let topAnim = null;
+			// After opening, release the height so late images are never cut;
+			// ignored if the block was closed again in the meantime.
+			const clear = (e) => {
+				if (e && e.propertyName !== 'max-height') return;
+				body.removeEventListener('transitionend', clear);
+				if (body.getAttribute('aria-hidden') === 'true') return;
+				body.style.maxHeight = 'none';
+			};
 
 			function setExpanded(next) {
+				const m0 = parseFloat(getComputedStyle(btn).marginTop) || 0;
 				btn.setAttribute('aria-expanded', String(next));
 				body.setAttribute('aria-hidden', String(!next));
 				body.toggleAttribute('inert', !next);
 
+				body.removeEventListener('transitionend', clear);
 				if (next) {
-					// Open: measured height, then release to `none` after
-					// the transition so late-loaded images can't get clipped.
+					// Open: measured height, then released (see clear).
 					body.style.maxHeight = body.scrollHeight + 'px';
-					const clear = () => {
-						body.style.maxHeight = 'none';
-						body.removeEventListener('transitionend', clear);
-					};
-					body.addEventListener('transitionend', clear);
+					if (reduce.matches) clear();
+					else body.addEventListener('transitionend', clear);
 				} else {
 					// Close: pin the current height, force reflow, drop to 0.
-					body.style.maxHeight = body.scrollHeight + 'px';
+					body.style.maxHeight = body.getBoundingClientRect().height + 'px';
 					void body.offsetHeight;
 					body.style.maxHeight = '0px';
 				}
-
 				if (labelEl) {
 					labelEl.textContent = next ? 'Show less' : 'Read the full case study';
 				}
 				if (chevron) {
 					chevron.style.transform = next ? 'rotate(180deg)' : '';
 				}
-				if (topBtn) topBtn.hidden = !next;
+				if (topBtn && next) {
+					topAnim?.cancel();
+					topAnim = null;
+					topBtn.hidden = false;
+				}
+				// Phones: the button's top margin changes with its state; the new
+				// margin applies at once and the button glides there with a
+				// transform (no margin animation).
+				const dm = (parseFloat(getComputedStyle(btn).marginTop) || 0) - m0;
+				if (dm && !reduce.matches) {
+					btn.animate([{ transform: `translateY(${-dm}px)` }, { transform: 'none' }], { duration: next ? D_OPEN : D, easing: EASE });
+				}
 			}
 
-			// Top "Show less": closes at once; "Read the full case study" comes
-			// back to the same place, so the page does not move.
+			// The top "Show less" folds away with the text, so "Read the full
+			// case study" lands back exactly where it was.
+			function foldTop() {
+				if (!topBtn || topBtn.hidden) return;
+				if (reduce.matches) { topBtn.hidden = true; return; }
+				const cs = getComputedStyle(topBtn);
+				const anim = topBtn.animate(
+					[
+						{ height: topBtn.offsetHeight + 'px', minHeight: '0px', marginTop: cs.marginTop, marginBottom: cs.marginBottom, opacity: 1, overflow: 'hidden' },
+						{ height: '0px', minHeight: '0px', marginTop: '0px', marginBottom: '0px', opacity: 0, overflow: 'hidden' },
+					],
+					{ duration: D, easing: EASE },
+				);
+				topAnim = anim;
+				anim.onfinish = () => { topBtn.hidden = true; topAnim = null; };
+			}
+
+			// Top "Show less": the page does not scroll; the focus goes back to
+			// the button, which ends where it was before opening.
 			topBtn?.addEventListener('click', () => {
-				const saved = body.style.transition;
-				body.style.transition = 'none';
 				setExpanded(false);
-				void body.offsetHeight;
-				requestAnimationFrame(() => { body.style.transition = saved; });
+				foldTop();
 				btn.focus({ preventScroll: true });
 			});
 
 			// Étape 9, J: "Show less" closes the case study and brings the page
 			// back, softly, to the button, at the height where it was clicked to
-			// open (instead of leaving the page down in the galleries).
+			// open. Étape 12, 8: the text folds while the page follows the
+			// button, which glides from under the finger to that height.
 			let openedAt = null;
-			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+			let followRaf = 0;
 			btn.addEventListener('click', () => {
 				const expanded = btn.getAttribute('aria-expanded') === 'true';
+				cancelAnimationFrame(followRaf); // reopened while the page was still gliding
 				if (!expanded) {
 					openedAt = btn.getBoundingClientRect().top;
 					setExpanded(true);
 					return;
 				}
-				// Close at once while the button stays under the finger, then glide
-				// the page back to where the button was when it was clicked to open.
 				const keep = openedAt ?? window.innerHeight * 0.4;
-				const underFinger = btn.getBoundingClientRect().top;
-				const saved = body.style.transition;
-				body.style.transition = 'none';
+				const from = btn.getBoundingClientRect().top;
 				setExpanded(false);
-				void body.offsetHeight;
-				const btnDocTop = btn.getBoundingClientRect().top + window.scrollY;
-				window.scrollTo({ top: Math.max(0, btnDocTop - underFinger), behavior: 'instant' });
-				requestAnimationFrame(() => {
-					body.style.transition = saved;
-					window.scrollTo({ top: Math.max(0, btnDocTop - keep), behavior: reduce.matches ? 'instant' : 'smooth' });
-				});
+				foldTop();
+				if (reduce.matches) {
+					const top = btn.getBoundingClientRect().top + window.scrollY;
+					window.scrollTo({ top: Math.max(0, top - keep), behavior: 'instant' });
+					return;
+				}
+				const t0 = performance.now();
+				const ease = (t) => 1 - Math.pow(1 - t, 3);
+				const follow = (now) => {
+					const t = Math.min(1, (now - t0) / (D + 50));
+					const y = from + (keep - from) * ease(t);
+					const top = btn.getBoundingClientRect().top + window.scrollY;
+					window.scrollTo({ top: Math.max(0, top - y), behavior: 'instant' });
+					if (t < 1) followRaf = requestAnimationFrame(follow);
+				};
+				followRaf = requestAnimationFrame(follow);
 			});
 		})();
 	</script>

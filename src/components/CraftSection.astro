@@ -6,6 +6,9 @@
 // Étape 11, 4: all the craft pieces, 2 copies (seamless loop), light images
 // loaded before they come into view, no pause stuck after a touch.
 // A click opens the Craft page straight on that piece, in the viewer.
+// Étape 12, 1: the strip can be dragged sideways (finger or mouse) at any
+// time; a short tap still opens the piece, a drag does not. The script
+// drives the motion (same speed); auto-scroll resumes after the drag.
 // Phones: "See craft →" under the strip, centred.
 import { craftItems } from '../data/craftItems';
 import { cld } from '../lib/cloudinary';
@@ -40,7 +43,7 @@ const track = [...items, ...items];
 				{
 					track.map((item, i) => (
 						<li class="craft-tile shrink-0" aria-hidden={i >= items.length ? 'true' : undefined}>
-							<a href={`/craft#${item.slug}`} class="group block overflow-hidden rounded-md bg-card" tabindex={i >= items.length ? -1 : undefined}>
+							<a href={`/craft#${item.slug}`} class="group block overflow-hidden rounded-md bg-card" draggable="false" tabindex={i >= items.length ? -1 : undefined}>
 								<img
 									src={sq(item.image, 400)}
 									srcset={`${sq(item.image, 300)} 300w, ${sq(item.image, 400)} 400w, ${sq(item.image, 600)} 600w`}
@@ -51,6 +54,7 @@ const track = [...items, ...items];
 									loading="lazy"
 									fetchpriority="low"
 									decoding="async"
+									draggable="false"
 									class="thumb-hover-zoom aspect-square h-auto w-full object-cover"
 								/>
 							</a>
@@ -115,6 +119,25 @@ const track = [...items, ...items];
 	.craft-marquee:has(:focus-visible) .craft-track {
 		animation-play-state: paused;
 	}
+	/* Étape 12, 1: once the script runs it moves the strip itself (drag +
+	   auto-scroll); the CSS animation above stays as the no-script fallback. */
+	.craft-marquee.is-js .craft-track {
+		animation: none;
+	}
+	.craft-marquee.is-js {
+		touch-action: pan-y pinch-zoom;
+		user-select: none;
+		-webkit-user-select: none;
+	}
+	@media (hover: hover) and (pointer: fine) {
+		.craft-marquee.is-js {
+			cursor: grab;
+		}
+		.craft-marquee.is-dragging,
+		.craft-marquee.is-dragging a {
+			cursor: grabbing;
+		}
+	}
 	@media (prefers-reduced-motion: reduce) {
 		.craft-track {
 			animation: none;
@@ -139,4 +162,111 @@ const track = [...items, ...items];
 			if (!m.contains(e.relatedTarget as Node)) m.scrollLeft = 0;
 		}),
 	);
+	// Étape 12, 1: drag the strip sideways. The script owns the motion:
+	// auto-scroll at the names' speed, paused under a mouse or keyboard
+	// focus, still under reduced motion; a drag moves it 1:1, a flick
+	// carries on and slows down, then auto-scroll takes over again.
+	document.querySelectorAll<HTMLElement>('.craft-marquee').forEach((m) => {
+		const track = m.querySelector<HTMLElement>('.craft-track');
+		if (!track) return;
+		const SPEED = 55.5; // px/s, same as the names strip
+		const TAP = 6; // px of movement before a press becomes a drag
+		const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+		const fine = matchMedia('(hover: hover) and (pointer: fine)');
+		let x = 0, half = 0, vel = 0, last = 0, raf = 0, moved = false;
+		let drag: { id: number; sx: number; x0: number; lt: number; pts: Array<[number, number]> } | null = null;
+		const measure = () => (half = track.scrollWidth / 2);
+		const paused = () =>
+			reduce.matches || (fine.matches && m.matches(':hover')) || m.matches(':focus-visible, :has(:focus-visible)');
+		const frame = (t: number) => {
+			const dt = last ? Math.min(0.05, (t - last) / 1000) : 0;
+			last = t;
+			if (!drag) {
+				// The speed eases towards the auto-scroll speed (or 0 when
+				// paused): a flick fades out in about a second, no sudden turn.
+				const target = paused() ? 0 : -SPEED;
+				vel = target + (vel - target) * Math.pow(0.05, dt);
+				x += vel * dt;
+			}
+			// no wrap while a tile has keyboard focus (it would jump to its copy)
+			if (half && !m.matches(':has(:focus-visible)')) {
+				x %= half;
+				if (x > 0) x -= half;
+			}
+			track.style.transform = `translate3d(${x}px,0,0)`;
+			raf = requestAnimationFrame(frame);
+		};
+		const start = () => {
+			if (!raf) { last = 0; raf = requestAnimationFrame(frame); }
+		};
+		const stop = () => {
+			cancelAnimationFrame(raf);
+			raf = 0;
+		};
+		m.classList.add('is-js');
+		measure();
+		new ResizeObserver(measure).observe(track);
+		// Only run while the strip is on screen.
+		new IntersectionObserver((e) => (e[0].isIntersecting ? start() : stop())).observe(m);
+
+		m.addEventListener('pointerdown', (e) => {
+			if (drag || (e.pointerType === 'mouse' && e.button !== 0)) return;
+			drag = { id: e.pointerId, sx: e.clientX, x0: x, lt: e.timeStamp, pts: [[e.timeStamp, e.clientX]] };
+			moved = false;
+			if (reduce.matches) vel = 0;
+		});
+		m.addEventListener('pointermove', (e) => {
+			if (!drag || e.pointerId !== drag.id) return;
+			const dx = e.clientX - drag.sx;
+			if (!moved && Math.abs(dx) > TAP) {
+				moved = true;
+				m.setPointerCapture(e.pointerId);
+				m.classList.add('is-dragging');
+			}
+			if (!moved) return;
+			x = drag.x0 + dx;
+			vel = 0;
+			// keep the last 100 ms of movement for the flick speed
+			drag.pts.push([e.timeStamp, e.clientX]);
+			while (drag.pts.length > 2 && e.timeStamp - drag.pts[0][0] > 100) drag.pts.shift();
+			drag.lt = e.timeStamp;
+		});
+		const end = (e: PointerEvent) => {
+			if (!drag || e.pointerId !== drag.id) return;
+			// Flick speed over the last 100 ms; none if the finger had stopped,
+			// or under reduced motion.
+			const [t0, x0] = drag.pts[0];
+			const [t1, x1] = drag.pts[drag.pts.length - 1];
+			vel = t1 > t0 ? ((x1 - x0) / (t1 - t0)) * 1000 : 0;
+			if (!moved || reduce.matches || e.timeStamp - drag.lt > 80) vel = 0;
+			vel = Math.max(-3000, Math.min(3000, vel));
+			drag = null;
+			m.classList.remove('is-dragging');
+			// a drag that ends without a click must not swallow the next one
+			setTimeout(() => (moved = false), 0);
+		};
+		m.addEventListener('pointerup', end);
+		m.addEventListener('pointercancel', (e) => {
+			end(e);
+			vel = 0;
+		});
+		// Keyboard: a focused tile slides fully into view (the strip is paused).
+		m.addEventListener('focusin', (e) => {
+			const tile = (e.target as HTMLElement).closest('.craft-tile');
+			if (!tile) return;
+			m.scrollLeft = 0;
+			const r = tile.getBoundingClientRect(), b = m.getBoundingClientRect();
+			const pad = b.width * 0.12; // stay clear of the faded edges
+			if (r.left < b.left + pad) x += b.left + pad - r.left;
+			else if (r.right > b.right - pad) x -= r.right - (b.right - pad);
+			vel = 0;
+		});
+		// A drag ends with a click on the tile under the pointer: swallow it.
+		m.addEventListener('click', (e) => {
+			if (!moved) return;
+			e.preventDefault();
+			e.stopPropagation();
+			moved = false;
+		}, true);
+	});
 </script>
