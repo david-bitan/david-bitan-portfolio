@@ -1,5 +1,5 @@
 ---
-import { testimonials } from '../data/testimonials';
+import { testimonials, LINKEDIN_RECOMMENDATIONS_URL } from '../data/testimonials';
 import RecByline from './RecByline.astro';
 
 // Home: the three strongest recommendations as verbatim excerpts; the full
@@ -35,8 +35,8 @@ const featured = testimonials.filter((t) => t.featured);
 
 	{/* Phones: centred in the page (étape 9, B4). */}
 	<div class="mt-8 text-center sm:text-left">
-	<a href="/about#recommendations" class="inline-flex min-h-11 items-center text-sm font-semibold text-accent-text hover:underline">
-		Read all {testimonials.length} recommendations&nbsp;<span class="arr" aria-hidden="true">→</span>
+	<a href={LINKEDIN_RECOMMENDATIONS_URL} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center text-sm font-semibold text-accent-text hover:underline">
+		Read all recommendations on LinkedIn<span class="sr-only"> (opens in a new tab)</span>&nbsp;<span aria-hidden="true">↗</span>
 	</a>
 	</div>
 </section>

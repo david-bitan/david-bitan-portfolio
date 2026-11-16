@@ -77,7 +77,7 @@ const projectJsonLd: Record<string, unknown> = {
 	<Nav />
 	<main id="main" tabindex="-1">
 
-	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 min-[1248px]:px-0" data-reveal>
+	<article class="mx-auto max-w-[1200px] px-6 pt-8 pb-8 sm:pt-10 min-[1248px]:px-0" data-reveal>
 		<a href="/#work" data-top-back class="text-sm font-semibold text-accent-text hover:underline">← Back to work</a>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">{project.category}</p>
@@ -119,6 +119,32 @@ const projectJsonLd: Record<string, unknown> = {
 			   legacy fullDesc paragraph when sections are absent. */
 			project.sections ? (
 				<div class="mt-8 max-w-3xl sm:pb-4">
+					{/* Étape 11, 6: once open, a "Show less" sits where "Read the full
+					    case study" was; the one under the text stays as it was. */}
+					<button
+						type="button"
+						id="case-study-toggle-top"
+						aria-controls="case-study-body"
+						aria-expanded="true"
+						hidden
+						class="mb-8 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text hover:underline sm:mt-8"
+					>
+						<span>Show less</span>
+						<svg
+							aria-hidden="true"
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.4"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="h-4 w-4"
+							style="transform: rotate(180deg)"
+						>
+							<path d="M6 9l6 6 6-6" />
+						</svg>
+					</button>
 					<div
 						id="case-study-body"
 						class="case-study-body"
@@ -230,6 +256,7 @@ const projectJsonLd: Record<string, unknown> = {
 			const body = document.getElementById('case-study-body');
 			if (!btn || !body) return;
 
+			const topBtn = document.getElementById('case-study-toggle-top');
 			const labelEl = btn.querySelector('[data-toggle-label]');
 			const chevron = btn.querySelector('[data-toggle-chevron]');
 
@@ -260,7 +287,19 @@ const projectJsonLd: Record<string, unknown> = {
 				if (chevron) {
 					chevron.style.transform = next ? 'rotate(180deg)' : '';
 				}
+				if (topBtn) topBtn.hidden = !next;
 			}
+
+			// Top "Show less": closes at once; "Read the full case study" comes
+			// back to the same place, so the page does not move.
+			topBtn?.addEventListener('click', () => {
+				const saved = body.style.transition;
+				body.style.transition = 'none';
+				setExpanded(false);
+				void body.offsetHeight;
+				requestAnimationFrame(() => { body.style.transition = saved; });
+				btn.focus({ preventScroll: true });
+			});
 
 			// Étape 9, J: "Show less" closes the case study and brings the page
 			// back, softly, to the button, at the height where it was clicked to
@@ -340,7 +379,7 @@ const projectJsonLd: Record<string, unknown> = {
 						zone.isMobile ? (
 							// Phone captures: one masonry gallery for the whole site
 							// (components/MasonryGallery.astro). Dark mockups have no frame.
-							<div class="mt-12">
+							<div class="mt-8">
 								{/* Sonary Mailer keeps its email layout (David, étape 5): masonry. */}
 								<MasonryGallery urls={zone.images.map((i) => i.url)} alt={project.title} framed={!isDarkZone} priority={zoneIdx === 0} layout={project.slug === 'sonary-mailer' ? 'masonry' : 'phone'} />
 							</div>
@@ -349,7 +388,7 @@ const projectJsonLd: Record<string, unknown> = {
 							// (avoids the gap issue when object-contain shows
 							// a smaller image than the card). Ring + shadow
 							// live on the <img> itself.
-							<div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
+							<div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
 								{zone.images.map(({ url }, imgIdx) => (
 									<div class="img-skeleton rounded-lg">
 										<img
@@ -387,7 +426,7 @@ const projectJsonLd: Record<string, unknown> = {
 							//     capped to natural width so it never upscales.
 							//   - Wide (natW ≥ 900) = normal desktop mockup → stays
 							//     full-width in the stack.
-							<div class="mt-12" data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
+							<div class="mt-8" data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
 								<div class="space-y-10" data-desktop-stack>
 									{zone.images.filter(({ url }) => !isNarrow(url)).map(({ url }, imgIdx) => (
 										<div

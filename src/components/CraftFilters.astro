@@ -14,14 +14,14 @@ const { categories } = Astro.props;
 
 <div
 	id="craft-filters"
-	style="top: calc(var(--header-h, 77px) - 1px)"
+	style="top: calc(var(--header-h, 65px) - 1px)"
 	class="sticky z-30 border-y border-ink/10 bg-bg/95 backdrop-blur"
 >
 	<div class="relative mx-auto max-w-[1200px] px-6 py-4 min-[1248px]:px-0">
 		{/* Back-to-home link — appears only when the bar becomes sticky
 			(user scrolled past its natural position). Slides in from the
-			left with a fade, and pushes the pill row to the right via
-			padding-left transition. */}
+			left with a fade, and slides the pills to the right with a
+			transform (étape 11, 1: no layout at every frame). */}
 		<a
 			href="/"
 			aria-label="Back to home"
@@ -146,22 +146,25 @@ const { categories } = Astro.props;
 	   24px, so the two stay in step — but at lg the container drops to px-0
 	   while the arrow kept its 24px offset, and it ran straight into "All".
 	   Arrow now pins to 0 at lg, and 48px = 32 (arrow) + 16 (gap). */
-	.craft-filters-content {
-		padding-left: 0;
-		transition: padding-left 400ms cubic-bezier(0.22, 0.61, 0.36, 1);
-		will-change: padding-left;
+	/* the pills keep their colour fade (Tailwind transition-colors) */
+	#craft-filters .craft-filters-content > * {
+		transition:
+			transform 400ms cubic-bezier(0.22, 0.61, 0.36, 1),
+			color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+			background-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+			border-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
 	}
 	#craft-filters.is-stuck .craft-filters-back {
 		opacity: 1;
 		transform: translateY(-50%) translateX(0);
 		pointer-events: auto;
 	}
-	#craft-filters.is-stuck .craft-filters-content {
-		padding-left: 48px;
+	#craft-filters.is-stuck .craft-filters-content > * {
+		transform: translateX(48px);
 	}
 	@media (prefers-reduced-motion: reduce) {
 		.craft-filters-back,
-		.craft-filters-content {
+		#craft-filters .craft-filters-content > * {
 			transition: none !important;
 		}
 	}

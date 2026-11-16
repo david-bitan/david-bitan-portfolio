@@ -45,38 +45,29 @@ import HeroAnimation from './HeroAnimation.astro';
 		<span class="order-6 whitespace-nowrap pl-4 sm:pl-0">Hybrid or remote, Tel Aviv area</span>
 	</p>
 
-	<div class="mt-7 flex flex-col gap-4 sm:flex-row sm:items-center">
+	<!-- Étape 11, 7: one orange action ("See work"), an outlined "AI Lab"
+	     (white outline in dark mode, night-blue outline in light mode) that
+	     goes straight to the AI Lab section, and the two CV files below. -->
+	<div class="mt-7 flex flex-col gap-4">
 		<div class="flex flex-col gap-4 sm:flex-row">
 			<a
 				href="#work"
-				class="rounded-pill bg-accent px-7 py-3.5 text-center text-sm font-semibold text-accent-ink hover:bg-ink hover:text-bg transition-colors"
+				class="rounded-pill border-[1.5px] border-transparent bg-accent px-7 py-3.5 text-center text-sm font-semibold text-accent-ink hover:bg-ink hover:text-bg transition-colors"
 			>
 				See work
 			</a>
 			<a
-				href="/cv/CV-David-Bitan.pdf"
-				download
-				class="rounded-pill border border-ink/15 px-7 py-3.5 text-center text-sm font-semibold hover:border-ink/40 transition-colors"
+				href="#ai-lab"
+				class="btn-outline-ink rounded-pill px-7 py-3.5 text-center text-sm font-semibold transition-colors"
 			>
-				Download CV
+				AI Lab
 			</a>
 		</div>
-
-		<!-- The .docx sits under the button rather than beside it: recruiters
-		     who need the editable file are a minority, and a third pill in the
-		     row would have made the primary action compete with itself. -->
-		<!-- Centred on mobile: the two buttons above stretch full-width with their
-		     labels centred, so a left-aligned line underneath reads as misaligned.
-		     From sm up the row is horizontal and the link sits beside them, where
-		     left alignment is the correct relationship again. -->
-		<p class="text-center text-sm text-muted sm:ml-1 sm:text-left">
-			<a
-				href="/cv/CV-David-Bitan.docx"
-				download
-				class="font-semibold text-ink underline underline-offset-4 hover:text-accent-text transition-colors"
-			>
-				or download .docx
-			</a>
+		<p class="text-center text-sm text-muted sm:text-left">
+			Download CV:
+			<a href="/cv/CV-David-Bitan.pdf" download class="inline-flex min-h-11 min-w-11 items-center justify-center px-1 font-semibold text-ink underline underline-offset-4 hover:text-accent-text transition-colors">PDF</a>
+			<span aria-hidden="true">·</span>
+			<a href="/cv/CV-David-Bitan.docx" download class="inline-flex min-h-11 min-w-11 items-center justify-center px-1 font-semibold text-ink underline underline-offset-4 hover:text-accent-text transition-colors">DOCX</a>
 		</p>
 	</div>
 	</div>
@@ -87,3 +78,20 @@ import HeroAnimation from './HeroAnimation.astro';
 		<HeroAnimation />
 	</div>
 </section>
+
+<style>
+	/* Étape 11, 7: outlined second button, night blue in light mode, white in
+	   dark mode; fills on hover. */
+	.btn-outline-ink {
+		border: 1.5px solid #0d101a;
+		color: #0d101a;
+	}
+	:global([data-theme='dark']) .btn-outline-ink {
+		border-color: #ffffff;
+		color: #ffffff;
+	}
+	.btn-outline-ink:hover {
+		background-color: var(--color-ink);
+		color: var(--color-bg);
+	}
+</style>

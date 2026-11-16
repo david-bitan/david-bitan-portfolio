@@ -12,8 +12,9 @@
      5.0:1 on #EAEDF2 light, 6.2:1 on #0D101A dark (David, 15/11). */
   --color-quiet: #5a6577;
   /* Metrics block lines 2 and 3: unchanged in light (muted). */
-  --color-metric-label: #4b5563;
-  --color-metric-sub: #4b5563;
+  /* Étape 11, 8: the second small line is quieter than the first (both ≥ 4.5:1) */
+  --color-metric-label: #374151; /* 8.8:1 on #EAEDF2 */
+  --color-metric-sub: #5a6577; /* 5.0:1 on #EAEDF2, 5.9:1 on white */
   /* Recommendation bylines, company and "worked with" lines (étape 9, C1):
      a darker blue-grey than muted, 9.5:1 on white cards. */
   --color-reco-sub: #3f4a5c;
@@ -61,8 +62,8 @@
      (David, 15/11, no border): ink 14.2:1, muted 8.6:1, orange 4.9:1. */
   --color-card: #1a2033;
   --color-quiet: #8a93a6;
-  --color-metric-label: #8a93a6;
-  --color-metric-sub: #7f889b;
+  --color-metric-label: #b8bdc8; /* 8.6:1 on #1A2033 */
+  --color-metric-sub: #8a93a6; /* 5.2:1 on #1A2033, 6.2:1 on #0D101A */
   --color-reco-sub: #8f99ad; /* 5.6:1 on #1A2033 cards */
   --color-footer-bg: #151a28;
   --color-footer-ink: #eef0f4;
@@ -87,10 +88,10 @@ h1, h2, h3, h4 {
   text-wrap: balance;
 }
 
-/* Header height before Nav's script measures it (85px phones, 77px lg+),
+/* Header height before Nav's script measures it (73px phones, 65px lg+ since étape 11, 10),
    so a sticky bar never starts under the header hairline. */
-:root { --header-h: 85px; }
-@media (min-width: 1024px) { :root { --header-h: 77px; } }
+:root { --header-h: 73px; }
+@media (min-width: 1024px) { :root { --header-h: 65px; } }
 
 html {
   /* Prevents the off-canvas mobile nav (translate-x-full) from creating
@@ -397,4 +398,23 @@ main:focus { outline: none; }
 }
 ::view-transition-new(site-header) {
   animation: none;
+}
+
+/* Étape 11, 14: theme switch = one 0.4 s fade of the whole page (header
+   included), set by Nav.astro with document.startViewTransition. The
+   per-element colour fades are off meanwhile, so nothing changes early. */
+html.theme-switching,
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+}
+html.theme-switching #site-header {
+  view-transition-name: none;
+}
+html.theme-switching::view-transition-old(root) {
+  animation: none;
+}
+html.theme-switching::view-transition-new(root) {
+  animation: 400ms ease both vt-fade-in;
 }

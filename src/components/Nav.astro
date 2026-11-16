@@ -20,7 +20,7 @@ const onContact = Astro.url.pathname.replace(/\/$/, '') === '/contact';
 ---
 
 <header id="site-header" class="sticky top-0 z-50 border-b border-ink/5 bg-bg">
-	<nav class="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-5 min-[1248px]:px-0">
+	<nav class="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-3.5 min-[1248px]:px-0">
 		<a href="/" data-menu-fade class="text-lg font-extrabold tracking-tight">David Bitan</a>
 
 		<div class="hidden items-center gap-8 lg:flex">
@@ -192,8 +192,8 @@ const onContact = Astro.url.pathname.replace(/\/$/, '') === '/contact';
 	const header = document.getElementById('site-header');
 	const isOpen = () => !!overlay?.classList.contains('is-open');
 
-	// Real header height for every sticky bar under it (85px on phones,
-	// 77px on desktop). Hard-coded tops slid the bars under the hairline.
+	// Real header height for every sticky bar under it (73px on phones,
+	// 65px on desktop since étape 11, 10). Hard-coded tops slid the bars under the hairline.
 	if (header) {
 		// exact height (a fraction of a pixel at some widths and zoom levels)
 		const setH = () => document.documentElement.style.setProperty('--header-h', header.getBoundingClientRect().height + 'px');
@@ -237,16 +237,43 @@ const onContact = Astro.url.pathname.replace(/\/$/, '') === '/contact';
 	}
 	syncThemeIcon();
 
-	themeToggle?.addEventListener('click', () => {
-		const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-		if (isDark) {
-			document.documentElement.removeAttribute('data-theme');
-			localStorage.setItem('theme', 'light');
-		} else {
-			document.documentElement.setAttribute('data-theme', 'dark');
-			localStorage.setItem('theme', 'dark');
-		}
+	const root = document.documentElement;
+	function setTheme(dark: boolean) {
+		if (dark) root.setAttribute('data-theme', 'dark');
+		else root.removeAttribute('data-theme');
 		syncThemeIcon();
+	}
+	// While the theme changes, the per-element colour fades are switched off
+	// (.theme-switching in global.css): otherwise each element fades on its own
+	// and the header changes before the rest of the page.
+	function endSwitch() {
+		requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('theme-switching')));
+	}
+
+	// Étape 11, 14: one soft fade (0.4 s) for the whole page at once, with a
+	// view transition; instant under reduced motion or without support.
+	themeToggle?.addEventListener('click', () => {
+		const dark = root.getAttribute('data-theme') !== 'dark';
+		try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch {}
+		root.classList.add('theme-switching');
+		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (!reduce && document.startViewTransition) {
+			document.startViewTransition(() => setTheme(dark)).finished.finally(endSwitch);
+		} else {
+			setTheme(dark);
+			endSwitch();
+		}
+	});
+
+	// Étape 11, 2: a page shown again from the back/forward cache keeps the
+	// theme it had; apply the saved one each time a page is shown.
+	window.addEventListener('pageshow', () => {
+		let dark = false;
+		try { dark = localStorage.getItem('theme') === 'dark'; } catch {}
+		if (dark === (root.getAttribute('data-theme') === 'dark')) return syncThemeIcon();
+		root.classList.add('theme-switching');
+		setTheme(dark);
+		endSwitch();
 	});
 
 	// --- Scroll spy (home only) ---

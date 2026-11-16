@@ -1,8 +1,8 @@
 ---
 // Author line of a LinkedIn recommendation: round photo (or initials until
-// David supplies one), name, role, relation, and a link to the
-// recommendations on LinkedIn (LinkedIn has no per-recommendation URL).
-import { LINKEDIN_RECOMMENDATIONS_URL, type Testimonial } from '../data/testimonials';
+// David supplies one), name and role. Étape 11, 5: no per-card LinkedIn link
+// and no "Worked with…" line; one link under the cards instead.
+import type { Testimonial } from '../data/testimonials';
 
 interface Props {
 	t: Testimonial;
@@ -39,16 +39,6 @@ const [title, company] = cut > 0 ? [t.role.slice(0, cut + 1), t.role.slice(cut +
 		<div class="min-w-0">
 			<p class="font-semibold">{t.name}</p>
 			<p class="mt-0.5 text-sm text-muted">{title}{company && <><br class="max-sm:hidden" /><span class="max-sm:hidden"> </span></>}<span class="reco-sub max-sm:block">{company}</span></p>
-		</div>
-		<div class="col-span-2 min-w-0 sm:col-auto">
-			<p class="reco-sub">{t.relation}</p>
-			<a
-				href={LINKEDIN_RECOMMENDATIONS_URL}
-				target="_blank"
-				rel="noopener"
-				class="mt-1 inline-flex min-h-11 items-center text-sm font-semibold text-accent-text hover:underline sm:min-h-0"
-				>View on LinkedIn<span class="sr-only"> (recommendation by {t.name}, opens in a new tab)</span>&nbsp;↗</a
-			>
 		</div>
 	</div>
 </figcaption>

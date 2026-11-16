@@ -3,25 +3,27 @@
 // other home sections, and the strip of craft pieces running on its own, in a
 // loop, exactly like the company-name marquee (same speed in px/s, same soft
 // fades on both edges, pause on hover or focus; still under reduced motion).
+// Étape 11, 4: all the craft pieces, 2 copies (seamless loop), light images
+// loaded before they come into view, no pause stuck after a touch.
 // A click opens the Craft page straight on that piece, in the viewer.
 // Phones: "See craft →" under the strip, centred.
 import { craftItems } from '../data/craftItems';
 import { cld } from '../lib/cloudinary';
 
-const picks = ['3d-03', 'paint-02', '3d-04', '3d-24', 'paint-05', '3d-05', '3d-17', '3d-12'];
-const items = picks.map((s) => craftItems.find((c) => c.slug === s)!).filter(Boolean);
-const sq = (url: string, w: number) => cld(url, `c_fill,ar_1:1,g_center,w_${w},q_auto:best,f_auto`);
-// Three copies back to back, like the marquee: translating one third loops
-// without a seam. Only the first copy is read out and reachable by keyboard.
-const track = [...items, ...items, ...items];
+const items = craftItems;
+const sq = (url: string, w: number) => cld(url, `c_fill,ar_1:1,g_center,w_${w},q_auto,f_auto`);
+// Two copies back to back (one copy is wider than any screen): translating
+// exactly half loops without a seam. Only the first copy is read out and
+// reachable by keyboard.
+const track = [...items, ...items];
 ---
 
 <section id="craft" class="mx-auto max-w-[1200px] scroll-mt-24 px-6 pb-20 sm:pb-24 min-[1248px]:px-0" data-reveal>
 	<div class="border-t border-ink/10 pt-14 sm:pt-8">
 		<div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 			<h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-				<span class="block">Outside product work</span>
-				<span class="block">3D and digital painting</span>
+				{/* Étape 11, 12: one line on desktop, two on phones and tablets */}
+				<span class="block lg:inline">Outside product work</span><span class="mx-4 hidden size-2.5 rounded-full bg-accent align-middle lg:inline-block" aria-hidden="true"></span><span class="block lg:inline">3D and digital painting</span>
 			</h2>
 			<a
 				href="/craft"
@@ -47,6 +49,7 @@ const track = [...items, ...items, ...items];
 									width="400"
 									height="400"
 									loading="lazy"
+									fetchpriority="low"
 									decoding="async"
 									class="thumb-hover-zoom aspect-square h-auto w-full object-cover"
 								/>
@@ -68,14 +71,15 @@ const track = [...items, ...items, ...items];
 
 <style>
 	/* Same speed as the names (one copy of names = 1,555 px in 28 s, about
-	   55.5 px/s): 8 tiles of 148 + 16 px = 1,312 px in 23.6 s on phones,
-	   8 x (200 + 16) = 1,728 px in 31.1 s from 640 px. */
+	   55.5 px/s): 29 tiles of 148 + 16 px = 4,756 px in 85.7 s on phones,
+	   29 x (200 + 16) = 6,264 px in 112.9 s from 640 px. */
 	.craft-tile {
 		width: 164px;
 		padding-inline: 8px;
 	}
 	.craft-track {
-		animation-duration: 23.6s;
+		animation-name: craft-marquee;
+		animation-duration: 85.7s;
 		/* room for the focus ring, which the mask would cut */
 		padding-block: 4px;
 	}
@@ -84,12 +88,51 @@ const track = [...items, ...items, ...items];
 			width: 216px;
 		}
 		.craft-track {
-			animation-duration: 31.1s;
+			animation-duration: 112.9s;
+		}
+	}
+	@keyframes craft-marquee {
+		to {
+			transform: translateX(-50%);
+		}
+	}
+	/* 60 tiles inside one moving layer: no extra GPU layer per image. */
+	.craft-tile img {
+		will-change: auto;
+	}
+	/* A touch leaves :hover and :focus-within on, which used to freeze the
+	   strip on phones: pause only under a real pointer or keyboard focus. */
+	.craft-marquee:hover .craft-track,
+	.craft-marquee:focus-within .craft-track {
+		animation-play-state: running;
+	}
+	@media (hover: hover) and (pointer: fine) {
+		.craft-marquee:hover .craft-track {
+			animation-play-state: paused;
+		}
+	}
+	.craft-marquee:focus-visible .craft-track,
+	.craft-marquee:has(:focus-visible) .craft-track {
+		animation-play-state: paused;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.craft-track {
+			animation: none;
 		}
 	}
 </style>
 
 <script>
+	// Étape 11, 4: lazy images in a moving strip were only asked for once on
+	// screen (an empty tile). Load them all when the block gets near.
+	document.querySelectorAll<HTMLElement>('.craft-marquee').forEach((m) => {
+		const io = new IntersectionObserver((entries) => {
+			if (!entries.some((e) => e.isIntersecting)) return;
+			m.querySelectorAll('img').forEach((img) => (img.loading = 'eager'));
+			io.disconnect();
+		}, { rootMargin: '800px 0px' });
+		io.observe(m);
+	});
 	// Keyboard focus may scroll the strip sideways: put it back once the focus leaves.
 	document.querySelectorAll<HTMLElement>('.craft-marquee').forEach((m) =>
 		m.addEventListener('focusout', (e) => {

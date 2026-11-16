@@ -157,8 +157,8 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 		}),
 	);
 
-	// Sticky state. The header height changes with the breakpoint (85px on
-	// phones, 77px on desktop): it is read from --header-h (set by Nav) so the
+	// Sticky state. The header height changes with the breakpoint (about 72px
+	// on phones, 64px on desktop since étape 11, 10): it is read from --header-h (set by Nav) so the
 	// bar never slides under the header hairline (P5, 15/11).
 	const bar = document.getElementById('zone-filters-bar');
 	const back = bar?.querySelector<HTMLElement>('.zone-filters-back');
@@ -166,8 +166,15 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 	// The top-of-page back link (first one in <main>): once it is under the
 	// header, the bare bar shows up.
 	const topLink = document.querySelector<HTMLElement>('main [data-top-back]');
+	// Étape 11, 1: the filters slide with transform (no layout per frame). The
+	// shift = where the old padding put them (pill width + 12px) minus the
+	// padding the row already has.
+	const row = bar?.querySelector<HTMLElement>('.zone-filters-scroll');
 	function measure() {
-		if (back && bar) bar.style.setProperty('--zf-back-w', back.offsetWidth + 'px');
+		if (!back || !bar) return;
+		bar.style.setProperty('--zf-back-w', back.offsetWidth + 'px');
+		const pad = row ? parseFloat(getComputedStyle(row).paddingLeft) || 0 : 0;
+		bar.style.setProperty('--zf-shift', back.offsetWidth + 12 - pad + 'px');
 	}
 	function update() {
 		if (!bar) return;
@@ -198,11 +205,11 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 </script>
 
 <style is:global>
-	html.has-zf { scroll-padding-top: calc(var(--header-h, 77px) + 72px); }
+	html.has-zf { scroll-padding-top: calc(var(--header-h, 65px) + 72px); }
 	/* Étape 9, I3: 1 px under the header (the header is drawn above it), so no
 	   gap ever shows between the two, at any width or zoom level. */
 	.zf-sticky,
-	.zf-bare { top: calc(var(--header-h, 77px) - 1px); }
+	.zf-bare { top: calc(var(--header-h, 65px) - 1px); }
 	/* Bare bar: out of the flow, pinned, hidden until the top link is gone. */
 	.zf-bare {
 		position: fixed;
@@ -222,7 +229,6 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 	.zone-filters-scroll {
 		scrollbar-width: none;
 		-webkit-overflow-scrolling: touch;
-		transition: padding-left 400ms cubic-bezier(0.22, 0.61, 0.36, 1);
 	}
 	.zone-filters-scroll::-webkit-scrollbar { display: none; }
 
@@ -269,12 +275,20 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 			border-color 200ms ease,
 			color 200ms ease;
 	}
-	.zone-filters-scroll {
-		transition: padding-left 280ms cubic-bezier(0.22, 1, 0.36, 1) 80ms;
+	/* Étape 11, 1: same move, timing and end position as the old padding-left,
+	   but on transform, so the page is not laid out again at every frame. */
+	.zone-filters-scroll > * {
+		transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1) 80ms;
 	}
-	.zf-sticky.is-stuck .zone-filters-scroll {
-		padding-left: calc(var(--zf-back-w, 72px) + 12px);
-		transition: padding-left 280ms cubic-bezier(0.22, 1, 0.36, 1);
+	.zf-sticky.is-stuck .zone-filters-scroll > * {
+		transform: translateX(var(--zf-shift, 57px));
+		transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+	/* the row scrolls as far as with the old padding (phones): same end */
+	.zf-sticky.is-stuck .zone-filters-scroll::after {
+		content: '';
+		flex: 0 0 calc(var(--zf-shift, 57px) - 12px);
+		height: 1px;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
@@ -282,7 +296,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 		.zone-filters-back .zf-back-link,
 		.zone-filters-back .zf-divider,
 		.zone-filters-back::before,
-		.zone-filters-scroll,
+		.zone-filters-scroll > *,
 		.zf-bare {
 			transition: none !important;
 		}

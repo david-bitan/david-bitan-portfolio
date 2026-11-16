@@ -71,6 +71,10 @@
 			opener = t;
 			inPage = t.getBoundingClientRect().width;
 			img.removeAttribute('style');
+			// Étape 11, 3: the previous picture never shows; the new one appears,
+			// with the same fade, once it is loaded and decoded.
+			img.style.visibility = 'hidden';
+			const mine = ++shown;
 			img.dataset.kind = t.dataset.lbKind || 'desktop';
 			img.alt = t.alt;
 			if (t.dataset.lbSrcset) img.srcset = t.dataset.lbSrcset; else img.removeAttribute('srcset');
@@ -78,8 +82,14 @@
 			count.textContent = `${index + 1} / ${list.length}`;
 			scroll.scrollTop = 0;
 			size();
-			if (!reduce.matches) img.animate([{ opacity: 0, transform: 'scale(0.98)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
+			const reveal = () => {
+				if (mine !== shown) return;
+				img.style.visibility = '';
+				if (!reduce.matches) img.animate([{ opacity: 0, transform: 'scale(0.98)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
+			};
+			img.decode().then(reveal, reveal);
 		}
+		let shown = 0;
 		let returnTo: HTMLElement | null = null;
 		function open(t: HTMLImageElement) {
 			returnTo = t;
@@ -102,6 +112,11 @@
 		img.addEventListener('load', () => { learn(); size(); });
 		window.addEventListener('resize', () => dlg.open && size());
 		dlg.addEventListener('close', () => {
+			// empty the viewer, so the next opening never starts on this picture
+			shown++;
+			img.style.visibility = 'hidden';
+			img.removeAttribute('srcset');
+			img.removeAttribute('src');
 			document.documentElement.style.overflow = '';
 			returnTo?.focus({ preventScroll: true });
 		});
