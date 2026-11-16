@@ -3,7 +3,7 @@
  * Top nav (étape 8, M, David 15/11): every entry scrolls the home page down to
  * its section, in the home's own order (Work · AI Lab · Testimonials · About ·
  * Craft · Contact). From an inner page it goes back to the home at that
- * section (/#…). Contact is the orange button on the right. The underline
+ * section (/#…). Contact is a plain link on the right (étape 9, F1) that opens /contact. The underline
  * follows the section in view (scroll spy, home only). The full /about, /craft
  * and /contact pages stay reachable from the home blocks and the footer.
  */
@@ -270,7 +270,7 @@ const onContact = Astro.url.pathname.replace(/\/$/, '') === '/contact';
 					const on = sid === id;
 					if (on) el.setAttribute('aria-current', 'location');
 					else el.removeAttribute('aria-current');
-					// the orange Contact button keeps its look; links get the orange underline
+					// links get the orange underline; [data-spy-btn] (old orange Contact button) is unused since étape 9, F1
 					if (el.hasAttribute('data-spy-btn')) return;
 					el.classList.toggle('nav-link-active', on);
 					if (el.classList.contains('nav-link')) {

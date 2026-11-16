@@ -222,7 +222,7 @@ Building on top of the Sonary Website design system, itself mature after almost 
 	},
 	{
 		slug: 'sonary-website',
-		title: `Sonary · Marketing Website`,
+		title: `Sonary · Marketing website`,
 		client: `Ryze Beyond`,
 		year: '2019 – 2026',
 		category: 'SaaS',
@@ -263,7 +263,7 @@ Addressed through a strict smart-component hierarchy and a library of editorial 
 
 Notable components: homepage, 37-category mega menu, review card, comparison table, interactive lineup: all built as smart components reused across templates.
 
-Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress to Webflow migration on the latest redesign, with a full design system rebuild in Webflow and handoff to the content team. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
+Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress to Webflow migration on the latest redesign, with a handoff to the content team. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
 			},
 			{
 				heading: 'What I took from it',
@@ -313,12 +313,12 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 			`40+ verticals on one parametric Figma design system`,
 			`Shared templates from homepage to review and lineup pages`,
 			`5 breakpoints`,
-			`WordPress to Webflow migration, with the design system rebuilt in Webflow`,
+			`WordPress to Webflow migration on the latest redesign`,
 		],
 		sections: [
 			{
 				heading: 'Context',
-				body: `Top5 is a family of comparison sites for products and services aimed at SMBs, published by Ryze Beyond. The family currently spans about 40 verticals (mattresses, POS providers, merchant services, dating sites, website builders, and more), each on its own domain (top5-mattresses.com, top-posproviders.com, top-merchantservices.com, top5-datingsites.com…) but all powered by a shared parametric design system.`,
+				body: `Top5 is a family of comparison sites for products and services aimed at SMBs, published by Ryze Beyond. The family currently spans 40+ verticals (mattresses, POS providers, merchant services, dating sites, website builders, and more), each on its own domain (top5-mattresses.com, top-posproviders.com, top-merchantservices.com, top5-datingsites.com…) but all powered by a shared parametric design system.`,
 			},
 			{
 				heading: 'Role',
@@ -336,7 +336,7 @@ Addressed through a parametric design system in Figma: each smart component read
 			},
 			{
 				heading: 'Deliverables',
-				body: `Parametric design system covering homepage, article, comparison, lineup, review, about and category pages, deployed across 40+ verticals. Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress to Webflow migration on the latest redesign, with a full design system rebuild in Webflow and handoff to the content team. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
+				body: `Parametric design system covering homepage, article, comparison, lineup, review, about and category pages, deployed across 40+ verticals. Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress to Webflow migration on the latest redesign, with a handoff to the content team. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
 			},
 			{
 				heading: 'What I took from it',
@@ -399,7 +399,7 @@ The solution: a system of abstract illustrations (colored geometric shapes, text
 			},
 			{
 				heading: 'Deliverables',
-				body: `Full marketing website: homepage, product showcases (Sonary Dashboard, Website, Top5, Playright), about, team, careers, legal. Design system built for this project (typography, palette derived from the existing brand, radius, illustration system, light and dark modes). Five breakpoints (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). WordPress CMS. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
+				body: `Full marketing website: homepage, product showcases (Sonary Dashboard, Website, Top5, Playright), about, team, careers, legal. Design system built for this project (typography, palette derived from the existing brand, radius, illustration system, light and dark modes). Five breakpoints (Desktop 1920, Laptop 1280, Tablet landscape, Tablet portrait, Mobile 375). Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
 			},
 			{
 				heading: 'What I took from it',
@@ -450,7 +450,7 @@ The solution: a system of abstract illustrations (colored geometric shapes, text
 	},
 	{
 		slug: 'sonary-mailer',
-		title: `Sonary · Email Templates`,
+		title: `Sonary · Email templates`,
 		client: `Ryze Beyond`,
 		year: '2025',
 		category: 'SaaS',
@@ -544,7 +544,7 @@ The project also held a particular status in the Ryze roadmap: design often ran 
 			},
 			{
 				heading: 'Deliverables',
-				body: `Redesigned homepage and ranking pages, with hover animations coded in HTML/CSS and handed to the developers ready to integrate. WordPress CMS. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
+				body: `Redesigned homepage and ranking pages, with hover animations coded in HTML/CSS and handed to the developers ready to integrate. Cross-functional work with PM, front-end and back-end developers, content writers, marketing and SEO.`,
 			},
 		],
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785341989/portfolio/playright/home-page/desktop---1200px---container-1140px.webp',
@@ -566,8 +566,8 @@ The project also held a particular status in the Ryze roadmap: design often ran 
 	},
 	{
 		slug: 'ui-ux-vintage',
-		title: `UI/UX Work (2011 – 2018)`,
-		client: `Multiple clients`,
+		title: `UI/UX work (2011 – 2018)`,
+		client: `Several companies`,
 		year: '2011 – 2018',
 		category: 'UI/UX',
 		shortDesc: `Selection of UI/UX work from 2011 – 2018: Wochat instant translation app, a full SaaS dashboard, plus personal explorations in music apps, landing concepts and wireframes.`,
@@ -603,7 +603,7 @@ The remaining captures gather more personal designs: music apps (MUSIK, HitShot,
 	},
 	{
 		slug: 'branding-old',
-		title: `Digital Campaigns & Ad Design (2006 – 2011)`,
+		title: `Digital campaigns & ad design (2006 – 2011)`,
 		client: `Arc Interactive / Publicis`,
 		year: '2006 – 2011',
 		category: 'Branding',
@@ -611,7 +611,7 @@ The remaining captures gather more personal designs: music apps (MUSIK, HitShot,
 		shortDesc: `Digital campaigns produced at Arc Interactive (Publicis Group) between 2006 and 2011: mini-sites, mini-games and animated banners in Flash and HTML/CSS. Cactus awards period.`,
 		fullDesc: `Selection of work produced between 2006 and 2011 at Arc Interactive, a media agency of the Publicis Group. My contribution covered the production of digital campaigns for several advertisers: short mini-sites (2 to 3 pages), mini-games and animated banners in large volume, built in Flash (Adobe) and in HTML/CSS.
 
-Among the clients: Banque Leumi, Afeka Academic Engineering College, UMI Motors (Cadillac and Chevrolet importer in Israel) and others. Some of these campaigns were recognized with Cactus awards (gold, silver, bronze), the annual awards for advertising in Israel, in the years that followed.
+Among the advertisers: Bank Leumi, Afeka Academic Engineering College, UMI Motors (Cadillac and Chevrolet importer in Israel) and others. Some of these campaigns were recognized with Cactus awards (gold, silver, bronze), the annual awards for advertising in Israel, in the years that followed.
 
 The captures below gather a selection of 13 pieces of work from that period.`,
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785345947/portfolio/old-wix/branding/branding-01.webp',
@@ -636,7 +636,7 @@ The captures below gather a selection of 13 pieces of work from that period.`,
 	},
 	{
 		slug: 'gamingtech',
-		title: `GamingTech · Casino & Sports Betting Platforms`,
+		title: `GamingTech · Casino & sports betting platforms`,
 		client: `GamingTech (SBTech Group)`,
 		year: '2015 – 2017',
 		category: 'iGaming',
@@ -698,7 +698,7 @@ Deliverables covered game lobbies, bonus systems, deposit funnels, promotional b
 	},
 	{
 		slug: 'tradologic',
-		title: `Tradologic · Casino Platforms`,
+		title: `Tradologic · Casino platforms`,
 		client: `Tradologic`,
 		year: '2011 – 2013',
 		category: 'iGaming',

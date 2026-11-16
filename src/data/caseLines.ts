@@ -30,15 +30,15 @@ export const caseLines: Record<string, CaseLines> = {
 	},
 	'sonary-website': {
 		role: END_TO_END,
-		challenge: 'Stay consistent and warm across very different categories and a very large number of generated pages.',
+		challenge: 'Stay consistent and warm across 37 software categories and 1,400+ generated pages.',
 		did: 'A strict system of smart components, three major redesigns and continuous improvements in between.',
-		result: 'A site that keeps growing without losing its consistency or its tone.',
+		result: '1,400+ indexed pages on one design system.',
 	},
 	top5: {
 		role: END_TO_END,
 		challenge: "Serve dozens of verticals with different content and colors, without duplicating components.",
 		did: "A parametric design system in Figma: each component takes on the site's color.",
-		result: 'One interface foundation for every site, each with its own identity.',
+		result: 'One design system for 40+ sites, each with its own colors and button styles.',
 	},
 	'ryze-brand': {
 		role: END_TO_END,
@@ -54,14 +54,14 @@ export const caseLines: Record<string, CaseLines> = {
 	},
 	playright: {
 		role: 'Senior Product Designer, homepage and ranking pages',
-		challenge: "Follow UK rules (UKGC, the UK Gambling Commission, the UK's gambling regulator) and still stand out in a saturated market.",
+		challenge: 'Follow UKGC rules and still stand out in a crowded market.',
 		did: 'Redesigned the homepage and ranking pages, built in trust blocks and coded the hover animations in HTML/CSS.',
 		result: 'The required notices are there without crushing the visual hierarchy.',
 	},
 	'branding-old': {
 		role: 'Interactive Art Designer',
 		challenge: 'A high volume of campaigns for several advertisers.',
-		did: 'Mini-sites, mini-games and animated banners in Flash and HTML/CSS (Banque Leumi, Afeka, UMI Motors…).',
+		did: 'Mini-sites, mini-games and animated banners in Flash and HTML/CSS (Bank Leumi, Afeka, UMI Motors…).',
 		result: 'Some campaigns won Cactus awards (gold, silver, bronze).',
 	},
 	'ui-ux-vintage': {
@@ -83,19 +83,19 @@ export const caseLines: Record<string, CaseLines> = {
 		role: PERSONAL,
 		challenge: 'Understand where your money goes from a simple bank statement.',
 		did: 'The statement is read in your browser, fully analyzed, and you ask questions in plain words.',
-		result: 'A live demo to try, in several languages including Hebrew.',
+		result: 'A live demo in seven languages, Hebrew included.',
 	},
 	margin: {
 		role: PERSONAL,
 		challenge: 'Understand a contract without reading all of it.',
 		did: 'An AI reader that explains what matters and shows the exact passage behind every point.',
-		result: 'A live demo to try, in several languages including Hebrew.',
+		result: 'A live demo in ten languages, Hebrew included.',
 	},
 	otium: {
 		role: PERSONAL,
 		challenge: 'Hand a trip to an AI without losing control.',
 		did: 'An agent that searches, compares and holds flights and a stay, then waits for your OK before paying.',
-		result: 'A live demo to try, in several languages including Hebrew.',
+		result: 'A live demo in five languages, Hebrew included.',
 	},
 	'apex-athletic-club': {
 		role: PERSONAL,

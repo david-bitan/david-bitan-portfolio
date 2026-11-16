@@ -446,20 +446,20 @@ Almost all of the work was in the parts that are usually faked. Booking a class 
 		subtitle: 'A family kitchen in San Gimignano, imagined from scratch.',
 		eyebrow: 'Restaurant · 2026',
 		shortDesc:
-			'A refined trattoria: full brand identity, menu and table booking with a demo sign-in. Designed and built with AI, from research to finished product, every choice directed by me.',
+			'Full brand identity, menu and table booking with a demo sign-in. Designed and built with AI, from research to finished product, every choice directed by me.',
 		metaDesc:
-			'A refined trattoria: brand identity, menu and table booking with a demo sign-in. Designed and built with AI, every choice directed by me.',
-		intro: `A refined trattoria: full brand identity, menu and table booking with a demo sign-in. Designed and built with AI, from research to finished product, every choice directed by me.
+			'Brand identity, menu and table booking with a demo sign-in. Designed and built with AI, every choice directed by me.',
+		intro: `Full brand identity, menu and table booking with a demo sign-in. Designed and built with AI, from research to finished product, every choice directed by me.
 
-The design language borrows from fine-dining editorial: Playfair Display and Cormorant Garamond over a noir + brushed-gold + ivoire palette, dish photography treated as painterly plates rather than product shots, and micro-typography for the menu (dotted leaders, lining figures, italic wine notes) that would look at home on a printed carte.
+The design language borrows from fine-dining editorial: Playfair Display and Cormorant Garamond over a noir + brushed-gold + ivory palette, dish photography treated as painterly plates rather than product shots, and micro-typography for the menu (dotted leaders, lining figures, italic wine notes) that would look at home on a printed carte.
 
 The build is a single self-contained page of hand-written HTML, CSS, and vanilla JS: view-transitions between sections, a lightbox-based reservation flow with a mock sign-in (demo account or email), a "My space" client area with cancel confirmation, and a hero parallax that respects reduced-motion. No frameworks, no CMS: the constraint was to see how far a single-file mini-site could be pushed with AI as the sparring partner.`,
 		designSystem: {
 			colors: [
 				{ name: 'Noir', hex: '#0F0E0C', role: 'Canvas · nav · deep backgrounds' },
 				{ name: 'Brushed gold', hex: '#B08D4B', role: 'Accents · dividers · CTA hover' },
-				{ name: 'Ivoire', hex: '#F5F0E5', role: 'Light surfaces · text on noir' },
-				{ name: 'Sang', hex: '#8B0000', role: 'Destructive intent · cancel confirm' },
+				{ name: 'Ivory', hex: '#F5F0E5', role: 'Light surfaces · text on noir' },
+				{ name: 'Deep red', hex: '#8B0000', role: 'Destructive intent · cancel confirm' },
 			],
 			typography: [
 				{

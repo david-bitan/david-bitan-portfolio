@@ -187,7 +187,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 		requestAnimationFrame(() => { update(); ticking = false; });
 	};
 	if (bar) {
-		// keyboard focus never lands hidden under the header + this bar (WCAG 2.4.11)
+		// keyboard focus never lands hidden under the header + this bar (focus not obscured, 2.4.11)
 		document.documentElement.classList.add('has-zf');
 		measure();
 		update();

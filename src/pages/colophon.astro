@@ -20,7 +20,7 @@ const stack = [
 const claudeDid = [
 	'Wrote most of the Astro + Tailwind code, refactored as the design evolved.',
 	'Debugged obscure CSS + build issues (rolldown native bindings, corner-shape support, srcset breakpoints).',
-	'Kept a versioned archive of every edit for one-click rollback (46+ snapshots).',
+	'Kept a versioned archive of every edit for one-click rollback (30+ snapshots).',
 	'Suggested UX improvements: pill filters, Load More coordination, dark-first ordering.',
 	'Maintained the session memory file so a fresh chat resumes exactly where we left off.',
 ];
@@ -38,7 +38,7 @@ const davidDid = [
 type BuildStat = { n: string; label: string; sub?: string };
 
 const buildStats: BuildStat[] = [
-	{ n: '75+', label: 'Iteration checkpoints tracked locally' },
+	{ n: '30+', label: 'Iteration checkpoints tracked locally' },
 	{ n: '17', label: 'Pages designed + coded' },
 	{ n: 'Solo', label: 'Designer + AI-assisted dev' },
 ];
@@ -49,7 +49,7 @@ const palette = [
 	{ swatch: '#EAEDF2', name: 'Background', role: 'Near-white canvas: launchnow.design-inspired, easy on the eyes' },
 	{ swatch: '#0A0A0A', name: 'Ink', role: 'Body copy + headlines, high contrast on the light bg' },
 	{ swatch: '#4B5563', name: 'Muted', role: 'Secondary text, metadata, captions' },
-	{ swatch: '#F25C24', name: 'Accent (dark)', role: 'Same role in dark mode: the brand orange itself passes AA on night blue' },
+	{ swatch: '#F25C24', name: 'Accent (dark)', role: 'Same role in dark mode: the brand orange on night blue' },
 	{ swatch: '#0D101A', name: 'Dark mode', role: 'Night blue: page #0D101A, cards #1A2033, blue-grey text #EEF0F4 and #B8BDC8' },
 ];
 
@@ -57,7 +57,7 @@ const shape = [
 	{ label: 'Typeface', value: 'Manrope 400 / 500 / 700 / 800', why: 'Geometric sans with tight tracking on headlines: modern without being sterile.' },
 	{ label: 'Radius', value: '8px · 16px · pill', why: 'Buttons 8, cards 16, CTAs full-round. Kept small tokens; no random values.' },
 	{ label: 'Corners', value: 'Squircle (superellipse 3)', why: 'iOS-style corner-shape on rounded cards where supported: quiet upgrade, falls back to normal radius elsewhere.' },
-	{ label: 'Dark mode', value: 'Warm charcoal, orange kept', why: 'Same family as the footer, never navy. Accent orange is identical in both modes, so the brand reads the same.' },
+	{ label: 'Dark mode', value: 'Night blue, orange kept', why: 'Same night blue as the footer. Accent orange is identical in both modes, so the brand reads the same.' },
 ];
 
 const method = [
@@ -67,7 +67,7 @@ const method = [
 	},
 	{
 		title: 'Versioned local archives before every edit',
-		body: 'Each substantive change gets a numbered snapshot in `/archives/vNNN_.../` with a README and the exact rollback command. 75+ checkpoints so far: one-click revert whenever an experiment does not land.',
+		body: 'Each substantive change gets a numbered snapshot in `/archives/vNNN_.../` with a README and the exact rollback command. 30+ checkpoints so far: one-click revert whenever an experiment does not land.',
 	},
 	{
 		title: 'Session memory file',
@@ -240,11 +240,6 @@ const method = [
 			<p>
 				What changed in 2025 – 2026 is <em>how</em> I ship the surface around the work:
 				this portfolio, its filters, its case-study pages, not the design craft itself.
-			</p>
-			<p>
-				If you want to see the same workflow applied to your product, that's exactly what
-				the <a href="/#work" class="text-accent-text hover:underline">Selected work</a> section
-				is about.
 			</p>
 		</div>
 	</section>
