@@ -67,11 +67,11 @@ const method = [
 	},
 	{
 		title: 'Versioned local archives before every edit',
-		body: 'Each substantive change gets a numbered snapshot in `/archives/vNNN_.../` with a README and the exact rollback command. 30+ checkpoints so far: one-click revert whenever an experiment does not land.',
+		body: 'Each substantive change gets a numbered snapshot in /archives/vNNN_.../ with a README and the exact rollback command. 30+ checkpoints so far: one-click revert whenever an experiment does not land.',
 	},
 	{
 		title: 'Session memory file',
-		body: 'A `contexte-portfolio.md` living outside the repo carries decisions, patterns, and next steps across chat sessions. Every new session starts by re-reading it; no restart cost.',
+		body: 'A contexte-portfolio.md living outside the repo carries decisions, patterns, and next steps across chat sessions. Every new session starts by re-reading it; no restart cost.',
 	},
 	{
 		title: 'Content in Google Sheets, code in Astro',
@@ -86,7 +86,6 @@ const method = [
 		body: 'Work sequenced as focused phases (nav → layout → interactions → SEO/backend). Each phase is built, pushed, reviewed on the live URL, then the next phase starts.',
 	},
 ];
-import Icon from '../components/Icon.astro';
 ---
 
 <Layout title="Colophon · How this site was built">
@@ -94,8 +93,8 @@ import Icon from '../components/Icon.astro';
 	<main id="main" tabindex="-1">
 	<ZoneFilters backHref="/about" backLabel="Back to About me" />
 
-	<article class="mx-auto max-w-[1200px] px-6 pt-16 pb-8 sm:pt-20 min-[1248px]:px-0" data-reveal>
-		<a href="/about" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><Icon name="arrow-left" class="arr-back" />Back</a>
+	<article class="mx-auto max-w-[1200px] px-6 pt-8 pb-8 sm:pt-10 min-[1248px]:px-0" data-reveal>
+		<a href="/about" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><span class="arr-back" aria-hidden="true">→</span>Back</a>
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">Colophon</p>
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
 			How this site was built.

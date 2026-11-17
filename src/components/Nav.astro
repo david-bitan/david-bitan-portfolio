@@ -9,7 +9,7 @@
  */
 const links = [
 	{ href: '/#work', label: 'Work', spy: 'work' },
-	{ href: '/#ai-lab', label: 'AI Lab', spy: 'ai-lab' },
+	{ href: '/#ai-lab', label: 'AI Lab Work', spy: 'ai-lab' }, // étape 13, 14
 	{ href: '/#testimonials', label: 'Testimonials', spy: 'testimonials' },
 	{ href: '/#about', label: 'About', spy: 'about' },
 	{ href: '/#craft', label: 'Craft', spy: 'craft' },
@@ -17,6 +17,15 @@ const links = [
 // Étape 9, F1: Contact is a link like the others and opens the /contact page
 // (its form); its underline shows only on that page.
 const onContact = Astro.url.pathname.replace(/\/$/, '') === '/contact';
+// Étape 13, 10: the page you are on is orange in the menu (top and phone)
+// on every page: About, Craft, project pages (Work), AI Lab pages.
+const path = Astro.url.pathname.replace(/\/$/, '');
+const current =
+	path === '/about' || path === '/colophon' ? 'about' :
+	path === '/craft' ? 'craft' :
+	path.startsWith('/work/') ? 'work' :
+	path.startsWith('/lab/') ? 'ai-lab' : null;
+import DownloadCV from './DownloadCV.astro';
 ---
 
 <header id="site-header" class="sticky top-0 z-50 border-b border-ink/5 bg-bg">
@@ -28,7 +37,7 @@ const onContact = Astro.url.pathname.replace(/\/$/, '') === '/contact';
 		<div class="hidden items-center gap-8 lg:flex">
 			{
 				links.map((link) => (
-					<a href={link.href} class="nav-link text-sm font-medium text-muted hover:text-ink transition-colors" data-spy={link.spy}>
+					<a href={link.href} class:list={['nav-link text-sm transition-colors', current === link.spy ? 'nav-link-active font-semibold' : 'font-medium text-muted hover:text-ink']} aria-current={current === link.spy ? 'page' : undefined} data-spy={link.spy}>
 						{link.label}
 					</a>
 				))
@@ -81,12 +90,17 @@ const onContact = Astro.url.pathname.replace(/\/$/, '') === '/contact';
 >
 	{
 		links.map((link) => (
-			<a href={link.href} class="mobile-nav-link text-3xl font-semibold" data-spy-mobile={link.spy}>
+			<a href={link.href} class:list={['mobile-nav-link text-3xl font-semibold', { 'nav-link-active': current === link.spy }]} aria-current={current === link.spy ? 'page' : undefined} data-spy-mobile={link.spy}>
 				{link.label}
 			</a>
 		))
 	}
 	<a href="/contact" class:list={['mobile-nav-link text-3xl font-semibold', { 'nav-link-active': onContact }]} aria-current={onContact ? 'page' : undefined}>Contact</a>
+	{/* Étape 13, 9: at the bottom, a light separator, then the common « Download CV » block. */}
+	<div class="mobile-nav-cv mobile-nav-link flex flex-col items-center gap-4">
+		<span class="block h-px w-16 bg-ink/15" aria-hidden="true"></span>
+		<DownloadCV />
+	</div>
 </div>
 
 <style>
@@ -121,6 +135,7 @@ const onContact = Astro.url.pathname.replace(/\/$/, '') === '/contact';
 	.mobile-nav-panel.is-open > :nth-child(4) { transition-delay: 450ms; }
 	.mobile-nav-panel.is-open > :nth-child(5) { transition-delay: 550ms; }
 	.mobile-nav-panel.is-open > :nth-child(6) { transition-delay: 650ms; }
+	.mobile-nav-panel.is-open > :nth-child(7) { transition-delay: 750ms; }
 
 	/* While the menu is open the header sits above the panel so the burger
 	   itself becomes the X. Logo, theme button and hairline fade with it. */

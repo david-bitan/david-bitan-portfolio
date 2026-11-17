@@ -10,6 +10,7 @@
 //   Phones: Pages (2 columns) / hairline / identity / hairline / bottom line.
 //   Desktop: Pages left, identity right, a vertical hairline between them,
 //   both titles on the same line.
+// Étape 13, 5-7: + Testimonials, no "Pages" title, contact icons in white.
 //   Phones: pages (2 columns), contact + CV, place, bottom line.
 //   Desktop (lg): identity + place / pages / contact + CV on one row, then
 //   the bottom line. Links in white at 70 %, full white on hover; orange only
@@ -27,7 +28,8 @@ const phone = '+972 54-924-8520';
 const phoneHref = 'tel:+972549248520';
 const pages = [
 	['Work', '/#work', 'briefcase'],
-	['AI Lab', '/#ai-lab', 'flask-conical'],
+	['AI Lab Work', '/#ai-lab', 'flask-conical'], // étape 13, 14
+	['Testimonials', '/#testimonials', 'quote'], // étape 13, 5: same target as the top menu
 	['About me', '/about', 'user'],
 	['Craft', '/craft', 'palette'],
 	['Contact', '/contact', 'send'],
@@ -39,9 +41,9 @@ const pages = [
 		{!hideCta && <h2 class="text-4xl font-extrabold tracking-tight text-footer-ink sm:text-6xl">Let's talk product design.</h2>}
 
 		<div class:list={['grid grid-cols-1 lg:grid-cols-[16rem_1px_minmax(0,1fr)] lg:gap-x-16', hideCta ? 'mt-0' : 'mt-10 sm:mt-12']}>
-			<nav aria-labelledby="footer-pages">
-				<p id="footer-pages" class="footer-title">Pages</p>
-				<ul class="mt-2 grid grid-cols-2 gap-x-6 text-sm font-medium lg:grid-cols-1">
+			{/* Étape 13, 6: no visible "Pages" title any more. */}
+			<nav aria-label="Pages">
+				<ul class="-mt-2.5 grid grid-cols-2 gap-x-6 text-sm font-medium lg:grid-cols-1">
 					{pages.map(([label, href, icon]) => (
 						<li>
 							<a href={href} class="footer-link inline-flex min-h-11 items-center gap-2.5">
@@ -62,17 +64,17 @@ const pages = [
 				<ul class="mt-2 flex flex-col items-start text-sm font-medium">
 					<li>
 						<a href={emailHref} class="footer-accent inline-flex min-h-11 items-center gap-2.5">
-							<Icon name="mail" class="size-4 shrink-0" />{email}
+							<Icon name="mail" class="footer-icon size-4 shrink-0" />{email}
 						</a>
 					</li>
 					<li>
 						<a href={phoneHref} class="footer-accent inline-flex min-h-11 items-center gap-2.5">
-							<Icon name="phone" class="size-4 shrink-0" />{phone}
+							<Icon name="phone" class="footer-icon size-4 shrink-0" />{phone}
 						</a>
 					</li>
 					<li>
 						<a href={linkedinUrl} target="_blank" rel="noopener" class="footer-accent inline-flex min-h-11 items-center gap-2.5">
-							<Icon name="linkedin" class="size-4 shrink-0" />LinkedIn<span class="ml-1" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span>
+							<Icon name="linkedin" class="footer-icon size-4 shrink-0" />LinkedIn<span class="ml-1" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span>
 						</a>
 					</li>
 					<li><DownloadCV tone="footer" /></li>
@@ -118,6 +120,10 @@ const pages = [
 		.footer-accent:hover {
 			opacity: 0.8;
 		}
+	}
+	/* étape 13, 7: e-mail, phone and LinkedIn icons in white (70 %, like the page icons) */
+	:global(.footer-icon) {
+		color: rgb(255 255 255 / 0.7);
 	}
 	.footer-link:focus-visible,
 	.footer-accent:focus-visible {

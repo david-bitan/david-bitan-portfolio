@@ -14,7 +14,7 @@
   /* Metrics block lines 2 and 3: unchanged in light (muted). */
   /* Étape 11, 8: the second small line is quieter than the first (both ≥ 4.5:1) */
   --color-metric-label: #4b5563; /* étape 12, 3a: back to V2. 6.4:1 on #EAEDF2 */
-  --color-metric-sub: #636c7c; /* étape 12, 3a: quieter. 4.5:1 on #EAEDF2, 5.3:1 on white */
+  --color-metric-sub: #6e7686; /* étape 13, 1: phones (white card) 4.6:1; from 768 px see Metrics.astro */
   /* Recommendation bylines, company and "worked with" lines (étape 9, C1):
      a darker blue-grey than muted, 9.5:1 on white cards. */
   --color-reco-sub: #3f4a5c;
@@ -63,7 +63,7 @@
   --color-card: #1a2033;
   --color-quiet: #8a93a6;
   --color-metric-label: #8a93a6; /* étape 12, 3a: back to V2. 5.2:1 on #1A2033 */
-  --color-metric-sub: #7f889b; /* étape 12, 3a: darker, as far as 4.5:1 allows. 4.5:1 on #1A2033, 5.3:1 on #0D101A */
+  --color-metric-sub: #788193; /* étape 13, 1: phones (#1A2033 card) about 4:1, accepted; from 768 px see Metrics.astro */
   --color-reco-sub: #8f99ad; /* 5.6:1 on #1A2033 cards */
   --color-footer-bg: #151a28;
   --color-footer-ink: #eef0f4;
@@ -200,16 +200,32 @@ select:not(:disabled) {
   transform: translateY(-0.1em);
 }
 
-/* Étape 12, 7: arrow of the "← Back…" links. A drawn arrow (Lucide), not
-   the text glyph (its height changes with the system font): vertical-align
-   middle puts its centre on the middle of the lowercase letters. */
+/* Étape 13, 11: arrow of the "← Back…" links = the same arrow as the
+   "More about me →" button (the → character, .arr), turned to the left. */
 .arr-back {
   display: inline-block;
-  width: 1.05em;
-  height: 1.05em;
   margin-right: 0.3em;
-  vertical-align: middle;
-  stroke-width: 2.25;
+  transform: translateY(-0.1em) scaleX(-1);
+}
+
+/* Étape 14, ajout 1 (S32): project page header. Desktop: the text keeps
+   the left half (it shrinks with the stage between 1024 and 1439 px) and the
+   composition is laid over the same grid cell; the block of 4 columns starts
+   under whichever is taller. */
+@media (min-width: 1024px) {
+  .ptv-hero[data-ptv-hero] {
+    display: grid;
+    grid-template-areas: 'all';
+  }
+  .ptv-hero[data-ptv-hero] > * {
+    grid-area: all;
+  }
+  .ptv-hero[data-ptv-hero] > .ptv-text {
+    max-width: calc(600px * var(--f, 1));
+    padding-bottom: 32px;
+    position: relative;
+    z-index: 1;
+  }
 }
 
 /* Same box radius for boxes styled in page CSS (galleries, swatches). */

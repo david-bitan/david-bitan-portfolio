@@ -22,16 +22,18 @@ const { id, categories, target } = Astro.props;
 
 <div
 	id={id}
-	class="home-filters mb-6"
+	class="home-filters mb-5"
 	data-target={target}
 >
-	{/* Phones: 3 equal columns over the full content width, everything
-	    visible, no swipe; 44px tall (David, 15/11). sm+: unchanged row. */}
-	<div class="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
+	{/* Étape 13, 2: ONE line on every screen, swipe or drag it sideways
+	    (finger and mouse) like the filters of the inner pages; 36 px tall
+	    (44 px tap area from global.css); each pill = text + the same
+	    padding on both sides. */}
+	<div class="home-filters-scroll -mx-6 flex flex-nowrap items-center gap-2 overflow-x-auto px-6 py-1 min-[1248px]:mx-0 min-[1248px]:px-0">
 		<button
 			type="button"
 			data-home-filter="__all__"
-			class="home-filter-btn flex min-h-11 items-center justify-center whitespace-nowrap cursor-pointer rounded-pill border border-ink/15 bg-ink px-2 py-2 text-sm sm:inline-flex sm:min-h-0 sm:px-4 font-semibold text-bg transition-colors"
+			class="home-filter-btn inline-flex h-9 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-pill border border-ink/15 bg-ink px-4 text-sm font-semibold text-bg transition-colors"
 			aria-pressed="true"
 		>
 			All
@@ -41,7 +43,7 @@ const { id, categories, target } = Astro.props;
 				<button
 					type="button"
 					data-home-filter={cat}
-					class="home-filter-btn flex min-h-11 items-center justify-center whitespace-nowrap cursor-pointer rounded-pill border border-ink/15 bg-transparent px-2 py-2 text-sm sm:inline-flex sm:min-h-0 sm:px-4 font-semibold text-ink transition-colors hover:border-accent hover:text-accent-text"
+					class="home-filter-btn inline-flex h-9 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-pill border border-ink/15 bg-transparent px-4 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent-text"
 					aria-pressed="false"
 				>
 					{cat}
@@ -105,8 +107,37 @@ const { id, categories, target } = Astro.props;
 			);
 		}
 
+		// Étape 13, 2: the row can also be dragged with the mouse; a drag
+		// does not press the pill it ends on.
+		const row = bar.querySelector<HTMLElement>('.home-filters-scroll');
+		let drag: { x: number; left: number } | null = null;
+		let dragged = false;
+		row?.addEventListener('pointerdown', (e) => {
+			if (e.pointerType !== 'mouse' || e.button !== 0) return;
+			drag = { x: e.clientX, left: row.scrollLeft };
+			dragged = false;
+		});
+		row?.addEventListener('pointermove', (e) => {
+			if (!drag) return;
+			const dx = e.clientX - drag.x;
+			if (!dragged && Math.abs(dx) > 5) {
+				dragged = true;
+				row.setPointerCapture(e.pointerId);
+				row.classList.add('is-dragging');
+			}
+			if (dragged) row.scrollLeft = drag.left - dx;
+		});
+		const end = () => {
+			drag = null;
+			row?.classList.remove('is-dragging');
+			setTimeout(() => (dragged = false), 0);
+		};
+		row?.addEventListener('pointerup', end);
+		row?.addEventListener('pointercancel', end);
+
 		buttons.forEach((b) => {
-			b.addEventListener('click', () => {
+			b.addEventListener('click', (e) => {
+				if (dragged) { e.preventDefault(); return; }
 				const key = b.dataset.homeFilter;
 				if (key) apply(key);
 			});
@@ -120,5 +151,18 @@ const { id, categories, target } = Astro.props;
 	   its "past initial cap" items, and both systems need to coexist. */
 	.home-filter-hidden {
 		display: none !important;
+	}
+	/* Swipe sideways, no visible scrollbar (like the inner pages). */
+	.home-filters-scroll {
+		scrollbar-width: none;
+		-webkit-overflow-scrolling: touch;
+	}
+	.home-filters-scroll::-webkit-scrollbar {
+		display: none;
+	}
+	.home-filters-scroll.is-dragging,
+	.home-filters-scroll.is-dragging .home-filter-btn {
+		cursor: grabbing;
+		user-select: none;
 	}
 </style>

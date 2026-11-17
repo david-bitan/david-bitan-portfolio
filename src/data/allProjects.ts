@@ -19,10 +19,13 @@ export interface FullProject {
 	 */
 	categories?: string[];
 	shortDesc: string;
+	/** Étape 14, ajout 1 (S33): text under the title on the project page only
+	 *  (shortDesc stays for the home cards and the search description). */
+	pageIntro?: string;
 	/** Legacy plain-text case study. Used as a fallback when `sections` is
 	 * absent. New/rewritten projects use `sections` instead for structured
 	 * rendering (h2 + paragraphs). */
-	fullDesc: string;
+	fullDesc?: string;
 	/** Structured case study — preferred over `fullDesc` when present. */
 	sections?: Section[];
 	/** "Scope & outcome": short, verifiable facts on size and delivery
@@ -307,6 +310,7 @@ Five breakpoints designed systematically (Desktop 1920, Laptop 1280, Tablet land
 		category: 'SaaS',
 		categories: ['SaaS', 'B2B', 'UI/UX'],
 		shortDesc: `One parametric Figma design system behind 40+ verticals, from mattresses and POS providers to dating.`,
+		pageIntro: "One parametric Figma design system behind 40+ verticals, from mattresses and POS providers to dating. I set each site’s brand colors and button shapes in the system, across 5 screen formats, so I design a new element once for every vertical. I built it from atomic components with auto-layout, and the other designers started from it. For the developers, I made a reference page with every component variant in numbered tables, and a clickable index inside Figma.",
 		fullDesc: `Product designer on Top5 since 2020: a family of comparison sites, 40+ verticals all powered by one parametric Figma design system (smart components that inherit color tokens from their parent frame). See structured case study below.`,
 		liveUrl: 'https://top5-mattresses.com',
 		scope: [
@@ -371,6 +375,7 @@ Addressed through a parametric design system in Figma: each smart component read
 		category: 'Branding',
 		categories: ['Branding', 'UI/UX'],
 		shortDesc: `The third full redesign of Ryze Beyond's marketing website, delivered in 2026, with an abstract-illustration design system built from scratch.`,
+		pageIntro: "The third full redesign of Ryze Beyond’s marketing website, delivered in 2026, with an abstract-illustration design system built from scratch. The site presents the company’s mission, products, team and open jobs. I benchmarked tech sites such as Linear, Vercel and Stripe, and kept the signature brand colors for continuity.",
 		fullDesc: `Product designer on the 2026 redesign of ryzebeyond.com: the marketing website for the company behind Sonary Dashboard, Sonary Website, Top5, Playright and other products. Third full redesign of the site, with an abstract-illustration design system built from scratch. See structured case study below.`,
 		liveUrl: 'https://ryzebeyond.com/',
 		scope: [
@@ -515,6 +520,7 @@ Addressed through a master template with two strict breakpoints (Desktop 600, Mo
 		category: 'iGaming',
 		categories: ['iGaming', 'UI/UX'],
 		shortDesc: `A UK online casino comparison platform: redesign of the homepage and ranking pages, with hover animations coded in HTML/CSS, under UKGC rules.`,
+		pageIntro: "A UK online casino comparison platform: redesign of the homepage and ranking pages, with hover animations coded in HTML/CSS, under UKGC (UK Gambling Commission, the UK’s gambling regulator) rules. Players compare offers through reviews, side-by-side tables and top lists, with pages by game type and payment method. I handed the hover animations to the developers ready to integrate, and worked with the PM, developers, content writers, marketing and SEO.",
 		fullDesc: `Designer on Playright, Ryze Beyond's UK online casino comparison platform: redesign of the homepage and the ranking pages, with hover animations I coded in HTML/CSS. See structured case study below.`,
 		liveUrl: 'https://playright.co.uk/casino/reviews/',
 		liveUrlNote: `Note: the site is geo-restricted to the UK. A VPN is required to view it from outside.`,
@@ -571,9 +577,12 @@ The project also held a particular status in the Ryze roadmap: design often ran 
 		year: '2011 – 2018',
 		category: 'UI/UX',
 		shortDesc: `Selection of UI/UX work from 2011 – 2018: Wochat instant translation app, a full SaaS dashboard, plus personal explorations in music apps, landing concepts and wireframes.`,
+		pageIntro: "Selection of UI/UX work I produced between 2011 and 2018, before Ryze Beyond, across several companies. It includes Wochat, a mobile instant translation app with voice, text and video chat, and a full SaaS dashboard for customer, product and invoicing management with a built-in chat room. On every project I covered the full cycle: research, low-fi wireframes, high-fidelity design, iteration and developer handoff. I also added personal explorations: music apps (MUSIK, HitShot, ALEXIA), landing page concepts and wireframes.",
+		/* Étape 14, ajout 2 (B): repeated the text on the left (pageIntro),
+		   no longer shown on this page, kept here:
 		fullDesc: `Selection of UI/UX work produced between 2011 and 2018, before Ryze Beyond. This period spanned several companies I worked at: notably a mobile instant translation app (Wochat, voice + text + video) and a full SaaS dashboard for customer / product / invoicing management with an integrated chat room. Every project covered the full cycle: research, low-fi wireframes, high-fidelity design, iteration, and dev handoff.
 
-The remaining captures gather more personal designs: music apps (MUSIK, HitShot, ALEXIA), landing page concepts (Ultra Bright System, Model Photos Creation) and wireframe explorations, produced outside any professional brief, to test visual directions, keep the practice sharp, and explore more experimental palettes than the ones allowed in a professional context.`,
+The remaining captures gather more personal designs: music apps (MUSIK, HitShot, ALEXIA), landing page concepts (Ultra Bright System, Model Photos Creation) and wireframe explorations, produced outside any professional brief, to test visual directions, keep the practice sharp, and explore more experimental palettes than the ones allowed in a professional context.`, */
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785346103/portfolio/old-wix/ui-ux/ui-ux-20.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785346098/portfolio/old-wix/ui-ux/ui-ux-17.webp',
@@ -603,17 +612,22 @@ The remaining captures gather more personal designs: music apps (MUSIK, HitShot,
 	},
 	{
 		slug: 'branding-old',
-		title: `Digital campaigns & ad design (2006 – 2011)`,
-		client: `Arc Interactive / Publicis`,
-		year: '2006 – 2011',
+		title: `Wochat · App and brand design`, // étape 14, ajout 1 (S34); was `Digital campaigns & ad design (2006 – 2011)`
+		client: `Wochat`, // was `Arc Interactive / Publicis`
+		year: '2017 – 2018', // was '2006 – 2011'
 		category: 'Branding',
 		categories: ['Branding', 'UI/UX'],
-		shortDesc: `Digital campaigns produced at Arc Interactive (Publicis Group) between 2006 and 2011: mini-sites, mini-games and animated banners in Flash and HTML/CSS. Cactus awards period.`,
+		shortDesc: `Wochat (now Slatch) is a messaging app, like WhatsApp, with instant translation of text messages, voice recordings and video calls: each person speaks their own language, and the other person gets it in theirs.`,
+		// was: shortDesc: `Digital campaigns produced at Arc Interactive (Publicis Group) between 2006 and 2011: mini-sites, mini-games and animated banners in Flash and HTML/CSS. Cactus awards period.`,
+		pageIntro: "Wochat (now Slatch) is a messaging app, like WhatsApp, with instant translation of text messages, voice recordings and video calls: each person speaks their own language, and the other person gets it in theirs. In a startup of about four people, in 2017 – 2018, I designed the whole product: the app with its design system and icons, the website, the Google Play visuals, the presentations and the animations. I also built the brand from scratch: many logo and name tests, the meetings that chose the name, then a brand book with the logo rules, colors and typography.",
+		/* Étape 14, ajout 1 (S34): the old story (Arc Interactive / Publicis) is
+		   no longer shown on this page, kept here:
 		fullDesc: `Selection of work produced between 2006 and 2011 at Arc Interactive, a media agency of the Publicis Group. My contribution covered the production of digital campaigns for several advertisers: short mini-sites (2 to 3 pages), mini-games and animated banners in large volume, built in Flash (Adobe) and in HTML/CSS.
 
 Among the advertisers: Bank Leumi, Afeka Academic Engineering College, UMI Motors (Cadillac and Chevrolet importer in Israel) and others. Some of these campaigns were recognized with Cactus awards (gold, silver, bronze), the annual awards for advertising in Israel, in the years that followed.
 
 The captures below gather a selection of 13 pieces of work from that period.`,
+		*/
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785345947/portfolio/old-wix/branding/branding-01.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785345947/portfolio/old-wix/branding/branding-01.webp',
@@ -630,7 +644,7 @@ The captures below gather a selection of 13 pieces of work from that period.`,
 			'https://res.cloudinary.com/akael/image/upload/v1785345971/portfolio/old-wix/branding/branding-12.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785345973/portfolio/old-wix/branding/branding-13.webp',
 		],
-		tags: ['Branding', 'Identity', 'Publicis', 'Awarded'],
+		tags: ['Branding', 'Identity', 'Mobile app', 'Brand book'], // was ['Branding', 'Identity', 'Publicis', 'Awarded']
 		featured: false,
 		orientation: 'portrait',
 	},
@@ -641,9 +655,12 @@ The captures below gather a selection of 13 pieces of work from that period.`,
 		year: '2015 – 2017',
 		category: 'iGaming',
 		shortDesc: `Sole designer on GamingTech's three brands (10Bet, Real Deal Bet, Bet Rally), each running a casino and a sports betting vertical, from 2015 to 2017.`,
+		pageIntro: "Sole designer on GamingTech’s three brands (10Bet, Real Deal Bet, Bet Rally), each running a casino and a sports betting vertical, from 2015 to 2017. I handled all six sites in parallel and owned the branding, specifications and design of the three brands. For mobile and web, I drew the sketches and wireframes, then the full UI: game lobbies, bonus systems, deposit funnels and responsive landing pages. I also produced a large volume of promotional banners and interactive calendars, with animations delivered as videos, Flash (SWF) files and animated HTML5 / CSS3 banners.",
+		/* Étape 14, ajout 2 (B): repeated the text on the left (pageIntro),
+		   no longer shown on this page, kept here:
 		fullDesc: `Selection of work produced at GamingTech (SBTech Group) between 2015 and 2017. Sole designer on the three brands operated by the company: 10Bet, Real Deal Bet and Bet Rally. Each brand ran two operational verticals (a casino and a sports betting site) for a total of six sites evolving in parallel.
 
-Deliverables covered game lobbies, bonus systems, deposit funnels, promotional banners in large volume, mobile and desktop interfaces, as well as animations produced as videos and Flash (SWF) files for dynamic elements.`,
+Deliverables covered game lobbies, bonus systems, deposit funnels, promotional banners in large volume, mobile and desktop interfaces, as well as animations produced as videos and Flash (SWF) files for dynamic elements.`, */
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785345993/portfolio/old-wix/casino/casino-12.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/e_improve:indoor:40/e_sharpen:40/v1785346052/portfolio/old-wix/sport-betting/sport-betting-06.webp',
@@ -703,9 +720,12 @@ Deliverables covered game lobbies, bonus systems, deposit funnels, promotional b
 		year: '2011 – 2013',
 		category: 'iGaming',
 		shortDesc: `Casino platform work at Tradologic (2011 – 2013): white-label backend for Crown Europe, City Club Casino, City Tower Casino and other operators.`,
+		pageIntro: "Casino platform work at Tradologic (2011 – 2013): white-label backend for Crown Europe, City Club Casino, City Tower Casino and other operators. I designed the operator-facing interfaces and the player-facing UI: casino lobbies, promotional landing pages and desktop screens. I also produced promotional banners and animations, as videos and Flash (SWF) files, for rollouts in several markets. The screens shown here come from City Club Casino and City Tower Casino.",
+		/* Étape 14, ajout 2 (B): repeated the text on the left (pageIntro),
+		   no longer shown on this page, kept here:
 		fullDesc: `Selection of work produced at Tradologic between 2011 and 2013 (about a year and a half to two years), within a team of several designers. Tradologic supplied white-label casino platforms to multiple operators: notably Crown Europe, City Club Casino and City Tower Casino, whose captures appear in this selection.
 
-My work quickly took on the most visible projects. Deliverables covered game lobbies, promotional banners, desktop interfaces, and animations produced as videos and Flash (SWF) files.`,
+My work quickly took on the most visible projects. Deliverables covered game lobbies, promotional banners, desktop interfaces, and animations produced as videos and Flash (SWF) files.`, */
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785346008/portfolio/old-wix/casino/casino-21.webp',
 		gallery: [
 			'https://res.cloudinary.com/akael/image/upload/v1785345984/portfolio/old-wix/casino/casino-07.webp',

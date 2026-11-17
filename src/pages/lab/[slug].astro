@@ -58,30 +58,34 @@ import ZoneFilters from '../../components/ZoneFilters.astro';
 import { caseLines, nextOf, LAB_ORDER } from '../../data/caseLines';
 import CaseLines from '../../components/CaseLines.astro';
 import NextProject from '../../components/NextProject.astro';
-import Icon from '../../components/Icon.astro';
+import ProjectTopVisual from '../../components/ProjectTopVisual.astro';
+import { topLayouts } from '../../data/topVisuals';
+const visual = topLayouts[project.slug];
 ---
 
 <Layout
-	title={`${project.title} · AI Lab · David Bitan`}
+	title={`${project.title} · AI Lab Work · David Bitan`}
 	description={seoDescription}
 	ogImage={seoOgImage}
 	structuredData={projectJsonLd}
 >
 	<Nav />
 	<main id="main" tabindex="-1">
-	<ZoneFilters backHref="/#ai-lab" backLabel="Back to AI Lab" />
+	<ZoneFilters backHref="/#ai-lab" backLabel="Back to AI Lab Work" />
 
-	<article class="mx-auto max-w-[1200px] px-6 pt-8 pb-2 sm:pt-10 min-[1248px]:px-0" data-reveal>
+	<article class="mx-auto max-w-[1200px] px-6 pt-4 pb-12 sm:pt-5 sm:pb-16 min-[1248px]:px-0" data-reveal>
 		<a href="/#ai-lab" data-top-back class="text-sm font-semibold text-accent-text hover:underline"
-			><Icon name="arrow-left" class="arr-back" />Back to AI Lab</a
+			><span class="arr-back" aria-hidden="true">→</span>Back to AI Lab Work</a
 		>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">
 			{project.eyebrow}
 		</p>
-		{/* Role right under the eyebrow, same style as the Work pages' meta line (one clean line on phones). */}
-		{lines && <p class="mt-2 text-sm text-muted"><span class="font-semibold text-ink">Role</span> · {lines.role}</p>}
-		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
+		{/* Étape 14, ajout 1: the text on the left, the composition over the
+		    right part (desktop); phones: the composition under the text. */}
+		<div class="ptv-hero mt-4" data-ptv-hero={visual ? '' : undefined}>
+		<div class="ptv-text">
+		<h1 class="max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
 			{project.title}
 		</h1>
 		<p class="mt-4 max-w-2xl text-lg text-muted">{project.subtitle}</p>
@@ -112,10 +116,9 @@ import Icon from '../../components/Icon.astro';
 				>Self-initiated concept</span
 			>
 		</div>
-	</article>
-
-	<section class="mx-auto max-w-[1200px] px-6 pt-8 pb-12 sm:pt-10 sm:pb-16 min-[1248px]:px-0" data-reveal>
-		<div class="prose-lab max-w-[68ch]">
+		{/* Étape 14, ajout 2 (A): the intro and its Show more back in the left
+		    column, 32 px under the button row; phones keep the same order. */}
+		<div class="prose-lab mt-8 max-w-[68ch]">
 			<p class="prose-lead">{firstPara}</p>
 
 			{
@@ -153,9 +156,15 @@ import Icon from '../../components/Icon.astro';
 					</>
 				)
 			}
-			{lines && <CaseLines lines={lines} />}
 		</div>
-	</section>
+		</div>
+		{visual && <ProjectTopVisual slug={project.slug} />}
+		</div>
+
+		{/* Étape 14, ajout 1 (S33): Challenge · What I did · Result · Role, full width */}
+		{lines && <div class="mt-10 lg:mt-0"><CaseLines lines={lines} /></div>}
+	</article>
+
 
 	{
 		project.aiFeature && (

@@ -24,8 +24,9 @@ const { project } = Astro.props;
 const lines = caseLines[project.slug];
 const nextSlug = nextOf(project.slug, WORK_ORDER);
 const next = nextSlug ? allProjects.find((p) => p.slug === nextSlug) : null;
-// Playright: the first UKGC on the page is spelled out (étape 8).
-const intro = project.slug === 'playright' ? project.shortDesc.replace('UKGC', "UKGC (UK Gambling Commission, the UK's gambling regulator)") : project.shortDesc;
+// Étape 14, ajout 1 (S33): the page text comes from pageIntro when there is
+// one (it already spells out UKGC on Playright); shortDesc stays for the cards.
+const intro = project.pageIntro ?? project.shortDesc;
 // Phase D — Behance-style layout: each project page is split into responsive
 // "zones" (Desktop·Light / Desktop·Dark / Mobile·Light / Mobile·Dark for
 // Sonary Dashboard; Desktop / Mobile for simpler projects; a single Gallery
@@ -66,7 +67,9 @@ const projectJsonLd: Record<string, unknown> = {
 	...(project.client ? { publisher: { '@type': 'Organization', name: project.client } } : {}),
 	...(project.liveUrl ? { url: project.liveUrl } : {}),
 };
-import Icon from '../../components/Icon.astro';
+import ProjectTopVisual from '../../components/ProjectTopVisual.astro';
+import { topLayouts } from '../../data/topVisuals';
+const visual = topLayouts[project.slug];
 ---
 
 <Layout
@@ -78,24 +81,32 @@ import Icon from '../../components/Icon.astro';
 	<Nav />
 	<main id="main" tabindex="-1">
 
-	<article class="mx-auto max-w-[1200px] px-6 pt-8 pb-8 sm:pt-10 min-[1248px]:px-0" data-reveal>
-		<a href="/#work" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><Icon name="arrow-left" class="arr-back" />Back to work</a>
+	<article class="mx-auto max-w-[1200px] px-6 pt-4 pb-8 sm:pt-5 min-[1248px]:px-0" data-reveal>
+		<a href="/#work" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><span class="arr-back" aria-hidden="true">→</span>Back to work</a>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">{project.category}</p>
-		<h1 class="mt-4 max-w-3xl text-[1.85rem] font-extrabold tracking-tight min-[374px]:text-4xl sm:text-5xl">{project.title}</h1>
+		{/* Étape 14, ajout 1: the text on the left, the composition over the
+		    right part (desktop); phones: the composition under the text. */}
+		<div class="ptv-hero mt-4" data-ptv-hero={visual ? '' : undefined}>
+		<div class="ptv-text">
+		<h1 class="max-w-3xl text-[1.85rem] font-extrabold tracking-tight min-[374px]:text-4xl sm:text-5xl">{project.title}</h1>
 		<p class="mt-4 max-w-2xl text-lg text-muted">{intro}</p>
 
 		<div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
 			<span><span class="font-semibold text-ink">Client</span> · {project.client}</span>
 			<span><span class="font-semibold text-ink">Year</span> · {project.year}</span>
-			{lines && <span><span class="font-semibold text-ink">Role</span> · {lines.role}</span>}
 		</div>
 
 		{/* Tags as plain text with separators: they aren't clickable, so they
 		    must not look like pills or buttons (David's rule). */}
 		<p class="mt-4 text-sm text-muted">{project.tags.join(' · ')}</p>
+		</div>
 
-		{lines && <CaseLines lines={lines} />}
+		{visual && <ProjectTopVisual slug={project.slug} />}
+		</div>
+
+		{/* Étape 14, ajout 1 (S33): Challenge · What I did · Result · Role, full width */}
+		{lines && <div class="mt-10 lg:mt-0"><CaseLines lines={lines} /></div>}
 
 		{project.scope && (
 			<section class="mt-8 max-w-3xl" aria-labelledby="scope-heading">
@@ -219,9 +230,9 @@ import Icon from '../../components/Icon.astro';
 						</svg>
 					</button>
 				</div>
-			) : (
+			) : project.fullDesc ? (
 				<p class="mt-10 max-w-3xl whitespace-pre-line leading-relaxed text-ink">{project.fullDesc}</p>
-			)
+			) : null
 		}
 	</article>
 
@@ -320,9 +331,45 @@ import Icon from '../../components/Icon.astro';
 				}
 			}
 
-			// The top "Show less" folds away with the text, so "Read the full
-			// case study" lands back exactly where it was.
+			// Étape 13, 13: the top "Show less" no longer folds (that jerked).
+			// It stays exactly where it is and already reads "Read the full
+			// case study" while the text folds under it; the bottom button is
+			// hidden meanwhile. At the end the two swap: they are identical and
+			// at the same place, so nothing moves.
 			function foldTop() {
+				if (!topBtn || topBtn.hidden) return;
+				if (reduce.matches) { topBtn.hidden = true; return; }
+				const lab = topBtn.querySelector('span');
+				const chev = topBtn.querySelector('svg');
+				if (lab) lab.textContent = 'Read the full case study';
+				if (chev) chev.style.transform = '';
+				btn.style.opacity = '0';
+				const done = () => {
+					body.removeEventListener('transitionend', onEnd);
+					clearTimeout(timer);
+					topAnim = null;
+					if (btn.getAttribute('aria-expanded') === 'true') return; // reopened meanwhile
+					const hadFocus = document.activeElement === topBtn;
+					topBtn.hidden = true;
+					if (lab) lab.textContent = 'Show less';
+					if (chev) chev.style.transform = 'rotate(180deg)';
+					btn.style.opacity = '';
+					if (hadFocus) btn.focus({ preventScroll: true });
+				};
+				const onEnd = (e) => { if (e.propertyName === 'max-height') done(); };
+				body.addEventListener('transitionend', onEnd);
+				const timer = setTimeout(done, D + 120); // safety net
+				topAnim = { cancel: () => {
+					body.removeEventListener('transitionend', onEnd);
+					clearTimeout(timer);
+					if (lab) lab.textContent = 'Show less';
+					if (chev) chev.style.transform = 'rotate(180deg)';
+					btn.style.opacity = '';
+				} };
+			}
+
+			// Bottom "Show less" (unchanged): the top one, out of view, folds away.
+			function foldTopAway() {
 				if (!topBtn || topBtn.hidden) return;
 				if (reduce.matches) { topBtn.hidden = true; return; }
 				const cs = getComputedStyle(topBtn);
@@ -340,9 +387,11 @@ import Icon from '../../components/Icon.astro';
 			// Top "Show less": the page does not scroll; the focus goes back to
 			// the button, which ends where it was before opening.
 			topBtn?.addEventListener('click', () => {
-				setExpanded(false);
+				if (btn.getAttribute('aria-expanded') !== 'true') return;
 				foldTop();
-				btn.focus({ preventScroll: true });
+				setExpanded(false);
+				// the focus stays on this button while it folds, then moves to its twin
+				if (reduce.matches) btn.focus({ preventScroll: true });
 			});
 
 			// Étape 9, J: "Show less" closes the case study and brings the page
@@ -362,7 +411,7 @@ import Icon from '../../components/Icon.astro';
 				const keep = openedAt ?? window.innerHeight * 0.4;
 				const from = btn.getBoundingClientRect().top;
 				setExpanded(false);
-				foldTop();
+				foldTopAway();
 				if (reduce.matches) {
 					const top = btn.getBoundingClientRect().top + window.scrollY;
 					window.scrollTo({ top: Math.max(0, top - keep), behavior: 'instant' });

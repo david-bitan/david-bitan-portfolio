@@ -1,29 +1,74 @@
 ---
-// Étape 8, L: the case in three lines (two on some older projects), visible
-// at the top of every project page, under the introduction. Labels and texts
-// validated by David; no figures.
+// Étape 14, ajout 1 (S33): the case in 4 columns under the header text and
+// the product visual, across the whole container: Challenge · What I did ·
+// Result · Role. No box, no background: a fine line on top of each column.
+// Desktop 4 equal columns (32 px gap), tablet 2 x 2, phones one under the other.
 import type { CaseLines } from '../data/caseLines';
 
 interface Props {
 	lines: CaseLines;
 }
 const { lines } = Astro.props;
-const rows = [
+const cols = [
 	['Challenge', lines.challenge],
 	['What I did', lines.did],
 	...(lines.result ? [['Result', lines.result]] : []),
+	['Role', lines.role],
 ];
 ---
 
-{/* Étape 9, H1: a thin orange line on the left of the block, the same touch
-    as "Mentor at heart." on About, so the lines read apart from the text. */}
-<dl class="mt-8 grid max-w-3xl grid-cols-1 gap-y-4 border-l-2 border-accent pl-5 sm:grid-cols-[8.5rem_1fr] sm:gap-x-6 sm:pl-6">
+<dl class="case-cols">
 	{
-		rows.map(([label, text]) => (
-			<>
-				<dt class="text-sm font-semibold uppercase tracking-widest text-muted sm:pt-0.5">{label}</dt>
-				<dd class="-mt-3 leading-relaxed text-ink sm:mt-0">{text}</dd>
-			</>
+		cols.map(([label, text]) => (
+			<div class="case-col">
+				<dt class="case-label">{label}</dt>
+				<dd class="case-text">{text}</dd>
+			</div>
 		))
 	}
 </dl>
+
+<style>
+	.case-cols {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 32px;
+	}
+	@media (min-width: 768px) {
+		.case-cols {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+	@media (min-width: 1024px) {
+		.case-cols {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
+	}
+	.case-col {
+		border-top: 1px solid rgb(13 16 26 / 0.14);
+		padding-top: 16px;
+	}
+	:global(:root[data-theme='dark']) .case-col {
+		border-top-color: rgb(255 255 255 / 0.14);
+	}
+	.case-label {
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: #5c6475;
+	}
+	:global(:root[data-theme='dark']) .case-label {
+		color: #8a93a6; /* the dark equivalent, 5.6:1 on #0D101A */
+	}
+	.case-text {
+		margin-top: 8px;
+		font-size: 15px;
+		line-height: 1.55;
+		color: #0d101a;
+		text-wrap: pretty;
+	}
+	:global(:root[data-theme='dark']) .case-text {
+		color: var(--color-ink);
+	}
+</style>

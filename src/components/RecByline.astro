@@ -6,8 +6,10 @@ import type { Testimonial } from '../data/testimonials';
 
 interface Props {
 	t: Testimonial;
+	/** Étape 13, 18: the About page puts the author at the top of the card. */
+	top?: boolean;
 }
-const { t } = Astro.props;
+const { t, top = false } = Astro.props;
 const initials = t.name
 	.split(/\s+/)
 	.map((w) => w[0])
@@ -24,7 +26,7 @@ const [title, company] = cut > 0 ? [t.role.slice(0, cut + 1), t.role.slice(cut +
 {/* Étape 9, C2: on phones the face and the name share the first row, the
     rest uses the full card width below (fewer broken lines); sm+ unchanged.
     C1: company and "worked with" lines a touch smaller, in a darker blue-grey. */}
-<figcaption class="mt-6 grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-3 gap-y-2 border-t border-ink/10 pt-5 sm:flex sm:items-center sm:gap-4">
+<figcaption class:list={['grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-3 gap-y-2 border-ink/10 sm:flex sm:items-center sm:gap-4', top ? 'mb-4 border-b pb-5' : 'mt-6 border-t pt-5']}>
 	{
 		t.photo ? (
 			<img src={t.photo} alt="" width="60" height="60" loading="lazy" class="h-12 w-12 shrink-0 rounded-full object-cover ring-1 ring-ink/10 sm:h-[60px] sm:w-[60px]" />

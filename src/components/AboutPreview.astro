@@ -29,9 +29,11 @@ const ungrouped = ['3D & motion (Cinema 4D, ZBrush, After Effects, SVGator)'];
 
 	<div class="mt-8 grid grid-cols-1 gap-10 lg:mt-10 lg:grid-cols-2 lg:gap-12">
 		<div class="flex flex-col">
-			<p class="text-base leading-relaxed sm:text-lg">
+			{/* Étape 13, 3: on phones the paragraph stops halfway with "… Read more";
+			    a tap opens the rest smoothly (height + fade). sm+: the whole text. */}
+			<p id="about-intro" class="text-base leading-relaxed sm:text-lg">
 				I design products end to end, from research to shipped product, with a focus on AI products. My
-				experience spans SaaS, fintech and iGaming products, game interfaces, and complex systems that stay simple to use, like a multi-brand design system for 40+ verticals. At Ryze Beyond, I owned my projects from start to finish. The design team ranged from 1 to 4 people: when designers joined, we split the projects, each very different from the others, to share the workload; when they moved on, I took them all back.
+				experience spans SaaS, fintech and iGaming products, game interfaces, and complex systems that stay simple to use, like a multi-brand design system<span class="about-rest"> for 40+ verticals. At Ryze Beyond, I owned my projects from start to finish. The design team ranged from 1 to 4 people: when designers joined, we split the projects, each very different from the others, to share the workload; when they moved on, I took them all back.</span><button type="button" class="about-more font-semibold text-accent-text sm:hidden" aria-expanded="false" aria-controls="about-intro">… Read more</button>
 			</p>
 			<div class="mt-8 border-l-2 border-accent pl-5">
 				<p class="font-semibold">Mentor at heart.</p>
@@ -84,3 +86,46 @@ const ungrouped = ['3D & motion (Cinema 4D, ZBrush, After Effects, SVGator)'];
 	</a>
 	</div>
 </section>
+
+<style>
+	/* Étape 13, 3: phones only. */
+	@media (max-width: 639px) {
+		#about-intro:not(.is-open) .about-rest {
+			display: none;
+		}
+		.about-more {
+			position: relative;
+			margin-left: 0.25em;
+		}
+		/* 44 px tap area without moving the text */
+		.about-more::after {
+			content: '';
+			position: absolute;
+			inset: 50% auto auto 50%;
+			width: max(100%, 44px);
+			height: 44px;
+			transform: translate(-50%, -50%);
+		}
+	}
+</style>
+
+<script>
+	// Étape 13, 3: "… Read more" opens the rest of the paragraph smoothly.
+	const intro = document.getElementById('about-intro');
+	const more = intro?.querySelector<HTMLButtonElement>('.about-more');
+	const rest = intro?.querySelector<HTMLElement>('.about-rest');
+	more?.addEventListener('click', () => {
+		if (!intro || !rest) return;
+		const h0 = intro.offsetHeight;
+		intro.classList.add('is-open');
+		more.setAttribute('aria-expanded', 'true');
+		more.hidden = true;
+		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		const h1 = intro.offsetHeight;
+		const ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+		intro.animate([{ height: h0 + 'px', overflow: 'hidden' }, { height: h1 + 'px', overflow: 'hidden' }], { duration: 450, easing: ease });
+		rest.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400, delay: 80, easing: 'ease-out', fill: 'backwards' });
+	});
+	// the focus moves to the text that just opened (the button is gone)
+	more?.addEventListener('click', () => { if (rest) { rest.tabIndex = -1; rest.focus({ preventScroll: true }); } });
+</script>

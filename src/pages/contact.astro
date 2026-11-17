@@ -17,7 +17,6 @@ const hasFormspree = Boolean(formspreeId);
 const defaultNote = hasFormspree
 	? "I usually reply within 24 hours."
 	: 'Opens your email client, pre-filled and ready to send.';
-import Icon from '../components/Icon.astro';
 ---
 
 <Layout
@@ -28,17 +27,20 @@ import Icon from '../components/Icon.astro';
 	<main id="main" tabindex="-1">
 	<ZoneFilters backHref="/" backLabel="Back to home" />
 
-	<section class="mx-auto max-w-[1200px] px-6 pt-16 pb-24 sm:pt-20 min-[1248px]:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 pt-8 pb-24 sm:pt-10 min-[1248px]:px-0" data-reveal>
 		{/* Étape 12, 6: a "← Back" link at the top of every inner page. */}
-		<a href="/" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><Icon name="arrow-left" class="arr-back" />Back</a>
+		<a href="/" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><span class="arr-back" aria-hidden="true">→</span>Back</a>
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">Contact</p>
 		<h1 class="mt-4 max-w-2xl text-[1.85rem] font-extrabold tracking-tight min-[374px]:text-4xl sm:text-5xl">Hiring a senior product designer?</h1>
-		<p class="mt-6 max-w-xl text-lg text-muted">
+		{/* Étape 13, 16: smaller text, 3 lines on desktop; the form moves up. */}
+		<p class="mt-4 max-w-xl text-base text-muted">
 			I'm available now for senior and lead product design roles: based in Ashkelon, Israel,
 			hybrid or remote in the Tel Aviv area. Send me a note and I'll reply within 24 hours.
 		</p>
 
-		<div class="mt-14 grid grid-cols-1 gap-16 lg:grid-cols-[1fr_320px]">
+		{/* Étape 13, 17: e-mail, phone, LinkedIn and location are in the footer;
+		    the column beside the form is gone. */}
+		<div class="mt-10 max-w-[816px]">
 			<form id="contact-form" class="flex flex-col gap-6" novalidate>
 				<!-- Honeypot: hidden from people and assistive tech, bots fill it and
 				     Formspree drops the submission (_gotcha is Formspree's own field). -->
@@ -93,32 +95,6 @@ import Icon from '../components/Icon.astro';
 				</div>
 			</form>
 
-			<div class="flex flex-col gap-8">
-				<div>
-					<p class="text-sm font-semibold uppercase tracking-widest text-muted">Email</p>
-					{/* Étape 9, F3: the address leads to the form, not to a mail app. */}
-					<a href="#contact-form" class="mt-2 block font-semibold text-accent-text hover:underline">
-						{email}
-					</a>
-				</div>
-				{/* Étape 12, 16: the phone, next to the e-mail, same style. */}
-				<div>
-					<p class="text-sm font-semibold uppercase tracking-widest text-muted">Phone</p>
-					<a href="tel:+972549248520" class="mt-2 block font-semibold text-accent-text hover:underline">
-						+972 54-924-8520
-					</a>
-				</div>
-				<div>
-					<p class="text-sm font-semibold uppercase tracking-widest text-muted">LinkedIn</p>
-					<a href={linkedinUrl} target="_blank" rel="noopener" class="mt-2 block font-semibold text-accent-text hover:underline">
-						in/david-bitan
-					</a>
-				</div>
-				<div>
-					<p class="text-sm font-semibold uppercase tracking-widest text-muted">Location</p>
-					<p class="mt-2 font-semibold">{city}</p>
-				</div>
-			</div>
 		</div>
 	</section>
 

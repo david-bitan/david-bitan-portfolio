@@ -71,6 +71,7 @@
 			opener = t;
 			inPage = t.getBoundingClientRect().width;
 			img.removeAttribute('style');
+			resetZoom();
 			// Étape 11, 3: the previous picture never shows; the new one appears,
 			// with the same fade, once it is loaded and decoded.
 			img.style.visibility = 'hidden';
@@ -114,6 +115,7 @@
 		dlg.addEventListener('close', () => {
 			// empty the viewer, so the next opening never starts on this picture
 			shown++;
+			resetZoom();
 			img.style.visibility = 'hidden';
 			img.removeAttribute('srcset');
 			img.removeAttribute('src');
@@ -129,10 +131,85 @@
 		dlg.querySelector('.lb-close')!.addEventListener('click', () => dlg.close());
 		dlg.querySelector('.lb-prev')!.addEventListener('click', () => show(index - 1));
 		dlg.querySelector('.lb-next')!.addEventListener('click', () => show(index + 1));
+		// Étape 13, 24: on a phone, pinching zooms the IMAGE only (the browser's
+		// own page zoom is off inside the viewer): the X, the counter, the
+		// arrows, the veil and the site behind never move or grow. Zoomed in,
+		// one finger moves the picture; back under 1x it snaps back.
+		let z = 1, tx = 0, ty = 0, gestured = false;
+		let pinch: { d: number; z: number; ux: number; uy: number; bx: number; by: number } | null = null;
+		let pan: { x: number; y: number; tx: number; ty: number } | null = null;
+		let base = { x: 0, y: 0, w: 0, h: 0 }; // image box at 1x
+		// keep the picture under the screen centre: it can't be pushed away
+		const clamp = () => {
+			const vw = window.innerWidth, vh = window.innerHeight;
+			tx = Math.min(vw / 2 - base.x, Math.max(vw / 2 - base.x - z * base.w, tx));
+			ty = Math.min(vh / 2 - base.y, Math.max(vh / 2 - base.y - z * base.h, ty));
+		};
+		const applyZoom = () => {
+			if (z > 1) clamp();
+			img.style.transformOrigin = '0 0';
+			img.style.transform = z > 1 ? `translate(${tx}px, ${ty}px) scale(${z})` : '';
+			scroll.classList.toggle('is-zoomed', z > 1);
+		};
+		function resetZoom(smooth = false) {
+			// back to 1x: a short ease, never a jump (instant under reduced motion)
+			if (smooth && z > 1 && !reduce.matches) {
+				img.style.transition = 'transform 220ms cubic-bezier(0.23, 1, 0.32, 1)';
+				img.addEventListener('transitionend', () => { img.style.transition = ''; }, { once: true });
+			}
+			z = 1; tx = 0; ty = 0; pinch = null; pan = null; applyZoom();
+		}
+		const mid = (t: TouchList) => [(t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2];
+		const gap = (t: TouchList) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+		const startPan = (t: Touch) => { pan = { x: t.clientX, y: t.clientY, tx, ty }; };
+		// iOS Safari: no page zoom while the viewer is open
+		dlg.addEventListener('gesturestart', (e) => e.preventDefault());
+
 		// Swipe sideways on a phone: previous / next (a vertical move scrolls).
 		let x0 = 0, y0 = 0;
-		scroll.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+		scroll.addEventListener('touchstart', (e) => {
+			if (e.touches.length === 1) {
+				x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+				gestured = z > 1;
+				if (z > 1) startPan(e.touches[0]);
+			}
+			if (e.touches.length === 2) {
+				gestured = true;
+				pan = null;
+				img.style.transition = '';
+				const r = img.getBoundingClientRect();
+				const bx = r.left - tx, by = r.top - ty; // image box before the zoom
+				base = { x: bx, y: by, w: r.width / z, h: r.height / z };
+				const [mx, my] = mid(e.touches);
+				pinch = { d: gap(e.touches), z, ux: (mx - bx - tx) / z, uy: (my - by - ty) / z, bx, by };
+			}
+		}, { passive: true });
+		scroll.addEventListener('touchmove', (e) => {
+			if (pinch && e.touches.length === 2) {
+				e.preventDefault();
+				z = Math.min(5, Math.max(1, (pinch.z * gap(e.touches)) / pinch.d));
+				const [mx, my] = mid(e.touches);
+				// the point first pinched stays under the fingers
+				tx = mx - pinch.bx - z * pinch.ux;
+				ty = my - pinch.by - z * pinch.uy;
+				applyZoom();
+			} else if (pan && e.touches.length === 1 && z > 1) {
+				e.preventDefault();
+				tx = pan.tx + e.touches[0].clientX - pan.x;
+				ty = pan.ty + e.touches[0].clientY - pan.y;
+				applyZoom();
+			}
+		}, { passive: false });
 		scroll.addEventListener('touchend', (e) => {
+			if (e.touches.length < 2) {
+				// zoomed in a lot: ask the browser for a sharper file
+				if (pinch && z > 1.5 && img.srcset) img.sizes = Math.ceil(base.w * z) + 'px';
+				pinch = null;
+			}
+			if (z < 1.02 || (z < 1.08 && e.touches.length === 0)) resetZoom(true);
+			else if (e.touches.length === 1) startPan(e.touches[0]);
+			if (e.touches.length === 0) pan = null;
+			if (gestured || e.touches.length) return; // a pinch or a zoomed move is not a swipe
 			const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
 			if (Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy) && items().length > 1) show(index + (dx < 0 ? 1 : -1));
 		}, { passive: true });
@@ -168,6 +245,10 @@
 		background: transparent;
 		overflow: hidden;
 	}
+	/* étape 13, 24: no page zoom anywhere in the viewer (Android too) */
+	.lb {
+		touch-action: pan-x pan-y;
+	}
 	.lb::backdrop {
 		background: rgb(0 0 0 / 0.8);
 	}
@@ -178,6 +259,12 @@
 		overflow-y: auto;
 		overscroll-behavior: contain;
 		outline: none;
+		/* étape 13, 24: the browser's pinch-zoom is off here; the script zooms the image */
+		touch-action: pan-x pan-y;
+	}
+	.lb-scroll.is-zoomed {
+		overflow: hidden;
+		touch-action: none;
 	}
 	.lb-stage {
 		min-height: 100%;

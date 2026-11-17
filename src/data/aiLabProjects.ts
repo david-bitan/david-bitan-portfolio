@@ -447,10 +447,10 @@ The language model only reads the request. Prices, the plan, the budget check an
 		subtitle: 'A family kitchen in San Gimignano, imagined from scratch.',
 		eyebrow: 'Restaurant · 2026',
 		shortDesc:
-			'Full brand identity, menu and table booking with a demo sign-in. Designed and built with AI, from research to finished product, every choice directed by me.',
+			'Full brand identity, menu and table booking with a demo sign-in. Designed and built with AI, every choice directed by me.',
 		metaDesc:
 			'Brand identity, menu and table booking with a demo sign-in. Designed and built with AI, every choice directed by me.',
-		intro: `Full brand identity, menu and table booking with a demo sign-in. Designed and built with AI, from research to finished product, every choice directed by me.
+		intro: `Full brand identity, menu and table booking with a demo sign-in. Designed and built with AI, every choice directed by me.
 
 The design language borrows from fine-dining editorial: Playfair Display and Cormorant Garamond over a noir + brushed-gold + ivory palette, dish photography treated as painterly plates rather than product shots, and micro-typography for the menu (dotted leaders, lining figures, italic wine notes) that would look at home on a printed carte.
 

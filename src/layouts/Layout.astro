@@ -130,6 +130,10 @@ const personJsonLd = {
 			(() => {
 				const sel = 'h1,h2,h3,h4,p,li,figcaption,blockquote';
 				document.querySelectorAll(sel).forEach((el) => {
+					// étape 14, ajout 2 (C): a card caption holds its own <p>, which is
+					// already glued; a second pass glued three words ("The / month's
+					// total, first.") and defeated text-wrap: balance.
+					if (el.matches('.ptv-card figcaption')) return;
 					const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
 					let last = null;
 					while (walker.nextNode()) if (walker.currentNode.textContent.trim()) last = walker.currentNode;

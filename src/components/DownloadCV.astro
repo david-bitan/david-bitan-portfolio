@@ -3,6 +3,10 @@
 // footer). Lucide file-down icon, "Download CV:" in normal text, PDF and
 // DOCX in orange, no underline, each a 44 px target, same space both
 // sides of the dot. `tone="footer"` keeps the footer's white-70% text.
+// Étape 13, 8: a file icon before PDF (file-text) and before DOCX
+// (file-pen-line, an editable Word file), same line style, orange with
+// the link; the leading file-down icon goes, so the block stays on one
+// line on the About page at 360 px.
 import Icon from './Icon.astro';
 interface Props { class?: string; tone?: 'page' | 'footer'; }
 const { class: cls = '', tone = 'page' } = Astro.props;
@@ -10,15 +14,14 @@ const text = tone === 'footer' ? 'text-white/70' : 'text-muted';
 ---
 
 <p class:list={['cv-dl inline-flex flex-wrap items-center text-sm', text, cls]}>
-	<Icon name="file-down" class="mr-2.5 size-4 shrink-0" />
 	<span>Download CV:</span>
-	<a href="/cv/CV-David-Bitan.pdf" download class="cv-dl-link">PDF</a>
+	<a href="/cv/CV-David-Bitan.pdf" download class="cv-dl-link"><Icon name="file-text" class="size-4 shrink-0" />PDF</a>
 	<span aria-hidden="true">·</span>
-	<a href="/cv/CV-David-Bitan.docx" download class="cv-dl-link">DOCX</a>
+	<a href="/cv/CV-David-Bitan.docx" download class="cv-dl-link"><Icon name="file-pen-line" class="size-4 shrink-0" />DOCX</a>
 </p>
 
 <style>
-	/* 44 px wide and tall targets; the 10 px side padding gives the same
+	/* 44 px wide and tall targets; the 6 px side padding gives the same
 	   space on both sides of the dot. */
 	.cv-dl-link {
 		display: inline-flex;
@@ -26,7 +29,8 @@ const text = tone === 'footer' ? 'text-white/70' : 'text-muted';
 		min-width: 44px;
 		align-items: center;
 		justify-content: center;
-		padding-inline: 10px;
+		gap: 4px;
+		padding-inline: 6px;
 		font-weight: 600;
 		color: var(--color-accent-text);
 		text-decoration: none;
