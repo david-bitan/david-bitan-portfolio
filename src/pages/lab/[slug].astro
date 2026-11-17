@@ -57,7 +57,6 @@ import Lightbox from '../../components/Lightbox.astro';
 import ZoneFilters from '../../components/ZoneFilters.astro';
 import { caseLines, nextOf, LAB_ORDER } from '../../data/caseLines';
 import CaseLines from '../../components/CaseLines.astro';
-import NextProject from '../../components/NextProject.astro';
 import ProjectTopVisual from '../../components/ProjectTopVisual.astro';
 import { topLayouts } from '../../data/topVisuals';
 const visual = topLayouts[project.slug];
@@ -73,13 +72,13 @@ const visual = topLayouts[project.slug];
 	<main id="main" tabindex="-1">
 	<ZoneFilters backHref="/#ai-lab" backLabel="Back to AI Lab Work" />
 
-	<article class="mx-auto max-w-[1200px] px-6 pt-4 pb-12 sm:pt-5 sm:pb-16 min-[1248px]:px-0" data-reveal>
+	<article class="mx-auto max-w-[1200px] px-6 pt-4 sm:pt-5 min-[1248px]:px-0" data-reveal>
 		<a href="/#ai-lab" data-top-back class="text-sm font-semibold text-accent-text hover:underline"
 			><span class="arr-back" aria-hidden="true">→</span>Back to AI Lab Work</a
 		>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">
-			{project.eyebrow}
+			{project.eyebrow.split(' · ').map((part, i) => <>{i > 0 && <span class="eb-gap"> </span>}{part}</>)}
 		</p>
 		{/* Étape 14, ajout 1: the text on the left, the composition over the
 		    right part (desktop); phones: the composition under the text. */}
@@ -162,15 +161,15 @@ const visual = topLayouts[project.slug];
 		</div>
 
 		{/* Étape 14, ajout 1 (S33): Challenge · What I did · Result · Role, full width */}
-		{lines && <div class="mt-10 lg:mt-0"><CaseLines lines={lines} /></div>}
+		{lines && <div class="mt-sec"><CaseLines lines={lines} /></div>}
 	</article>
 
 
 	{
 		project.aiFeature && (
-			<section id="ai-feature" class="mx-auto max-w-[1200px] scroll-mt-24 px-6 pt-4 pb-12 sm:pt-6 sm:pb-16 min-[1248px]:px-0" data-reveal>
-				<div class="rounded-lg border border-ink/10 bg-card p-5 sm:p-10">
-					<p class="text-sm font-semibold uppercase tracking-widest text-accent-text">{project.aiFeature.eyebrow}</p>
+			<section id="ai-feature" class="lab-sec mx-auto max-w-[1200px] scroll-mt-24 px-6 min-[1248px]:px-0" data-reveal>
+				<div class="box-line rounded-lg border border-ink/10 bg-card p-card">
+					<p class="text-sm font-semibold uppercase tracking-widest text-accent-text">{project.aiFeature.eyebrow.split(' · ').map((part, i) => <>{i > 0 && <span class="eb-gap"> </span>}{part}</>)}</p>
 					<h2 class="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">{project.aiFeature.title}</h2>
 					<p class="mt-4 max-w-[68ch] text-lg text-muted">{project.aiFeature.lead}</p>
 					<a
@@ -231,20 +230,20 @@ const visual = topLayouts[project.slug];
 	{
 		ds && (
 			<section
-				class="mx-auto max-w-[1200px] px-6 pt-4 pb-12 sm:pt-6 sm:pb-16 min-[1248px]:px-0"
+				class="lab-sec mx-auto max-w-[1200px] px-6 min-[1248px]:px-0"
 				data-reveal
 			>
 				<p class="text-sm font-semibold uppercase tracking-widest text-muted">
 					Under the hood
 				</p>
-				<h2 class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+				<h2 class="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
 					Design system
 				</h2>
 
 				{/* Colors */}
-				<div class="mt-10">
+				<div class="mt-title">
 					<h3 class="ds-h3">Palette</h3>
-					<div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+					<div class="mt-4 gap-cards grid grid-cols-2 sm:grid-cols-4">
 						{ds.colors.map((c) => (
 							<div class="ds-swatch">
 								<div
@@ -260,11 +259,11 @@ const visual = topLayouts[project.slug];
 					</div>
 				</div>
 
-				{/* Typography: the demo's own self-hosted fonts, so each sample shows the real face (no Google Fonts) */}
+				{/* Typography: the demo’s own self-hosted fonts, so each sample shows the real face (no Google Fonts) */}
 				{ds.fontCss && <link rel="stylesheet" href={ds.fontCss} />}
 				<div class="mt-12">
 					<h3 class="ds-h3">Typography</h3>
-					<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+					<div class="mt-4 gap-cards grid grid-cols-1 md:grid-cols-3">
 						{ds.typography.map((t) => (
 							<div class="ds-type">
 								<p
@@ -313,10 +312,10 @@ const visual = topLayouts[project.slug];
 	}
 
 	<section
-		class="mx-auto max-w-[1200px] px-6 py-8 sm:py-12 min-[1248px]:px-0"
+		class="lab-sec mx-auto max-w-[1200px] px-6 min-[1248px]:px-0"
 		data-reveal
 	>
-		<div class="grid grid-cols-1 gap-6">
+		<div class="gap-cards grid grid-cols-1">
 			{
 				project.gallery.map((src, i) => (
 					<div class="ai-lab-shot block overflow-hidden rounded-md bg-card">
@@ -339,7 +338,7 @@ const visual = topLayouts[project.slug];
 
 	{
 		project.mobileGallery && project.mobileGallery.length > 0 && (
-			<section class="mx-auto max-w-[1200px] px-6 pb-8 sm:pb-12 min-[1248px]:px-0" data-reveal>
+			<section class="lab-sec mx-auto max-w-[1200px] px-6 min-[1248px]:px-0" data-reveal>
 				<p class="mb-4 text-sm font-semibold uppercase tracking-widest text-muted">On mobile</p>
 				<MasonryGallery urls={project.mobileGallery} alt={`${project.title}: mobile screenshot`} />
 			</section>
@@ -348,8 +347,8 @@ const visual = topLayouts[project.slug];
 
 	{
 		project.nextSteps && project.nextSteps.length > 0 && (
-			<section id="next-steps" class="mx-auto max-w-[1200px] px-6 pt-4 pb-4 sm:pt-8 min-[1248px]:px-0" data-reveal>
-				<div class="rounded-lg border border-ink/10 bg-card p-6 sm:p-10">
+			<section id="next-steps" class="lab-sec mx-auto max-w-[1200px] px-6 min-[1248px]:px-0" data-reveal>
+				<div class="box-line rounded-lg border border-ink/10 bg-card p-card">
 					<p class="text-sm font-semibold uppercase tracking-widest text-muted">Next steps</p>
 					<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
 						{project.nextSteps.map((n) => (
@@ -367,7 +366,7 @@ const visual = topLayouts[project.slug];
 		)
 	}
 
-	<section class="mx-auto max-w-[1200px] px-6 py-12 text-center sm:py-16 min-[1248px]:px-0" data-reveal>
+	<section class="lab-sec mx-auto max-w-[1200px] px-6 text-center min-[1248px]:px-0" data-reveal>
 		<a
 			href={project.demoUrl}
 			target="_blank"
@@ -391,7 +390,7 @@ const visual = topLayouts[project.slug];
 		</a>
 	</section>
 
-	{next && <NextProject href={`/lab/${next.slug}`} title={next.title} />}
+	<div class="sec-gap"></div>
 	</main>
 	<Lightbox />
 	<Footer />
@@ -409,6 +408,13 @@ const visual = topLayouts[project.slug];
 	.prose-lead {
 		/* first visible paragraph slightly larger for hierarchy */
 		font-size: 1.125rem !important;
+	}
+	/* Étape 15, S57: phones and tablets (intro under the button), the intro
+	   is grey like the text under the title of the Work pages. */
+	@media (max-width: 1023.98px) {
+		.prose-lab p {
+			color: var(--color-muted);
+		}
 	}
 
 	/* Show more accordion — same mechanics as work case study */
@@ -447,7 +453,7 @@ const visual = topLayouts[project.slug];
 		border-radius: var(--radius-box);
 		corner-shape: superellipse(3);
 		background: var(--color-card);
-		padding: 1rem;
+		padding: var(--sp-pad); /* étape 15, S46: card padding 24 */
 	}
 	.ds-swatch-chip {
 		height: 4rem;

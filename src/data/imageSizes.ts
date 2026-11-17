@@ -1,7 +1,7 @@
 // Pixel size of every gallery image shown in a masonry gallery (mobile
 // captures, email templates, Lab phone shots). Read once from Cloudinary
 // (fl_getinfo) and from the files in public/ on 13/11. The gallery uses it to
-// reserve each card's exact height before the image loads, to place cards in
+// reserve each card’s exact height before the image loads, to place cards in
 // the shortest column, and to never show an image wider than its own pixels.
 // A new image missing here still works: its size is read when it loads.
 // Keys: the Cloudinary public id with its folder (no version, no transform),

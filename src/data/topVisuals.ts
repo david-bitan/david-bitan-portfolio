@@ -1,5 +1,5 @@
 // Étape 14: the visual at the top of each project page. 2 or 3 small cards,
-// each showing ONE feature of the product, cut from the project's real
+// each showing ONE feature of the product, cut from the project’s real
 // screenshots (never a whole page, never a gallery image as it is). Files:
 // public/top-visuals/<slug>/<n>.webp, saved at twice their display width
 // (w x h = file pixels) and never enlarged beyond the original.
@@ -19,7 +19,7 @@ export type TopLayout = { a: { card: CardRef; x: number; y: number }; b: { card:
 export const CARD_WIDTHS = [292, 312, 219];
 
 export const extraCards: Record<string, TopCard & { width: number }> = {
-	'monthly': { src: "/top-visuals/sonary-dashboard/monthly.webp", w: 300, h: 308, width: 182, title: "Monthly spend", desc: "The month's total, first.", alt: "Sonary dashboard: Monthly Spend card, $52,577" },
+	'monthly': { src: "/top-visuals/sonary-dashboard/monthly.webp", w: 300, h: 308, width: 182, title: "Monthly spend", desc: "The month’s total, first.", alt: "Sonary dashboard: Monthly Spend card, $52,577" },
 	'uiv-dash': { src: "/top-visuals/ui-ux-vintage/sales-dashboard.webp", w: 520, h: 212, width: 292, title: "Sales dashboard", desc: "Views, sales and earnings.", alt: "SaaS dashboard overview: four stat tiles and a sales chart" },
 	'uiv-wochat': { src: "/top-visuals/ui-ux-vintage/wochat-messaging.webp", w: 374, h: 221, width: 219, title: "Wochat messaging", desc: "Voice, text and video chat.", alt: "Wochat app on five phones: contacts, chat, video call and profile" },
 	'brandbook': { src: "/top-visuals/branding-old/brand-book.webp", w: 560, h: 327, width: 312, title: "Brand book", desc: "Typography and brand visuals.", alt: "Wochat brand book open on the typography page, next to a brand photo" },
@@ -63,7 +63,7 @@ export const topLayouts: Record<string, TopLayout> = {
 	'margin': {
 		a: { card: 3, x: 725, y: 100 },
 		b: { card: 1, x: 908, y: 0 },
-		pill: { x: 913, y: 203, icon: "!", color: "#E5484D", l1: "20 hours a month", l2: "Overtime included in your salary" },
+		pill: { x: 913, y: 227, icon: "!", color: "#E5484D", l1: "20 hours a month", l2: "Overtime included in your salary" },
 		doodles: [
 			{ name: 'highlighter', x: 835, y: 62, r: -10, s: 0.85, orange: true },
 			{ name: 'magnifier', x: 1178, y: 288, r: 0, s: 0.8 },
@@ -107,7 +107,7 @@ export const topLayouts: Record<string, TopLayout> = {
 	'sonary-website': {
 		a: { card: 3, x: 719, y: 0 },
 		b: { card: 1, x: 908, y: 96 },
-		pill: { x: 714, y: 236, w: 224, icon: "★", color: "#F5B800", l1: "4.6 rating", l2: "256 reviews, Editor’s choice" },
+		pill: { x: 714, y: 248.7, w: 224, icon: "★", color: "#F5B800", l1: "4.6 rating", l2: "256 reviews, Editor’s choice" },
 		doodles: [
 			{ name: 'magnifier', x: 686, y: 146, r: 0, s: 0.8 },
 			{ name: 'star', x: 1020, y: 44, r: 8, s: 0.8, orange: true },
@@ -144,7 +144,7 @@ export const topLayouts: Record<string, TopLayout> = {
 		doodles: [
 			{ name: 'envelope', x: 760, y: 30, r: -8, s: 0.85, orange: true },
 			{ name: 'plane', x: 642, y: 268, r: -6, s: 0.8 },
-			{ name: 'bell', x: 1187, y: 65, r: 10, s: 0.7 },
+			{ name: 'bell', x: 1188, y: 65, r: 10, s: 0.64 },
 		],
 		blocTop: 348,
 	},
@@ -198,7 +198,7 @@ export const topVisuals: Record<string, TopCard[]> = {
 	'sonary-dashboard': [
 		{ src: "/top-visuals/sonary-dashboard/1.webp", w: 536, h: 165, title: 'AI assistant', desc: 'Ask your stack anything.', alt: 'Sonary AI chat: a question and the assistant answer' },
 		{ src: "/top-visuals/sonary-dashboard/2.webp", w: 576, h: 154, title: 'Spend overview', desc: 'Costs by category and month.', alt: 'Sonary dashboard: expenses by category donut and spend timeline chart' },
-		{ src: "/top-visuals/sonary-dashboard/3.webp", w: 376, h: 319, title: 'Monthly spend', desc: "The month's total, first.", alt: 'Sonary dashboard: Monthly Spend card, $52,577' },
+		{ src: "/top-visuals/sonary-dashboard/3.webp", w: 376, h: 319, title: 'Monthly spend', desc: "The month’s total, first.", alt: 'Sonary dashboard: Monthly Spend card, $52,577' },
 	],
 	'apex-athletic-club': [
 		{ src: "/top-visuals/apex-athletic-club/1.webp", w: 536, h: 193, title: "Workout plan", desc: "Built and changed in chat.", alt: "APEX member page: weekly workout plan with Tuesday marked updated in chat by APEX Coach" },
@@ -211,7 +211,7 @@ export const topVisuals: Record<string, TopCard[]> = {
 		{ src: "/top-visuals/branding-old/3.webp", w: 376, h: 294, title: "Color palette", desc: "Blue, charcoal and white.", alt: "Wochat brand book page: color palette swatches #0176D6, #46454B and #FFFFFF" },
 	],
 	'facet': [
-		{ src: "/top-visuals/facet/1.webp", w: 536, h: 196, title: "Ask a question", desc: "Answered from your own file.", alt: "Facet answer to \"How much do I spend on groceries each month?\": average per month, this month so far and average purchase" },
+		{ src: "/top-visuals/facet/1.webp", w: 536, h: 196, title: "Ask a question", desc: "Answered from your own file.", alt: "Facet answer to “How much do I spend on groceries each month?”: average per month, this month so far and average purchase" },
 		{ src: "/top-visuals/facet/2.webp", w: 576, h: 288, title: "See the lines", desc: "Every total, line by line.", alt: "Facet side panel listing the 407 statement lines behind a total, with search, category filter and sort" },
 		{ src: "/top-visuals/facet/3.webp", w: 376, h: 359, title: "Where it goes", desc: "Spending by category.", alt: "Facet donut chart of October spending by category, total 27,397.12 euros, with Home and Groceries first" },
 	],
@@ -223,11 +223,11 @@ export const topVisuals: Record<string, TopCard[]> = {
 	'margin': [
 		{ src: "/top-visuals/margin/1.webp", w: 536, h: 244, title: "Highlighted source", desc: "One tap to the exact clause.", alt: "Margin point about a 1,200 euro learning budget, with its source clause highlighted on page 5 of the contract" },
 		{ src: "/top-visuals/margin/2.webp", w: 576, h: 270, title: "Risk summary", desc: "What could work against you.", alt: "Margin report section \"Could work against you\" with three points, each linked to its source" },
-		{ src: "/top-visuals/margin/3.webp", w: 376, h: 311, title: "Ask the document", desc: "Answers cite the contract.", alt: "Margin answer to \"Can I work for a competitor after I leave?\" with two \"Where it says it\" links" },
+		{ src: "/top-visuals/margin/3.webp", w: 376, h: 311, title: "Ask the document", desc: "Answers cite the contract.", alt: "Margin answer to “Can I work for a competitor after I leave?” with two “Where it says it” links" },
 	],
 	'otium': [
 		{ src: "/top-visuals/otium/1.webp", w: 536, h: 189, title: "Agent steps", desc: "Paying waits for your OK.", alt: "Otium agent steps: budget check tagged Automatic, hold flights and stay tagged Needs your OK" },
-		{ src: "/top-visuals/otium/2.webp", w: 576, h: 297, title: "Trip request", desc: "Read by AI, edited by you.", alt: "Otium \"What I understood\" panel: a trip request in plain words turned into editable fields for city, dates, travellers and budget cap" },
+		{ src: "/top-visuals/otium/2.webp", w: 576, h: 297, title: "Trip request", desc: "Read by AI, edited by you.", alt: "Otium “What I understood” panel: a trip request in plain words turned into editable fields for city, dates, travellers and budget cap" },
 		{ src: "/top-visuals/otium/3.webp", w: 376, h: 187, title: "Travel documents", desc: "A pass for each traveller.", alt: "Otium boarding pass, Paris CDG to Lisbon, with passenger, seat and gate" },
 	],
 	'playright': [

@@ -28,7 +28,7 @@
 	const ready = () => S.docs.filter((d) => !d.loading && d.words >= 30);
 
 	/* ---------------- language ---------------- */
-	let startLang = "en"; try { startLang = localStorage.getItem("margin-lang") || "en"; /* English unless the visitor chose another language */ } catch {}
+	const startLang = "en"; /* étape 15, S68: always opens in English (never the browser language, never a saved one); the visitor can change it */
 	I.set(startLang);
 	function setLang(l) {
 		I.set(l); try { localStorage.setItem("margin-lang", I.lang); } catch {}

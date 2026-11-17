@@ -243,8 +243,12 @@ select:not(:disabled) {
   transition: transform 900ms cubic-bezier(0.22, 0.61, 0.36, 1);
   will-change: transform;
 }
-.group:hover .thumb-hover-zoom {
-  transform: scale(1.06);
+/* Étape 15, S58: zoom only with a real mouse; after a tap on a phone the
+   :hover state sticks and the thumbnail stayed zoomed (Facet, APEX). */
+@media (hover: hover) and (pointer: fine) {
+  .group:hover .thumb-hover-zoom {
+    transform: scale(1.06);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .thumb-hover-zoom {
@@ -446,3 +450,176 @@ html.theme-switching::view-transition-old(root) {
 html.theme-switching::view-transition-new(root) {
   animation: 400ms ease both vt-fade-in;
 }
+
+/* Étape 15, S46: ONE spacing rule for the 21 pages (multiples of 8).
+   --sp-sec   between 2 sections, on each side of the thin rule
+   --sp-title section title to its content
+   --sp-cards between cards        --sp-pad inner padding of cards
+   --sp-btn   text to its button   small gaps: 8 or 16
+   Phones < 768 px, tablets 768–1023 px, desktop ≥ 1024 px. */
+:root {
+  --sp-sec: 40px;
+  --sp-title: 24px;
+  --sp-cards: 16px;
+  --sp-pad: 24px;
+  --sp-btn: 24px;
+}
+@media (min-width: 768px) {
+  :root { --sp-sec: 48px; --sp-title: 32px; --sp-cards: 24px; --sp-btn: 32px; }
+}
+@media (min-width: 1024px) {
+  :root { --sp-sec: 64px; }
+}
+/* The thin rule between 2 sections: --sp-sec above and below it. No rule
+   right after the hero and right before the footer (only --sp-sec there). */
+.sec-rule {
+  display: block;
+  height: 0;
+  margin: var(--sp-sec) 0;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+.sec-gap { height: var(--sp-sec); }
+.mt-sec { margin-top: var(--sp-sec); }
+.mt-title { margin-top: var(--sp-title); }
+.mb-title { margin-bottom: var(--sp-title); }
+.gap-cards { gap: var(--sp-cards); }
+.p-card { padding: var(--sp-pad); }
+.mt-btn { margin-top: var(--sp-btn); }
+
+/* Étape 15, S47: Scope on the same grid as the 4 columns (CaseLines.astro:
+   1 column, 2 from 768 px, 4 from 1024 px, 32 px between columns). */
+.scope-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 32px;
+  row-gap: 8px;
+}
+@media (min-width: 768px) {
+  .scope-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .scope-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* Étape 15, S46: zones of a project page (Desktop, Mobile…). --sp-sec under
+   the filter bar; between 2 zones a thin rule with --sp-sec on each side.
+   ZoneFilters.astro moves .zone-first to the first zone still shown. */
+.zone-sec { margin-top: var(--sp-sec); }
+.zone-sec:not(.zone-first) {
+  padding-top: var(--sp-sec);
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+
+/* Étape 15, S46: blocks of an AI Lab page after the header and its 4
+   columns: a thin rule with --sp-sec on each side before each block (the
+   rule sits in the content box, aligned with the text). */
+.lab-sec { margin-top: var(--sp-sec); }
+.lab-sec::before {
+  content: "";
+  display: block;
+  margin-bottom: var(--sp-sec);
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+
+/* Étape 15, S53: the ↗ after "LinkedIn" sits 4 px from the word (visible
+   gap, the glyphs’ own side bearings included). */
+.ext-arr {
+  display: inline-block;
+  margin-left: 2px;
+}
+
+/* Étape 15, S54: About, recommendations in cascade (masonry): 3 columns
+   from 1024 px, 2 on tablets, 1 on phones; 24 / 16 px between cards. */
+.reco-masonry {
+  columns: 1;
+  column-gap: var(--sp-cards);
+}
+@media (min-width: 768px) { .reco-masonry { columns: 2; } }
+@media (min-width: 1024px) { .reco-masonry { columns: 3; } }
+.reco-masonry > .reco-card {
+  break-inside: avoid;
+  margin-bottom: var(--sp-cards);
+}
+.reco-masonry > .reco-card:last-child { margin-bottom: 0; }
+
+/* Étape 15, S62: the « · » of small lines (« FITNESS · 2026 ») becomes a
+   16 px space (the space inside keeps the words apart for screen readers). */
+.eb-gap {
+  display: inline-block;
+  width: 16px;
+}
+
+/* Étape 15, S65: « This portfolio » card, light mode only: a 1 px outline,
+   #0D101A at 8 %, on the card’s own squircle (drawn above the picture). */
+.ai-lab-card.is-portfolio { position: relative; }
+:root:not([data-theme='dark']) .ai-lab-card.is-portfolio::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgb(13 16 26 / 0.08);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+@supports (corner-shape: superellipse(3)) {
+  .ai-lab-card.is-portfolio::after { corner-shape: superellipse(3); }
+}
+
+/* Étape 15, S66: dark mode, no outline on boxes (the card colour is
+   enough). Same size kept (transparent border). Light mode unchanged. */
+:root[data-theme='dark'] .box-line,
+:root[data-theme='dark'] .ds-swatch,
+:root[data-theme='dark'] .ds-type {
+  border-color: transparent;
+}
+/* With JS (about.astro): columns filled in David's order, row by row. */
+.reco-masonry.is-js {
+  columns: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-cards);
+}
+.reco-masonry .reco-col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-cards);
+}
+.reco-masonry .reco-col > .reco-card { margin-bottom: 0; }
+
+/* Étape 15, S67: narrow banners of the "Gallery" zones: rows centred, each
+   banner at most its own width (never enlarged). */
+section[data-zone-label="Gallery"] .narrow-masonry:not(:empty) {
+  columns: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 32px;
+}
+section[data-zone-label="Gallery"] .narrow-masonry > [data-desktop-item] {
+  width: auto !important;
+  flex: 0 1 auto;
+  margin: 0 !important;
+}
+
+/* Étape 15, S46: project pages with one zone (no filter bar): the thin rule
+   between the case-study block and the first zone. */
+.zf-bare ~ div > .zone-sec.zone-first {
+  padding-top: var(--sp-sec);
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+/* Home: the hero ends with the scene dots and their 14 px margin (in
+   HeroAnimation.astro, not touched); below 1024 px the gap after the hero
+   takes them back so it measures --sp-sec from the dots' tap area. */
+@media (max-width: 1023.98px) {
+  .sec-gap.after-hero { margin-top: -14px; }
+}
+/* The craft strip and the filter row carry 4 px of room for focus rings:
+   the gaps around them take it back, so the visible gaps follow the rule. */
+.craft-strip { margin-top: calc(var(--sp-title) - 4px); margin-bottom: -4px; }
+.craft-btn { margin-top: calc(var(--sp-btn) - 4px); }
+@media (max-width: 639.98px) { .craft-strip { margin-bottom: 0; } }
+.work-head { margin-bottom: calc(var(--sp-title) - 4px); }

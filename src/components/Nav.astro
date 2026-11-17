@@ -1,7 +1,7 @@
 ---
 /**
  * Top nav (étape 8, M, David 15/11): every entry scrolls the home page down to
- * its section, in the home's own order (Work · AI Lab · Testimonials · About ·
+ * its section, in the home’s own order (Work · AI Lab · Testimonials · About ·
  * Craft · Contact). From an inner page it goes back to the home at that
  * section (/#…). Contact is a plain link on the right (étape 9, F1) that opens /contact. The underline
  * follows the section in view (scroll spy, home only). The full /about, /craft
@@ -97,7 +97,7 @@ import DownloadCV from './DownloadCV.astro';
 	}
 	<a href="/contact" class:list={['mobile-nav-link text-3xl font-semibold', { 'nav-link-active': onContact }]} aria-current={onContact ? 'page' : undefined}>Contact</a>
 	{/* Étape 13, 9: at the bottom, a light separator, then the common « Download CV » block. */}
-	<div class="mobile-nav-cv mobile-nav-link flex flex-col items-center gap-4">
+	<div class="mobile-nav-cv mobile-nav-link flex flex-col items-center gap-[18px]">
 		<span class="block h-px w-16 bg-ink/15" aria-hidden="true"></span>
 		<DownloadCV />
 	</div>

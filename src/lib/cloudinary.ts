@@ -18,8 +18,8 @@ export function isMobileShot(url: string): boolean {
 // land anywhere.
 // "Large" cards (Selected Work grid, Work grid, case-study gallery) get enough
 // width to stay sharp at 2x pixel density; "small" thumbnails (Craft grid) get less.
-// Quality policy: David's Cloudinary uploads are already WebP q=90. Passing
-// them through Cloudinary's default `q_auto:best` (~85) re-compresses them,
+// Quality policy: David’s Cloudinary uploads are already WebP q=90. Passing
+// them through Cloudinary’s default `q_auto:best` (~85) re-compresses them,
 // noticeably softening UI screenshots (menus, text, thin lines). We force
 // `q_100` so Cloudinary re-encodes at the maximum quality — bigger files,
 // but the visual fidelity matches what David sees in Figma.
@@ -48,7 +48,7 @@ export const FULL = 'c_limit,w_2000,q_100,f_auto,fl_progressive';
 // WIDTH (upscales narrow mobile sources to a legible ~1200px wide) and lets
 // HEIGHT grow proportionally — the lightbox scrolls the tall image vertically
 // like a real phone screen.
-// c_limit (never upscale) instead of c_scale — David's rule: no upscale ever.
+// c_limit (never upscale) instead of c_scale — David’s rule: no upscale ever.
 // A tall mobile source narrower than 1200px is served at its true native
 // width; the browser handles fit-to-viewport in the (now unused) lightbox.
 export const FULL_TALL = 'c_limit,w_1200,q_100,f_auto,fl_progressive';
@@ -77,7 +77,7 @@ export function mobileSrcset(url: string): string {
 // every time. Landscape only — tall mobile screenshots have a fixed narrow
 // width so a single high-res version is simpler.
 //
-// Widths chosen to stay under Cloudinary Free tier's 25 MP output cap when
+// Widths chosen to stay under Cloudinary Free tier’s 25 MP output cap when
 // applied to very tall @2x screenshots. v100 update: after David bulk-uploaded
 // Top5 at @2x (Article 3896×19972 = 77.8 MP source, Lineup 3840×18530 = 71.2
 // MP source), the w_2400 and w_3200 variants blew past 25 MP output cap and

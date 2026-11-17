@@ -1,5 +1,5 @@
 ---
-// Home About block (CL2 étape 6, lot 1; layout étape 8, N): David's validated
+// Home About block (CL2 étape 6, lot 1; layout étape 8, N): David’s validated
 // paragraph, the mentor note, then the skills already shown here, sorted into
 // three titled groups (none added, none removed). One skill fits none of the
 // three groups; it closes the skills block on its own line.
@@ -20,14 +20,14 @@ const groups = [
 const ungrouped = ['3D & motion (Cinema 4D, ZBrush, After Effects, SVGator)'];
 ---
 
-<section id="about" class="mx-auto max-w-[1200px] scroll-mt-24 px-6 pt-10 pb-14 sm:scroll-mt-0 sm:py-28 min-[1248px]:px-0" data-reveal>
+<section id="about" class="mx-auto max-w-[1200px] scroll-mt-24 px-6 sm:scroll-mt-0 min-[1248px]:px-0" data-reveal>
 	{/* Étape 8, N (David 15/11): a real title like the other sections; on desktop two balanced
 	    columns, the text on the left, every skill in one clean block on the right (three groups of
 	    the same height, "3D & motion" filed inside); "More about me →" as an orange-outline button.
 	    Texts unchanged. */}
 	<h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">About me</h2>
 
-	<div class="mt-8 grid grid-cols-1 gap-10 lg:mt-10 lg:grid-cols-2 lg:gap-12">
+	<div class="mt-title grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
 		<div class="flex flex-col">
 			{/* Étape 13, 3: on phones the paragraph stops halfway with "… Read more";
 			    a tap opens the rest smoothly (height + fade). sm+: the whole text. */}
@@ -38,17 +38,17 @@ const ungrouped = ['3D & motion (Cinema 4D, ZBrush, After Effects, SVGator)'];
 			<div class="mt-8 border-l-2 border-accent pl-5">
 				<p class="font-semibold">Mentor at heart.</p>
 				<p class="mt-1.5 text-muted">
-					At every company I've worked for, I helped onboard the designers who joined the team,
+					At every company I’ve worked for, I helped onboard the designers who joined the team,
 					with honest, encouraging design reviews, and shared tips and design-system practices
 					with them.
 				</p>
 			</div>
-			<a href="/about" class="btn-secondary mt-8 hidden min-h-11 items-center justify-center self-start whitespace-nowrap rounded-pill px-6 text-sm font-semibold lg:inline-flex">
+			<a href="/about" class="btn-secondary mt-btn hidden min-h-11 items-center justify-center self-start whitespace-nowrap rounded-pill px-6 text-sm font-semibold lg:inline-flex">
 				More about me&nbsp;<span class="arr" aria-hidden="true">→</span>
 			</a>
 		</div>
 
-		<div class="rounded-lg border border-ink/10 bg-card p-6 sm:p-8">
+		<div class="box-line rounded-lg border border-ink/10 bg-card p-card">
 			<div class="grid divide-y divide-ink/10 lg:auto-rows-fr">
 				{
 					groups.map((g) => (
@@ -80,7 +80,7 @@ const ungrouped = ['3D & motion (Cinema 4D, ZBrush, After Effects, SVGator)'];
 	</div>
 
 	{/* Phones: centred in the page (étape 9, B4). */}
-	<div class="mt-8 flex justify-center lg:hidden">
+	<div class="mt-btn flex justify-center lg:hidden">
 	<a href="/about" class="btn-secondary inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-pill px-6 text-sm font-semibold">
 		More about me&nbsp;<span class="arr" aria-hidden="true">→</span>
 	</a>

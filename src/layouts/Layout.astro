@@ -69,8 +69,11 @@ const personJsonLd = {
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonicalUrl} />
+		{/* Étape 15, S59: favicon V6 (SVG as supplied; .ico 16/32/48 and the
+		    180 px Apple icon made from it). */}
+		<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 		<meta name="generator" content={Astro.generator} />
 
 		<!-- Open Graph — Facebook / LinkedIn / iMessage previews. -->
@@ -118,12 +121,29 @@ const personJsonLd = {
 			} catch {
 				// localStorage unavailable (private mode, etc.) — default to light
 			}
+			// Étape 15, S64: no smooth scrolling while the browser puts the page
+			// back where it was (back button); smooth again once loaded.
+			document.documentElement.style.scrollBehavior = 'auto';
 		</script>
 	</head>
 	<body>
 		<a href="#main" class="skip-link">Skip to content</a>
 		<slot />
 		<BackToTop />
+		<script is:inline>
+			// Étape 15, S64: on Back / reload, the saved position is put back as
+			// soon as the page is parsed, before it is shown (see the script below).
+			(function () {
+				try {
+					var n = performance.getEntriesByType('navigation')[0];
+					var y = history.state && history.state.cpY;
+					if (n && (n.type === 'back_forward' || n.type === 'reload') && typeof y === 'number') {
+						history.scrollRestoration = 'manual';
+						scrollTo(0, y);
+					}
+				} catch (e) {}
+			})();
+		</script>
 			<script is:inline>
 			// nowidow: glue the last two words of short text blocks with a
 			// non-breaking space, unless the pair would be too long for a phone.
@@ -131,7 +151,7 @@ const personJsonLd = {
 				const sel = 'h1,h2,h3,h4,p,li,figcaption,blockquote';
 				document.querySelectorAll(sel).forEach((el) => {
 					// étape 14, ajout 2 (C): a card caption holds its own <p>, which is
-					// already glued; a second pass glued three words ("The / month's
+					// already glued; a second pass glued three words ("The / month’s
 					// total, first.") and defeated text-wrap: balance.
 					if (el.matches('.ptv-card figcaption')) return;
 					const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
@@ -151,6 +171,55 @@ const personJsonLd = {
 </html>
 
 <script>
+	// Étape 15, S64: the « Back » links (top link and round chevron) go back
+	// to exactly where the visitor was: if the previous page is on this site,
+	// history.back() (the position comes back exactly, no smooth scroll);
+	// otherwise the normal link.
+	{
+		const html = document.documentElement;
+		const smoothAgain = () => requestAnimationFrame(() => requestAnimationFrame(() => { html.style.scrollBehavior = ''; }));
+		// The browser's own restore landed 16 px off (it records the position
+		// at another moment), so the site keeps the position itself: each
+		// history entry stores its scroll position (history.state, written when
+		// the scrolling stops and on leaving) and gets it back exactly, on Back,
+		// Forward or reload, and for in-page steps (#work…) too.
+		try { history.scrollRestoration = 'manual'; } catch {}
+		const save = () => { try { history.replaceState({ ...(history.state || {}), cpY: Math.round(scrollY) }, ''); } catch {} };
+		let st = 0;
+		addEventListener('scroll', () => { clearTimeout(st); st = window.setTimeout(save, 200); }, { passive: true });
+		addEventListener('pagehide', save);
+		document.addEventListener('click', save, true); // before a link adds a history entry
+		const savedY = () => { const y = history.state?.cpY; return typeof y === 'number' ? y : NaN; };
+		const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+		const back = !!nav && (nav.type === 'back_forward' || nav.type === 'reload');
+		const restore = () => { const y = savedY(); if (back && Number.isFinite(y)) scrollTo({ top: y, behavior: 'instant' as ScrollBehavior }); };
+		restore();
+		const onLoad = () => { restore(); smoothAgain(); };
+		if (document.readyState === 'complete') onLoad();
+		else addEventListener('load', onLoad, { once: true });
+		addEventListener('popstate', () => {
+			const y = savedY();
+			if (Number.isFinite(y)) scrollTo({ top: y, behavior: 'instant' as ScrollBehavior });
+			else if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView({ behavior: 'instant' as ScrollBehavior });
+			else scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+		});
+		addEventListener('pageshow', (e) => { if ((e as PageTransitionEvent).persisted) smoothAgain(); });
+		let moved = false; // an in-page jump (#anchor) adds a history entry on this page
+		addEventListener('hashchange', () => { moved = true; });
+		const fromSite = () => {
+			try { return !!document.referrer && new URL(document.referrer).origin === location.origin && new URL(document.referrer).pathname !== location.pathname; }
+			catch { return false; }
+		};
+		document.addEventListener('click', (e) => {
+			const a = (e.target as Element | null)?.closest?.('a[data-top-back], a.zf-back-link');
+			if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+			if (moved || history.length < 2 || !fromSite()) return;
+			e.preventDefault();
+			html.style.scrollBehavior = 'auto';
+			history.back();
+		});
+	}
+
 	const targets = document.querySelectorAll('[data-reveal]');
 	// threshold: 0 + a bottom rootMargin (not a % threshold) so this triggers
 	// consistently regardless of section height — a percentage threshold like

@@ -2,7 +2,7 @@
 // Étape 12, bloc « Download CV »: the same block everywhere (home, About,
 // footer). Lucide file-down icon, "Download CV:" in normal text, PDF and
 // DOCX in orange, no underline, each a 44 px target, same space both
-// sides of the dot. `tone="footer"` keeps the footer's white-70% text.
+// sides of the dot. `tone="footer"` keeps the footer’s white-70% text.
 // Étape 13, 8: a file icon before PDF (file-text) and before DOCX
 // (file-pen-line, an editable Word file), same line style, orange with
 // the link; the leading file-down icon goes, so the block stays on one
@@ -13,16 +13,15 @@ const { class: cls = '', tone = 'page' } = Astro.props;
 const text = tone === 'footer' ? 'text-white/70' : 'text-muted';
 ---
 
-<p class:list={['cv-dl inline-flex flex-wrap items-center text-sm', text, cls]}>
-	<span>Download CV:</span>
-	<a href="/cv/CV-David-Bitan.pdf" download class="cv-dl-link"><Icon name="file-text" class="size-4 shrink-0" />PDF</a>
-	<span aria-hidden="true">·</span>
-	<a href="/cv/CV-David-Bitan.docx" download class="cv-dl-link"><Icon name="file-pen-line" class="size-4 shrink-0" />DOCX</a>
+{/* Étape 15, S50: « [icon] CV PDF   [icon] CV Word »; no "Download", no
+    dots; 24 px between the two links (the gap; no side padding). */}
+<p class:list={['cv-dl inline-flex flex-wrap items-center gap-x-6 text-sm', text, cls]}>
+	<a href="/cv/CV-David-Bitan.pdf" download class="cv-dl-link"><Icon name="file-text" class="size-4 shrink-0" />CV PDF</a>
+	<a href="/cv/CV-David-Bitan.docx" download class="cv-dl-link"><Icon name="file-pen-line" class="size-4 shrink-0" />CV Word</a>
 </p>
 
 <style>
-	/* 44 px wide and tall targets; the 6 px side padding gives the same
-	   space on both sides of the dot. */
+	/* 44 px tall targets (each link is wider than 44 px). */
 	.cv-dl-link {
 		display: inline-flex;
 		min-height: 44px;
@@ -30,7 +29,6 @@ const text = tone === 'footer' ? 'text-white/70' : 'text-muted';
 		align-items: center;
 		justify-content: center;
 		gap: 4px;
-		padding-inline: 6px;
 		font-weight: 600;
 		color: var(--color-accent-text);
 		text-decoration: none;

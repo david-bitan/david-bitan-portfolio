@@ -16,8 +16,23 @@ const pick = (ref: CardRef) =>
 	typeof ref === 'number' ? { ...cards[ref - 1], width: CARD_WIDTHS[ref - 1] } : extraCards[ref];
 const A = L && pick(L.a.card);
 const B = L && pick(L.b.card);
-const orange = L?.doodles.find((d) => d.orange);
-const firstGray = L?.doodles.find((d) => !d.orange);
+// Étape 15, S60: phones and tablets show the desktop composition itself,
+// scaled down to the column. First paint uses this estimate of its box (at a
+// 342 px column, a 390 px phone); the script below measures the real box.
+const est = (() => {
+	if (!L || !A || !B) return null;
+	const cardH = (c: any) => 32 + 20.6 + 2 + 17.9 + 12 + ((c.width - 32) * c.h) / c.w;
+	const boxes: number[][] = [
+		[L.a.x, L.a.y, L.a.x + A.width, L.a.y + cardH(A)],
+		[L.b.x, L.b.y, L.b.x + B.width, L.b.y + cardH(B)],
+		[L.pill.x, L.pill.y, L.pill.x + (L.pill.w ?? 200), L.pill.y + 53.4],
+		...L.doodles.map((d) => [d.x - 24 * d.s, d.y - 24 * d.s, d.x + 24 * d.s, d.y + 24 * d.s]),
+	];
+	const x0 = Math.min(...boxes.map((b) => b[0])), y0 = Math.min(...boxes.map((b) => b[1]));
+	const w = Math.max(...boxes.map((b) => b[2])) - x0, h = Math.max(...boxes.map((b) => b[3])) - y0;
+	const k = Math.min(1, 342 / w);
+	return { x0: +x0.toFixed(1), y0: +y0.toFixed(1), k: +k.toFixed(4), h: Math.round(h * k) };
+})();
 const dd = (d: { name: string; x: number; y: number; r: number; s: number; orange?: boolean }, x = d.x, y = d.y, k = 1) =>
 	`<g class="ptv-dd${d.orange ? ' is-orange' : ''}" transform="translate(${x} ${y}) rotate(${d.r}) scale(${+(d.s * k).toFixed(3)})">` +
 	`<g filter="url(#ptv-p1)" stroke-width="3.2" opacity="0.85">${DOODLES[d.name]}</g>` +
@@ -25,10 +40,10 @@ const dd = (d: { name: string; x: number; y: number; r: number; s: number; orang
 ---
 
 {L && A && B && (
-	<div class="ptv2" style={`--bloc:${L.blocTop}px`}>
+	<div class="ptv2" data-ptv2 style={`--bloc:${L.blocTop}px;--ph:${est!.h}px;--pt:scale(${est!.k}) translate(${-est!.x0}px, ${-est!.y0}px)`}>
 		<svg class="ptv-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs set:html={DOODLE_FILTERS} /></svg>
 
-		{/* desktop */}
+		{/* desktop; phones and tablets: the same stage, scaled (étape 15, S60) */}
 		<div class="ptv2-stage" role="group" aria-label="Product highlights">
 			<svg class="ptv2-dd" width="1200" height={L.blocTop} viewBox={`0 0 1200 ${L.blocTop}`} aria-hidden="true" focusable="false" set:html={L.doodles.map((d) => dd(d)).join('')} />
 			{[[A, L.a, 1], [B, L.b, 2]].map(([c, p, z]: any) => (
@@ -46,24 +61,6 @@ const dd = (d: { name: string; x: number; y: number; r: number; s: number; orang
 			</div>
 		</div>
 
-		{/* phones and tablets */}
-		<div class="ptv2-phone" role="group" aria-label="Product highlights">
-			{[[A, 1], [B, 2]].map(([c, z]: any) => (
-				<figure class:list={['ptv-card radius-box bg-card', z === 1 ? 'ptv-pa' : 'ptv-pb']} style={`--w:${c.width}`}>
-					<figcaption>
-						<p class="ptv-t">{c.title}</p>
-						<p class="ptv-d">{c.desc}</p>
-					</figcaption>
-					<img src={c.src} width={c.w / 2} height={c.h / 2} alt={c.alt} loading="lazy" decoding="async" class="ptv-img" />
-				</figure>
-			))}
-			<div class="ptv-pill ptv-pp radius-box" style={`${L.pill.w ? `width:${L.pill.w}px;` : ''}${L.pill.bg ? `--pill-bg:${L.pill.bg};` : ''}`}>
-				<span class="ptv-pill-ic" style={`background:${L.pill.color}`} aria-hidden="true">{L.pill.icon}</span>
-				<span class="ptv-pill-tx"><span class="ptv-l1">{L.pill.l1}</span><span class="ptv-l2">{L.pill.l2}</span></span>
-			</div>
-			<svg class="ptv2-pdd" width="60" height="120" viewBox="0 0 60 120" aria-hidden="true" focusable="false"
-				set:html={(orange ? dd(orange, 30, 26, 0.8) : '') + (firstGray ? dd(firstGray, 22, 88, 0.8) : '')} />
-		</div>
 	</div>
 )}
 
@@ -88,9 +85,37 @@ const dd = (d: { name: string; x: number; y: number; r: number; s: number; orang
 			hero.style.setProperty('--glyph', `${top.toFixed(2)}px`);
 		});
 	};
-	fit();
-	document.fonts?.ready.then(fit);
-	document.querySelectorAll('[data-ptv-hero]').forEach((h) => new ResizeObserver(fit).observe(h));
+	// Étape 15, S60: phones and tablets, the stage is cropped to the box of
+	// what it shows (cards, pill, drawings) and scaled to the column.
+	const fitPhone = () => {
+		if (matchMedia('(min-width: 1024px)').matches) return;
+		document.querySelectorAll<HTMLElement>('[data-ptv2]').forEach((host) => {
+			const stage = host.querySelector<HTMLElement>('.ptv2-stage');
+			if (!stage) return;
+			const prev = stage.style.transform;
+			stage.style.transform = 'none';
+			const o = stage.getBoundingClientRect();
+			let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+			const add = (r: DOMRect) => {
+				if (!r.width && !r.height) return;
+				x0 = Math.min(x0, r.left - o.left); y0 = Math.min(y0, r.top - o.top);
+				x1 = Math.max(x1, r.right - o.left); y1 = Math.max(y1, r.bottom - o.top);
+			};
+			stage.querySelectorAll(':scope > figure, :scope > .ptv-pill, .ptv2-dd > g').forEach((el) => add(el.getBoundingClientRect()));
+			stage.style.transform = prev;
+			if (!isFinite(x0)) return;
+			const w = x1 - x0, h = y1 - y0, room = host.clientWidth;
+			const k = Math.min(1, room / w);
+			const dx = k < 1 ? 0 : (room - w) / 2;
+			host.style.setProperty('--ph', `${(h * k).toFixed(1)}px`);
+			host.style.setProperty('--pt', `translate(${dx.toFixed(1)}px, 0) scale(${k.toFixed(4)}) translate(${(-x0).toFixed(1)}px, ${(-y0).toFixed(1)}px)`);
+		});
+	};
+	const fitAll = () => { fit(); fitPhone(); };
+	fitAll();
+	document.fonts?.ready.then(fitAll);
+	addEventListener('load', fitPhone);
+	document.querySelectorAll('[data-ptv-hero]').forEach((h) => new ResizeObserver(fitAll).observe(h));
 </script>
 
 <style>
@@ -198,7 +223,25 @@ const dd = (d: { name: string; x: number; y: number; r: number; s: number; orang
 
 	/* ---------- desktop ---------- */
 	.ptv2-stage {
-		display: none;
+		display: block;
+		position: absolute;
+		left: 0;
+		width: 1200px;
+		height: var(--bloc);
+		transform-origin: 0 0;
+	}
+	.ptv2-stage > * {
+		position: absolute;
+	}
+	.ptv2-dd {
+		left: 0;
+		top: 0;
+		overflow: visible;
+		z-index: 0;
+		pointer-events: none;
+	}
+	.ptv2-stage .ptv-pill {
+		z-index: 3;
 	}
 	@media (min-width: 1024px) {
 		.ptv2 {
@@ -207,83 +250,36 @@ const dd = (d: { name: string; x: number; y: number; r: number; s: number; orang
 			pointer-events: none;
 		}
 		.ptv2-stage {
-			display: block;
-			position: absolute;
-			left: 0;
 			top: var(--glyph, 8px);
-			width: 1200px;
-			height: var(--bloc);
 			transform: scale(var(--f, 1));
-			transform-origin: 0 0;
 		}
 		.ptv2-stage > * {
-			position: absolute;
 			pointer-events: auto;
 		}
-		.ptv2-dd {
-			left: 0;
+	}
+
+	/* ---------- phones and tablets (étape 15, S60) ----------
+	   The desktop composition itself (2 cards, pill, 3 drawings, same
+	   places), cropped to its own box and scaled to the column width; never
+	   larger than on desktop (tablets: centred at its desktop size). The
+	   script sets --ph (height) and --pt (scale + offset) from the real box. */
+	@media (max-width: 1023.98px) {
+		.ptv2 {
+			position: relative;
+			margin-top: var(--sp-title);
+			height: var(--ph);
+			/* the unscaled 1200 px stage must not widen the page or catch taps
+			   outside the picture; shadows keep 24 px of room */
+			overflow: clip;
+			overflow-clip-margin: 24px;
+		}
+		.ptv2-stage {
 			top: 0;
-			overflow: visible;
-			z-index: 0;
+			transform: var(--pt);
 			pointer-events: none;
 		}
-		.ptv2-stage .ptv-pill {
-			z-index: 3;
-		}
-		.ptv2-phone {
-			display: none;
-		}
-	}
-
-	/* tablets: the cards keep their desktop size (never wider) */
-	@media (min-width: 768px) and (max-width: 1023.98px) {
-		.ptv2-phone {
-			max-width: 560px !important;
-		}
-		.ptv2-phone .ptv-card {
-			width: calc(var(--w) * 1px) !important;
-		}
-	}
-
-	/* ---------- phones and tablets ---------- */
-	@media (max-width: 1023.98px) {
-		.ptv2-phone {
-			position: relative;
-			display: flex;
-			flex-direction: column;
-			max-width: 390px;
-			margin-top: 32px;
-			padding-bottom: 56px; /* the pill sits below the 2nd card, on its bottom padding only */
-		}
-		/* card widths keep the desktop proportions, never wider than on desktop */
-		.ptv2-phone .ptv-card {
-			width: calc(var(--w) / 390 * 100%);
-		}
-		.ptv-pa {
-			align-self: flex-start;
-			z-index: 1;
-		}
-		.ptv-pb {
-			align-self: flex-end;
-			margin-top: -14px; /* covers the bottom padding of the first card only (16 px) */
-			z-index: 2;
-		}
-		.ptv-pp {
-			position: absolute;
-			left: 0;
-			bottom: 0;
-			z-index: 3;
-			max-width: 64%;
-		}
-		.ptv2-phone .ptv-d {
-			text-wrap: balance;
-		}
-		.ptv2-pdd {
-			position: absolute;
-			right: 0;
-			top: 0;
-			overflow: visible;
-			z-index: 0;
+		.ptv2-stage > :not(.ptv2-dd) {
+			pointer-events: auto;
 		}
 	}
 </style>

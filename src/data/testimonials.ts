@@ -1,8 +1,8 @@
 // LinkedIn recommendations, quoted word for word (2026-11-12). Only edits:
-// two long dashes turned into ": " / ", " (site rule, OK'd by David) and one
+// two long dashes turned into ": " / ", " (site rule, OK’d by David) and one
 // typo fixed ("producr" -> "product"). `excerpt` is a verbatim cut of `text`,
 // cuts marked […]. Never rephrase inside quotes. No photos: the words are
-// the proof (13/11: photos added with each author's consent, supplied by David). Source for everything: LINKEDIN_RECOMMENDATIONS_URL.
+// the proof (13/11: photos added with each author’s consent, supplied by David). Source for everything: LINKEDIN_RECOMMENDATIONS_URL.
 export const LINKEDIN_RECOMMENDATIONS_URL =
 	'https://www.linkedin.com/in/david-bitan/details/recommendations/';
 
@@ -22,6 +22,21 @@ export interface Testimonial {
 // the home page and on /about#recommendations.
 export const testimonials: Testimonial[] = [
 	{
+		name: 'Elad Shachar',
+		photo: '/recommendations/elad-shachar.webp',
+		role: 'Head of Product, Dragontail (Yum! Brands)',
+		relation: 'Managed David directly',
+		featured: true, // étape 15 ajout 1, S43: first everywhere
+		excerpt:
+			'I managed David directly at Ryze Beyond for almost six years. He’s an exceptional designer, with a way of thinking unlike any other designer I’ve worked with. His design systems are among the most solid I’ve seen.',
+		text: [
+			'I managed David directly at Ryze Beyond for almost six years. He’s an exceptional designer, with a way of thinking unlike any other designer I’ve worked with. His design systems are among the most solid I’ve seen.',
+			'David is self-taught, new technology has always fascinated him. He has been following AI closely since day one.',
+			'David is super fast and adapts to any project. His work is always polished and always delivered on time.',
+			'I recommend David without the slightest hesitation.',
+		],
+	},
+	{
 		name: 'Leah Grantz',
 		photo: '/recommendations/leah-grantz.webp',
 		role: 'Product Manager, Ryze Beyond',
@@ -36,11 +51,23 @@ export const testimonials: Testimonial[] = [
 		],
 	},
 	{
+		name: 'Ben Calfon',
+		photo: '/recommendations/ben-calfon.webp',
+		role: 'Technical Product Lead, Ryze Beyond',
+		relation: 'Worked with David on the same team',
+		featured: true,
+		excerpt:
+			'David is a natural talent. He always starts from the user […] and more than once he caught gaps I hadn’t seen myself. Any product team would be lucky to have him.',
+		text: [
+			'I worked closely with David at Ryze, where I was technical product lead and he was the designer on our internal platform, used across the entire company. The challenge was letting people work with complex data in a way that felt simple, and that took deep UX thinking. David is a natural talent. He always starts from the user, stays on top of the latest in design, and more than once he caught gaps I hadn’t seen myself. Any product team would be lucky to have him.',
+		],
+	},
+	{
 		name: 'Hadas Blitz',
 		photo: '/recommendations/hadas-blitz.webp',
 		role: 'Product Manager, Playright (Ryze Beyond)',
 		relation: 'Worked with David on the same team',
-		featured: true,
+		featured: false, // étape 15, S56: on About only (home since ajout 1: Elad, Leah, Ben)
 		excerpt:
 			'During our four years working together at RYZE, he led the design of our gaming comparison platform, bringing authentic gaming aesthetics and visual flair to the product.',
 		text: [
@@ -54,7 +81,7 @@ export const testimonials: Testimonial[] = [
 		photo: '/recommendations/daniel-zvi.webp',
 		role: 'Product Manager, Ryze Beyond',
 		relation: 'Worked with David on the same team',
-		featured: true,
+		featured: false, // étape 15 ajout 1, S43: on About only (home: Elad, Leah, Ben)
 		excerpt:
 			'He’s a true professional and a perfectionist in the best sense: every design choice he makes has clear logic behind it, and he always takes the time to explain his thinking.',
 		text: [

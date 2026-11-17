@@ -43,7 +43,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
     With filters: the bar sticks under the header and "← Back" appears pinned
     on its left; only the filters scroll behind it (David, 15/11).
     Without filters ("bare"): a thin bar with "← Back to …" fades in, pinned
-    under the header, once the page's own top back link has scrolled away. */}
+    under the header, once the page’s own top back link has scrolled away. */}
 <div
 	id="zone-filters-bar"
 	data-zf
@@ -142,6 +142,9 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 			const matchTheme = selectedTheme === 'all' || label.includes(selectedTheme);
 			sec.classList.toggle('hidden', !(matchDevice && matchTheme));
 		});
+		// Étape 15, S46: no rule above the first zone still shown.
+		const first = sections.find((s) => !s.classList.contains('hidden'));
+		sections.forEach((s) => s.classList.toggle('zone-first', s === first));
 	}
 
 	deviceBtns.forEach((b) =>

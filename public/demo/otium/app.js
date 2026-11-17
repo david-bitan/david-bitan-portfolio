@@ -2327,7 +2327,7 @@
 
 	/* ---------------- boot ---------------- */
 	const q = new URLSearchParams(location.search);
-	let startLang = "en"; try { startLang = localStorage.getItem("otium-lang") || "en"; } catch {}
+	let startLang = "en"; /* étape 15, S68: always opens in English (never a saved language); a ?lang= link still picks one */
 	if (q.get("lang")) startLang = q.get("lang");
 	I.set(startLang); applyCityLang();
 	syncInert(); document.querySelectorAll(".drawer").forEach((d) => new MutationObserver(syncInert).observe(d, { attributes: true, attributeFilter: ["aria-hidden"] }));

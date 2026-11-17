@@ -62,7 +62,7 @@ export const allProjects: FullProject[] = [
 
 	{
 		slug: 'sonary-dashboard',
-		title: `Sonary · Software Stack Manager`,
+		title: `Sonary Software Stack Manager`,
 		client: `Ryze Beyond`,
 		year: '2026',
 		category: 'SaaS',
@@ -70,7 +70,7 @@ export const allProjects: FullProject[] = [
 		shortDesc: `A SaaS to track software subscriptions: dark and light design system, AI chat for natural-language queries, 96 shipped screens from a 2,000+ frame Figma project.`,
 		fullDesc: `Designed a SaaS to track software subscriptions: full dark/light design system, 96 shipped screens from a 2,000+ frame Figma project, AI chat bot for natural-language queries. See structured case study below.`,
 		liveUrl: 'https://sonary.com',
-		liveUrlNote: `Note: to reach the actual dashboard, click 'Login/Sign up' at the top right. Alternatively, 'Get started' leads to a landing page with a Sign up button.`,
+		liveUrlNote: `Note: to reach the actual dashboard, click “Login/Sign up” at the top right. Alternatively, “Get started” leads to a landing page with a Sign up button.`,
 		scope: [
 			`6 core surfaces, including an AI chat for natural-language queries`,
 			`96 shipped screens, from a 2,000+ frame Figma project`,
@@ -81,9 +81,9 @@ export const allProjects: FullProject[] = [
 		sections: [
 			{
 				heading: 'Context',
-				body: `Software subscriptions are messy: teams sign up for SaaS across departments, individual receipts sit in different inboxes, and nobody has a clean picture of what's actually being spent, used, or duplicated.
+				body: `Software subscriptions are messy: teams sign up for SaaS across departments, individual receipts sit in different inboxes, and nobody has a clean picture of what’s actually being spent, used, or duplicated.
 
-Sonary was Ryze Beyond's answer: a single dashboard that gives users a full view of their subscription stack (spend per month, potential savings, unused tools) while surfacing personalized alternatives: recommendations funded through Sonary's affiliate model, which keeps the product free for end users.`,
+Sonary was Ryze Beyond’s answer: a single dashboard that gives users a full view of their subscription stack (spend per month, potential savings, unused tools) while surfacing personalized alternatives: recommendations funded through Sonary’s affiliate model, which keeps the product free for end users.`,
 			},
 			{
 				heading: 'Role',
@@ -99,7 +99,7 @@ Design system extended from the Sonary Website foundation (already almost 7 year
 			},
 			{
 				heading: 'Key challenge',
-				body: `An initial visual direction, defined collectively upfront, didn't pass top-level review, deemed too close to what competitors were shipping.
+				body: `An initial visual direction, defined collectively upfront, didn’t pass top-level review, deemed too close to what competitors were shipping.
 
 I then brought forward the alternative I had been proposing from the start; once validated, it required a full re-design: new palette, new iconography, addition of a dark mode (only one mode existed at first), applied across a project of 2,000+ frames. Delivered on time.`,
 			},
@@ -225,13 +225,13 @@ Building on top of the Sonary Website design system, itself mature after almost 
 	},
 	{
 		slug: 'sonary-website',
-		title: `Sonary · Marketing website`,
+		title: `Sonary Marketing website`,
 		client: `Ryze Beyond`,
 		year: '2019 – 2026',
 		category: 'SaaS',
 		categories: ['SaaS', 'UI/UX'],
-		shortDesc: `Three major redesigns of Sonary's SaaS comparison platform since 2019: 1,400+ indexed pages across 37 software categories, WordPress to Webflow migration.`,
-		fullDesc: `Product designer on Sonary's SaaS comparison and review platform since 2019. Design system that later seeded the Sonary Dashboard product. See structured case study below.`,
+		shortDesc: `Three major redesigns of Sonary’s SaaS comparison platform since 2019: 1,400+ indexed pages across 37 software categories, WordPress to Webflow migration.`,
+		fullDesc: `Product designer on Sonary’s SaaS comparison and review platform since 2019. Design system that later seeded the Sonary Dashboard product. See structured case study below.`,
 		liveUrl: 'https://sonary.com',
 		scope: [
 			`3 major redesigns since 2019`,
@@ -250,13 +250,13 @@ Building on top of the Sonary Website design system, itself mature after almost 
 			},
 			{
 				heading: 'Approach',
-				body: `Constant benchmarking of domain references (G2, Capterra, Software Advice) cross-referenced with Dribbble and Pinterest to avoid the "directory" look. On the latest redesign, the research phase was accelerated with Midjourney, Firefly and Figma AI for moodboards and concept exploration.
+				body: `Constant benchmarking of domain references (G2, Capterra, Software Advice) cross-referenced with Dribbble and Pinterest to avoid the “directory” look. On the latest redesign, the research phase was accelerated with Midjourney, Firefly and Figma AI for moodboards and concept exploration.
 
 The design system was built for the site starting in 2019 (color tokens, Inter typography, radius, light and dark modes), later extended to the Sonary Dashboard product shipped in 2026. Components were designed from day one as editable templates so the content team could add reviews without design intervention.`,
 			},
 			{
 				heading: 'Key challenge',
-				body: `Designing a system that could absorb the site's growth: 37 very different software categories (finance, AI, HR, e-commerce…) and 1,400+ indexed, CMS-generated pages, without losing consistency or editorial tone. Every template needed to feel warm and inviting despite the functional density (comparison tables, review cards, scoring, lineups).
+				body: `Designing a system that could absorb the site’s growth: 37 very different software categories (finance, AI, HR, e-commerce…) and 1,400+ indexed, CMS-generated pages, without losing consistency or editorial tone. Every template needed to feel warm and inviting despite the functional density (comparison tables, review cards, scoring, lineups).
 
 Addressed through a strict smart-component hierarchy and a library of editorial patterns (illustrated headers, quote blocks, category chips) that break up the dense sections.`,
 			},
@@ -369,12 +369,12 @@ Addressed through a parametric design system in Figma: each smart component read
 	},
 	{
 		slug: 'ryze-brand',
-		title: `Ryze Beyond · Brand`,
+		title: `Ryze Beyond`,
 		client: `Ryze Beyond`,
 		year: '2026',
 		category: 'Branding',
 		categories: ['Branding', 'UI/UX'],
-		shortDesc: `The third full redesign of Ryze Beyond's marketing website, delivered in 2026, with an abstract-illustration design system built from scratch.`,
+		shortDesc: `The third full redesign of Ryze Beyond’s marketing website, delivered in 2026, with an abstract-illustration design system built from scratch.`,
 		pageIntro: "The third full redesign of Ryze Beyond’s marketing website, delivered in 2026, with an abstract-illustration design system built from scratch. The site presents the company’s mission, products, team and open jobs. I benchmarked tech sites such as Linear, Vercel and Stripe, and kept the signature brand colors for continuity.",
 		fullDesc: `Product designer on the 2026 redesign of ryzebeyond.com: the marketing website for the company behind Sonary Dashboard, Sonary Website, Top5, Playright and other products. Third full redesign of the site, with an abstract-illustration design system built from scratch. See structured case study below.`,
 		liveUrl: 'https://ryzebeyond.com/',
@@ -394,7 +394,7 @@ Addressed through a parametric design system in Figma: each smart component read
 			},
 			{
 				heading: 'Approach',
-				body: `Benchmarking of tech corporate sites (Linear, Vercel, Stripe, Notion, Figma) and the marketing sites of the domain's main comparison platforms (G2, Capterra, Top10), cross-referenced with Dribbble, Pinterest and Behance to avoid the "generic corporate" look. Research phase accelerated with Midjourney, Firefly, Figma AI, ChatGPT and Leonardo AI for moodboards, illustrative concepts and exploratory tests. Design system built from scratch for this project, drawing on elements inherited from the previous version (signature brand colors, a few graphic elements kept for visual continuity).`,
+				body: `Benchmarking of tech corporate sites (Linear, Vercel, Stripe, Notion, Figma) and the marketing sites of the domain’s main comparison platforms (G2, Capterra, Top10), cross-referenced with Dribbble, Pinterest and Behance to avoid the “generic corporate” look. Research phase accelerated with Midjourney, Firefly, Figma AI, ChatGPT and Leonardo AI for moodboards, illustrative concepts and exploratory tests. Design system built from scratch for this project, drawing on elements inherited from the previous version (signature brand colors, a few graphic elements kept for visual continuity).`,
 			},
 			{
 				heading: 'Key challenge',
@@ -455,7 +455,7 @@ The solution: a system of abstract illustrations (colored geometric shapes, text
 	},
 	{
 		slug: 'sonary-mailer',
-		title: `Sonary · Email templates`,
+		title: `Sonary Email templates`,
 		client: `Ryze Beyond`,
 		year: '2025',
 		category: 'SaaS',
@@ -483,7 +483,7 @@ The solution: a system of abstract illustrations (colored geometric shapes, text
 			},
 			{
 				heading: 'Key challenge',
-				body: `Email client technical constraints are rigid: maximum 600-pixel width on desktop (past that, clients truncate or zoom), and mobile rendering that must adapt automatically to the device's width, with a design reference at 375 pixels. This means a much narrower grid than standard web, and a mobile-first layout designed at 375 and scaled up to 600.
+				body: `Email app technical constraints are rigid: maximum 600-pixel width on desktop (past that, apps truncate or zoom), and mobile rendering that must adapt automatically to the device’s width, with a design reference at 375 pixels. This means a much narrower grid than standard web, and a mobile-first layout designed at 375 and scaled up to 600.
 
 Addressed through a master template with two strict breakpoints (Desktop 600, Mobile 375) and components that restructure vertically on mobile: each block designed to be added, removed, or duplicated without breaking the layout.`,
 			},
@@ -493,7 +493,7 @@ Addressed through a master template with two strict breakpoints (Desktop 600, Mo
 			},
 			{
 				heading: 'What I took from it',
-				body: `An email isn't a web page: technical constraints (width, heterogeneous email clients, table-based rendering) force a different discipline. Designing a master template modular enough to absorb every future campaign is more valuable than one polished one-off: it's a design system in a very small footprint.`,
+				body: `An email isn’t a web page: technical constraints (width, heterogeneous email apps, table-based rendering) force a different discipline. Designing a master template modular enough to absorb every future campaign is more valuable than one polished one-off: it’s a design system in a very small footprint.`,
 			},
 		],
 		thumbnail: 'https://res.cloudinary.com/akael/image/upload/v1785342153/portfolio/sonary-mailer/desktop/mailer-1-desktop.webp',
@@ -521,7 +521,7 @@ Addressed through a master template with two strict breakpoints (Desktop 600, Mo
 		categories: ['iGaming', 'UI/UX'],
 		shortDesc: `A UK online casino comparison platform: redesign of the homepage and ranking pages, with hover animations coded in HTML/CSS, under UKGC rules.`,
 		pageIntro: "A UK online casino comparison platform: redesign of the homepage and ranking pages, with hover animations coded in HTML/CSS, under UKGC (UK Gambling Commission, the UK’s gambling regulator) rules. Players compare offers through reviews, side-by-side tables and top lists, with pages by game type and payment method. I handed the hover animations to the developers ready to integrate, and worked with the PM, developers, content writers, marketing and SEO.",
-		fullDesc: `Designer on Playright, Ryze Beyond's UK online casino comparison platform: redesign of the homepage and the ranking pages, with hover animations I coded in HTML/CSS. See structured case study below.`,
+		fullDesc: `Designer on Playright, Ryze Beyond’s UK online casino comparison platform: redesign of the homepage and the ranking pages, with hover animations I coded in HTML/CSS. See structured case study below.`,
 		liveUrl: 'https://playright.co.uk/casino/reviews/',
 		liveUrlNote: `Note: the site is geo-restricted to the UK. A VPN is required to view it from outside.`,
 		scope: [
@@ -561,7 +561,7 @@ The project also held a particular status in the Ryze roadmap: design often ran 
 			'https://res.cloudinary.com/akael/image/upload/v1785341995/portfolio/playright/home-page/mobile---375px---container-343px.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785341997/portfolio/playright/home-page/tablet---768px---container-720px.webp',
 			// Two of the three identical Sky Vegas cards cut out (CL2, 13/11): the
-			// capture's top up to the first card, then everything after the third,
+			// capture’s top up to the first card, then everything after the third,
 			// joined by Cloudinary. The original file is untouched.
 			'https://res.cloudinary.com/akael/image/upload/c_crop,w_375,h_1729,x_0,y_0/c_pad,w_375,h_11775,g_north,b_rgb:0b0b13/l_portfolio:playright:prodlist:mobile---375px---container-343px,c_crop,w_375,h_10046,x_0,y_2159/fl_layer_apply,g_south/v1785342000/portfolio/playright/prodlist/mobile---375px---container-343px.webp',
 			'https://res.cloudinary.com/akael/image/upload/v1785342002/portfolio/playright/prodlist/tablet---768px---container-720px.webp',
@@ -612,7 +612,7 @@ The remaining captures gather more personal designs: music apps (MUSIK, HitShot,
 	},
 	{
 		slug: 'branding-old',
-		title: `Wochat · App and brand design`, // étape 14, ajout 1 (S34); was `Digital campaigns & ad design (2006 – 2011)`
+		title: `Wochat App and brand design`, // étape 14, ajout 1 (S34); was `Digital campaigns & ad design (2006 – 2011)`
 		client: `Wochat`, // was `Arc Interactive / Publicis`
 		year: '2017 – 2018', // was '2006 – 2011'
 		category: 'Branding',
@@ -650,11 +650,11 @@ The captures below gather a selection of 13 pieces of work from that period.`,
 	},
 	{
 		slug: 'gamingtech',
-		title: `GamingTech · Casino & sports betting platforms`,
+		title: `GamingTech Casino & sports betting platforms`,
 		client: `GamingTech (SBTech Group)`,
 		year: '2015 – 2017',
 		category: 'iGaming',
-		shortDesc: `Sole designer on GamingTech's three brands (10Bet, Real Deal Bet, Bet Rally), each running a casino and a sports betting vertical, from 2015 to 2017.`,
+		shortDesc: `Sole designer on GamingTech’s three brands (10Bet, Real Deal Bet, Bet Rally), each running a casino and a sports betting vertical, from 2015 to 2017.`,
 		pageIntro: "Sole designer on GamingTech’s three brands (10Bet, Real Deal Bet, Bet Rally), each running a casino and a sports betting vertical, from 2015 to 2017. I handled all six sites in parallel and owned the branding, specifications and design of the three brands. For mobile and web, I drew the sketches and wireframes, then the full UI: game lobbies, bonus systems, deposit funnels and responsive landing pages. I also produced a large volume of promotional banners and interactive calendars, with animations delivered as videos, Flash (SWF) files and animated HTML5 / CSS3 banners.",
 		/* Étape 14, ajout 2 (B): repeated the text on the left (pageIntro),
 		   no longer shown on this page, kept here:
@@ -715,7 +715,7 @@ Deliverables covered game lobbies, bonus systems, deposit funnels, promotional b
 	},
 	{
 		slug: 'tradologic',
-		title: `Tradologic · Casino platforms`,
+		title: `Tradologic Casino platforms`,
 		client: `Tradologic`,
 		year: '2011 – 2013',
 		category: 'iGaming',

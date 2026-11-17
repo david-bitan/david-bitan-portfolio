@@ -27,23 +27,23 @@ const defaultNote = hasFormspree
 	<main id="main" tabindex="-1">
 	<ZoneFilters backHref="/" backLabel="Back to home" />
 
-	<section class="mx-auto max-w-[1200px] px-6 pt-8 pb-24 sm:pt-10 min-[1248px]:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 pt-8 sm:pt-10 min-[1248px]:px-0" data-reveal>
 		{/* Étape 12, 6: a "← Back" link at the top of every inner page. */}
 		<a href="/" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><span class="arr-back" aria-hidden="true">→</span>Back</a>
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">Contact</p>
 		<h1 class="mt-4 max-w-2xl text-[1.85rem] font-extrabold tracking-tight min-[374px]:text-4xl sm:text-5xl">Hiring a senior product designer?</h1>
 		{/* Étape 13, 16: smaller text, 3 lines on desktop; the form moves up. */}
 		<p class="mt-4 max-w-xl text-base text-muted">
-			I'm available now for senior and lead product design roles: based in Ashkelon, Israel,
-			hybrid or remote in the Tel Aviv area. Send me a note and I'll reply within 24 hours.
+			I’m available now for senior and lead product design roles: based in Ashkelon, Israel,
+			hybrid or remote in the Tel Aviv area. Send me a note and I’ll reply within 24 hours.
 		</p>
 
 		{/* Étape 13, 17: e-mail, phone, LinkedIn and location are in the footer;
 		    the column beside the form is gone. */}
-		<div class="mt-10 max-w-[816px]">
+		<div class="mt-title max-w-[816px]">
 			<form id="contact-form" class="flex flex-col gap-6" novalidate>
 				<!-- Honeypot: hidden from people and assistive tech, bots fill it and
-				     Formspree drops the submission (_gotcha is Formspree's own field). -->
+				     Formspree drops the submission (_gotcha is Formspree’s own field). -->
 				<div class="hidden" aria-hidden="true">
 					<label for="_gotcha">Leave this field empty</label>
 					<input id="_gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
@@ -56,7 +56,7 @@ const defaultNote = hasFormspree
 						name="name"
 						type="text"
 						required
-						class="mt-2 w-full rounded-sm border border-ink/10 bg-card px-4 py-3 text-ink outline-none focus:border-accent"
+						class="radius-box mt-2 w-full rounded-box border border-ink/10 bg-card px-4 py-3 text-ink outline-none focus:border-accent"
 					/>
 				</div>
 
@@ -68,7 +68,7 @@ const defaultNote = hasFormspree
 						name="email"
 						type="email"
 						required
-						class="mt-2 w-full rounded-sm border border-ink/10 bg-card px-4 py-3 text-ink outline-none focus:border-accent"
+						class="radius-box mt-2 w-full rounded-box border border-ink/10 bg-card px-4 py-3 text-ink outline-none focus:border-accent"
 					/>
 				</div>
 
@@ -79,24 +79,25 @@ const defaultNote = hasFormspree
 						name="message"
 						rows="6"
 						required
-						class="mt-2 w-full resize-none rounded-sm border border-ink/10 bg-card px-4 py-3 text-ink outline-none focus:border-accent"
+						class="radius-box mt-2 block w-full resize-none rounded-box border border-ink/10 bg-card px-4 py-3 text-ink outline-none focus:border-accent"
 					></textarea>
 				</div>
 
-				<div class="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+				<div class="flex flex-col items-stretch gap-4 sm:mt-2">
 					<button
 						id="submit-btn"
 						type="submit"
-						class="shrink-0 whitespace-nowrap rounded-pill bg-accent px-7 py-3.5 text-sm font-semibold text-accent-ink hover:bg-ink hover:text-bg transition-colors disabled:opacity-60 disabled:cursor-wait"
+						class="w-full whitespace-nowrap rounded-pill bg-accent px-7 py-3.5 text-sm font-semibold text-accent-ink hover:bg-ink hover:text-bg transition-colors disabled:opacity-60 disabled:cursor-wait"
 					>
 						Send message
 					</button>
-					<p id="form-note" class="text-sm text-muted" role="status" aria-live="polite">{defaultNote}</p>
+					<p id="form-note" class="text-center text-sm text-muted" role="status" aria-live="polite">{defaultNote}</p>
 				</div>
 			</form>
 
 		</div>
 	</section>
+	<div class="sec-gap"></div>
 
 	</main>
 	<Footer hideCta />
@@ -108,14 +109,14 @@ const defaultNote = hasFormspree
 	const submitBtn = document.getElementById('submit-btn');
 
 	// Keep the original class strings so we can restore them after showing a
-	// transient status ("Sending…", success, error) without wiping the note's
+	// transient status ("Sending…", success, error) without wiping the note’s
 	// layout. `text-muted` is the resting style used at load; success uses
 	// `text-accent-text`; error uses a red utility already available in globals.
 	const NOTE_CLASSES = {
-		idle: 'text-sm text-muted',
-		sending: 'text-sm text-muted',
-		success: 'text-sm text-accent-text',
-		error: 'text-sm text-[#c1121f]',
+		idle: 'text-center text-sm text-muted',
+		sending: 'text-center text-sm text-muted',
+		success: 'text-center text-sm text-accent-text',
+		error: 'text-center text-sm text-[#c1121f]',
 	};
 
 	function setNote(state, text) {
@@ -125,7 +126,7 @@ const defaultNote = hasFormspree
 	}
 
 	function fallbackMailto(data) {
-		// Used when PUBLIC_FORMSPREE_ID isn't set — opens the visitor's email
+		// Used when PUBLIC_FORMSPREE_ID isn’t set — opens the visitor’s email
 		// client pre-filled with the message body so the form still works in
 		// local dev before the ID is provisioned.
 		const name = String(data.get('name') ?? '');
@@ -140,8 +141,8 @@ const defaultNote = hasFormspree
 		event.preventDefault();
 		const data = new FormData(form);
 
-		// novalidate keeps the browser bubbles out (they don't match the site),
-		// so check the three fields here and focus the first one that's wrong.
+		// novalidate keeps the browser bubbles out (they don’t match the site),
+		// so check the three fields here and focus the first one that’s wrong.
 		const fields = ['name', 'email', 'message'].map((id) => document.getElementById(id));
 		const bad = fields.find((el) => !el.value.trim() || (el.type === 'email' && !el.checkValidity()));
 		fields.forEach((el) => el.setAttribute('aria-invalid', String(el === bad)));
@@ -170,7 +171,7 @@ const defaultNote = hasFormspree
 
 			if (res.ok) {
 				form.reset();
-				setNote('success', "Thanks, your message is on its way. I'll reply within 24 hours.");
+				setNote('success', "Thanks, your message is on its way. I’ll reply within 24 hours.");
 			} else {
 				// Formspree returns JSON with a helpful `errors` array on 4xx
 				// (missing field, spam trap, etc.). We surface a generic message

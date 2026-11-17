@@ -23,7 +23,7 @@ export interface AILabProject {
 		micro: string[];
 		interactions: string[];
 		constraints: string[];
-		/** Optional stylesheet with the demo's self-hosted fonts, loaded so the typography samples show the real faces. */
+		/** Optional stylesheet with the demo’s self-hosted fonts, loaded so the typography samples show the real faces. */
 		fontCss?: string;
 	};
 	/** Gallery images (root-relative paths under /public). */
@@ -68,11 +68,11 @@ export const aiLabProjects: AILabProject[] = [
 		eyebrow: 'Fitness · 2026',
 		shortDesc:
 			'A members club: five interlinked pages, a booking gate, a live timetable, a shop with a persistent cart, a QR guest pass, and APEX Coach, its AI chatbot, designed state by state.',
-		intro: `APEX Athletic Club is a private gym I invented and built end-to-end, and the brief I set myself was to go past the marketing page: a mini-site is easy to fake in one screen, and much harder to hold together across five.
+		intro: `APEX Athletic Club is a private gym I invented and built end-to-end. My brief was to go past the marketing page. One screen is easy to fake; five screens that hold together are much harder.
 
-The visual language is the opposite of the wellness pastel most gyms reach for. Ink canvas, one hot pink accent, one mint signal, Space Grotesk for display and JetBrains Mono for anything numeric (times, prices, capacities), so the timetable reads like a schedule board rather than a brochure. The photography is stock, so the grid imposes its own treatment (grayscale, dimmed, colour returning on hover) instead of hoping six unrelated shoots agree with each other.
+Most gyms go for soft wellness pastels, and APEX goes the other way: an ink canvas, one hot pink accent, one mint signal, Space Grotesk for display and JetBrains Mono for every number (times, prices, capacities). The timetable reads like a schedule board. The photos are stock from six unrelated shoots, so I gave them one shared treatment in the grid: grayscale and dimmed, with colour coming back on hover.
 
-Almost all of the work was in the parts that are usually faked. Booking a class is a member action, so the CTA opens an identity gate, not a payment funnel, and after signing in, the booking the visitor originally clicked resumes on its own. The seven-day timetable is generated from the real date, so it can never show a stale week. The shop derives its member discount from the list price at render time rather than storing a second number that could drift. The guest pass emits an actual ticket with a scannable QR, encoded by hand (around 200 lines of Reed-Solomon and mask scoring), and validated by decoding the rendered bitmap, because a QR that looks right and never scans is the easiest thing in the world to ship.`,
+Most of the work went into the parts that demos usually fake. Only members can book a class, so the button asks the visitor to sign in instead of sending them to pay. Once they sign in, the booking they first clicked goes through on its own. The seven-day timetable follows the real date, so it never shows an old week. The shop works out the member discount from the list price each time the page renders, so no second price can fall out of sync. The guest pass gives you a real ticket with a QR code that scans. The QR encoder is written by hand (around 200 lines of Reed-Solomon and mask scoring), and a check decodes the rendered image, since a QR that looks right but never scans is easy to ship by mistake.`,
 		aiFeature: {
 			eyebrow: 'AI UX · Assistant',
 			title: 'APEX Coach',
@@ -163,11 +163,11 @@ Almost all of the work was in the parts that are usually faked. Booking a class 
 		eyebrow: 'Personal finance · 2026',
 		shortDesc:
 			'A money app: drop the statement your bank gives you (Excel, CSV, PDF or Word) and Facet reads it in your browser, sorts every line and builds the full analysis. Then you ask questions in plain words. Seven languages, Hebrew in RTL.',
-		intro: `Facet is a self-initiated personal finance app I designed and built end-to-end. It starts from a file almost everyone has and almost nobody reads: the statement your bank lets you download. Facet turns it into an answer to the question behind it, where does my money go?
+		intro: `Facet is a self-initiated personal finance app I designed and built end-to-end. It starts from the statement your bank lets you download, a file most people have and never read, and answers the question behind it: where does my money go?
 
-You drop the file, or several. Facet finds the dates, labels and amounts on its own, whatever the format: a French bank's CSV with semicolons and decimal commas, an Excel budget sheet, a PDF statement with debit and credit columns. When it is not sure how to read a table, it asks: a preview of the file with a choice above each column, and the number of lines found updating as you go. Every merchant is then sorted into a category, first with the categories written in the file, then with common words, and only then with the AI.
+You drop the file, or several. Facet finds the dates, labels and amounts on its own, whatever the format: a French bank’s CSV with semicolons and decimal commas, an Excel budget sheet, a PDF statement with debit and credit columns. When it is not sure how to read a table, it asks: a preview of the file with a choice above each column, and the number of lines found updating as you go. Every merchant is then sorted into a category, first with the categories written in the file, then with common words, and only then with the AI.
 
-The report builds itself: money in and out, spending by category and month by month, regular payments found from their rhythm, the expenses that stand out. Above it, a question field: ask "how much do I spend on restaurants each month?" and Facet answers in one sentence, with the charts that show it. Every figure on the page opens the exact lines of your file it comes from.`,
+Facet then builds the report: money in and out, spending by category and month by month, regular payments found from their rhythm, and the expenses that stand out. Above it sits a question field. Ask “how much do I spend on restaurants each month?” and Facet answers in one sentence, with the charts that show it. Click any figure on the page to open the lines of your file it comes from.`,
 		aiFeature: {
 			eyebrow: 'AI UX · Generated interface',
 			title: 'The AI picks the screen, the code computes the numbers',
@@ -177,13 +177,13 @@ The report builds itself: money in and out, spending by category and month by mo
 			states: ['Excel, CSV, PDF, Word or text, several files at once', 'Column check when a table is unclear', 'Merchants sorted by the AI, shown for review', 'Lines left to check, fixed in one tap', 'Report: overview, where the money goes, worth knowing, regular payments', 'Question answered in one sentence plus charts', 'Lines behind any figure, with search and sort', 'Filters for period, categories and amount', 'Free AI used up: simpler reader, figures still exact', 'Dark and light themes, seven languages, Hebrew in RTL'],
 			decisions: [
 				{ title: 'No figure from the model', body: 'The AI only describes the screen: blocks, periods, filters. The page drops anything it does not understand and computes every total itself, so the model cannot invent an amount, even when it misreads the question.' },
-				{ title: 'Every number opens its lines', body: '"See the lines" sits under every figure and chart. It opens a side panel with the exact lines of the file, their line number or page, and a search, a category filter and a sort, so checking a number costs one tap.' },
-				{ title: 'Ask before guessing the columns', body: 'When a table has no header or leaves many lines aside, Facet shows a preview with a choice above each column and counts the lines found as you change them. Reading a stranger\'s file wrong is the fastest way to lose trust.' },
-				{ title: 'Rules first, the AI last', body: 'Categories written in the file come first, then common words in English and French, and only the merchants left go to the AI. Fewer calls, faster results, and the AI\'s choices are listed right after the analysis so they can be confirmed or corrected.' },
+				{ title: 'Every number opens its lines', body: '“See the lines” sits under every figure and chart. It opens a side panel with the exact lines of the file, their line number or page, and a search, a category filter and a sort, so checking a number costs one tap.' },
+				{ title: 'Ask before guessing the columns', body: 'When a table has no header or leaves many lines aside, Facet shows a preview with a choice above each column and counts the lines found as you change them. Reading a stranger’s file wrong is the fastest way to lose trust.' },
+				{ title: 'Rules first, the AI last', body: 'Categories written in the file come first, then common words in English and French, and only the merchants left go to the AI. Fewer calls, faster results, and the AI’s choices are listed right after the analysis so they can be confirmed or corrected.' },
 				{ title: 'Your file stays on your device', body: 'Files are opened in the browser: Excel without any library, PDF with PDF.js, Word with Mammoth. Only unknown merchant names are sent to the AI, never an amount, a date or an account number.' },
 				{ title: 'A question field, not a chatbot', body: 'People ask about their money, they do not want to chat. One field at the top, suggested questions written from the file itself, and an answer in one sentence above the charts. Each answer can be removed or changed, with undo.' },
 				{ title: 'Correct once, everything follows', body: 'Changing the category of one line moves every line from that merchant, and every chart, total and insight updates. One undo takes it back.' },
-				{ title: 'When the free AI runs out', body: 'The demo has a small daily allowance. When it is spent, nothing breaks: a simpler local reader answers, unknown merchants wait in "To check", and a short note says why and when the AI comes back, in the visitor\'s own time.' },
+				{ title: 'When the free AI runs out', body: 'The demo has a small daily allowance. When it is spent, nothing breaks: a simpler local reader answers, unknown merchants wait in “To check”, and a short note says why and when the AI comes back, in the visitor’s own time.' },
 				{ title: 'What I left out on purpose', body: 'No connection to a real bank, no budgets to fill in, no score or judgement on spending. The app describes, it does not lecture, and it never needs more than the file you chose to give it.' },
 				{ title: 'How I would test it', body: 'Moderated sessions with 6 to 8 people per round, each bringing an export from their own bank. I would measure how many files read correctly without the column check, how often people open the lines behind a figure, and whether they can answer three questions about their month faster than in their banking app.' },
 			],
@@ -257,11 +257,11 @@ The report builds itself: money in and out, spending by category and month by mo
 		eyebrow: 'Documents · 2026',
 		shortDesc:
 			'An AI reader for contracts, letters and terms of use. Drop a PDF or a Word file, paste a link or some text: Margin explains what matters in plain words and points to the exact passage behind every point. Ten languages, Hebrew in RTL.',
-		intro: `Margin is a self-initiated AI reader I designed and built end-to-end. It starts from a moment everyone knows: a contract, a lawyer’s letter or a page of terms lands in front of you, and you sign or scroll past it without really knowing what you agreed to.
+		intro: `Margin is a self-initiated AI reader I designed and built end-to-end. It starts from a familiar moment: a contract, a lawyer’s letter or a page of terms lands in front of you, and you sign it or scroll past without knowing what you agreed to.
 
 Margin reads the document and answers the questions you would ask a friend who knows the subject: what is in my favour, what could work against me, what must I not miss, which dates and amounts matter. Then you can ask your own questions. Every point comes with “Where it says it”, which opens the exact passage, highlighted, on the right page.
 
-The hard part of an AI reader is trust, so the design is built around one rule: a point you cannot check should not be shown. Each answer must cite a passage that was actually sent to the model, and every number in it must appear in that passage, or the point is removed before you see it. Files are read in your browser; only the useful passages go to the AI. The demo runs on an invented sample contract, and nothing it says is legal advice.`,
+People need to trust an AI reader, so I designed Margin around one rule: if you cannot check a point, you do not see it. Each answer must cite a passage the model received, and every number in the answer must appear in that passage. If not, Margin removes the point before you see it. Your browser reads the files, and only the useful passages go to the AI. The demo runs on an invented sample contract, and nothing it says is legal advice.`,
 		aiFeature: {
 			eyebrow: 'AI UX · Grounded answers',
 			title: 'Every answer points to its source',
@@ -351,9 +351,9 @@ The hard part of an AI reader is trust, so the design is built around one rule: 
 		eyebrow: 'Travel · 2026',
 		shortDesc:
 			'An AI travel agent: it reads a trip described in plain words, searches, compares and holds flights and a stay, then stops for your OK before it pays or shares your details. Five languages, Hebrew in RTL.',
-		intro: `Otium is a self-initiated AI travel agent I designed and built end-to-end. The question behind it is the one every agentic product now faces: once an AI can act for you (search, book, pay), how do you stay in control without doing the work yourself?
+		intro: `Otium is a self-initiated AI travel agent I designed and built end-to-end. It takes on a question that any agentic product has to answer: once an AI can act for you (search, book, pay), how do you stay in control without doing the work yourself?
 
-The answer I designed is an agent that works in the open. You describe a trip in your own words; Otium shows each step as it happens, flags what it assumed, and lets you correct any of it. Searching is automatic. Paying, sharing your details and going over budget always wait for an explicit yes, with a before/after view of what changes. Every booking can be cancelled from the trip, every decision is written to a trip history, and a human travel team is always one tap away.
+My answer is an agent that works in the open. You describe a trip in your own words. Otium shows each step as it happens, flags what it assumed and lets you correct any of it. Search runs on its own. Before Otium pays, shares your details or goes over budget, it waits for your explicit yes and shows a before/after view of what changes. You can cancel any booking from the trip, Otium logs every decision in a trip history, and a human travel team is one tap away.
 
 The language model only reads the request. Prices, the plan, the budget check and every action are computed in code, so the model can never invent a fare or approve a payment. The demo runs on invented airlines, stays and prices; nothing is ever booked or charged.`,
 		aiFeature: {
@@ -450,11 +450,11 @@ The language model only reads the request. Prices, the plan, the budget check an
 			'Full brand identity, menu and table booking with a demo sign-in. Designed and built with AI, every choice directed by me.',
 		metaDesc:
 			'Brand identity, menu and table booking with a demo sign-in. Designed and built with AI, every choice directed by me.',
-		intro: `Full brand identity, menu and table booking with a demo sign-in. Designed and built with AI, every choice directed by me.
+		intro: `Trattoria Fiori has a full brand identity, a menu and table booking with a demo sign-in. I designed and built it with AI, from research to finished product, and directed every choice.
 
-The design language borrows from fine-dining editorial: Playfair Display and Cormorant Garamond over a noir + brushed-gold + ivory palette, dish photography treated as painterly plates rather than product shots, and micro-typography for the menu (dotted leaders, lining figures, italic wine notes) that would look at home on a printed carte.
+The look comes from fine-dining print: Playfair Display and Cormorant Garamond on a noir, brushed-gold and ivory palette, dish photos treated like paintings, and menu details (dotted leaders, lining figures, italic wine notes) that would suit a printed carte.
 
-The build is a single self-contained page of hand-written HTML, CSS, and vanilla JS: view-transitions between sections, a lightbox-based reservation flow with a mock sign-in (demo account or email), a "My space" client area with cancel confirmation, and a hero parallax that respects reduced-motion. No frameworks, no CMS: the constraint was to see how far a single-file mini-site could be pushed with AI as the sparring partner.`,
+The site is one self-contained page of hand-written HTML, CSS and vanilla JS, with no framework and no CMS. It has view transitions between sections, a reservation flow in a lightbox with a mock sign-in (demo account or email), a “My space” client area with cancel confirmation, and a hero parallax that respects reduced motion. I set that limit to see how far a single-file mini-site could go with AI as my sparring partner.`,
 		designSystem: {
 			colors: [
 				{ name: 'Noir', hex: '#0F0E0C', role: 'Canvas · nav · deep backgrounds' },

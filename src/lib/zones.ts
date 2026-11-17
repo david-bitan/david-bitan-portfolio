@@ -45,7 +45,7 @@ function classify(url: string): {
 }
 
 // Optional per-project override map. Keys are substrings matched against the
-// image URL — the FIRST matching key wins. Used when a filename doesn't carry
+// image URL — the FIRST matching key wins. Used when a filename doesn’t carry
 // the usual `-desktop` / `-mobile` token (e.g. Sonary Website "article-hub"
 // which was uploaded before David settled on the naming convention).
 export type DeviceOverrides = Record<string, 'desktop' | 'mobile'>;
@@ -117,7 +117,7 @@ export function groupImagesByZone(
 	return zones;
 }
 
-// Auto-generated zone descriptions removed per David's ask — the h2 (zone
+// Auto-generated zone descriptions removed per David’s ask — the h2 (zone
 // label) stands on its own. Function signature kept in case we want to bring
 // back per-project custom copy later; the template already skips rendering
 // the <p> when this returns an empty string.

@@ -33,7 +33,7 @@ export const DOODLES: Record<string, string> = {
 	wine: '<path d="M-9 -16 h18 q0 16 -9 16 q-9 0 -9 -16z M0 0 v14 M-7 15 h14"/>',
 };
 
-// The two filters of the hero's hand-drawn line (annexe A), ids prefixed.
+// The two filters of the hero’s hand-drawn line (annexe A), ids prefixed.
 export const DOODLE_FILTERS =
 	'<filter id="ptv-p1" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="5" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="1.4" result="d"/><feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="2" seed="11" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.9 0.45" result="gm"/><feComposite in="d" in2="gm" operator="in"/></filter>' +
 	'<filter id="ptv-p2" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="2" seed="21" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="2.2" result="d"/><feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="1" seed="2" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0.2" result="gm"/><feComposite in="d" in2="gm" operator="in"/></filter>';

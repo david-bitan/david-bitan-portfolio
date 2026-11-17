@@ -1,7 +1,7 @@
 ---
 // hideCta: /contact already opens with its own headline, so the closing
-// "Let's talk product design." would repeat it there (2026-11-12 brief).
-// id="contact": kept as an anchor for old links (/#contact); the menu's Contact
+// "Let’s talk product design." would repeat it there (2026-11-12 brief).
+// id="contact": kept as an anchor for old links (/#contact); the menu’s Contact
 // opens the /contact page since étape 9 (F1).
 // Étape 11, 13: a real footer, same elements, better sorted.
 // Étape 12, 13-15 (redone): a « Pages » block (Lucide icons) and an identity
@@ -38,7 +38,7 @@ const pages = [
 
 <footer id="contact" class:list={['site-footer scroll-mt-20 bg-footer-bg px-6', hideCta ? 'pt-12 pb-8 sm:pt-14' : 'pt-16 pb-8 sm:pt-20']}>
 	<div class="mx-auto max-w-[1200px]">
-		{!hideCta && <h2 class="text-4xl font-extrabold tracking-tight text-footer-ink sm:text-6xl">Let's talk product design.</h2>}
+		{!hideCta && <h2 class="text-4xl font-extrabold tracking-tight text-footer-ink sm:text-6xl">Let’s talk product design.</h2>}
 
 		<div class:list={['grid grid-cols-1 lg:grid-cols-[16rem_1px_minmax(0,1fr)] lg:gap-x-16', hideCta ? 'mt-0' : 'mt-10 sm:mt-12']}>
 			{/* Étape 13, 6: no visible "Pages" title any more. */}
@@ -74,10 +74,10 @@ const pages = [
 					</li>
 					<li>
 						<a href={linkedinUrl} target="_blank" rel="noopener" class="footer-accent inline-flex min-h-11 items-center gap-2.5">
-							<Icon name="linkedin" class="footer-icon size-4 shrink-0" />LinkedIn<span class="ml-1" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span>
+							<Icon name="linkedin" class="footer-icon size-4 shrink-0" /><span>LinkedIn<span class="ext-arr" aria-hidden="true">↗</span></span><span class="sr-only"> (opens in a new tab)</span>
 						</a>
 					</li>
-					<li><DownloadCV tone="footer" /></li>
+					<li class="mt-1.5"><DownloadCV tone="footer" /></li>
 				</ul>
 			</div>
 		</div>

@@ -224,6 +224,7 @@ footer .wrap { padding-top: 20px; padding-bottom: 28px; display: flex; justify-c
 	.steps li + li::before { width: 12px; } .steps .lbl { display: none; } .steps li[aria-current="step"] .lbl { display: inline; }
 	.lead { font-size: 16.5px; }
 	.drop { padding: 28px 16px; } .drop .hide-m { display: none; }
+	.drop > .i:first-child { margin-bottom: 16px; } /* étape 15, S69: 16 px between the upload icon and « Choose files » on phones */
 	.sample { grid-template-columns: minmax(0, 1fr); } .sample .i-big { grid-row: auto; }
 	.tools { gap: 10px; } .tool { padding: 14px; } .tool span:not(.ti) { display: none; }
 	.res { padding: 18px; } .res-h { flex-direction: column; } .res-acts { justify-content: flex-start; margin-inline-start: -10px; }

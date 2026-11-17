@@ -10,6 +10,7 @@ import Testimonials from '../components/Testimonials.astro';
 import CraftSection from '../components/CraftSection.astro';
 import AboutPreview from '../components/AboutPreview.astro';
 import Footer from '../components/Footer.astro';
+import SectionRule from '../components/SectionRule.astro';
 ---
 
 <Layout
@@ -19,14 +20,24 @@ import Footer from '../components/Footer.astro';
 	<Nav />
 	<main id="main" tabindex="-1">
 	<Hero />
+	{/* Étape 15, S46: --sp-sec after the hero (no rule), a thin rule between
+	    2 sections, --sp-sec before the footer (no rule). */}
+	<div class="sec-gap after-hero"></div>
 	{/* Étape 9, B1: the company names run above the figures. */}
 	<LogosMarquee />
+	<SectionRule />
 	<Metrics />
+	<SectionRule />
 	<SelectedWork />
+	<SectionRule />
 	<AILabSection />
+	<SectionRule />
 	<Testimonials />
+	<SectionRule />
 	<AboutPreview />
+	<SectionRule />
 	<CraftSection />
+	<div class="sec-gap"></div>
 	</main>
 	<Footer />
 </Layout>

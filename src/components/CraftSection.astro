@@ -21,8 +21,8 @@ const sq = (url: string, w: number) => cld(url, `c_fill,ar_1:1,g_center,w_${w},q
 const track = [...items, ...items];
 ---
 
-<section id="craft" class="mx-auto max-w-[1200px] scroll-mt-24 px-6 pb-20 sm:pb-24 min-[1248px]:px-0" data-reveal>
-	<div class="border-t border-ink/10 pt-14 sm:pt-8">
+<section id="craft" class="mx-auto max-w-[1200px] scroll-mt-24 px-6 min-[1248px]:px-0" data-reveal>
+	<div>
 		<div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 			<h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
 				{/* Étape 11, 12: one line on desktop, two on phones and tablets */}
@@ -37,7 +37,7 @@ const track = [...items, ...items];
 		</div>
 
 		{/* Full width like the names strip (its fades sit on the screen edges on phones). */}
-		<div class="-mx-6 mt-8 min-[1248px]:mx-0">
+		<div class="craft-strip -mx-6 min-[1248px]:mx-0">
 		<div class="marquee-mask craft-marquee" tabindex="0" role="region" aria-label="A few craft pieces">
 			<ul class="marquee-track craft-track">
 				{
@@ -65,7 +65,7 @@ const track = [...items, ...items];
 		</div>
 		</div>
 
-		<div class="mt-8 flex justify-center sm:hidden">
+		<div class="craft-btn flex justify-center sm:hidden">
 			<a href="/craft" class="btn-secondary inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-pill px-6 text-sm font-semibold">
 				See craft&nbsp;<span class="arr" aria-hidden="true">→</span>
 			</a>

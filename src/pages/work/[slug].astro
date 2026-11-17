@@ -11,7 +11,6 @@ import { cld, FULL, LANDSCAPE, landscapeSrcset, sizeOf, fullSrcset } from '../..
 import { groupImagesByZone, zoneDescription } from '../../lib/zones';
 import { caseLines, nextOf, WORK_ORDER } from '../../data/caseLines';
 import CaseLines from '../../components/CaseLines.astro';
-import NextProject from '../../components/NextProject.astro';
 
 export function getStaticPaths() {
 	return allProjects.map((project) => ({
@@ -32,7 +31,7 @@ const intro = project.pageIntro ?? project.shortDesc;
 // Sonary Dashboard; Desktop / Mobile for simpler projects; a single Gallery
 // for legacy Wix imports). See src/lib/zones.ts for the classifier.
 // No in-page lightbox — clicking an image opens the full Cloudinary URL in a
-// new tab so the visitor gets the browser's native zoom / download UI.
+// new tab so the visitor gets the browser’s native zoom / download UI.
 const zones = groupImagesByZone(project.gallery, project.imageDeviceOverrides);
 // Desktop items narrower than 900px whose size is known (email templates)
 // go to the masonry gallery under the full-width stack (CL2, 13/11).
@@ -50,7 +49,7 @@ const seoOgImage = cld(project.thumbnail, LANDSCAPE);
 // Schema.org CreativeWork — surfaces the case study to search engines as a
 // discrete piece of work with a creator, image and year. `about` reflects the
 // primary category; `keywords` reuses the visible tag list so the JSON-LD and
-// the on-page pill row can't drift out of sync.
+// the on-page pill row can’t drift out of sync.
 const projectJsonLd: Record<string, unknown> = {
 	'@context': 'https://schema.org',
 	'@type': 'CreativeWork',
@@ -81,7 +80,7 @@ const visual = topLayouts[project.slug];
 	<Nav />
 	<main id="main" tabindex="-1">
 
-	<article class="mx-auto max-w-[1200px] px-6 pt-4 pb-8 sm:pt-5 min-[1248px]:px-0" data-reveal>
+	<article class="mx-auto max-w-[1200px] px-6 pt-4 sm:pt-5 min-[1248px]:px-0" data-reveal>
 		<a href="/#work" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><span class="arr-back" aria-hidden="true">→</span>Back to work</a>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">{project.category}</p>
@@ -93,12 +92,12 @@ const visual = topLayouts[project.slug];
 		<p class="mt-4 max-w-2xl text-lg text-muted">{intro}</p>
 
 		<div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
-			<span><span class="font-semibold text-ink">Client</span> · {project.client}</span>
+			<span><span class="font-semibold text-ink">Company</span> · {project.client}</span>
 			<span><span class="font-semibold text-ink">Year</span> · {project.year}</span>
 		</div>
 
-		{/* Tags as plain text with separators: they aren't clickable, so they
-		    must not look like pills or buttons (David's rule). */}
+		{/* Tags as plain text with separators: they aren’t clickable, so they
+		    must not look like pills or buttons (David’s rule). */}
 		<p class="mt-4 text-sm text-muted">{project.tags.join(' · ')}</p>
 		</div>
 
@@ -106,14 +105,19 @@ const visual = topLayouts[project.slug];
 		</div>
 
 		{/* Étape 14, ajout 1 (S33): Challenge · What I did · Result · Role, full width */}
-		{lines && <div class="mt-10 lg:mt-0"><CaseLines lines={lines} /></div>}
+		{lines && <div class="mt-sec"><CaseLines lines={lines} /></div>}
 
 		{project.scope && (
-			<section class="mt-8 max-w-3xl" aria-labelledby="scope-heading">
+			<>
+			{/* Étape 15, S46: a thin rule between the 4 columns and Scope. */}
+			{lines && <hr class="sec-rule" />}
+			<section class:list={['scope-block', { 'mt-sec': !lines }]} aria-labelledby="scope-heading">
 				<h2 id="scope-heading" class="text-sm font-semibold uppercase tracking-widest text-muted">Scope</h2>
 				{/* Plain text with markers, never pills: these are facts to read,
 				    not filters to click. */}
-				<ul class="mt-3 grid grid-cols-1 gap-x-8 gap-y-2 sm:grid-cols-2">
+				{/* Étape 15, S47: the same 4-column grid as Challenge · What I did ·
+				    Result · Role (2 × 2 on tablets, stacked on phones). */}
+				<ul class="scope-grid mt-title">
 					{project.scope.map((item) => (
 						<li class="flex items-start gap-3 text-ink">
 							<span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
@@ -122,6 +126,7 @@ const visual = topLayouts[project.slug];
 					))}
 				</ul>
 			</section>
+			</>
 		)}
 
 		{
@@ -130,7 +135,7 @@ const visual = topLayouts[project.slug];
 			   the sections and switches to "Show less". Falls back to the
 			   legacy fullDesc paragraph when sections are absent. */
 			project.sections ? (
-				<div class="mt-8 max-w-3xl sm:pb-4">
+				<div class="mt-btn max-w-3xl">
 					{/* Étape 11, 6: once open, a "Show less" sits where "Read the full
 					    case study" was; the one under the text stays as it was. */}
 					<button
@@ -139,7 +144,7 @@ const visual = topLayouts[project.slug];
 						aria-controls="case-study-body"
 						aria-expanded="true"
 						hidden
-						class="mb-8 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text hover:underline sm:mt-8"
+						class="mb-6 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text hover:underline sm:mb-8"
 					>
 						<span>Show less</span>
 						<svg
@@ -211,7 +216,7 @@ const visual = topLayouts[project.slug];
 						id="case-study-toggle"
 						aria-controls="case-study-body"
 						aria-expanded="false"
-						class="mt-0 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text hover:underline aria-expanded:mt-8 sm:mt-8"
+						class="mt-0 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text hover:underline aria-expanded:mt-6 sm:aria-expanded:mt-8"
 					>
 						<span data-toggle-label>Read the full case study</span>
 						<svg
@@ -239,7 +244,7 @@ const visual = topLayouts[project.slug];
 	<style>
 		/* Accordion body: animate expand/collapse using measured scrollHeight
 		   set inline by the toggle script. Fallback to auto so the layout
-		   still works without JS. Étape 12, 8 (David's law): it opens AND
+		   still works without JS. Étape 12, 8 (David’s law): it opens AND
 		   closes smoothly, height + fade, same duration and curve both ways. */
 		.case-study-body {
 			overflow: hidden;
@@ -322,7 +327,7 @@ const visual = topLayouts[project.slug];
 					topAnim = null;
 					topBtn.hidden = false;
 				}
-				// Phones: the button's top margin changes with its state; the new
+				// Phones: the button’s top margin changes with its state; the new
 				// margin applies at once and the button glides there with a
 				// transform (no margin animation).
 				const dm = (parseFloat(getComputedStyle(btn).marginTop) || 0) - m0;
@@ -437,16 +442,16 @@ const visual = topLayouts[project.slug];
 	    scrolled past that height. mt-8 keeps the 32px gap below the
 	    "Read the full case study" toggle. */}
 	{/* mt-8 wrapper — spans full viewport (no max-w constraint) so
-		ZoneFilters bar can extend edge-to-edge viewport (David's ask).
+		ZoneFilters bar can extend edge-to-edge viewport (David’s ask).
 		Zones are wrapped in an inner max-w-1200 container below. */}
-	<div class="mt-0 sm:mt-8">
+	<div class="mt-sec">
 		<ZoneFilters zones={zones} backHref="/#work" backLabel="Back to work" />
 		<div class="mx-auto max-w-[1200px] px-6 min-[1248px]:px-0">
 
 		{
 			zones.map((zone, zoneIdx) => {
 			// Dark mockups already have a distinct dark background of their
-			// own, so they don't need the wrapper border/shadow/bg treatment
+			// own, so they don’t need the wrapper border/shadow/bg treatment
 			// that light mockups need to stand out from the near-white body.
 			// Zones without a theme token (just "Desktop" / "Mobile" /
 			// "Other") default to the "needs border" behaviour (safer for
@@ -455,17 +460,17 @@ const visual = topLayouts[project.slug];
 			return (
 				<section
 					data-zone-label={zone.label}
-					class="mx-auto mt-12 max-w-[1200px] scroll-mt-32"
+					class:list={["zone-sec mx-auto max-w-[1200px] scroll-mt-32", { "zone-first": zoneIdx === 0 }]}
 					data-reveal
 				>
 					<header class="grid grid-cols-12 gap-y-3 sm:gap-8">
 						<h2 class="col-span-12 text-3xl font-extrabold tracking-tight text-ink sm:col-span-4 sm:text-4xl">
-							{zone.label}
+							{zone.label.replace(/ · /g, ' ')}
 						</h2>
 						{
 							/* Zone description is optional — some zones (e.g. "Other")
 							   intentionally return an empty string. Skip rendering the
-							   <p> entirely when empty so the header doesn't collapse
+							   <p> entirely when empty so the header doesn’t collapse
 							   with dead whitespace. */
 							zoneDescription(zone.label, zone.images.length) && (
 								<p class="col-span-12 text-lg leading-relaxed text-muted sm:col-span-6 sm:col-start-7">
@@ -479,7 +484,7 @@ const visual = topLayouts[project.slug];
 						zone.isMobile ? (
 							// Phone captures: one masonry gallery for the whole site
 							// (components/MasonryGallery.astro). Dark mockups have no frame.
-							<div class="mt-8">
+							<div class="mt-title">
 								{/* Sonary Mailer keeps its email layout (David, étape 5): masonry. */}
 								<MasonryGallery urls={zone.images.map((i) => i.url)} alt={project.title} framed={!isDarkZone} priority={zoneIdx === 0} layout={project.slug === 'sonary-mailer' ? 'masonry' : 'phone'} />
 							</div>
@@ -488,7 +493,7 @@ const visual = topLayouts[project.slug];
 							// (avoids the gap issue when object-contain shows
 							// a smaller image than the card). Ring + shadow
 							// live on the <img> itself.
-							<div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
+							<div class="mt-title gap-cards grid grid-cols-1 sm:grid-cols-2">
 								{zone.images.map(({ url }, imgIdx) => (
 									<div class="img-skeleton rounded-lg">
 										<img
@@ -517,16 +522,16 @@ const visual = topLayouts[project.slug];
 							// Desktop shots: stacked full-width. srcset covers 2K/4K.
 							// NO rounded (would clip mockup edges). Border+shadow
 							// only for LIGHT (or theme-less) zones so light mockups
-							// don't bleed into the near-white body. Dark mockups
+							// don’t bleed into the near-white body. Dark mockups
 							// render border-less — they already stand out.
-							// Client script (see bottom of file) reads each image's
+							// Client script (see bottom of file) reads each image’s
 							// naturalWidth after load:
 							//   - Narrow (natW < 900) = email template / narrow
 							//     screenshot → moved to a 2-col grid below the stack,
 							//     capped to natural width so it never upscales.
 							//   - Wide (natW ≥ 900) = normal desktop mockup → stays
 							//     full-width in the stack.
-							<div class="mt-8" data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
+							<div class="mt-title" data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
 								<div class="space-y-10" data-desktop-stack>
 									{zone.images.filter(({ url }) => !isNarrow(url)).map(({ url }, imgIdx) => (
 										<div
@@ -556,7 +561,7 @@ const visual = topLayouts[project.slug];
 									))}
 								</div>
 								{/* Narrow items land here. The track max used to be `max-content`,
-								    which is the image's own natural width — so a 600px-wide email
+								    which is the image’s own natural width — so a 600px-wide email
 								    template made a 600px column no matter how little room there
 								    was. Two of them on a 900px tablet asked for 1232px and the
 								    row simply overflowed; on a phone one column alone was 600
@@ -590,7 +595,7 @@ const visual = topLayouts[project.slug];
 		</div>
 	</div>
 
-	<div class="pb-24"></div>
+	<div class="sec-gap"></div>
 
 	<style is:global>
 		/* Skeleton shimmer for image containers. Wrapper shows a pulsing gradient
@@ -632,6 +637,7 @@ const visual = topLayouts[project.slug];
 		}
 
 		.narrow-masonry { columns: 1; column-gap: 32px; }
+		.narrow-masonry:empty { display: none; } /* étape 15, S46: no extra space when no narrow item */
 		@media (min-width: 640px) { .narrow-masonry { columns: 2; } }
 		@media (min-width: 1024px) { .narrow-masonry { columns: 3; } }
 		.narrow-masonry > * { display: block; break-inside: avoid; margin-bottom: 32px; }
@@ -653,7 +659,7 @@ const visual = topLayouts[project.slug];
 	<script is:inline>
 		// Desktop zone: split narrow images (e.g. Sonary Email Templates, 400px
 		// wide) out of the full-width stack into an auto-fit grid. Cap each
-		// moved item's inline max-width to the SOURCE width (not the served
+		// moved item’s inline max-width to the SOURCE width (not the served
 		// variant width — see probe below). Wide images (≥900px source) stay
 		// in the full-width stack.
 		//
@@ -671,7 +677,7 @@ const visual = topLayouts[project.slug];
 			if (!zones.length) return;
 
 			// Probe true source width via a Cloudinary transform that always
-			// returns the source's own width (never upscales, never downscales
+			// returns the source’s own width (never upscales, never downscales
 			// below source). Cached across probes for the same URL.
 			const probeCache = new Map();
 			function probeSourceWidth(imgSrc) {
@@ -714,7 +720,7 @@ const visual = topLayouts[project.slug];
 						const trueW = await probeSourceWidth(img.src);
 						if (!trueW || trueW >= NARROW_THRESHOLD) return;
 
-						// Genuinely narrow source: cap the item's inline
+						// Genuinely narrow source: cap the item’s inline
 						// max-width to the true source width so the auto-fit
 						// grid centers it at native size — never upscaled,
 						// never squeezed.
@@ -727,11 +733,11 @@ const visual = topLayouts[project.slug];
 						// 600px email template overflowed a phone-width column.
 						// width:100% is set explicitly, not left to the `w-full`
 						// class. Inside an auto-fit track the item was resolving to
-						// the served image's intrinsic width (309px in one viewport,
+						// the served image’s intrinsic width (309px in one viewport,
 						// 361px in another) instead of filling the track — a 600px
 						// email template rendered at half size and moved when the
 						// window did. With width:100% it fills the track and the
-						// max-width below stops it at the source's own size, so it is
+						// max-width below stops it at the source’s own size, so it is
 						// never upscaled and never squeezed.
 						item.style.width = '100%';
 						item.style.maxWidth = 'min(100%, ' + trueW + 'px)';
@@ -751,10 +757,26 @@ const visual = topLayouts[project.slug];
 					}
 				});
 			});
+
+			// Étape 15, S67: banner galleries (zones "Gallery": GamingTech,
+			// Tradologic, UI/UX work, Wochat). An image is never shown wider than
+			// its own pixels: one at least as wide as the column fills it (an image
+			// at least twice the shown width is sharp on every screen); a narrower
+			// one keeps its size and is centred. Narrow banners (the grid under the
+			// stack) sit in rows that are centred (CSS below).
+			document.querySelectorAll('section[data-zone-label="Gallery"] [data-desktop-stack] img').forEach((img) => {
+				const fit = () => {
+					const it = img.closest('[data-desktop-item]');
+					if (!it || !img.naturalWidth || it.parentElement?.matches('[data-desktop-narrow-grid]')) return;
+					it.style.maxWidth = 'min(100%, ' + img.naturalWidth + 'px)';
+					it.style.marginInline = 'auto';
+				};
+				if (img.complete) fit();
+				else img.addEventListener('load', fit, { once: true });
+			});
 		})();
 	</script>
 
-	{next && <NextProject href={`/work/${next.slug}`} title={next.title} />}
 	</main>
 	<Lightbox />
 	<Footer />

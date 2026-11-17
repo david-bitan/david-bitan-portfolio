@@ -28,7 +28,7 @@ export const caseLines: Record<string, CaseLines> = {
 		result: "A live demo in five languages, Hebrew included.",
 	},
 	'apex-athletic-club': {
-		role: "Personal project I designed and built with AI: the brand, the five pages and the coach's answers.",
+		role: "Personal project I designed and built with AI: the brand, the five pages and the coach’s answers.",
 		challenge: "Invent a club from scratch, with class booking, a shop and an AI coach, spread across five linked pages.",
 		did: "I designed five pages with booking, a shop and a guest pass, and the coach state by state.",
 		result: "A live demo: you book a class, change a workout in chat and see warning signs go to a human.",

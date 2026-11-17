@@ -16,7 +16,7 @@ const categories = Array.from(new Set(craftItems.map((i) => i.category)));
 	<Nav />
 	<main id="main" tabindex="-1">
 
-	<article class="mx-auto max-w-[1200px] px-6 pt-8 pb-8 sm:pt-10 min-[1248px]:px-0" data-reveal>
+	<article class="mx-auto max-w-[1200px] px-6 pt-8 sm:pt-10 min-[1248px]:px-0" data-reveal>
 		<a href="/" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><span class="arr-back" aria-hidden="true">→</span>Back</a>
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">Craft</p>
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
@@ -27,11 +27,12 @@ const categories = Array.from(new Set(craftItems.map((i) => i.category)));
 			to focus on a single medium.
 		</p>
 	</article>
+	<div class="sec-gap"></div>
 
 	<CraftFilters categories={categories} />
 
 	<div class="mx-auto max-w-[1200px] px-6 min-[1248px]:px-0">
-		<div class="mt-16 space-y-16">
+		<div class="mt-sec space-y-16">
 			{
 				craftItems.map((item) => (
 					<figure
@@ -57,7 +58,7 @@ const categories = Array.from(new Set(craftItems.map((i) => i.category)));
 						<figcaption class="mt-4 flex flex-wrap items-baseline gap-x-4">
 							<h2 class="text-lg font-bold tracking-tight text-ink">{item.title}</h2>
 							<span class="text-sm text-muted">
-								{item.category} · {item.year}
+								{item.category}<span class="eb-gap"> </span>{item.year}
 							</span>
 						</figcaption>
 					</figure>
@@ -66,7 +67,7 @@ const categories = Array.from(new Set(craftItems.map((i) => i.category)));
 		</div>
 	</div>
 
-	<div class="pb-24"></div>
+	<div class="sec-gap"></div>
 	</main>
 	<Lightbox />
 	<Footer />
@@ -84,11 +85,11 @@ const categories = Array.from(new Set(craftItems.map((i) => i.category)));
 	</script>
 
 	<script>
-		// Prevent CSS upscale of low-resolution sources — cap each image's
+		// Prevent CSS upscale of low-resolution sources — cap each image’s
 		// displayed max-width to its actual naturalWidth. Old-Wix imports
 		// range from ~600px to ~1400px wide; without this cap the browser
 		// stretches them to the ~1200px container and they look pixelated.
-		// naturalWidth reflects the picked srcset variant (Cloudinary's
+		// naturalWidth reflects the picked srcset variant (Cloudinary’s
 		// c_limit already keeps served pixels ≤ source, so max-width =
 		// naturalWidth means "displayed pixels ≤ actual pixels" — no upscale).
 		// mx-auto keeps small images centered in the 1200px column.

@@ -131,7 +131,7 @@
 		dlg.querySelector('.lb-close')!.addEventListener('click', () => dlg.close());
 		dlg.querySelector('.lb-prev')!.addEventListener('click', () => show(index - 1));
 		dlg.querySelector('.lb-next')!.addEventListener('click', () => show(index + 1));
-		// Étape 13, 24: on a phone, pinching zooms the IMAGE only (the browser's
+		// Étape 13, 24: on a phone, pinching zooms the IMAGE only (the browser’s
 		// own page zoom is off inside the viewer): the X, the counter, the
 		// arrows, the veil and the site behind never move or grow. Zoomed in,
 		// one finger moves the picture; back under 1x it snaps back.
@@ -139,7 +139,7 @@
 		let pinch: { d: number; z: number; ux: number; uy: number; bx: number; by: number } | null = null;
 		let pan: { x: number; y: number; tx: number; ty: number } | null = null;
 		let base = { x: 0, y: 0, w: 0, h: 0 }; // image box at 1x
-		// keep the picture under the screen centre: it can't be pushed away
+		// keep the picture under the screen centre: it can’t be pushed away
 		const clamp = () => {
 			const vw = window.innerWidth, vh = window.innerHeight;
 			tx = Math.min(vw / 2 - base.x, Math.max(vw / 2 - base.x - z * base.w, tx));
@@ -259,7 +259,7 @@
 		overflow-y: auto;
 		overscroll-behavior: contain;
 		outline: none;
-		/* étape 13, 24: the browser's pinch-zoom is off here; the script zooms the image */
+		/* étape 13, 24: the browser’s pinch-zoom is off here; the script zooms the image */
 		touch-action: pan-x pan-y;
 	}
 	.lb-scroll.is-zoomed {

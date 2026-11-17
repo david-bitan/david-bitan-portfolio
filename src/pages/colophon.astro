@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import SectionRule from '../components/SectionRule.astro';
 import ZoneFilters from '../components/ZoneFilters.astro';
 
 // Dedicated page for the "how this site was built" story. Linked from the
@@ -9,27 +10,27 @@ import ZoneFilters from '../components/ZoneFilters.astro';
 // screens): stack + role split + build stats + brief case study.
 
 const stack = [
-	{ label: 'Framework', value: 'Astro 7', why: 'Static-first, zero JS by default, content-focused. Ships lightweight HTML.' },
+	{ label: 'Framework', value: 'Astro 7', why: 'Static-first and made for content sites. No JavaScript by default, so pages ship as light HTML.' },
 	{ label: 'Styling', value: 'Tailwind CSS 4', why: 'Design tokens in CSS, no config file, tree-shaken to a tiny bundle.' },
 	{ label: 'Images', value: 'Cloudinary', why: '260+ WebP assets, on-the-fly transforms, DPR-aware srcsets for retina.' },
 	{ label: 'Hosting', value: 'Cloudflare Pages', why: 'Free tier, global CDN, HTTPS out of the box, auto-deploys from GitHub.' },
-	{ label: 'Source', value: 'GitHub', why: 'Version control + trigger for Cloudflare Pages builds.' },
+	{ label: 'Source', value: 'GitHub', why: 'Version control. Each push starts a Cloudflare Pages build.' },
 	{ label: 'Editor', value: 'VS Code + Cowork (Claude)', why: 'Local editing plus a Claude session with file + shell access.' },
 ];
 
 const claudeDid = [
 	'Wrote most of the Astro + Tailwind code, refactored as the design evolved.',
-	'Debugged obscure CSS + build issues (rolldown native bindings, corner-shape support, srcset breakpoints).',
+	'Fixed CSS and build bugs (rolldown native bindings, corner-shape support, srcset breakpoints).',
 	'Kept a versioned archive of every edit for one-click rollback (30+ snapshots).',
 	'Suggested UX improvements: pill filters, Load More coordination, dark-first ordering.',
-	'Maintained the session memory file so a fresh chat resumes exactly where we left off.',
+	'Kept the session memory file up to date, so a new chat picks up where the last one stopped.',
 ];
 
 const davidDid = [
 	'Set the direction: audience, tone, project selection, editorial angle.',
-	'Reviewed every visual change in the browser, called out what didn\'t work.',
+	'Reviewed every visual change in the browser, called out what didn’t work.',
 	'Managed the Figma exports, Cloudinary uploads, and the Google Sheet CMS.',
-	'Held the taste line: rejected the phone-mockup bezel experiment, kept the Behance grid.',
+	'Made the design calls: dropped the phone-mockup bezel experiment and kept the Behance grid.',
 	'Ran every git push from PowerShell (Cowork sandbox blocks HTTPS to GitHub).',
 ];
 
@@ -54,36 +55,36 @@ const palette = [
 ];
 
 const shape = [
-	{ label: 'Typeface', value: 'Manrope 400 / 500 / 700 / 800', why: 'Geometric sans with tight tracking on headlines: modern without being sterile.' },
-	{ label: 'Radius', value: '8px · 16px · pill', why: 'Buttons 8, cards 16, CTAs full-round. Kept small tokens; no random values.' },
-	{ label: 'Corners', value: 'Squircle (superellipse 3)', why: 'iOS-style corner-shape on rounded cards where supported: quiet upgrade, falls back to normal radius elsewhere.' },
+	{ label: 'Typeface', value: 'Manrope 400 / 500 / 700 / 800', why: 'A geometric sans, set with tight tracking on headlines.' },
+	{ label: 'Radius', value: '8px · 16px · pill', why: 'Buttons 8, cards 16, CTAs fully rounded. Three values only, no one-off radii.' },
+	{ label: 'Corners', value: 'Squircle (superellipse 3)', why: 'iOS-style corners on rounded cards in browsers that support corner-shape. Other browsers show the normal radius.' },
 	{ label: 'Dark mode', value: 'Night blue, orange kept', why: 'Same night blue as the footer. Accent orange is identical in both modes, so the brand reads the same.' },
 ];
 
 const method = [
 	{
 		title: 'Pair with Claude via Cowork',
-		body: 'Claude has direct file + shell access to the repo. I keep the taste line and review every change in-browser; Claude writes the code, debugs, and proposes UX improvements.',
+		body: 'Claude works in the repo with file and shell access. Claude writes the code, fixes bugs and suggests UX improvements. I make the design calls and review each change in the browser.',
 	},
 	{
 		title: 'Versioned local archives before every edit',
-		body: 'Each substantive change gets a numbered snapshot in /archives/vNNN_.../ with a README and the exact rollback command. 30+ checkpoints so far: one-click revert whenever an experiment does not land.',
+		body: 'Before each real change, Claude saves a numbered snapshot in /archives/vNNN_.../ with a README and the rollback command. 30+ checkpoints so far, so a failed experiment can be undone in one click.',
 	},
 	{
 		title: 'Session memory file',
-		body: 'A contexte-portfolio.md living outside the repo carries decisions, patterns, and next steps across chat sessions. Every new session starts by re-reading it; no restart cost.',
+		body: 'A file outside the repo, contexte-portfolio.md, holds the decisions, patterns and next steps. Each new chat session starts by reading it, so nothing is lost between sessions.',
 	},
 	{
 		title: 'Content in Google Sheets, code in Astro',
-		body: 'Projects, craft items, timeline and metadata live in a five-tab spreadsheet, parsed by a TypeScript layer at build time. Edit the sheet, rebuild, ship: no CMS to host.',
+		body: 'Projects, craft items, timeline and metadata live in a five-tab spreadsheet. TypeScript code reads it at build time. To change content, I edit the sheet and rebuild, with no CMS to host.',
 	},
 	{
 		title: 'Behance-informed layout, own tokens',
-		body: 'Grid + case-study format inspired by Behance; visual tokens come from launchnow.design as a starting point, then narrowed down to what this site actually needs.',
+		body: 'The grid and case-study format follow Behance. The visual tokens started from launchnow.design, and the final set keeps only what this site uses.',
 	},
 	{
 		title: 'Ship in phases, review live',
-		body: 'Work sequenced as focused phases (nav → layout → interactions → SEO/backend). Each phase is built, pushed, reviewed on the live URL, then the next phase starts.',
+		body: 'The work ran in phases: nav, layout, interactions, then SEO and backend. Each phase went live and got a review on the live URL before the next one began.',
 	},
 ];
 ---
@@ -93,24 +94,24 @@ const method = [
 	<main id="main" tabindex="-1">
 	<ZoneFilters backHref="/about" backLabel="Back to About me" />
 
-	<article class="mx-auto max-w-[1200px] px-6 pt-8 pb-8 sm:pt-10 min-[1248px]:px-0" data-reveal>
+	<article class="mx-auto max-w-[1200px] px-6 pt-8 sm:pt-10 min-[1248px]:px-0" data-reveal>
 		<a href="/about" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><span class="arr-back" aria-hidden="true">→</span>Back</a>
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">Colophon</p>
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
 			How this site was built.
 		</h1>
 		<p class="mt-6 max-w-2xl text-lg text-muted">
-			A short, honest breakdown of the stack, the workflow, and who did what.
-			The AI-augmented workflow this portfolio talks about is the same one that shipped it.
+			The stack, the workflow and who did what. I built this portfolio with the same AI workflow it describes.
 		</p>
 	</article>
+	<div class="sec-gap"></div>
 
-	<section class="mx-auto max-w-[1200px] px-6 py-16 min-[1248px]:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 min-[1248px]:px-0" data-reveal>
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">The stack</h2>
-		<div class="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
+		<div class="mt-title gap-cards grid grid-cols-1 sm:grid-cols-2">
 			{
 				stack.map((s) => (
-					<div class="rounded-lg border border-ink/10 bg-card p-6">
+					<div class="box-line rounded-lg border border-ink/10 bg-card p-card">
 						<p class="text-xs font-semibold uppercase tracking-widest text-muted">{s.label}</p>
 						<p class="mt-2 text-lg font-bold">{s.value}</p>
 						<p class="mt-2 text-sm text-muted">{s.why}</p>
@@ -119,20 +120,20 @@ const method = [
 			}
 		</div>
 	</section>
+	<SectionRule />
 
-	<section class="mx-auto max-w-[1200px] px-6 py-16 min-[1248px]:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 min-[1248px]:px-0" data-reveal>
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Design system</h2>
 		<p class="mt-4 max-w-2xl text-muted">
-			A small, opinionated set of tokens shared across every page: the same values
-			live in <code class="rounded bg-ink/5 px-1.5 py-0.5 text-sm">global.css</code>.
+			One small set of tokens for every page. The values live in <code class="rounded bg-ink/5 px-1.5 py-0.5 text-sm">global.css</code>.
 		</p>
 
-		<h3 class="mt-10 text-sm font-semibold uppercase tracking-widest text-muted">Palette</h3>
+		<h3 class="mt-title text-sm font-semibold uppercase tracking-widest text-muted">Palette</h3>
 		{/* Étape 12, 17: 2 per row on phones, like the AI Lab palettes; 5 on desktop. */}
-		<div class="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-5">
+		<div class="mt-4 gap-cards grid grid-cols-2 lg:grid-cols-5">
 			{
 				palette.map((c) => (
-					<div class="rounded-lg border border-ink/10 bg-card p-4">
+					<div class="box-line rounded-lg border border-ink/10 bg-card p-card">
 						<div
 							class="h-16 w-full rounded-[4px] ring-1 ring-ink/10"
 							style={`background-color: ${c.swatch};`}
@@ -147,10 +148,10 @@ const method = [
 		</div>
 
 		<h3 class="mt-12 text-sm font-semibold uppercase tracking-widest text-muted">Type, shape, mode</h3>
-		<div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+		<div class="mt-4 gap-cards grid grid-cols-1 sm:grid-cols-2">
 			{
 				shape.map((s) => (
-					<div class="rounded-lg border border-ink/10 bg-card p-6">
+					<div class="box-line rounded-lg border border-ink/10 bg-card p-card">
 						<p class="text-xs font-semibold uppercase tracking-widest text-muted">{s.label}</p>
 						<p class="mt-2 text-lg font-bold">{s.value}</p>
 						<p class="mt-2 text-sm text-muted">{s.why}</p>
@@ -159,16 +160,17 @@ const method = [
 			}
 		</div>
 	</section>
+	<SectionRule />
 
-	<section class="mx-auto max-w-[1200px] px-6 py-16 min-[1248px]:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 min-[1248px]:px-0" data-reveal>
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Method</h2>
 		<p class="mt-4 max-w-2xl text-muted">
-			How the work actually got done: the process behind the pixels.
+			The habits and tools behind the build.
 		</p>
-		<div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
+		<div class="mt-title gap-cards grid grid-cols-1 sm:grid-cols-2">
 			{
 				method.map((m) => (
-					<div class="rounded-lg border border-ink/10 bg-card p-6">
+					<div class="box-line rounded-lg border border-ink/10 bg-card p-card">
 						<p class="text-base font-bold text-ink">{m.title}</p>
 						<p class="mt-2 text-sm leading-relaxed text-muted">{m.body}</p>
 					</div>
@@ -176,18 +178,18 @@ const method = [
 			}
 		</div>
 	</section>
+	<SectionRule />
 
-	<section class="mx-auto max-w-[1200px] px-6 py-16 min-[1248px]:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 min-[1248px]:px-0" data-reveal>
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Who did what</h2>
 		<p class="mt-4 max-w-2xl text-muted">
-			Pair-designing with an AI isn't magic: it's a division of labor. Here's how the
-			work actually split.
+			I worked with Claude as a pair, and each of us had a clear part of the job.
 		</p>
 
-		<div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
-			<div class="rounded-lg border border-ink/10 bg-card p-8">
+		<div class="mt-title gap-cards grid grid-cols-1 sm:grid-cols-2">
+			<div class="box-line rounded-lg border border-ink/10 bg-card p-card">
 				<p class="text-sm font-semibold uppercase tracking-widest text-accent-text">Claude did</p>
-				<ul class="mt-5 flex flex-col gap-3">
+				<ul class="mt-4 flex flex-col gap-3">
 					{
 						claudeDid.map((line) => (
 							<li class="flex items-start gap-3 text-muted">
@@ -199,9 +201,9 @@ const method = [
 				</ul>
 			</div>
 
-			<div class="rounded-lg border border-ink/10 bg-card p-8">
+			<div class="box-line rounded-lg border border-ink/10 bg-card p-card">
 				<p class="text-sm font-semibold uppercase tracking-widest text-accent-text">I did</p>
-				<ul class="mt-5 flex flex-col gap-3">
+				<ul class="mt-4 flex flex-col gap-3">
 					{
 						davidDid.map((line) => (
 							<li class="flex items-start gap-3 text-muted">
@@ -214,11 +216,12 @@ const method = [
 			</div>
 		</div>
 	</section>
+	<SectionRule />
 
-	<section class="mx-auto max-w-[1200px] px-6 py-16 min-[1248px]:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 min-[1248px]:px-0" data-reveal>
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Build stats</h2>
 		{/* Étape 12, 18: the 3 side by side on one line, each centred. */}
-		<div class="mt-10 grid grid-cols-3 gap-4 sm:gap-8">
+		<div class="mt-title grid grid-cols-3 gap-4 sm:gap-8">
 			{
 				buildStats.map((s) => (
 					<div class="text-center">
@@ -230,21 +233,20 @@ const method = [
 			}
 		</div>
 	</section>
+	<SectionRule />
 
-	<section class="mx-auto max-w-[1200px] px-6 py-16 min-[1248px]:px-0" data-reveal>
+	<section class="mx-auto max-w-[1200px] px-6 min-[1248px]:px-0" data-reveal>
 		<h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">A note on honesty</h2>
-		<div class="mt-6 max-w-2xl space-y-4 text-lg text-muted">
+		<div class="mt-title max-w-2xl space-y-4 text-lg text-muted">
 			<p>
-				Every project shown here was designed by hand: Figma today, Adobe XD before that,
-				Photoshop and Illustrator in the earlier years, plus Cinema 4D, ZBrush,
-				After Effects and Spline for motion and 3D.
+				I designed the projects in Selected Work by hand, with the tools each project needed: Figma, and earlier Photoshop and Illustrator, plus Cinema 4D, ZBrush, After Effects or Spline when a project called for motion or 3D.
 			</p>
 			<p>
-				What changed in 2025 – 2026 is <em>how</em> I ship the surface around the work:
-				this portfolio, its filters, its case-study pages, not the design craft itself.
+				In 2025 and 2026, AI changed how I build what sits around the work: this portfolio, its filters and its case-study pages. My design craft stayed the same.
 			</p>
 		</div>
 	</section>
+	<div class="sec-gap"></div>
 
 	</main>
 	<Footer />

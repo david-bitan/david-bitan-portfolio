@@ -24,7 +24,7 @@
 
 	/* ---------------- language ---------------- */
 	const qs = new URLSearchParams(location.search);
-	S.lang = [qs.get("lang"), store.get("facet-lang", null)].map((l) => String(l || "").slice(0, 2)).find((l) => I.LANGS.some((x) => x[0] === l)) || "en"; // English unless the person chose another language
+	S.lang = [qs.get("lang")] /* étape 15, S68: always opens in English (never a saved language); a ?lang= link still picks one */.map((l) => String(l || "").slice(0, 2)).find((l) => I.LANGS.some((x) => x[0] === l)) || "en"; // English unless the person chose another language
 	/* the last two words of a sentence stay together: never one word alone on the last line, in any language */
 	function t(k, p) { let s = (I.dict[S.lang] && I.dict[S.lang][k]) || k; if (p) s = s.replace(/\{(\w+)\}/g, (m, n) => (p[n] ?? m)); if (S.lang === "fr") s = s.replace(/ ([?:!;»])/g, "\u00a0$1").replace(/« /g, "«\u00a0"); /* French: no line break before ? : ! ; */ return s.split(/\s+/).length >= 3 && !/<[^>]+$/.test(s) ? s.replace(/ ([^ <>]+)$/, "\u00a0$1") : s; }
 	const catName = (id) => (id === "other" ? t("To check") : t(I.CAT_NAMES[id] || id));
