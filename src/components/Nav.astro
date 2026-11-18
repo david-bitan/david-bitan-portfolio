@@ -11,7 +11,7 @@ const links = [
 	{ href: '/#work', label: 'Work', spy: 'work' },
 	{ href: '/#ai-lab', label: 'AI Lab Work', spy: 'ai-lab' }, // étape 13, 14
 	{ href: '/#testimonials', label: 'Testimonials', spy: 'testimonials' },
-	{ href: '/#about', label: 'About', spy: 'about' },
+	{ href: '/#about', label: 'About', spy: 'about', mobileHref: '/about' }, // étape 16, S86: phone menu opens /about
 	{ href: '/#craft', label: 'Craft', spy: 'craft' },
 ];
 // Étape 9, F1: Contact is a link like the others and opens the /contact page
@@ -90,7 +90,7 @@ import DownloadCV from './DownloadCV.astro';
 >
 	{
 		links.map((link) => (
-			<a href={link.href} class:list={['mobile-nav-link text-3xl font-semibold', { 'nav-link-active': current === link.spy }]} aria-current={current === link.spy ? 'page' : undefined} data-spy-mobile={link.spy}>
+			<a href={link.mobileHref ?? link.href} class:list={['mobile-nav-link text-3xl font-semibold', { 'nav-link-active': current === link.spy }]} aria-current={current === link.spy ? 'page' : undefined} data-spy-mobile={link.spy}>
 				{link.label}
 			</a>
 		))
@@ -246,6 +246,27 @@ import DownloadCV from './DownloadCV.astro';
 	});
 	toggle?.addEventListener('click', () => (isOpen() ? closeMenu() : openMenu()));
 	overlay?.querySelectorAll('.mobile-nav-link').forEach((link) => link.addEventListener('click', closeMenu));
+	// Étape 16, S84: a link of the phone menu leaves the page: the sticky back
+	// bar (inner pages) fades out together with the menu (same 320 ms, same
+	// curve, global.css .zf-leave), in one move, instead of showing again for
+	// a moment once the menu is gone.
+	const backBars = () => document.querySelectorAll<HTMLElement>('[data-zf], [data-zf-pre], #craft-filters');
+	overlay?.querySelectorAll<HTMLAnchorElement>('a.mobile-nav-link').forEach((a) =>
+		a.addEventListener('click', (e) => {
+			if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; // new tab: the page stays
+			backBars().forEach((el) => el.classList.add('zf-leave'));
+		}),
+	);
+	window.addEventListener('pageshow', () => backBars().forEach((el) => el.classList.remove('zf-leave')));
+	// Étape 16, S85: a menu link (top or phone) to a home section from another
+	// page asks the home to scroll down softly (Layout.astro reads it once).
+	document.querySelectorAll<HTMLAnchorElement>('a.nav-link, a.mobile-nav-link').forEach((a) =>
+		a.addEventListener('click', (e) => {
+			if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+			if (!a.hash || a.pathname === location.pathname) return;
+			try { sessionStorage.setItem('cpSmooth', '1'); } catch {}
+		}),
+	);
 
 	// --- Theme toggle ---
 	const themeToggle = document.getElementById('theme-toggle');
@@ -268,23 +289,32 @@ import DownloadCV from './DownloadCV.astro';
 	// While the theme changes, the per-element colour fades are switched off
 	// (.theme-switching in global.css): otherwise each element fades on its own
 	// and the header changes before the rest of the page.
-	function endSwitch() {
-		requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('theme-switching')));
+	let switchId = 0; // étape 16, S87: only the latest switch ends the fade mode
+	function endSwitch(id = switchId) {
+		requestAnimationFrame(() => requestAnimationFrame(() => { if (id === switchId) root.classList.remove('theme-switching'); }));
 	}
 
-	// Étape 11, 14: one soft fade (0.4 s) for the whole page at once, with a
+	// Étape 11, 14: one soft fade (0.8 s since étape 16, S87) for the whole page at once, with a
 	// view transition; instant under reduced motion or without support.
 	themeToggle?.addEventListener('click', () => {
 		const dark = root.getAttribute('data-theme') !== 'dark';
 		try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch {}
 		root.classList.add('theme-switching');
+		const id = ++switchId;
 		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		if (!reduce && document.startViewTransition) {
-			document.startViewTransition(() => setTheme(dark)).finished.finally(endSwitch);
+			document.startViewTransition(() => setTheme(dark)).finished.finally(() => endSwitch(id));
 		} else {
 			setTheme(dark);
-			endSwitch();
+			endSwitch(id);
 		}
+	});
+	// Étape 16, S87: during the 0.8 s fade the browser sends clicks to the
+	// page itself; a click on the theme button's place still switches back.
+	document.addEventListener('click', (e) => {
+		if (!themeToggle || e.target !== root || !root.classList.contains('theme-switching')) return;
+		const r = themeToggle.getBoundingClientRect();
+		if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) themeToggle.click();
 	});
 
 	// Étape 11, 2: a page shown again from the back/forward cache keeps the

@@ -39,6 +39,28 @@ if (hasLight || hasDark) {
 const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 ---
 
+{/* Étape 16, S84: pages with filters (Selected Work) also get the bare bar
+    while scrolling down to the filter bar: it shows once the top back link
+    has gone under the header, and hides when the filter bar sticks (its own
+    round pill then takes over at the same place). Placed before the filter
+    bar so the Tab order follows the screen; drawn above it (z 31). */}
+{showBar && (
+	<div data-zf-pre class="zf-bare z-[31] w-full border-y border-ink/10 bg-bg">
+		<div class="relative mx-auto max-w-[1200px]">
+			<div class="zone-filters-back absolute inset-y-0 left-0 z-20 flex items-center pl-6 min-[1248px]:pl-0">
+				<a
+					href={backHref}
+					aria-label={backLabel}
+					class="zf-back-link flex h-8 w-8 items-center justify-center rounded-full border border-ink/15 text-muted transition-colors hover:border-accent hover:text-accent-text"
+				>
+					<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M15 18l-6-6 6-6" /></svg>
+				</a>
+			</div>
+			<div class="h-[60px]" aria-hidden="true" />
+		</div>
+	</div>
+)}
+
 {/* Always rendered, so every project page keeps a sticky way back.
     With filters: the bar sticks under the header and "← Back" appears pinned
     on its left; only the filters scroll behind it (David, 15/11).
@@ -113,6 +135,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 	</div>
 </div>
 
+
 <script>
 	const deviceBtns = Array.from(
 		document.querySelectorAll<HTMLButtonElement>('[data-filter-group="device"]'),
@@ -173,6 +196,8 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 	// shift = where the old padding put them (pill width + 12px) minus the
 	// padding the row already has.
 	const row = bar?.querySelector<HTMLElement>('.zone-filters-scroll');
+	const pre = document.querySelector<HTMLElement>('[data-zf-pre]');
+	let mainWasStuck = false;
 	function measure() {
 		if (!back || !bar) return;
 		bar.style.setProperty('--zf-back-w', back.offsetWidth + 'px');
@@ -189,6 +214,22 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 			stuck = bar.getBoundingClientRect().top <= headerH() + 0.5;
 		}
 		bar.classList.toggle('is-stuck', stuck);
+		if (pre) {
+			const anchor = topLink || document.querySelector<HTMLElement>('main h1');
+			const gone = anchor ? anchor.getBoundingClientRect().bottom <= headerH() : window.scrollY > 200;
+			const was = pre.classList.contains('is-stuck');
+			const now = gone && !stuck;
+			// Hand-over without a blink: going down, the bare bar stays on top
+			// until the filter bar's pill has grown (80 + 280 ms), then fades;
+			// going up, it shows at once, right over the pill it replaces.
+			pre.classList.toggle('zf-late', was && !now && stuck);
+			if (!was && now && mainWasStuck) {
+				pre.classList.add('zf-instant');
+				requestAnimationFrame(() => requestAnimationFrame(() => pre.classList.remove('zf-instant')));
+			}
+			pre.classList.toggle('is-stuck', now);
+		}
+		mainWasStuck = stuck;
 	}
 	let ticking = false;
 	const onScroll = () => {
@@ -205,6 +246,7 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 		window.addEventListener('resize', () => { measure(); onScroll(); });
 		document.fonts?.ready.then(measure);
 	}
+
 </script>
 
 <style is:global>
@@ -227,6 +269,11 @@ const showBar = deviceOptions.length > 1 || themeOptions.length > 1;
 		visibility: visible;
 		transition: opacity 160ms ease-out, visibility 0s;
 	}
+	/* Étape 16, S84: hand-over with the filter bar (see update()). */
+	.zf-bare.zf-late:not(.is-stuck) {
+		transition: opacity 160ms ease-out 360ms, visibility 0s linear 520ms;
+	}
+	.zf-bare.zf-instant { transition: none !important; }
 
 	/* Swipe sideways, no visible scrollbar. */
 	.zone-filters-scroll {

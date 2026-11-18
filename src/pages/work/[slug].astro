@@ -89,7 +89,7 @@ const visual = topLayouts[project.slug];
 		<div class="ptv-hero mt-4" data-ptv-hero={visual ? '' : undefined}>
 		<div class="ptv-text">
 		<h1 class="max-w-3xl text-[1.85rem] font-extrabold tracking-tight min-[374px]:text-4xl sm:text-5xl">{project.title}</h1>
-		<p class="mt-4 max-w-2xl text-lg text-muted">{intro}</p>
+		<p class="mt-4 max-w-2xl proj-intro">{intro}</p>
 
 		<div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
 			<span><span class="font-semibold text-ink">Company</span> · {project.client}</span>
@@ -119,7 +119,7 @@ const visual = topLayouts[project.slug];
 				    Result · Role (2 × 2 on tablets, stacked on phones). */}
 				<ul class="scope-grid mt-title">
 					{project.scope.map((item) => (
-						<li class="flex items-start gap-3 text-ink">
+						<li class="flex items-start gap-3 proj-long">
 							<span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
 							<span>{item}</span>
 						</li>
@@ -171,7 +171,7 @@ const visual = topLayouts[project.slug];
 						{project.sections.map((section) => (
 							<section class="mt-10 first:mt-0">
 								<h2 class="text-xl font-extrabold tracking-tight sm:text-2xl">{section.heading}</h2>
-								<div class="mt-4 space-y-4 leading-relaxed text-ink">
+								<div class="mt-4 space-y-4 leading-relaxed proj-long">
 									{section.body
 										.split(/\n\s*\n/)
 										.map((para) => (
@@ -236,7 +236,7 @@ const visual = topLayouts[project.slug];
 					</button>
 				</div>
 			) : project.fullDesc ? (
-				<p class="mt-10 max-w-3xl whitespace-pre-line leading-relaxed text-ink">{project.fullDesc}</p>
+				<p class="mt-10 max-w-3xl whitespace-pre-line leading-relaxed proj-long">{project.fullDesc}</p>
 			) : null
 		}
 	</article>

@@ -63,12 +63,12 @@ const cols = [
 	}
 	.case-text {
 		margin-top: 8px;
-		font-size: 15px;
+		font-size: var(--fs-proj-long); /* Étape 16, S81 */
 		line-height: 1.55;
-		color: #0d101a;
+		color: var(--c-proj-text);
 		text-wrap: pretty;
 	}
 	:global(:root[data-theme='dark']) .case-text {
-		color: var(--color-ink);
+		color: var(--c-proj-text);
 	}
 </style>

@@ -122,8 +122,18 @@ const personJsonLd = {
 				// localStorage unavailable (private mode, etc.) — default to light
 			}
 			// Étape 15, S64: no smooth scrolling while the browser puts the page
-			// back where it was (back button); smooth again once loaded.
-			document.documentElement.style.scrollBehavior = 'auto';
+			// back where it was (back button, reload); smooth again once loaded.
+			// Étape 16, S85: a menu link to a home section (/#work…, flag set by
+			// Nav.astro) keeps the smooth scroll down to its section; any other
+			// arrival stays instant, as before.
+			try {
+				var nv = performance.getEntriesByType('navigation')[0];
+				var soft = !!nv && nv.type === 'navigate' && sessionStorage.getItem('cpSmooth') === '1';
+				sessionStorage.removeItem('cpSmooth');
+				if (!soft) document.documentElement.style.scrollBehavior = 'auto';
+			} catch (e) {
+				document.documentElement.style.scrollBehavior = 'auto';
+			}
 		</script>
 	</head>
 	<body>
@@ -197,7 +207,18 @@ const personJsonLd = {
 		const onLoad = () => { restore(); smoothAgain(); };
 		if (document.readyState === 'complete') onLoad();
 		else addEventListener('load', onLoad, { once: true });
+		// Étape 16, S85: a click on a link to a section of this same page
+		// (/#work from the home menu) also fires popstate; that one is not a
+		// Back, so it keeps the browser's smooth scroll.
+		let hashClick = false;
+		document.addEventListener('click', (e) => {
+			const a = (e.target as Element | null)?.closest?.('a[href*="#"]') as HTMLAnchorElement | null;
+			if (!a || a.pathname !== location.pathname || !a.hash) return;
+			hashClick = true;
+			setTimeout(() => { hashClick = false; }, 100);
+		}, true);
 		addEventListener('popstate', () => {
+			if (hashClick) { hashClick = false; return; }
 			const y = savedY();
 			if (Number.isFinite(y)) scrollTo({ top: y, behavior: 'instant' as ScrollBehavior });
 			else if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView({ behavior: 'instant' as ScrollBehavior });

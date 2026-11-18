@@ -16,7 +16,7 @@ const hasFormspree = Boolean(formspreeId);
 
 const defaultNote = hasFormspree
 	? "I usually reply within 24 hours."
-	: 'Opens your email client, pre-filled and ready to send.';
+	: 'Opens your email app, pre-filled and ready to send.';
 ---
 
 <Layout
@@ -41,7 +41,9 @@ const defaultNote = hasFormspree
 		{/* Étape 13, 17: e-mail, phone, LinkedIn and location are in the footer;
 		    the column beside the form is gone. */}
 		<div class="mt-title max-w-[816px]">
-			<form id="contact-form" class="flex flex-col gap-6" novalidate>
+			<form id="contact-form" class="flex flex-col gap-4" novalidate>
+				{/* Étape 16, S83: 16 px from a field to the next label (was 24); the button
+				    block keeps its 24 px (32 px from 640 px) via its own margin. */}
 				<!-- Honeypot: hidden from people and assistive tech, bots fill it and
 				     Formspree drops the submission (_gotcha is Formspree’s own field). -->
 				<div class="hidden" aria-hidden="true">
@@ -83,7 +85,7 @@ const defaultNote = hasFormspree
 					></textarea>
 				</div>
 
-				<div class="flex flex-col items-stretch gap-4 sm:mt-2">
+				<div class="mt-2 flex flex-col items-stretch gap-4 sm:mt-4">
 					<button
 						id="submit-btn"
 						type="submit"

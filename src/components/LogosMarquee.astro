@@ -20,7 +20,7 @@ const track = [...employers, ...employers, ...employers];
 	</p>
 	{/* Focusable region so keyboard users can pause the strip too. Only the
 	    first copy is read out; the two loop copies are aria-hidden. */}
-	<div class="marquee-mask" tabindex="0" role="region" aria-label="Companies I have designed for">
+	<div class="marquee-mask logos-mask" tabindex="0" role="region" aria-label="Companies I have designed for">
 		<div class="marquee-track">
 			{
 				track.map((name, i) => (
@@ -30,3 +30,48 @@ const track = [...employers, ...employers, ...employers];
 		</div>
 	</div>
 </section>
+
+<script>
+	// Étape 16, S91: a click or a tap toggles pause / play; a click elsewhere
+	// plays again. Keyboard: the strip still pauses when it gets the focus,
+	// and Enter or Space toggles. Mouse hover still pauses (CSS); a click on
+	// the paused strip plays it, until the pointer leaves the strip.
+	const mask = document.querySelector<HTMLElement>('.logos-mask');
+	if (mask) {
+		type State = '' | 'paused' | 'playing';
+		let state: State = '';
+		const set = (s: State) => {
+			state = s;
+			mask.classList.toggle('lm-paused', s === 'paused');
+			mask.classList.toggle('lm-playing', s === 'playing');
+		};
+		// What the visitor sees decides: paused (by a click, by the mouse
+		// hovering it, or by the keyboard focus) -> play; running -> pause.
+		// A finger has no real hover (the browser keeps one after a tap), so
+		// for touch only the click state counts.
+		let touch = false;
+		mask.addEventListener('pointerdown', (e) => { touch = e.pointerType !== 'mouse'; });
+		const toggle = (keyboard: boolean) => {
+			const held = keyboard ? mask.matches(':focus-visible') : !touch && mask.matches(':hover');
+			const paused = state === 'paused' || (state === '' && held);
+			set(paused ? 'playing' : 'paused');
+		};
+		mask.addEventListener('click', () => toggle(false));
+		mask.addEventListener('keydown', (e) => {
+			if (e.key !== 'Enter' && e.key !== ' ') return;
+			e.preventDefault();
+			toggle(true);
+		});
+		document.addEventListener('pointerdown', (e) => {
+			if (state && !mask.contains(e.target as Node)) set('');
+		});
+		mask.addEventListener('blur', () => set(''));
+		// The pointer leaves after a click that played: back to normal (a
+		// focus given by the mouse would pause it again, so it is let go).
+		mask.addEventListener('mouseleave', () => {
+			if (state !== 'playing') return;
+			set('');
+			if (document.activeElement === mask && !mask.matches(':focus-visible')) mask.blur();
+		});
+	}
+</script>

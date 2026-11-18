@@ -199,6 +199,13 @@ select:not(:disabled) {
   display: inline-block;
   transform: translateY(-0.1em);
 }
+/* Étape 16, S82: "All recommendations →", "More about me →" and "See craft →":
+   the same thin arrow, centred on the middle of the lowercase letters
+   (x-height). Measured at 4x: the arrow's ink middle sits 0.32 em above the
+   baseline, the middle of "a" / "o" 0.27 em, so it goes down 0.05 em. */
+.arr.arr-x {
+  transform: translateY(0.05em);
+}
 
 /* Étape 13, 11: arrow of the "← Back…" links = the same arrow as the
    "More about me →" button (the → character, .arr), turned to the left. */
@@ -295,6 +302,21 @@ select:not(:disabled) {
 .marquee-mask:hover .marquee-track,
 .marquee-mask:focus-within .marquee-track {
   animation-play-state: paused;
+}
+/* Étape 16, S91 (names strip only): each click or tap (Enter or Space on the
+   keyboard) toggles pause / play (LogosMarquee.astro); a click elsewhere
+   plays again. "lm-playing" wins over the hover and focus pauses. */
+/* 44 px tap area (the names are 28 px high), layout unchanged. */
+.logos-mask {
+  padding-block: 8px;
+  margin-block: -8px;
+}
+.logos-mask:focus-visible { outline-offset: -4px; } /* same ring as before */
+.logos-mask.lm-paused .marquee-track {
+  animation-play-state: paused;
+}
+.logos-mask.lm-playing .marquee-track {
+  animation-play-state: running;
 }
 .marquee-mask:focus-visible {
   outline: 2px solid var(--color-accent);
@@ -432,7 +454,7 @@ main:focus { outline: none; }
   animation: none;
 }
 
-/* Étape 11, 14: theme switch = one 0.4 s fade of the whole page (header
+/* Étape 11, 14: theme switch = one fade (0.8 s since étape 16, S87) of the whole page (header
    included), set by Nav.astro with document.startViewTransition. The
    per-element colour fades are off meanwhile, so nothing changes early. */
 html.theme-switching,
@@ -447,8 +469,12 @@ html.theme-switching #site-header {
 html.theme-switching::view-transition-old(root) {
   animation: none;
 }
+/* Étape 16, S87: twice as slow (0.4 s -> 0.8 s) and an even fade (linear):
+   the new theme comes in over the old one in a single layer (background,
+   text, cards and images together), so nothing flashes white. Reduced
+   motion: no fade (the change is instant, see Nav.astro). */
 html.theme-switching::view-transition-new(root) {
-  animation: 400ms ease both vt-fade-in;
+  animation: 800ms linear both vt-fade-in;
 }
 
 /* Étape 15, S46: ONE spacing rule for the 21 pages (multiples of 8).
@@ -607,7 +633,7 @@ section[data-zone-label="Gallery"] .narrow-masonry > [data-desktop-item] {
 
 /* Étape 15, S46: project pages with one zone (no filter bar): the thin rule
    between the case-study block and the first zone. */
-.zf-bare ~ div > .zone-sec.zone-first {
+.zf-bare:not([data-zf-pre]) ~ div > .zone-sec.zone-first {
   padding-top: var(--sp-sec);
   border-top: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
 }
@@ -623,3 +649,29 @@ section[data-zone-label="Gallery"] .narrow-masonry > [data-desktop-item] {
 .craft-btn { margin-top: calc(var(--sp-btn) - 4px); }
 @media (max-width: 639.98px) { .craft-strip { margin-bottom: 0; } }
 .work-head { margin-bottom: calc(var(--sp-title) - 4px); }
+
+/* Étape 16, S81: ONE text rule for every inner project page (Selected Work,
+   Earlier work, AI Lab): the intro under the title 17 px, the long paragraphs
+   (text under "View live demo", case study, columns, scope) 16 px, all in the
+   grey of the Work intro. Line heights unchanged. Small labels (13-15 px)
+   keep their own sizes. */
+:root {
+  --fs-proj-intro: 17px;
+  --fs-proj-long: 16px;
+  --c-proj-text: var(--color-muted);
+}
+.proj-intro { font-size: var(--fs-proj-intro); line-height: 28px; color: var(--c-proj-text); }
+.proj-long { font-size: var(--fs-proj-long); color: var(--c-proj-text); }
+
+/* Étape 16, S84: a link of the phone menu leaves an inner page: the sticky
+   back bar fades out with the menu (same 320 ms and curve as .mobile-nav-panel
+   in Nav.astro), in one move. */
+.zf-leave,
+.zf-leave.is-stuck {
+  opacity: 0 !important;
+  transition: opacity 320ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .zf-leave,
+  .zf-leave.is-stuck { transition: none !important; }
+}

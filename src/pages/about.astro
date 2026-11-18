@@ -274,8 +274,9 @@ import DownloadCV from '../components/DownloadCV.astro';
 		<p class="mt-2 max-w-2xl text-muted">
 			Quoted in full from LinkedIn, in the authors’ own words.
 		</p>
-		{/* Étape 15, S54: 3 columns in cascade (masonry; 2 on tablets, 1 on phones). */}
-		<div class="reco-masonry mt-title">
+		{/* Étape 16, S80: back to the V5 layout (grid, 2 columns on desktop, 1 below),
+		    in David's order (Elad first); text 13 px. The cascade of S54 is gone. */}
+		<div class="mt-title gap-cards grid grid-cols-1 lg:grid-cols-2">
 			{
 				testimonials.map((t) => (
 					/* Étape 13, 18: author (photo, name, role, company) at the top of
@@ -285,7 +286,7 @@ import DownloadCV from '../components/DownloadCV.astro';
 						<svg aria-hidden="true" viewBox="0 0 24 24" class="h-6 w-6 text-accent" fill="currentColor">
 							<path d="M9.5 6C6.5 6.6 4 9.3 4 13v5h6v-6H7c.2-2 1.4-3.4 3.2-3.9L9.5 6Zm10 0c-3 .6-5.5 3.3-5.5 7v5h6v-6h-3c.2-2 1.4-3.4 3.2-3.9L19.5 6Z" />
 						</svg>
-						<blockquote class="mt-4 space-y-4 text-[14px] leading-[1.6] text-ink">
+						<blockquote class="mt-4 space-y-4 text-[13px] leading-[1.6] text-ink">
 							{t.text.map((para) => <p>{para}</p>)}
 						</blockquote>
 					</figure>
@@ -374,32 +375,3 @@ import DownloadCV from '../components/DownloadCV.astro';
 	<Footer />
 </Layout>
 
-<script>
-	// Étape 15, S54 + S56: recommendations in cascade, in David's order read
-	// left to right (Elad, Leah, Ben on the first row): each card goes, in
-	// order, to the shortest column (leftmost when equal). Without JS, the
-	// CSS columns of .reco-masonry stay.
-	const box = document.querySelector<HTMLElement>('.reco-masonry');
-	if (box) {
-		const cards = Array.from(box.children) as HTMLElement[];
-		const layout = (force = false) => {
-			const n = innerWidth >= 1024 ? 3 : innerWidth >= 768 ? 2 : 1;
-			if (!force && box.dataset.n === String(n)) return;
-			box.dataset.n = String(n);
-			const cols = Array.from({ length: n }, () => {
-				const c = document.createElement('div');
-				c.className = 'reco-col';
-				return c;
-			});
-			box.classList.add('is-js');
-			box.replaceChildren(...cols);
-			cards.forEach((card) => {
-				const col = cols.reduce((a, b) => (b.offsetHeight < a.offsetHeight ? b : a));
-				col.appendChild(card);
-			});
-		};
-		layout(true);
-		document.fonts?.ready.then(() => layout(true));
-		addEventListener('resize', () => layout());
-	}
-</script>
