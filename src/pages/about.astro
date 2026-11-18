@@ -184,7 +184,7 @@ import DownloadCV from '../components/DownloadCV.astro';
 
 	<section class="mx-auto max-w-[1200px] px-6 pt-8 sm:pt-10 min-[1248px]:px-0" data-reveal>
 		{/* Étape 12, 6: a "← Back" link at the top of every inner page. */}
-		<a href="/" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><span class="arr-back" aria-hidden="true">→</span>Back</a>
+		<a href="/" data-top-back class="text-sm font-semibold text-accent-text"><span class="arr-back" aria-hidden="true">→</span>Back</a>
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">About me</p>
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
 			Product design craft, now <span class="whitespace-nowrap">AI-native.</span>
@@ -195,7 +195,7 @@ import DownloadCV from '../components/DownloadCV.astro';
 		<p class="mt-4 text-sm font-semibold text-ink">Available now · <span class="whitespace-nowrap">Ashkelon, Israel</span> · <span class="whitespace-nowrap">Hybrid or remote, Tel Aviv area</span></p>
 		{/* Étape 12, 10 + 15, S50: one line, LinkedIn ↗ then the CV block, 32 px apart, no dot. */}
 		<div class="mt-6 flex flex-wrap items-center gap-x-8 text-sm">
-			<a href={linkedinUrl} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-semibold text-accent-text hover:underline">LinkedIn<span class="sr-only"> (opens in a new tab)</span><span class="ext-arr" aria-hidden="true">↗</span></a>
+			<a href={linkedinUrl} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-semibold text-accent-text">LinkedIn<span class="sr-only"> (opens in a new tab)</span><span class="ext-arr" aria-hidden="true">↗</span></a>
 			<DownloadCV />
 		</div>
 	</section>
@@ -213,14 +213,14 @@ import DownloadCV from '../components/DownloadCV.astro';
 	<div class="sec-gap"></div>
 
 	<section class="mx-auto max-w-[1200px] px-6 min-[1248px]:px-0" data-reveal>
-		<div class="box-line rounded-lg border border-ink/10 bg-card p-card">
+		<div class="box-line rounded-lg bg-card p-card">
 			<p class="text-sm font-semibold uppercase tracking-widest text-accent-text">How this site was built</p>
 			<p class="mt-4 max-w-2xl text-lg">
 				I designed and built this portfolio with AI (Claude).
 			</p>
 			<a
 				href="/colophon"
-				class="-mb-3 mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text hover:underline"
+				class="-mb-3 mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text"
 			>
 				Read the full colophon
 				<svg
@@ -232,7 +232,7 @@ import DownloadCV from '../components/DownloadCV.astro';
 					stroke-width="2.4"
 					stroke-linecap="round"
 					stroke-linejoin="round"
-					class="h-4 w-4"
+					class="relative top-[0.09em] h-4 w-4"
 				>
 					<path d="M5 12h14" />
 					<path d="M13 5l7 7-7 7" />
@@ -276,26 +276,33 @@ import DownloadCV from '../components/DownloadCV.astro';
 		</p>
 		{/* Étape 16, S80: back to the V5 layout (grid, 2 columns on desktop, 1 below),
 		    in David's order (Elad first); text 13 px. The cascade of S54 is gone. */}
-		<div class="mt-title gap-cards grid grid-cols-1 lg:grid-cols-2">
+		{/* Étape 17, S96: from 1024 px, 3 columns; closed cards all have the height of
+		    the shortest recommendation shown in full; "Read more" opens the 3 cards of
+		    its row together (see the script at the end of the page). Below 1024 px:
+		    unchanged (S80). */}
+		<div id="reco-grid" class="mt-title gap-cards grid grid-cols-1 lg:grid-cols-3">
 			{
 				testimonials.map((t) => (
 					/* Étape 13, 18: author (photo, name, role, company) at the top of
 					   the card, then the quote marks as on the home page, then the text. */
-					<figure class="reco-card rounded-md bg-card p-card">
+					<figure class="reco-card flex flex-col rounded-md bg-card p-card">
 						<RecByline t={t} top />
 						<svg aria-hidden="true" viewBox="0 0 24 24" class="h-6 w-6 text-accent" fill="currentColor">
 							<path d="M9.5 6C6.5 6.6 4 9.3 4 13v5h6v-6H7c.2-2 1.4-3.4 3.2-3.9L9.5 6Zm10 0c-3 .6-5.5 3.3-5.5 7v5h6v-6h-3c.2-2 1.4-3.4 3.2-3.9L19.5 6Z" />
 						</svg>
-						<blockquote class="mt-4 space-y-4 text-[13px] leading-[1.6] text-ink">
-							{t.text.map((para) => <p>{para}</p>)}
-						</blockquote>
+						<div class="reco-clip mt-4">
+							<blockquote class="space-y-4 text-[13px] leading-[1.6] text-ink">
+								{t.text.map((para) => <p>{para}</p>)}
+							</blockquote>
+						</div>
+						<button type="button" class="reco-more mt-auto min-h-11 self-start text-[13px] font-semibold text-ink" aria-expanded="false">Read more</button>
 					</figure>
 				))
 			}
 		</div>
 		{/* Étape 13, 19: centred. */}
 		<div class="mt-btn flex justify-center">
-			<a href={LINKEDIN_RECOMMENDATIONS_URL} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center text-sm font-semibold text-accent-text hover:underline">
+			<a href={LINKEDIN_RECOMMENDATIONS_URL} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center text-sm font-semibold text-accent-text">
 				Read all recommendations on LinkedIn<span class="sr-only"> (opens in a new tab)</span><span class="ext-arr" aria-hidden="true">↗</span>
 			</a>
 		</div>
@@ -375,3 +382,139 @@ import DownloadCV from '../components/DownloadCV.astro';
 	<Footer />
 </Layout>
 
+<style is:global>
+	/* Étape 17, S96: "Read more" only exists from 1024 px, and only on the cards whose text
+	   is cut (the script turns it on). */
+	.reco-more { display: none; }
+	.reco-more.is-on { display: inline-flex; align-items: center; }
+</style>
+
+<script>
+	// Étape 17, S96: About page, recommendations, from 1024 px up.
+	// Closed: every card has the height of the shortest recommendation shown in full
+	// (H0); longer texts are cut on a line boundary, with "Read more" at the bottom of the
+	// card. A click opens the 3 cards of its row together (each card keeps its own text,
+	// the row takes the height of its longest card), the row's links become "Read less";
+	// another click closes the row. Other rows stay as they are. Soft open (450 ms) and
+	// close (350 ms); instant with "reduce motion". Below 1024 px nothing happens.
+	const grid = document.getElementById('reco-grid');
+	if (grid) {
+		const COLS = 3;
+		const cards = Array.from(grid.querySelectorAll<HTMLElement>('.reco-card'));
+		const rowOf = (i: number) => Math.floor(i / COLS);
+		const rows = new Map<number, HTMLElement[]>();
+		cards.forEach((c, i) => rows.set(rowOf(i), [...(rows.get(rowOf(i)) ?? []), c]));
+		const openRows = new Set<number>();
+		const mq = window.matchMedia('(min-width: 1024px)');
+		const ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+		const clipOf = (c: HTMLElement) => c.querySelector<HTMLElement>('.reco-clip')!;
+		const btnOf = (c: HTMLElement) => c.querySelector<HTMLButtonElement>('.reco-more')!;
+		const reduce = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		let cut = new Map<HTMLElement, number>(); // card -> height of its cut text
+		let H0 = 0;
+
+		function reset() {
+			cards.forEach((c) => {
+				c.style.height = '';
+				clipOf(c).style.height = '';
+				clipOf(c).style.overflow = '';
+				btnOf(c).classList.remove('is-on');
+			});
+			cut = new Map();
+		}
+		// last text line that ends within `room` px of the top of the text block
+		function snap(c: HTMLElement, room: number) {
+			const clip = clipOf(c);
+			const top = clip.getBoundingClientRect().top;
+			const lineH = parseFloat(getComputedStyle(clip.querySelector('blockquote')!).lineHeight) || 20.8;
+			const range = document.createRange();
+			range.selectNodeContents(clip.querySelector('blockquote')!);
+			let best = 0;
+			for (const r of Array.from(range.getClientRects())) {
+				const bottom = r.bottom - top + (lineH - r.height) / 2;
+				if (bottom <= room + 0.5 && bottom > best) best = bottom;
+			}
+			return Math.round(best);
+		}
+		function layout() {
+			reset();
+			if (!mq.matches) return;
+			// 1. natural height of every card alone (text whole, no link): the shortest is H0
+			cards.forEach((c) => (c.style.alignSelf = 'start'));
+			const alone = cards.map((c) => c.offsetHeight);
+			H0 = Math.min(...alone);
+			// 2. the cards taller than H0 get the link and a text cut on a line boundary
+			cards.forEach((c, i) => {
+				if (alone[i] <= H0 + 0.5) return; // fits whole: no link
+				const clip = clipOf(c);
+				btnOf(c).classList.add('is-on');
+				clip.style.height = '0px';
+				const room = H0 - c.offsetHeight; // room for the text next to the card's other parts
+				clip.style.height = '';
+				cut.set(c, snap(c, room));
+			});
+			cards.forEach((c) => (c.style.alignSelf = ''));
+			// 3. closed state (a row that was open stays open)
+			cards.forEach((c, i) => {
+				const r = rowOf(i);
+				const clip = clipOf(c);
+				const btn = btnOf(c);
+				if (cut.has(c)) {
+					btn.classList.add('is-on');
+					btn.textContent = openRows.has(r) ? 'Read less' : 'Read more';
+					btn.setAttribute('aria-expanded', openRows.has(r) ? 'true' : 'false');
+				}
+				if (openRows.has(r)) return;
+				c.style.height = H0 + 'px';
+				if (cut.has(c)) { clip.style.height = cut.get(c)! + 'px'; clip.style.overflow = 'hidden'; }
+			});
+		}
+		function toggle(r: number) {
+			const row = rows.get(r)!;
+			const opening = !openRows.has(r);
+			const fast = reduce();
+			const start = row.map((c) => ({ card: c, h: c.getBoundingClientRect().height, clip: clipOf(c).getBoundingClientRect().height }));
+			// target heights
+			row.forEach((c) => { c.style.height = ''; clipOf(c).style.height = ''; clipOf(c).style.overflow = ''; });
+			let end: { h: number; clip: number }[];
+			if (opening) {
+				row.forEach((c) => (c.style.alignSelf = ''));
+				end = row.map((c) => ({ h: c.getBoundingClientRect().height, clip: clipOf(c).getBoundingClientRect().height }));
+			} else {
+				end = row.map((c) => ({ h: H0, clip: cut.has(c) ? cut.get(c)! : clipOf(c).getBoundingClientRect().height }));
+			}
+			if (opening) openRows.add(r); else openRows.delete(r);
+			row.forEach((c) => {
+				const b = btnOf(c);
+				if (cut.has(c)) { b.textContent = opening ? 'Read less' : 'Read more'; b.setAttribute('aria-expanded', String(opening)); }
+			});
+			const finish = () => {
+				row.forEach((c) => {
+					const clip = clipOf(c);
+					if (opening) { c.style.height = ''; clip.style.height = ''; clip.style.overflow = ''; }
+					else { c.style.height = H0 + 'px'; if (cut.has(c)) { clip.style.height = cut.get(c)! + 'px'; clip.style.overflow = 'hidden'; } }
+				});
+			};
+			if (fast) return finish();
+			let done = 0;
+			row.forEach((c, i) => {
+				const clip = clipOf(c);
+				c.style.height = start[i].h + 'px';
+				clip.style.overflow = 'hidden';
+				clip.style.height = start[i].clip + 'px';
+				const dur = opening ? 450 : 350;
+				const a1 = c.animate([{ height: start[i].h + 'px' }, { height: end[i].h + 'px' }], { duration: dur, easing: ease, fill: 'forwards' });
+				const a2 = clip.animate([{ height: start[i].clip + 'px' }, { height: end[i].clip + 'px' }], { duration: dur, easing: ease, fill: 'forwards' });
+				a1.onfinish = () => { a1.cancel(); if (++done === row.length * 2) finish(); };
+				a2.onfinish = () => { a2.cancel(); if (++done === row.length * 2) finish(); };
+			});
+		}
+		cards.forEach((c, i) => btnOf(c).addEventListener('click', () => toggle(rowOf(i))));
+		let t: number | undefined;
+		const again = () => { window.clearTimeout(t); t = window.setTimeout(layout, 120); };
+		window.addEventListener('resize', again);
+		mq.addEventListener('change', layout);
+		document.fonts?.ready.then(layout);
+		layout();
+	}
+</script>

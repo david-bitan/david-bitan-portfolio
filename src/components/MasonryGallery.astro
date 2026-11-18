@@ -233,9 +233,9 @@ const wideSrcset = (url: string, w: number) =>
 		   image’s exact shape, so nothing moves when it arrives. */
 		background: color-mix(in srgb, var(--color-ink) 6%, transparent);
 	}
+	/* étape 17, ajout 1: the 1 px outline is gone; the soft shadow stays. */
 	.mg-framed {
 		box-shadow:
-			0 0 0 1px color-mix(in srgb, var(--color-ink) 15%, transparent),
 			0 4px 6px -1px rgb(0 0 0 / 0.1),
 			0 2px 4px -2px rgb(0 0 0 / 0.1);
 	}

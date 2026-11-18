@@ -58,26 +58,28 @@ const pages = [
 			{/* the same very fine line as above the bottom line */}
 			<div class="my-6 h-px bg-white/10 lg:my-0 lg:h-auto lg:w-px" aria-hidden="true"></div>
 
-			<div>
+			<div class="flex flex-col">
 				<p class="footer-title">David Bitan</p>
 				<p class="mt-1 text-xs text-footer-muted">Ashkelon, Israel<span class="mx-1.5" aria-hidden="true">·</span>Hybrid or remote<span class="mx-1.5" aria-hidden="true">·</span>Tel Aviv area</p>
-				<ul class="mt-2 flex flex-col items-start text-sm font-medium">
+				<ul class="mt-2 flex flex-1 flex-col items-start text-sm font-medium">
 					<li>
-						<a href={emailHref} class="footer-accent inline-flex min-h-11 items-center gap-2.5">
+						<a href={emailHref} class="footer-link inline-flex min-h-11 items-center gap-2.5">
 							<Icon name="mail" class="footer-icon size-4 shrink-0" />{email}
 						</a>
 					</li>
 					<li>
-						<a href={phoneHref} class="footer-accent inline-flex min-h-11 items-center gap-2.5">
+						<a href={phoneHref} class="footer-link inline-flex min-h-11 items-center gap-2.5">
 							<Icon name="phone" class="footer-icon size-4 shrink-0" />{phone}
 						</a>
 					</li>
 					<li>
-						<a href={linkedinUrl} target="_blank" rel="noopener" class="footer-accent inline-flex min-h-11 items-center gap-2.5">
+						<a href={linkedinUrl} target="_blank" rel="noopener" class="footer-link inline-flex min-h-11 items-center gap-2.5">
 							<Icon name="linkedin" class="footer-icon size-4 shrink-0" /><span>LinkedIn<span class="ext-arr" aria-hidden="true">↗</span></span><span class="sr-only"> (opens in a new tab)</span>
 						</a>
 					</li>
-					<li class="mt-1.5"><DownloadCV tone="footer" /></li>
+					{/* Étape 17, S101: pushed to the bottom of the column, so the links sit as far from
+					    the new line above them as from the bottom line of the footer. */}
+					<li class="mt-auto self-stretch pt-2"><DownloadCV tone="footer" /></li>
 				</ul>
 			</div>
 		</div>
@@ -107,7 +109,9 @@ const pages = [
 		border-radius: 4px;
 		transition: color 150ms ease;
 	}
-	/* contact links: orange (5.2:1 on #151A28); hover like the CV links */
+	/* Étape 17, S100: e-mail, phone and LinkedIn use .footer-link (white at 70 %,
+	   orange on hover); orange stays on the CV links and on Colophon (.footer-accent). */
+	/* Colophon: orange (5.2:1 on #151A28); hover like the CV links */
 	.footer-accent {
 		color: #f25c24;
 		border-radius: 4px;

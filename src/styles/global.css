@@ -212,7 +212,9 @@ select:not(:disabled) {
 .arr-back {
   display: inline-block;
   margin-right: 0.3em;
-  transform: translateY(-0.1em) scaleX(-1);
+  /* Étape 17, ajout 1: height only, so the stroke sits on the middle of the
+     lowercase letters (was 2.06 px too high at 14 px; measured at 8x). */
+  transform: translateY(0.05em) scaleX(-1);
 }
 
 /* Étape 14, ajout 1 (S32): project page header. Desktop: the text keeps
@@ -463,11 +465,43 @@ html.theme-switching *::before,
 html.theme-switching *::after {
   transition: none !important;
 }
-html.theme-switching #site-header {
-  view-transition-name: none;
-}
+/* Étape 17, S94: the header and the sticky bars (chevron bar, filter bars)
+   were part of the page picture. On a phone, once the page was scrolled, that
+   picture sometimes dropped them for a moment, so the menu vanished and came
+   back at once in the other colour. Now each has its own layer (its own
+   name), pinned to its box, and fades exactly like the page: the old one
+   stays, the new one fades in over it, 0.8 s linear, all together. */
+html.theme-switching #site-header { view-transition-name: site-header; }
+html.theme-switching [data-zf-pre] { view-transition-name: zf-pre; }
+html.theme-switching #zone-filters-bar { view-transition-name: zf-bar; }
+html.theme-switching #craft-filters { view-transition-name: craft-bar; }
+/* with the phone menu open, the bars stay under the menu panel (in the page picture) */
+html.theme-switching:has(#site-header.menu-open) [data-zf-pre],
+html.theme-switching:has(#site-header.menu-open) #zone-filters-bar,
+html.theme-switching:has(#site-header.menu-open) #craft-filters { view-transition-name: none; }
 html.theme-switching::view-transition-old(root) {
   animation: none;
+}
+html.theme-switching::view-transition-group(site-header),
+html.theme-switching::view-transition-group(zf-pre),
+html.theme-switching::view-transition-group(zf-bar),
+html.theme-switching::view-transition-group(craft-bar) {
+  animation-duration: 0s;
+}
+html.theme-switching::view-transition-old(site-header),
+html.theme-switching::view-transition-old(zf-pre),
+html.theme-switching::view-transition-old(zf-bar),
+html.theme-switching::view-transition-old(craft-bar) {
+  display: block;
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.theme-switching::view-transition-new(site-header),
+html.theme-switching::view-transition-new(zf-pre),
+html.theme-switching::view-transition-new(zf-bar),
+html.theme-switching::view-transition-new(craft-bar) {
+  animation: 800ms linear both vt-fade-in;
+  mix-blend-mode: normal;
 }
 /* Étape 16, S87: twice as slow (0.4 s -> 0.8 s) and an even fade (linear):
    the new theme comes in over the old one in a single layer (background,
@@ -506,6 +540,24 @@ html.theme-switching::view-transition-new(root) {
   border-top: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
 }
 .sec-gap { height: var(--sp-sec); }
+/* Étape 17, S95: the rule under the hero, centred in the existing gap. */
+.hero-rule-gap { position: relative; }
+.hero-rule {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+@media (min-width: 1248px) { .hero-rule { padding-inline: 0; } }
+.hero-rule hr {
+  display: block;
+  height: 0;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-quiet) 40%, transparent);
+}
 .mt-sec { margin-top: var(--sp-sec); }
 .mt-title { margin-top: var(--sp-title); }
 .mb-title { margin-bottom: var(--sp-title); }

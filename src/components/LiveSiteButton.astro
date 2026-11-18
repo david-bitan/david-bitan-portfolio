@@ -1,0 +1,21 @@
+---
+// Étape 17, S93: the orange "Visit live site" button, moved out of the
+// "Read the full case study" drop-down. Same button as before (style, text,
+// new tab). Étape 17, ajout 1: the arrow is the V7 "→" of the small buttons (.arr .arr-x). `place`: 'text' = under the tags (desktop, or any width
+// when the page has no top composition); 'visual' = under the composition
+// (phones and tablets, below 1024 px).
+interface Props { href: string; place: 'text' | 'visual' | 'always' }
+const { href, place } = Astro.props;
+const show = place === 'text' ? 'max-[1023px]:hidden' : place === 'visual' ? 'min-[1024px]:hidden' : '';
+---
+<div class:list={['live-site-wrap mt-6', show]}>
+	<a
+		href={href}
+		target="_blank"
+		rel="noopener"
+		class="inline-flex items-center gap-2 rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-colors hover:bg-ink hover:text-bg"
+	>
+		Visit live site
+		<span class="arr arr-x" aria-hidden="true">→</span>
+	</a>
+</div>

@@ -15,10 +15,24 @@ const text = tone === 'footer' ? 'text-white/70' : 'text-muted';
 
 {/* Étape 15, S50: « [icon] CV PDF   [icon] CV Word »; no "Download", no
     dots; 24 px between the two links (the gap; no side padding). */}
+{tone === 'footer' ? (
+	/* Étape 17, S101: footer only. A thin line across the column, then the two
+	   links share the width in two equal halves, each centred in its half, with a
+	   small vertical rule (1 px, cap height, white at 40 %) exactly in the middle.
+	   Space above the links = space below them up to the bottom line of the footer: 8 px (padding) + 24 px (phones) or 40 px (desktop) below, so 32 / 48 px above (multiples of 8). Icons white (S97). */
+	<div class="border-t border-white/10 pb-2 pt-8 text-sm lg:pt-12">
+		<div class="cv-split">
+			<a href="/cv/CV-David-Bitan.pdf" download class="cv-dl-link"><Icon name="file-text" class="cv-ico size-4 shrink-0" />CV PDF</a>
+			<span class="cv-split-sep" aria-hidden="true"></span>
+			<a href="/cv/CV-David-Bitan.docx" download class="cv-dl-link"><Icon name="file-pen-line" class="cv-ico size-4 shrink-0" />CV Word</a>
+		</div>
+	</div>
+) : (
 <p class:list={['cv-dl inline-flex flex-wrap items-center gap-x-6 text-sm', text, cls]}>
 	<a href="/cv/CV-David-Bitan.pdf" download class="cv-dl-link"><Icon name="file-text" class="size-4 shrink-0" />CV PDF</a>
 	<a href="/cv/CV-David-Bitan.docx" download class="cv-dl-link"><Icon name="file-pen-line" class="size-4 shrink-0" />CV Word</a>
 </p>
+)}
 
 <style>
 	/* 44 px tall targets (each link is wider than 44 px). */
@@ -34,6 +48,25 @@ const text = tone === 'footer' ? 'text-white/70' : 'text-muted';
 		text-decoration: none;
 		transition: opacity 150ms ease;
 	}
+	/* Étape 17, S101: two equal halves, the rule exactly in the middle. */
+	.cv-split {
+		position: relative;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		align-items: center;
+	}
+	.cv-split .cv-dl-link { width: 100%; }
+	.cv-split-sep {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		width: 1px;
+		height: 1cap;
+		transform: translate(-50%, -50%);
+		background-color: rgb(255 255 255 / 0.4);
+	}
+	/* Étape 17, S97: footer icons white like the other footer icons. */
+	:global(.cv-ico) { color: rgb(255 255 255 / 0.7); }
 	@media (hover: hover) and (pointer: fine) {
 		.cv-dl-link:hover {
 			opacity: 0.8;

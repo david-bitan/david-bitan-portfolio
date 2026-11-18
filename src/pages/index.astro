@@ -22,7 +22,10 @@ import SectionRule from '../components/SectionRule.astro';
 	<Hero />
 	{/* Étape 15, S46: --sp-sec after the hero (no rule), a thin rule between
 	    2 sections, --sp-sec before the footer (no rule). */}
-	<div class="sec-gap after-hero"></div>
+	{/* Étape 17, S95: a thin 1 px rule in the middle of the gap between the hero
+	    and the company strip. It is drawn over the gap (absolute), so nothing
+	    moves. Same colour as the vertical rule of S90 (the specialties line at 40%). */}
+	<div class="sec-gap after-hero hero-rule-gap"><div class="hero-rule" aria-hidden="true"><hr /></div></div>
 	{/* Étape 9, B1: the company names run above the figures. */}
 	<LogosMarquee />
 	<SectionRule />

@@ -67,6 +67,7 @@ const projectJsonLd: Record<string, unknown> = {
 	...(project.liveUrl ? { url: project.liveUrl } : {}),
 };
 import ProjectTopVisual from '../../components/ProjectTopVisual.astro';
+import LiveSiteButton from '../../components/LiveSiteButton.astro';
 import { topLayouts } from '../../data/topVisuals';
 const visual = topLayouts[project.slug];
 ---
@@ -81,7 +82,7 @@ const visual = topLayouts[project.slug];
 	<main id="main" tabindex="-1">
 
 	<article class="mx-auto max-w-[1200px] px-6 pt-4 sm:pt-5 min-[1248px]:px-0" data-reveal>
-		<a href="/#work" data-top-back class="text-sm font-semibold text-accent-text hover:underline"><span class="arr-back" aria-hidden="true">→</span>Back to work</a>
+		<a href="/#work" data-top-back class="text-sm font-semibold text-accent-text"><span class="arr-back" aria-hidden="true">→</span>Back to work</a>
 
 		<p class="mt-8 text-sm font-semibold uppercase tracking-widest text-muted">{project.category}</p>
 		{/* Étape 14, ajout 1: the text on the left, the composition over the
@@ -99,9 +100,11 @@ const visual = topLayouts[project.slug];
 		{/* Tags as plain text with separators: they aren’t clickable, so they
 		    must not look like pills or buttons (David’s rule). */}
 		<p class="mt-4 text-sm text-muted">{project.tags.join(' · ')}</p>
+		{project.liveUrl && <LiveSiteButton href={project.liveUrl} place={visual ? 'text' : 'always'} />}
 		</div>
 
 		{visual && <ProjectTopVisual slug={project.slug} />}
+		{visual && project.liveUrl && <LiveSiteButton href={project.liveUrl} place="visual" />}
 		</div>
 
 		{/* Étape 14, ajout 1 (S33): Challenge · What I did · Result · Role, full width */}
@@ -144,7 +147,7 @@ const visual = topLayouts[project.slug];
 						aria-controls="case-study-body"
 						aria-expanded="true"
 						hidden
-						class="mb-6 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text hover:underline sm:mb-8"
+						class="mb-6 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text sm:mb-8"
 					>
 						<span>Show less</span>
 						<svg
@@ -180,33 +183,9 @@ const visual = topLayouts[project.slug];
 								</div>
 							</section>
 						))}
-						{project.liveUrl && (
+						{project.liveUrl && project.liveUrlNote && (
 							<div class="mt-10">
-								{project.liveUrlNote && (
-									<p class="mb-3 text-sm text-muted">{project.liveUrlNote}</p>
-								)}
-								<a
-									href={project.liveUrl}
-									target="_blank"
-									rel="noopener"
-									class="inline-flex items-center gap-2 rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-colors hover:bg-ink hover:text-bg"
-								>
-									Visit live site
-									<svg
-										aria-hidden="true"
-										xmlns="http://www.w3.org/2000/svg"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2.4"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										class="h-4 w-4"
-									>
-										<path d="M5 12h14" />
-										<path d="M13 5l7 7-7 7" />
-									</svg>
-								</a>
+								<p class="text-sm text-muted">{project.liveUrlNote}</p>
 							</div>
 						)}
 					</div>
@@ -216,7 +195,7 @@ const visual = topLayouts[project.slug];
 						id="case-study-toggle"
 						aria-controls="case-study-body"
 						aria-expanded="false"
-						class="mt-0 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text hover:underline aria-expanded:mt-6 sm:aria-expanded:mt-8"
+						class="mt-0 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text aria-expanded:mt-6 sm:aria-expanded:mt-8"
 					>
 						<span data-toggle-label>Read the full case study</span>
 						<svg
@@ -545,7 +524,7 @@ const visual = topLayouts[project.slug];
 												alt={project.title}
 												loading="lazy"
 												fetchpriority={zoneIdx === 0 && imgIdx < 2 ? "high" : undefined}
-												class={'block h-auto w-full' + (isDarkZone ? '' : ' border border-ink/15 shadow-md')}
+												class={'block h-auto w-full' + (isDarkZone ? '' : ' shadow-md')}
 												data-lb
 												data-lb-kind="desktop"
 												data-lb-src={cld(url, FULL)}
