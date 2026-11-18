@@ -58,10 +58,10 @@ const pages = [
 			{/* the same very fine line as above the bottom line */}
 			<div class="my-6 h-px bg-white/10 lg:my-0 lg:h-auto lg:w-px" aria-hidden="true"></div>
 
-			<div class="flex flex-col">
+			<div class="flex flex-col lg:block">
 				<p class="footer-title">David Bitan</p>
 				<p class="mt-1 text-xs text-footer-muted">Ashkelon, Israel<span class="mx-1.5" aria-hidden="true">·</span>Hybrid or remote<span class="mx-1.5" aria-hidden="true">·</span>Tel Aviv area</p>
-				<ul class="mt-2 flex flex-1 flex-col items-start text-sm font-medium">
+				<ul class="mt-2 flex flex-1 flex-col items-start text-sm font-medium lg:flex-none">
 					<li>
 						<a href={emailHref} class="footer-link inline-flex min-h-11 items-center gap-2.5">
 							<Icon name="mail" class="footer-icon size-4 shrink-0" />{email}
@@ -79,13 +79,13 @@ const pages = [
 					</li>
 					{/* Étape 17, S101: pushed to the bottom of the column, so the links sit as far from
 					    the new line above them as from the bottom line of the footer. */}
-					<li class="mt-auto self-stretch pt-2"><DownloadCV tone="footer" /></li>
+					<li class="mt-auto self-stretch pt-2 lg:mt-1.5 lg:self-auto lg:pt-0"><DownloadCV tone="footer" /></li>
 				</ul>
 			</div>
 		</div>
 
 		{/* bottom line: copyright · Colophon · release marker (+1 at every release) */}
-		<div class="mt-6 flex flex-wrap items-center gap-x-2 border-t border-white/10 pt-4 text-xs text-footer-muted lg:mt-10">
+		<div class="mt-6 flex flex-wrap items-center justify-center gap-x-2 border-t border-white/10 pt-4 text-xs text-footer-muted lg:mt-10 lg:justify-start">
 			<span>© {year} David Bitan</span>
 			<span aria-hidden="true">·</span>
 			<a href="/colophon" class="footer-accent inline-flex min-h-11 items-center">Colophon</a>
@@ -115,14 +115,15 @@ const pages = [
 	.footer-accent {
 		color: #f25c24;
 		border-radius: 4px;
-		transition: opacity 150ms ease;
+		transition: color 150ms ease;
 	}
 	@media (hover: hover) and (pointer: fine) {
 		.footer-link:hover {
 			color: #f25c24;
 		}
+		/* Étape 18, S111: orange link -> white on hover (colour only). */
 		.footer-accent:hover {
-			opacity: 0.8;
+			color: var(--color-footer-ink);
 		}
 	}
 	/* étape 13, 7: e-mail, phone and LinkedIn icons in white (70 %, like the page icons) */

@@ -29,7 +29,7 @@ const [title, company] = cut > 0 ? [t.role.slice(0, cut + 1), t.role.slice(cut +
 <figcaption class:list={['grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-3 gap-y-2 border-ink/10 sm:flex sm:items-center sm:gap-4', top ? 'mb-4 border-b pb-5' : 'mt-6 border-t pt-5']}>
 	{
 		t.photo ? (
-			<img src={t.photo} alt="" width="60" height="60" loading="lazy" class="h-12 w-12 shrink-0 rounded-full object-cover ring-1 ring-ink/10 sm:h-[60px] sm:w-[60px]" />
+			<img src={t.photo} alt="" width="60" height="60" loading="lazy" class="h-12 w-12 shrink-0 rounded-full object-cover sm:h-[60px] sm:w-[60px]" />
 		) : (
 			<span
 				class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ink/10 text-base font-bold text-muted sm:h-[60px] sm:w-[60px]"

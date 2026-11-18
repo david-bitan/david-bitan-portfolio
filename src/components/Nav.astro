@@ -37,12 +37,12 @@ import DownloadCV from './DownloadCV.astro';
 		<div class="hidden items-center gap-8 lg:flex">
 			{
 				links.map((link) => (
-					<a href={link.href} class:list={['nav-link text-sm transition-colors', current === link.spy ? 'nav-link-active font-semibold' : 'font-medium text-muted hover:text-ink']} aria-current={current === link.spy ? 'page' : undefined} data-spy={link.spy}>
+					<a href={link.href} class:list={['nav-link text-sm transition-colors', current === link.spy ? 'nav-link-active font-semibold' : 'font-medium text-muted hover:text-accent-text']} aria-current={current === link.spy ? 'page' : undefined} data-spy={link.spy}>
 						{link.label}
 					</a>
 				))
 			}
-			<a href="/contact" class:list={['nav-link text-sm transition-colors', onContact ? 'nav-link-active font-semibold' : 'font-medium text-muted hover:text-ink']} aria-current={onContact ? 'page' : undefined}>Contact</a>
+			<a href="/contact" class:list={['nav-link text-sm transition-colors', onContact ? 'nav-link-active font-semibold' : 'font-medium text-muted hover:text-accent-text']} aria-current={onContact ? 'page' : undefined}>Contact</a>
 		</div>
 
 		<div class="flex items-center gap-3">
@@ -190,21 +190,14 @@ import DownloadCV from './DownloadCV.astro';
 		position: relative;
 		color: var(--color-accent-text) !important;
 	}
-	.nav-link-active::after {
-		content: '';
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: -6px;
-		height: 2px;
-		background: var(--color-accent);
-		border-radius: 1px;
-	}
+	/* Étape 18, S112: no bar under the current section any more (orange text only). */
 	/* Étape 12, 12: in the phone menu the current section is orange text
 	   only, never underlined. */
 	.mobile-nav-panel .nav-link-active::after {
 		content: none;
 	}
+	/* Étape 18, S119: 8 px more between « CV Pdf » and « CV Docx » in the phone menu (24 -> 32 px). */
+	.mobile-nav-cv :global(.cv-dl) { column-gap: 32px; }
 </style>
 
 <script>

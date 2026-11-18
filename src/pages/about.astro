@@ -189,7 +189,7 @@ import DownloadCV from '../components/DownloadCV.astro';
 		<h1 class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
 			Product design craft, now <span class="whitespace-nowrap">AI-native.</span>
 		</h1>
-		<p class="mt-6 max-w-2xl text-lg text-muted">
+		<p class="mt-6 max-w-2xl text-lg text-muted max-lg:text-[16px] max-lg:leading-7">
 			Senior AI Product Designer for SaaS, fintech and iGaming products and websites, focused on AI-augmented design and AI UX. At Ryze Beyond (2019 – 2026), I owned my projects end to end. The design team ranged from 1 to 4 people: when designers joined, we split the projects, each very different from the others, to share the workload; when they moved on, I took them all back.
 		</p>
 		<p class="mt-4 text-sm font-semibold text-ink">Available now · <span class="whitespace-nowrap">Ashkelon, Israel</span> · <span class="whitespace-nowrap">Hybrid or remote, Tel Aviv area</span></p>
@@ -223,20 +223,7 @@ import DownloadCV from '../components/DownloadCV.astro';
 				class="-mb-3 mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text"
 			>
 				Read the full colophon
-				<svg
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2.4"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					class="relative top-[0.09em] h-4 w-4"
-				>
-					<path d="M5 12h14" />
-					<path d="M13 5l7 7-7 7" />
-				</svg>
+				<span class="arr arr-x" aria-hidden="true">→</span>
 			</a>
 		</div>
 	</section>
@@ -295,7 +282,7 @@ import DownloadCV from '../components/DownloadCV.astro';
 								{t.text.map((para) => <p>{para}</p>)}
 							</blockquote>
 						</div>
-						<button type="button" class="reco-more mt-auto min-h-11 self-start text-[13px] font-semibold text-ink" aria-expanded="false">Read more</button>
+						<button type="button" class="reco-more mt-auto min-h-11 self-start text-[13px] font-semibold text-accent-text" aria-expanded="false">Read more</button>
 					</figure>
 				))
 			}
@@ -387,6 +374,18 @@ import DownloadCV from '../components/DownloadCV.astro';
 	   is cut (the script turns it on). */
 	.reco-more { display: none; }
 	.reco-more.is-on { display: inline-flex; align-items: center; }
+	/* Étape 18, S113: closed card, "…" right after the last visible word (set by the
+	   script); it fades out when the card opens. */
+	.reco-card { position: relative; }
+	.reco-ell {
+		position: absolute;
+		font-size: 13px;
+		line-height: normal;
+		color: var(--color-ink);
+		pointer-events: none;
+		transition: opacity 150ms ease;
+	}
+	@media (prefers-reduced-motion: reduce) { .reco-ell { transition: none; } }
 </style>
 
 <script>
@@ -413,7 +412,39 @@ import DownloadCV from '../components/DownloadCV.astro';
 		let cut = new Map<HTMLElement, number>(); // card -> height of its cut text
 		let H0 = 0;
 
+		// Étape 18, S113: the "…" after the last visible word of a closed card.
+		const ellOf = (c: HTMLElement) => {
+			let e = c.querySelector<HTMLElement>('.reco-ell');
+			if (!e) { e = document.createElement('span'); e.className = 'reco-ell'; e.setAttribute('aria-hidden', 'true'); e.textContent = '…'; c.appendChild(e); }
+			return e;
+		};
+		function placeEll(c: HTMLElement, h: number) {
+			const bq = clipOf(c).querySelector('blockquote')!;
+			const top = clipOf(c).getBoundingClientRect().top;
+			const range = document.createRange();
+			const walker = document.createTreeWalker(bq, NodeFilter.SHOW_TEXT);
+			let last: DOMRect | null = null;
+			let done = false;
+			while (!done && walker.nextNode()) {
+				const n = walker.currentNode as Text;
+				const re = /\S+/g;
+				let m: RegExpExecArray | null;
+				while ((m = re.exec(n.data))) {
+					range.setStart(n, m.index); range.setEnd(n, m.index + m[0].length);
+					const rs = range.getClientRects(); const r = rs[rs.length - 1];
+					if (!r) continue;
+					if (r.bottom - top <= h + 0.5) last = r; else { done = true; break; }
+				}
+			}
+			const e = ellOf(c);
+			if (!last) { e.style.opacity = '0'; return; }
+			const box = c.getBoundingClientRect();
+			e.style.left = last.right - box.left + 'px';
+			e.style.top = last.top - box.top + 'px';
+			e.style.opacity = '1';
+		}
 		function reset() {
+			cards.forEach((c) => c.querySelector('.reco-ell')?.remove());
 			cards.forEach((c) => {
 				c.style.height = '';
 				clipOf(c).style.height = '';
@@ -464,10 +495,11 @@ import DownloadCV from '../components/DownloadCV.astro';
 					btn.textContent = openRows.has(r) ? 'Read less' : 'Read more';
 					btn.setAttribute('aria-expanded', openRows.has(r) ? 'true' : 'false');
 				}
-				if (openRows.has(r)) return;
+				if (openRows.has(r)) { if (cut.has(c)) ellOf(c).style.opacity = '0'; return; }
 				c.style.height = H0 + 'px';
 				if (cut.has(c)) { clip.style.height = cut.get(c)! + 'px'; clip.style.overflow = 'hidden'; }
 			});
+			cards.forEach((c, i) => { if (cut.has(c) && !openRows.has(rowOf(i))) placeEll(c, cut.get(c)!); });
 		}
 		function toggle(r: number) {
 			const row = rows.get(r)!;
@@ -487,12 +519,13 @@ import DownloadCV from '../components/DownloadCV.astro';
 			row.forEach((c) => {
 				const b = btnOf(c);
 				if (cut.has(c)) { b.textContent = opening ? 'Read less' : 'Read more'; b.setAttribute('aria-expanded', String(opening)); }
+				if (cut.has(c) && opening) ellOf(c).style.opacity = '0';
 			});
 			const finish = () => {
 				row.forEach((c) => {
 					const clip = clipOf(c);
 					if (opening) { c.style.height = ''; clip.style.height = ''; clip.style.overflow = ''; }
-					else { c.style.height = H0 + 'px'; if (cut.has(c)) { clip.style.height = cut.get(c)! + 'px'; clip.style.overflow = 'hidden'; } }
+					else { c.style.height = H0 + 'px'; if (cut.has(c)) { clip.style.height = cut.get(c)! + 'px'; clip.style.overflow = 'hidden'; placeEll(c, cut.get(c)!); } }
 				});
 			};
 			if (fast) return finish();

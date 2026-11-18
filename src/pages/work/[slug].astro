@@ -230,15 +230,17 @@ const visual = topLayouts[project.slug];
 			max-height: 0;
 			opacity: 0;
 			/* closing: a touch quicker than opening */
+			/* Étape 18, S114: slower and softer both ways (was 450 / 350 ms, ease-out):
+			   650 ms to close, 750 ms to open, ease-in-out (starts and ends gently). */
 			transition:
-				max-height 350ms cubic-bezier(0.22, 0.61, 0.36, 1),
-				opacity 250ms ease-out;
+				max-height 650ms cubic-bezier(0.65, 0, 0.35, 1),
+				opacity 400ms ease-out;
 		}
 		.case-study-body[aria-hidden='false'] {
 			opacity: 1;
 			transition:
-				max-height 450ms cubic-bezier(0.22, 0.61, 0.36, 1),
-				opacity 300ms ease-out 100ms;
+				max-height 750ms cubic-bezier(0.65, 0, 0.35, 1),
+				opacity 450ms ease-out 150ms;
 		}
 		@media (prefers-reduced-motion: reduce) {
 			.case-study-body,
@@ -264,10 +266,26 @@ const visual = topLayouts[project.slug];
 			const labelEl = btn.querySelector('[data-toggle-label]');
 			const chevron = btn.querySelector('[data-toggle-chevron]');
 			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-			const D_OPEN = 450;
-			const D = 350; // closing
-			const EASE = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+			// Étape 18, S114: 750 ms to open, 650 ms to close, ease-in-out (was 450 / 350 ms).
+			const D_OPEN = 750;
+			const D = 650; // closing
+			const EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';
 			let topAnim = null;
+			// Étape 18, S114: the block that holds the two buttons and the text changes height
+			// smoothly, so what is under it (the filter bar "All Desktop Mobile | All Light
+			// Dark") moves without any jump. Before, the top button vanished at the end of the
+			// close (and the bottom one changed its margin), so the bar jumped 24 to 76 px.
+			const wrap = btn.parentElement;
+			let wrapAnim = null;
+			let topFull = 0; // full height of the top button with its margins, measured when it opens
+			const releaseWrap = () => { wrapAnim?.cancel(); wrapAnim = null; wrap.style.overflowY = ''; };
+			function slideWrap(h0, h1, dur, auto) {
+				releaseWrap();
+				if (reduce.matches || Math.abs(h1 - h0) < 1) return;
+				wrap.style.overflowY = 'clip';
+				wrapAnim = wrap.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: dur, easing: EASE, fill: 'forwards' });
+				if (auto) wrapAnim.onfinish = releaseWrap;
+			}
 			// After opening, release the height so late images are never cut;
 			// ignored if the block was closed again in the meantime.
 			const clear = (e) => {
@@ -305,6 +323,22 @@ const visual = topLayouts[project.slug];
 					topAnim?.cancel();
 					topAnim = null;
 					topBtn.hidden = false;
+					// Étape 18, S114: the top button grows in instead of appearing at once.
+					const csTop = getComputedStyle(topBtn);
+					topFull = topBtn.offsetHeight + (parseFloat(csTop.marginTop) || 0) + (parseFloat(csTop.marginBottom) || 0);
+					if (!reduce.matches) {
+						const cs = csTop;
+						// block-level while it grows: an inline button keeps a text line (24 px) even at height 0
+						topBtn.style.display = 'flex';
+						const grow = topBtn.animate(
+							[
+								{ height: '0px', minHeight: '0px', marginTop: '0px', marginBottom: '0px', opacity: 0, overflow: 'hidden' },
+								{ height: topBtn.offsetHeight + 'px', minHeight: '0px', marginTop: cs.marginTop, marginBottom: cs.marginBottom, opacity: 1, overflow: 'hidden' },
+							],
+							{ duration: D_OPEN, easing: EASE },
+						);
+						grow.onfinish = grow.oncancel = () => { topBtn.style.display = ''; };
+					}
 				}
 				// Phones: the button’s top margin changes with its state; the new
 				// margin applies at once and the button glides there with a
@@ -327,7 +361,11 @@ const visual = topLayouts[project.slug];
 				const chev = topBtn.querySelector('svg');
 				if (lab) lab.textContent = 'Read the full case study';
 				if (chev) chev.style.transform = '';
+				// Étape 18, S114: the block shrinks smoothly to the height of one button.
+				const h0 = wrap.getBoundingClientRect().height;
 				btn.style.opacity = '0';
+				btn.style.position = 'absolute';
+				slideWrap(h0, topBtn.offsetHeight, D, false);
 				const done = () => {
 					body.removeEventListener('transitionend', onEnd);
 					clearTimeout(timer);
@@ -335,6 +373,8 @@ const visual = topLayouts[project.slug];
 					if (btn.getAttribute('aria-expanded') === 'true') return; // reopened meanwhile
 					const hadFocus = document.activeElement === topBtn;
 					topBtn.hidden = true;
+					btn.style.position = '';
+					releaseWrap();
 					if (lab) lab.textContent = 'Show less';
 					if (chev) chev.style.transform = 'rotate(180deg)';
 					btn.style.opacity = '';
@@ -346,6 +386,8 @@ const visual = topLayouts[project.slug];
 				topAnim = { cancel: () => {
 					body.removeEventListener('transitionend', onEnd);
 					clearTimeout(timer);
+					btn.style.position = '';
+					releaseWrap();
 					if (lab) lab.textContent = 'Show less';
 					if (chev) chev.style.transform = 'rotate(180deg)';
 					btn.style.opacity = '';
@@ -357,6 +399,8 @@ const visual = topLayouts[project.slug];
 				if (!topBtn || topBtn.hidden) return;
 				if (reduce.matches) { topBtn.hidden = true; return; }
 				const cs = getComputedStyle(topBtn);
+				// Étape 18, S114: block-level while it folds (an inline button keeps a 24 px text line at height 0)
+				topBtn.style.display = 'flex';
 				const anim = topBtn.animate(
 					[
 						{ height: topBtn.offsetHeight + 'px', minHeight: '0px', marginTop: cs.marginTop, marginBottom: cs.marginBottom, opacity: 1, overflow: 'hidden' },
@@ -365,7 +409,8 @@ const visual = topLayouts[project.slug];
 					{ duration: D, easing: EASE },
 				);
 				topAnim = anim;
-				anim.onfinish = () => { topBtn.hidden = true; topAnim = null; };
+				anim.onfinish = () => { topBtn.hidden = true; topBtn.style.display = ''; topAnim = null; releaseWrap(); };
+				anim.oncancel = () => { topBtn.style.display = ''; };
 			}
 
 			// Top "Show less": the page does not scroll; the focus goes back to
@@ -387,14 +432,19 @@ const visual = topLayouts[project.slug];
 			btn.addEventListener('click', () => {
 				const expanded = btn.getAttribute('aria-expanded') === 'true';
 				cancelAnimationFrame(followRaf); // reopened while the page was still gliding
+				const h0 = wrap.getBoundingClientRect().height; // Étape 18, S114
 				if (!expanded) {
 					openedAt = btn.getBoundingClientRect().top;
 					setExpanded(true);
+					// the block grows from its height to its full open height
+					slideWrap(h0, topFull + body.scrollHeight + btn.offsetHeight + (parseFloat(getComputedStyle(btn).marginTop) || 0), D_OPEN, true);
 					return;
 				}
 				const keep = openedAt ?? window.innerHeight * 0.4;
 				const from = btn.getBoundingClientRect().top;
 				setExpanded(false);
+				// the block shrinks to the height of one button (released when the top one is gone)
+				slideWrap(h0, btn.offsetHeight, D, !topBtn || topBtn.hidden);
 				foldTopAway();
 				if (reduce.matches) {
 					const top = btn.getBoundingClientRect().top + window.scrollY;
@@ -510,7 +560,7 @@ const visual = topLayouts[project.slug];
 							//     capped to natural width so it never upscales.
 							//   - Wide (natW ≥ 900) = normal desktop mockup → stays
 							//     full-width in the stack.
-							<div class="mt-title" data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
+							<div class:list={['mt-title', { 'bleed-mobile': project.slug === 'gamingtech' }]} data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
 								<div class="space-y-10" data-desktop-stack>
 									{zone.images.filter(({ url }) => !isNarrow(url)).map(({ url }, imgIdx) => (
 										<div
@@ -615,6 +665,11 @@ const visual = topLayouts[project.slug];
 			.img-skeleton > img { transition: none; }
 		}
 
+		/* Étape 18, S121: GamingTech, phones and tablets (< 1024 px): the images go from one
+		   edge of the screen to the other (the page margin is 24 px). Desktop unchanged. */
+		@media (max-width: 1023.98px) {
+			.bleed-mobile { margin-inline: -24px; }
+		}
 		.narrow-masonry { columns: 1; column-gap: 32px; }
 		.narrow-masonry:empty { display: none; } /* étape 15, S46: no extra space when no narrow item */
 		@media (min-width: 640px) { .narrow-masonry { columns: 2; } }

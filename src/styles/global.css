@@ -25,6 +25,8 @@
   --color-accent-ink: #ffffff;
   --color-accent-text: #f25c24;
   --color-accent-secondary: #f25c24;
+  /* Étape 18, S111: hover of an orange link, light mode: a slightly darker orange */
+  --color-accent-hover: #d55120;
 
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 
@@ -70,6 +72,8 @@
   --color-footer-muted: #8e94a2;
   --color-accent-text: #f25c24;
   --color-accent-secondary: #f25c24;
+  /* Étape 18, S111: hover of an orange link, dark mode: white (the site's white text) */
+  --color-accent-hover: #eef0f4;
 }
 
 /* The footer is always dark, so it keeps the bright orange in both themes. */
@@ -471,14 +475,16 @@ html.theme-switching *::after {
    back at once in the other colour. Now each has its own layer (its own
    name), pinned to its box, and fades exactly like the page: the old one
    stays, the new one fades in over it, 0.8 s linear, all together. */
-html.theme-switching #site-header { view-transition-name: site-header; }
-html.theme-switching [data-zf-pre] { view-transition-name: zf-pre; }
-html.theme-switching #zone-filters-bar { view-transition-name: zf-bar; }
-html.theme-switching #craft-filters { view-transition-name: craft-bar; }
-/* with the phone menu open, the bars stay under the menu panel (in the page picture) */
-html.theme-switching:has(#site-header.menu-open) [data-zf-pre],
-html.theme-switching:has(#site-header.menu-open) #zone-filters-bar,
-html.theme-switching:has(#site-header.menu-open) #craft-filters { view-transition-name: none; }
+/* Étape 18, S123 (replaces the S94 layers): during the theme switch the header and the
+   sticky bars get NO layer of their own. A separate layer is placed by the browser from
+   the element's box; for a sticky bar on a scrolled phone page, that place can be wrong
+   (out of the screen), so the menu vanished for 0.8 s and came back in the other colour.
+   Without a name they are painted inside the page picture exactly where they are on the
+   screen, and fade with the page. Page changes keep the header's own layer (above). */
+html.theme-switching #site-header,
+html.theme-switching [data-zf-pre],
+html.theme-switching #zone-filters-bar,
+html.theme-switching #craft-filters { view-transition-name: none; }
 html.theme-switching::view-transition-old(root) {
   animation: none;
 }
@@ -713,6 +719,21 @@ section[data-zone-label="Gallery"] .narrow-masonry > [data-desktop-item] {
   --c-proj-text: var(--color-muted);
 }
 .proj-intro { font-size: var(--fs-proj-intro); line-height: 28px; color: var(--c-proj-text); }
+/* Étape 18, S124: phones and tablets (< 1024 px): the text under the title is 16 px
+   (line height and grey unchanged). Desktop unchanged (17 px). */
+@media (max-width: 1023.98px) {
+  :root { --fs-proj-intro: 16px; }
+}
+
+/* Étape 18, S111: hover of the orange text links (computer with a mouse only): the
+   colour changes, nothing else. Light mode: a slightly darker orange; dark mode: white.
+   Buttons (filled or outlined) keep their own hover. */
+@media (hover: hover) and (pointer: fine) {
+  a.text-accent-text,
+  button.text-accent-text { transition: color 150ms ease; }
+  a.text-accent-text:hover,
+  button.text-accent-text:hover { color: var(--color-accent-hover); }
+}
 .proj-long { font-size: var(--fs-proj-long); color: var(--c-proj-text); }
 
 /* Étape 16, S84: a link of the phone menu leaves an inner page: the sticky

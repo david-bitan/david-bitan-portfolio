@@ -20,17 +20,25 @@ const text = tone === 'footer' ? 'text-white/70' : 'text-muted';
 	   links share the width in two equal halves, each centred in its half, with a
 	   small vertical rule (1 px, cap height, white at 40 %) exactly in the middle.
 	   Space above the links = space below them up to the bottom line of the footer: 8 px (padding) + 24 px (phones) or 40 px (desktop) below, so 32 / 48 px above (multiples of 8). Icons white (S97). */
-	<div class="border-t border-white/10 pb-2 pt-8 text-sm lg:pt-12">
+	<>
+	<div class="border-t border-white/10 pb-2 pt-8 text-sm lg:hidden">
 		<div class="cv-split">
-			<a href="/cv/CV-David-Bitan.pdf" download class="cv-dl-link"><Icon name="file-text" class="cv-ico size-4 shrink-0" />CV PDF</a>
+			<a href="/cv/CV-David-Bitan.pdf" download class="cv-dl-link cv-dl-foot"><Icon name="file-text" class="cv-ico size-4 shrink-0" />CV Pdf</a>
 			<span class="cv-split-sep" aria-hidden="true"></span>
-			<a href="/cv/CV-David-Bitan.docx" download class="cv-dl-link"><Icon name="file-pen-line" class="cv-ico size-4 shrink-0" />CV Word</a>
+			<a href="/cv/CV-David-Bitan.docx" download class="cv-dl-link cv-dl-foot"><Icon name="file-pen-line" class="cv-ico size-4 shrink-0" />CV Docx</a>
 		</div>
 	</div>
+	{/* Étape 18, S117: from 1024 px, the footer CV links are laid out exactly as in the V7
+	    (a-envoyer-sur-github-19), with the S116 texts. */}
+	<p class="cv-dl hidden flex-wrap items-center gap-x-6 text-sm text-white/70 lg:inline-flex">
+		<a href="/cv/CV-David-Bitan.pdf" download class="cv-dl-link cv-dl-foot"><Icon name="file-text" class="cv-ico size-4 shrink-0" />CV Pdf</a>
+		<a href="/cv/CV-David-Bitan.docx" download class="cv-dl-link cv-dl-foot"><Icon name="file-pen-line" class="cv-ico size-4 shrink-0" />CV Docx</a>
+	</p>
+	</>
 ) : (
 <p class:list={['cv-dl inline-flex flex-wrap items-center gap-x-6 text-sm', text, cls]}>
-	<a href="/cv/CV-David-Bitan.pdf" download class="cv-dl-link"><Icon name="file-text" class="size-4 shrink-0" />CV PDF</a>
-	<a href="/cv/CV-David-Bitan.docx" download class="cv-dl-link"><Icon name="file-pen-line" class="size-4 shrink-0" />CV Word</a>
+	<a href="/cv/CV-David-Bitan.pdf" download class="cv-dl-link"><Icon name="file-text" class="cv-ico-page size-4 shrink-0" />CV Pdf</a>
+	<a href="/cv/CV-David-Bitan.docx" download class="cv-dl-link"><Icon name="file-pen-line" class="cv-ico-page size-4 shrink-0" />CV Docx</a>
 </p>
 )}
 
@@ -46,7 +54,7 @@ const text = tone === 'footer' ? 'text-white/70' : 'text-muted';
 		font-weight: 600;
 		color: var(--color-accent-text);
 		text-decoration: none;
-		transition: opacity 150ms ease;
+		transition: color 150ms ease;
 	}
 	/* Étape 17, S101: two equal halves, the rule exactly in the middle. */
 	.cv-split {
@@ -65,11 +73,15 @@ const text = tone === 'footer' ? 'text-white/70' : 'text-muted';
 		transform: translate(-50%, -50%);
 		background-color: rgb(255 255 255 / 0.4);
 	}
-	/* Étape 17, S97: footer icons white like the other footer icons. */
-	:global(.cv-ico) { color: rgb(255 255 255 / 0.7); }
+	/* Étape 18, S115: CV icons white in dark mode, in the site's black (--color-ink) in
+	   light mode. The footer is dark in both modes, so its icons stay white (100 %). */
+	:global(.cv-ico) { color: #ffffff; }
+	:global(.cv-ico-page) { color: var(--color-ink); }
+	:global(:root[data-theme='dark'] .cv-ico-page) { color: #ffffff; }
+	/* Étape 18, S111: hover changes the colour only. Orange link: darker orange in light
+	   mode, white in dark mode; footer (dark in both modes): white. */
 	@media (hover: hover) and (pointer: fine) {
-		.cv-dl-link:hover {
-			opacity: 0.8;
-		}
+		.cv-dl-link:hover { color: var(--color-accent-hover); }
+		.cv-dl-foot:hover { color: var(--color-footer-ink); }
 	}
 </style>
