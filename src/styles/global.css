@@ -547,11 +547,15 @@ html.theme-switching::view-transition-new(root) {
 }
 .sec-gap { height: var(--sp-sec); }
 /* Étape 17, S95: the rule under the hero, centred in the existing gap. */
-.hero-rule-gap { position: relative; }
+/* V10 (David, 18/11 14:15): from the rule to "Companies I have designed for" = the
+   same space as from the company names to the rule under them (--sp-sec: 64 / 48 /
+   40 px). The rule keeps its distance to the hero above (half of --sp-sec), so the
+   gap grows by half of --sp-sec + 1 px (the rule). Same colour as the rule under the names. */
+.sec-gap.hero-rule-gap { position: relative; height: calc(var(--sp-sec) * 1.5 + 1px); }
 .hero-rule {
   position: absolute;
   inset-inline: 0;
-  top: 50%;
+  top: calc(var(--sp-sec) / 2);
   max-width: 1200px;
   margin-inline: auto;
   padding-inline: 24px;
@@ -562,7 +566,7 @@ html.theme-switching::view-transition-new(root) {
   height: 0;
   margin: 0;
   border: 0;
-  border-top: 1px solid color-mix(in srgb, var(--color-quiet) 40%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
 }
 .mt-sec { margin-top: var(--sp-sec); }
 .mt-title { margin-top: var(--sp-title); }
