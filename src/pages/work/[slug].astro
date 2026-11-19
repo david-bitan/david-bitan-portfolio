@@ -549,7 +549,8 @@ const visual = topLayouts[project.slug];
 							</div>
 						) : (
 							// Desktop shots: stacked full-width. srcset covers 2K/4K.
-							// NO rounded (would clip mockup edges). Border+shadow
+							// NO rounded (would clip mockup edges; V11 ajout 1, S125.2: GamingTech
+							// only is rounded, see the .gt-fill rules below). Border+shadow
 							// only for LIGHT (or theme-less) zones so light mockups
 							// don’t bleed into the near-white body. Dark mockups
 							// render border-less — they already stand out.
@@ -560,7 +561,7 @@ const visual = topLayouts[project.slug];
 							//     capped to natural width so it never upscales.
 							//   - Wide (natW ≥ 900) = normal desktop mockup → stays
 							//     full-width in the stack.
-							<div class:list={['mt-title', { 'bleed-mobile': project.slug === 'gamingtech' }]} data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
+							<div class:list={['mt-title', { 'gt-fill': project.slug === 'gamingtech' }]} data-desktop-zone data-dark-zone={isDarkZone ? '1' : '0'}>
 								<div class="space-y-10" data-desktop-stack>
 									{zone.images.filter(({ url }) => !isNarrow(url)).map(({ url }, imgIdx) => (
 										<div
@@ -665,10 +666,22 @@ const visual = topLayouts[project.slug];
 			.img-skeleton > img { transition: none; }
 		}
 
-		/* Étape 18, S121: GamingTech, phones and tablets (< 1024 px): the images go from one
-		   edge of the screen to the other (the page margin is 24 px). Desktop unchanged. */
+		/* V11, S121 + S125 (replaces the edge-to-edge of étape 18): GamingTech, phones and
+		   tablets (< 1024 px): EVERY image, small or large, takes the full width of the
+		   column, like the other full-width images of the site; the page margins stay
+		   (24 px), corners: see S125.2 below. Small images are enlarged (David checks sharpness).
+		   One image per row. Desktop and the other pages unchanged. */
 		@media (max-width: 1023.98px) {
-			.bleed-mobile { margin-inline: -24px; }
+			.gt-fill [data-desktop-item] { width: 100% !important; max-width: 100% !important; margin-inline: 0 !important; }
+			.gt-fill [data-desktop-item] > img { width: 100% !important; max-width: 100% !important; }
+			section[data-zone-label="Gallery"] .gt-fill .narrow-masonry > [data-desktop-item] { flex: 1 1 100%; width: 100% !important; }
+		}
+		/* V11 ajout 1, S125.2: GamingTech only, phones AND desktop: every gallery image has
+		   squircle corners, the same 16 px as the phone screenshots of the other pages
+		   (.pg-card). No outline. The other pages keep their square desktop images. */
+		.gt-fill [data-desktop-item] > img { border-radius: var(--radius-box); }
+		@supports (corner-shape: superellipse(3)) {
+			.gt-fill [data-desktop-item] > img { corner-shape: superellipse(3); }
 		}
 		.narrow-masonry { columns: 1; column-gap: 32px; }
 		.narrow-masonry:empty { display: none; } /* étape 15, S46: no extra space when no narrow item */

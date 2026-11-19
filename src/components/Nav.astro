@@ -289,6 +289,29 @@ import DownloadCV from './DownloadCV.astro';
 
 	// Étape 11, 14: one soft fade (0.8 s since étape 16, S87) for the whole page at once, with a
 	// view transition; instant under reduced motion or without support.
+	// V11, S123: on a phone (Chrome Android), when the address bar is shown, the fade's
+	// picture of the page also covers the address bar's place; the menu bar (sticky at
+	// the top) is drawn at the top of that bigger picture, so it sits behind the address
+	// bar (seen in David's video: only its last 3 px stay visible). During the fade only,
+	// the bar is moved down by the address bar's height, so it lands where it is on the
+	// screen. Only Chrome on Android (the case seen); the height is 0 when the address
+	// bar is hidden: then nothing changes. Computers, iPhone, iPad, Firefox: never.
+	let barProbe: HTMLDivElement | null = null;
+	function addressBarHeight() {
+		const ua = navigator.userAgent;
+		if (!/Android/i.test(ua) || !/Chrome\//.test(ua) || /Firefox/i.test(ua) || !window.matchMedia('(pointer: coarse)').matches) return 0;
+		if (window.visualViewport && Math.abs(window.visualViewport.scale - 1) > 0.01) return 0; // pinch-zoomed: no guess
+		if (!barProbe) {
+			barProbe = document.createElement('div');
+			barProbe.setAttribute('aria-hidden', 'true');
+			barProbe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:100lvh;visibility:hidden;pointer-events:none';
+			document.body.appendChild(barProbe);
+		}
+		const d = Math.round(barProbe.getBoundingClientRect().height - window.innerHeight);
+		return d > 0 && d <= 120 ? d : 0;
+	}
+	function endShift(id: number) { if (id === switchId) { root.classList.remove('vt-shift'); root.style.removeProperty('--vt-shift'); } }
+
 	themeToggle?.addEventListener('click', () => {
 		const dark = root.getAttribute('data-theme') !== 'dark';
 		try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch {}
@@ -296,7 +319,10 @@ import DownloadCV from './DownloadCV.astro';
 		const id = ++switchId;
 		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		if (!reduce && document.startViewTransition) {
-			document.startViewTransition(() => setTheme(dark)).finished.finally(() => endSwitch(id));
+			const shift = addressBarHeight();
+			if (shift) { root.style.setProperty('--vt-shift', shift + 'px'); root.classList.add('vt-shift'); }
+			else endShift(id);
+			document.startViewTransition(() => setTheme(dark)).finished.finally(() => { endShift(id); endSwitch(id); });
 		} else {
 			setTheme(dark);
 			endSwitch(id);

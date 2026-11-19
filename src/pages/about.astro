@@ -263,11 +263,13 @@ import DownloadCV from '../components/DownloadCV.astro';
 		</p>
 		{/* Étape 16, S80: back to the V5 layout (grid, 2 columns on desktop, 1 below),
 		    in David's order (Elad first); text 13 px. The cascade of S54 is gone. */}
-		{/* Étape 17, S96: from 1024 px, 3 columns; closed cards all have the height of
-		    the shortest recommendation shown in full; "Read more" opens the 3 cards of
-		    its row together (see the script at the end of the page). Below 1024 px:
-		    unchanged (S80). */}
-		<div id="reco-grid" class="mt-title gap-cards grid grid-cols-1 lg:grid-cols-3">
+		{/* Étape 17, S96: closed cards all have the height of the shortest recommendation
+		    shown in full; "Read more" opens the cards of its row together (see the script
+		    at the end of the page). */}
+		{/* V11, S113 + S125.1: the closed cards now work at every width; cards per row
+		    (.reco-grid, CSS below): 1 under 640 px, 2 from 640 px, 3 on a landscape screen
+		    at least 900 px wide and 500 px high, and 3 above 1366 px wide. */}
+		<div id="reco-grid" class="reco-grid mt-title gap-cards grid">
 			{
 				testimonials.map((t) => (
 					/* Étape 13, 18: author (photo, name, role, company) at the top of
@@ -370,7 +372,15 @@ import DownloadCV from '../components/DownloadCV.astro';
 </Layout>
 
 <style is:global>
-	/* Étape 17, S96: "Read more" only exists from 1024 px, and only on the cards whose text
+	/* V11, S125.1: recommendations per row. 1 under 640 px; 2 from 640 px (tablet in
+	   portrait, phone in landscape); 3 on a landscape screen (wider than high) at least
+	   900 px wide and 500 px high (tablet in landscape, laptop, desktop), and 3 above
+	   1366 px wide even in portrait. A phone in landscape (under 500 px high) keeps 2. */
+	.reco-grid { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+	@media (min-width: 640px) { .reco-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+	@media (orientation: landscape) and (min-width: 900px) and (min-height: 500px) { .reco-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+	@media (min-width: 1366.02px) { .reco-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+	/* Étape 17, S96 (V11, S113: at every width): "Read more" only on the cards whose text
 	   is cut (the script turns it on). */
 	.reco-more { display: none; }
 	.reco-more.is-on { display: inline-flex; align-items: center; }
@@ -389,22 +399,33 @@ import DownloadCV from '../components/DownloadCV.astro';
 </style>
 
 <script>
-	// Étape 17, S96: About page, recommendations, from 1024 px up.
+	// Étape 17, S96: About page, recommendations (V11: at every width).
 	// Closed: every card has the height of the shortest recommendation shown in full
 	// (H0); longer texts are cut on a line boundary, with "Read more" at the bottom of the
 	// card. A click opens the 3 cards of its row together (each card keeps its own text,
 	// the row takes the height of its longest card), the row's links become "Read less";
 	// another click closes the row. Other rows stay as they are. Soft open (450 ms) and
-	// close (350 ms); instant with "reduce motion". Below 1024 px nothing happens.
+	// close (350 ms); instant with "reduce motion".
+	// V11, S113 + S125.1: the same at every width (phone, tablet, desktop). A "row" is
+	// the cards side by side on the screen at that moment (1, 2 or 3, CSS .reco-grid).
+	// When the number per row changes (window resized, tablet turned), every row closes
+	// and the cards are measured again.
 	const grid = document.getElementById('reco-grid');
 	if (grid) {
-		const COLS = 3;
+		let COLS = 0;
 		const cards = Array.from(grid.querySelectorAll<HTMLElement>('.reco-card'));
 		const rowOf = (i: number) => Math.floor(i / COLS);
 		const rows = new Map<number, HTMLElement[]>();
-		cards.forEach((c, i) => rows.set(rowOf(i), [...(rows.get(rowOf(i)) ?? []), c]));
 		const openRows = new Set<number>();
-		const mq = window.matchMedia('(min-width: 1024px)');
+		const colsNow = () => getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
+		function setCols() {
+			const n = colsNow();
+			if (n === COLS) return;
+			COLS = n;
+			openRows.clear();
+			rows.clear();
+			cards.forEach((c, i) => rows.set(rowOf(i), [...(rows.get(rowOf(i)) ?? []), c]));
+		}
 		const ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
 		const clipOf = (c: HTMLElement) => c.querySelector<HTMLElement>('.reco-clip')!;
 		const btnOf = (c: HTMLElement) => c.querySelector<HTMLButtonElement>('.reco-more')!;
@@ -443,7 +464,13 @@ import DownloadCV from '../components/DownloadCV.astro';
 			e.style.top = last.top - box.top + 'px';
 			e.style.opacity = '1';
 		}
+		// V11: a new measure (tablet turned, window resized) stops a row that is still
+		// opening or closing, and that old animation's end does nothing.
+		let gen = 0;
+		const running: Animation[] = [];
 		function reset() {
+			gen++;
+			running.splice(0).forEach((a) => a.cancel());
 			cards.forEach((c) => c.querySelector('.reco-ell')?.remove());
 			cards.forEach((c) => {
 				c.style.height = '';
@@ -469,7 +496,7 @@ import DownloadCV from '../components/DownloadCV.astro';
 		}
 		function layout() {
 			reset();
-			if (!mq.matches) return;
+			setCols();
 			// 1. natural height of every card alone (text whole, no link): the shortest is H0
 			cards.forEach((c) => (c.style.alignSelf = 'start'));
 			const alone = cards.map((c) => c.offsetHeight);
@@ -521,7 +548,9 @@ import DownloadCV from '../components/DownloadCV.astro';
 				if (cut.has(c)) { b.textContent = opening ? 'Read less' : 'Read more'; b.setAttribute('aria-expanded', String(opening)); }
 				if (cut.has(c) && opening) ellOf(c).style.opacity = '0';
 			});
+			const my = gen;
 			const finish = () => {
+				if (my !== gen) return;
 				row.forEach((c) => {
 					const clip = clipOf(c);
 					if (opening) { c.style.height = ''; clip.style.height = ''; clip.style.overflow = ''; }
@@ -538,15 +567,25 @@ import DownloadCV from '../components/DownloadCV.astro';
 				const dur = opening ? 450 : 350;
 				const a1 = c.animate([{ height: start[i].h + 'px' }, { height: end[i].h + 'px' }], { duration: dur, easing: ease, fill: 'forwards' });
 				const a2 = clip.animate([{ height: start[i].clip + 'px' }, { height: end[i].clip + 'px' }], { duration: dur, easing: ease, fill: 'forwards' });
+				running.push(a1, a2);
 				a1.onfinish = () => { a1.cancel(); if (++done === row.length * 2) finish(); };
 				a2.onfinish = () => { a2.cancel(); if (++done === row.length * 2) finish(); };
 			});
 		}
 		cards.forEach((c, i) => btnOf(c).addEventListener('click', () => toggle(rowOf(i))));
 		let t: number | undefined;
-		const again = () => { window.clearTimeout(t); t = window.setTimeout(layout, 120); };
+		// V11: on a phone the window height changes each time the address bar shows or
+		// hides; that alone (same width, same number per row) does not measure again.
+		let lastW = window.innerWidth;
+		const again = () => {
+			window.clearTimeout(t);
+			t = window.setTimeout(() => {
+				if (window.innerWidth === lastW && colsNow() === COLS) return;
+				lastW = window.innerWidth;
+				layout();
+			}, 120);
+		};
 		window.addEventListener('resize', again);
-		mq.addEventListener('change', layout);
 		document.fonts?.ready.then(layout);
 		layout();
 	}

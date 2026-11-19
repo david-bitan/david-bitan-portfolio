@@ -485,6 +485,10 @@ html.theme-switching #site-header,
 html.theme-switching [data-zf-pre],
 html.theme-switching #zone-filters-bar,
 html.theme-switching #craft-filters { view-transition-name: none; }
+/* V11, S123: phone with the address bar shown: during the fade only, the menu bar is
+   moved down by the address bar's height (--vt-shift, set by Nav.astro), because the
+   fade's picture starts behind the address bar. 0 on a computer: no change. */
+html.theme-switching.vt-shift #site-header { top: var(--vt-shift, 0px); }
 html.theme-switching::view-transition-old(root) {
   animation: none;
 }
